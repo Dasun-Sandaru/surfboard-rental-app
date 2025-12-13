@@ -45,6 +45,11 @@ dependencies:
   flutter_screenutil: ^5.9.3
   get_storage: ^2.1.1
   path_provider: ^2.1.5
+  in_app_update: ^4.2.5
+  logger: ^2.6.2
+  timeago: ^3.7.1
+  url_launcher: ^6.3.2
+  iconsax: ^0.0.8
 
 dev_dependencies:
   flutter_test:

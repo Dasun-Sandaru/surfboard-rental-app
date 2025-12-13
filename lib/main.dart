@@ -7,15 +7,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
+import 'app/bindings/initial_binding.dart';
 import 'app/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'utils/storage/app_storage.dart';
 import 'utils/theme/app_material_theme.dart';
 import 'utils/translations/app_translations.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   await dotenv.load(fileName: ".env");
 
@@ -58,6 +61,7 @@ class MyApp extends StatelessWidget {
       fallbackLocale: const Locale('en', 'GB'),
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
+      initialBinding: InitialBinding(),
       translations: AppTranslations(),
     );
   }
