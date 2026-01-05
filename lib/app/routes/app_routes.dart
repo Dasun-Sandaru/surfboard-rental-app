@@ -10,8 +10,11 @@ abstract class Routes {
   static const SHOP_SETUP = _Paths.SHOP_SETUP;
   static const HOME = _Paths.HOME;
   static const SIGN_IN = _Paths.SIGN_IN;
+  static const SIGN_UP = _Paths.SIGN_UP;
   static const ADMIN_HOME = _Paths.ADMIN_HOME;
   static const STAFF_HOME = _Paths.STAFF_HOME;
+  static const VERIFY_EMAIL = _Paths.VERIFY_EMAIL;
+  static const FORGOT_PASSWORD = _Paths.FORGOT_PASSWORD;
 }
 
 abstract class _Paths {
@@ -21,6 +24,9 @@ abstract class _Paths {
   static const SHOP_SETUP = '/shop-setup';
   static const HOME = '/home';
   static const SIGN_IN = '/sign-in';
+  static const SIGN_UP = '/sign-up';
   static const ADMIN_HOME = '/admin-home';
   static const STAFF_HOME = '/staff-home';
+  static const VERIFY_EMAIL = '/verify-email';
+  static const FORGOT_PASSWORD = '/forgot-password';
 }
