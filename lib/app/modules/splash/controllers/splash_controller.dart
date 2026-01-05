@@ -72,25 +72,25 @@ class SplashController extends GetxController {
     //   return;
     // }
     
-    final userController = Get.find<UserController>();
-    ever(userController.userModel, (MyUser.UserModel? userModel) {
-      if (!_navigated) {
-        _navigated = true;
-        if (userModel != null) {
-          if (userModel.role == 'Admin') {
-            Get.offNamed(Routes.ADMIN_HOME);
-          } else {
-            Get.offNamed(Routes.STAFF_HOME);
-          }
-        } else {
-          Get.offNamed(Routes.SIGN_IN);
-        }
-      }
-    });
+    // final userController = Get.find<UserController>();
+    // ever(userController.userModel, (MyUser.UserModel? userModel) {
+    //   if (!_navigated) {
+    //     _navigated = true;
+    //     if (userModel != null) {
+    //       if (userModel.role == 'Admin') {
+    //         Get.offNamed(Routes.ADMIN_HOME);
+    //       } else {
+    //         Get.offNamed(Routes.STAFF_HOME);
+    //       }
+    //     } else {
+    //       Get.offNamed(Routes.SIGN_IN);
+    //     }
+    //   }
+    // });
 
     // Add a timeout in case userModel never gets a value.
     // For example, if there is no internet connection.
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (!_navigated) {
         _navigated = true;
         // Default navigation if userModel is not resolved.

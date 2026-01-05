@@ -16,6 +16,7 @@ import 'app/routes/app_pages.dart';
 import 'utils/storage/app_storage.dart';
 import 'utils/theme/app_material_theme.dart';
 import 'utils/translations/app_translations.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -25,14 +26,20 @@ Future<void> main() async {
   Get.put(ThemeController(), permanent: true);
 
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => ScreenUtilInit(
-        designSize: const Size(360.0, 770.0),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) => MyApp(),
-      ),
+    // DevicePreview(
+    //   enabled: !kReleaseMode,
+    //   builder: (context) => ScreenUtilInit(
+    //     designSize: const Size(360.0, 770.0),
+    //     minTextAdapt: true,
+    //     splitScreenMode: true,
+    //     builder: (context, child) => MyApp(),
+    //   ),
+    // ),
+    ScreenUtilInit(
+      designSize: const Size(360.0, 770.0),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) => MyApp(),
     ),
   );
 }
