@@ -50,6 +50,7 @@ dependencies:
   timeago: ^3.7.1
   url_launcher: ^6.3.2
   iconsax: ^0.0.8
+  smooth_page_indicator: ^2.0.1
 
 dev_dependencies:
   flutter_test:
