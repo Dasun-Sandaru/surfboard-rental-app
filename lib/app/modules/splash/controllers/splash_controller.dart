@@ -65,13 +65,13 @@ class SplashController extends GetxController {
   }
 
   void navigateToNextScreen() {
-    // final isOnboardingShown = box.readData('onboarding_shown') ?? false;
+    final isOnboardingShown = box.readData('onboarding_shown') ?? false;
 
-    // if (!isOnboardingShown) {
-    //   Get.offNamed(Routes.ONBOARD);
-    //   return;
-    // }
-    
+    if (!isOnboardingShown) {
+      Get.offNamed(Routes.ONBOARD);
+      return;
+    }
+
     final userController = Get.find<UserController>();
     ever(userController.userModel, (MyUser.UserModel? userModel) {
       if (!_navigated) {
