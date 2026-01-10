@@ -1,44 +1,77 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Stream<User?> get user => _auth.authStateChanges();
+  /// ======================
+  /// AUTH STATE
+  /// ======================
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  Future<UserCredential> signInWithEmailAndPassword(
-    String email,
-    String password,
-  ) {
-    return _auth.signInWithEmailAndPassword(email: email, password: password);
-  }
+  User? get currentUser => _auth.currentUser;
 
-  Future<UserCredential> registerWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+  /// ======================
+  /// SIGN UP
+  /// ======================
+  Future<UserCredential> signUp({
+    required String email,
+    required String password,
+  }) async {
+    final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
-    if (userCredential.user != null) {
-      UserModel newUser = UserModel(
-        uid: userCredential.user!.uid,
-        email: email,
-        role: 'Staff',
-      );
-      await _db
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set(newUser.toMap());
-    }
-    return userCredential;
+    // Send verification email after signup
+    await credential.user?.sendEmailVerification();
+
+    return credential;
   }
 
-  Future<void> signOut() {
-    return _auth.signOut();
+  /// ======================
+  /// SIGN IN
+  /// ======================
+  Future<UserCredential> signIn({
+    required String email,
+    required String password,
+  }) async {
+    return await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
+
+  /// ======================
+  /// SIGN OUT
+  /// ======================
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  /// ======================
+  /// EMAIL VERIFICATION
+  /// ======================
+  Future<bool> isEmailVerified() async {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+
+    await user.reload();
+    return _auth.currentUser?.emailVerified ?? false;
+  }
+
+  Future<void> resendVerificationEmail() async {
+    final user = _auth.currentUser;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+    }
+  }
+
+  /// ======================
+  /// PASSWORD RESET
+  /// ======================
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  
 }
