@@ -79,7 +79,7 @@ class VerifyEmailScreenCopy extends GetView<VerifyEmailController> {
             ),
             if (!controller.isEmailVerified.value)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 child: const Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.green),

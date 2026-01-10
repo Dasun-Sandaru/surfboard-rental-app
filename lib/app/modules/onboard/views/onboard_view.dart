@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../../../../utils/constants/a_image_strings.dart';
 import '../../../../utils/constants/a_text_string.dart';
 import '../controllers/onboard_controller.dart';
@@ -12,12 +10,17 @@ import '../widgets/onboarding_widget.dart';
 
 class OnboardView extends GetView<OnboardController> {
   const OnboardView({super.key});
+
+  // Theme Colors
+  final Color bgDark = const Color(0xFF101f22);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgDark, // Set dark background here
       body: Stack(
         children: [
-          /// horizonatl scrollable pages
+          /// Horizontal Scrollable Pages
           PageView(
             controller: controller.pageController,
             onPageChanged: controller.updatePageIndicator,
@@ -39,13 +42,14 @@ class OnboardView extends GetView<OnboardController> {
               ),
             ],
           ),
-          // skip button
+
+          /// Skip Button (Top Right)
           const OnBoardingSkipWidget(),
 
-          /// dot navigation smmoth page indicatior
+          /// Dot Navigation (Bottom Left)
           const OnBoardingDotNavigationWidget(),
 
-          /// circulor button
+          /// Next Button (Bottom Right)
           const OnBoardingNextButtonWidget(),
         ],
       ),

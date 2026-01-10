@@ -5,17 +5,24 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
-import '../../../../utils/common/is_text_field_required.dart';
 import '../../../../utils/helper/a_validator.dart';
 import '../controllers/sign_up_controller.dart';
 
 class SignUpView extends GetView<SignUpController> {
   const SignUpView({super.key});
 
+  // -- Theme Colors --
+  final Color bgDark = const Color(0xFF101f22);
+  final Color cardDark = const Color(0xFF182c30);
+  final Color primaryBlue = const Color(0xFF4A90E2);
+  final Color textWhite = const Color(0xFFf0f4f4);
+  final Color textGrey = const Color(0xFF94a3b8);
+  final Color borderDark = const Color(0xFF334155);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgDark,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -25,7 +32,7 @@ class SignUpView extends GetView<SignUpController> {
             controller.role.value == 'staff' ? 'Join the Team' : 'Setup Shop',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: textWhite,
             ),
           ),
         ),
@@ -40,7 +47,9 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  // STAFF
+  // ===========================================================================
+  // STAFF FORM
+  // ===========================================================================
   Widget _buildStaffForm(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(ASizes.defaultPadding),
@@ -52,18 +61,22 @@ class SignUpView extends GetView<SignUpController> {
             /// Header Text
             Text(
               "Create Staff Account",
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: textWhite,
+              ),
             ),
             SizedBox(height: 4.h),
             Text(
               "Fill in your details to get started.",
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14.sp, color: textGrey),
             ),
             SizedBox(height: 24.h),
 
             /// Name
-            IsTextFieldRequired(fieldName: 'Full Name'),
-            SizedBox(height: 6.h),
+            _buildLabel('Full Name'),
+            SizedBox(height: 8.h),
             _buildTextField(
               controller: controller.nameController,
               hintText: 'John Doe',
@@ -74,8 +87,8 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Email
-            IsTextFieldRequired(fieldName: 'Email Address'),
-            SizedBox(height: 6.h),
+            _buildLabel('Email Address'),
+            SizedBox(height: 8.h),
             _buildTextField(
               controller: controller.emailController,
               hintText: 'staff@surfshop.com',
@@ -87,12 +100,8 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Phone
-            // Text(
-            //   'Phone Number (Optional)',
-            //   style: Theme.of(context).textTheme.bodySmall,
-            // ),
-            IsTextFieldRequired(fieldName: 'Phone Number'),
-            SizedBox(height: 6.h),
+            _buildLabel('Phone Number'),
+            SizedBox(height: 8.h),
             _buildTextField(
               controller: controller.phoneController,
               hintText: '+1 234 567 890',
@@ -104,8 +113,8 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Shop Code
-            IsTextFieldRequired(fieldName: 'Shop Code'),
-            SizedBox(height: 6.h),
+            _buildLabel('Shop Code'),
+            SizedBox(height: 8.h),
             _buildTextField(
               controller: controller.shopCodeController,
               hintText: 'SHP-1234',
@@ -116,8 +125,8 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Password
-            IsTextFieldRequired(fieldName: 'Password'),
-            SizedBox(height: 6.h),
+            _buildLabel('Password'),
+            SizedBox(height: 8.h),
             _buildTextField(
               controller: controller.passwordController,
               hintText: '••••••••',
@@ -129,8 +138,8 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Confirm Password
-            IsTextFieldRequired(fieldName: 'Confirm Password'),
-            SizedBox(height: 6.h),
+            _buildLabel('Confirm Password'),
+            SizedBox(height: 8.h),
             _buildTextField(
               controller: controller.confirmPasswordController,
               hintText: '••••••••',
@@ -149,25 +158,34 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(
               width: double.infinity,
               height: 54.h,
-              child: ElevatedButton(
-                onPressed: () => controller.registerShopStaff(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black87,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+              child: Obx(
+                () => ElevatedButton(
+                  onPressed: () => controller.registerShopStaff(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryBlue,
+                    foregroundColor: textWhite,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 4,
                   ),
-                  elevation: 2,
-                ),
-                child: controller.isLoading.value
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        'Create Account',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+                  child: controller.isLoading.value
+                      ? SizedBox(
+                          height: 24.h,
+                          width: 24.w,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Create Account',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
           ],
@@ -176,12 +194,20 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  // ADMIN
+  // ===========================================================================
+  // ADMIN STEPPER
+  // ===========================================================================
   Widget _buildAdminStepper(BuildContext context) {
     return Theme(
-      data: Theme.of(
-        context,
-      ).copyWith(colorScheme: ColorScheme.light(primary: Colors.black87)),
+      // Override Stepper colors for Dark Mode
+      data: Theme.of(context).copyWith(
+        canvasColor: bgDark,
+        colorScheme: ColorScheme.dark(
+          primary: primaryBlue,
+          onSurface: textWhite, // Text color for inactive steps
+          background: bgDark,
+        ),
+      ),
       child: Obx(
         () => Stepper(
           type: StepperType.vertical,
@@ -189,7 +215,7 @@ class SignUpView extends GetView<SignUpController> {
           elevation: 0,
           physics: const ClampingScrollPhysics(),
 
-          /// Custom Controls (Buttons) for the Stepper
+          /// Custom Controls
           controlsBuilder: (context, details) {
             final isLastStep = controller.currentStep.value == 1;
             return Padding(
@@ -203,28 +229,30 @@ class SignUpView extends GetView<SignUpController> {
                         () => ElevatedButton(
                           onPressed: () {
                             if (controller.currentStep.value == 0) {
-                              // Validate only shop information fields
                               if (_validateShopStep()) {
                                 details.onStepContinue!();
                               }
                             } else {
-                              // Validate owner information before registering
                               if (_validateOwnerStep()) {
                                 controller.registerShopOwner();
                               }
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black87,
-                            foregroundColor: Colors.white,
+                            backgroundColor: primaryBlue,
+                            foregroundColor: textWhite,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            elevation: 2,
                           ),
                           child: controller.isLoading.value
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
+                              ? SizedBox(
+                                  height: 24.h,
+                                  width: 24.w,
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : Text(
                                   isLastStep ? 'Complete Setup' : 'Next Step',
@@ -245,14 +273,14 @@ class SignUpView extends GetView<SignUpController> {
                         child: OutlinedButton(
                           onPressed: details.onStepCancel,
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.grey.shade300),
+                            side: BorderSide(color: borderDark),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Back',
-                            style: TextStyle(color: Colors.black87),
+                            style: TextStyle(color: textWhite),
                           ),
                         ),
                       ),
@@ -274,7 +302,11 @@ class SignUpView extends GetView<SignUpController> {
             Step(
               title: Text(
                 'Shop Information',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.sp,
+                  color: textWhite,
+                ),
               ),
               content: Form(
                 key: controller.shopFormKey,
@@ -282,8 +314,8 @@ class SignUpView extends GetView<SignUpController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 8.h),
-                    IsTextFieldRequired(fieldName: 'Shop Name'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Shop Name'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.shopNameController,
                       hintText: 'Aloha Surf Rentals',
@@ -291,8 +323,8 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validateText(v, 'Shop Name'),
                     ),
                     SizedBox(height: 16.h),
-                    IsTextFieldRequired(fieldName: 'Location'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Location'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.shopLocationController,
                       hintText: 'Ahangama Beach',
@@ -300,8 +332,8 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validateText(v, 'Location'),
                     ),
                     SizedBox(height: 16.h),
-                    IsTextFieldRequired(fieldName: 'Contact Number'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Contact Number'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.shopContactController,
                       hintText: '+94 77 123 4567',
@@ -322,7 +354,11 @@ class SignUpView extends GetView<SignUpController> {
             Step(
               title: Text(
                 'Owner Information',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.sp,
+                  color: textWhite,
+                ),
               ),
               content: Form(
                 key: controller.ownerFormKey,
@@ -330,8 +366,8 @@ class SignUpView extends GetView<SignUpController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 8.h),
-                    IsTextFieldRequired(fieldName: 'Full Name'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Full Name'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.nameController,
                       hintText: 'Your Name',
@@ -339,8 +375,8 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validateText(v, 'Name'),
                     ),
                     SizedBox(height: 16.h),
-                    IsTextFieldRequired(fieldName: 'Email Address'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Email Address'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.emailController,
                       hintText: 'admin@surfshop.com',
@@ -349,8 +385,8 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validateEmail(v),
                     ),
                     SizedBox(height: 16.h),
-                    IsTextFieldRequired(fieldName: 'Phone Number'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Phone Number'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.phoneController,
                       hintText: '+94 77 123 4567',
@@ -359,8 +395,8 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validatePhoneNumber(v),
                     ),
                     SizedBox(height: 16.h),
-                    IsTextFieldRequired(fieldName: 'Password'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Password'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.passwordController,
                       hintText: '••••••••',
@@ -369,8 +405,8 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validatePassword(v),
                     ),
                     SizedBox(height: 16.h),
-                    IsTextFieldRequired(fieldName: 'Confirm Password'),
-                    SizedBox(height: 6.h),
+                    _buildLabel('Confirm Password'),
+                    SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.confirmPasswordController,
                       hintText: '••••••••',
@@ -393,21 +429,27 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-
+  // ===========================================================================
   // HELPER WIDGETS
- 
+  // ===========================================================================
 
-  /// Validate only shop information fields for Step 1
   bool _validateShopStep() {
     return controller.shopFormKey.currentState?.validate() ?? false;
   }
 
-  /// Validate only owner information fields for Step 2
   bool _validateOwnerStep() {
     return controller.ownerFormKey.currentState?.validate() ?? false;
   }
 
-  /// Reusable Text Field to keep code clean and consistent
+  /// Dark Theme Label
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(color: textWhite, fontWeight: FontWeight.w500),
+    );
+  }
+
+  /// Dark Theme Text Field
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
@@ -417,6 +459,31 @@ class SignUpView extends GetView<SignUpController> {
     RxBool? isObscure,
     String? Function(String?)? validator,
   }) {
+    InputDecoration decoration = InputDecoration(
+      prefixIcon: Icon(icon, size: 20.w, color: textGrey),
+      hintText: hintText,
+      hintStyle: TextStyle(color: textGrey.withValues(alpha: 0.5)),
+      filled: true,
+      fillColor: cardDark,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: borderDark),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: borderDark),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primaryBlue),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.redAccent),
+      ),
+      contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+    );
+
     if (isObscure != null) {
       return Obx(
         () => TextFormField(
@@ -425,16 +492,14 @@ class SignUpView extends GetView<SignUpController> {
           keyboardType: inputType,
           obscureText: isObscure.value,
           validator: validator,
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20.w),
-            hintText: hintText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: EdgeInsets.symmetric(
-              vertical: 16.h,
-              horizontal: 16.w,
-            ),
+          style: TextStyle(color: textWhite), // White input text
+          decoration: decoration.copyWith(
             suffixIcon: IconButton(
-              icon: Icon(isObscure.value ? Iconsax.eye_slash : Iconsax.eye),
+              icon: Icon(
+                isObscure.value ? Iconsax.eye_slash : Iconsax.eye,
+                size: 20.w,
+                color: textGrey,
+              ),
               onPressed: () {
                 isObscure.value = !isObscure.value;
               },
@@ -449,15 +514,8 @@ class SignUpView extends GetView<SignUpController> {
         keyboardType: inputType,
         obscureText: false,
         validator: validator,
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, size: 20.w),
-          hintText: hintText,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: EdgeInsets.symmetric(
-            vertical: 16.h,
-            horizontal: 16.w,
-          ),
-        ),
+        style: TextStyle(color: textWhite), // White input text
+        decoration: decoration,
       );
     }
   }

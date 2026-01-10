@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
+import '../modules/alerts/bindings/alerts_binding.dart';
+import '../modules/alerts/views/alerts_view.dart';
 import '../modules/auth/bindings/forgot_password_binding.dart';
 import '../modules/auth/bindings/verify_email_binding.dart';
 import '../modules/auth/view/forgot_password_view.dart';
@@ -10,6 +12,8 @@ import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/newRental/bindings/new_rental_binding.dart';
+import '../modules/newRental/views/new_rental_view.dart';
 import '../modules/onboard/bindings/onboard_binding.dart';
 import '../modules/onboard/views/onboard_view.dart';
 import '../modules/shopSetup/bindings/shop_setup_binding.dart';
@@ -30,7 +34,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.SPLASH;
+  static const INITIAL = Routes.ONBOARD;
 
   static final routes = [
     GetPage(
@@ -87,6 +91,16 @@ class AppPages {
       name: _Paths.AUTH_GATE,
       page: () => const AuthGateView(),
       binding: AuthGateBinding(),
+    ),
+    GetPage(
+      name: _Paths.NEW_RENTAL,
+      page: () => const NewRentalView(),
+      binding: NewRentalBinding(),
+    ),
+    GetPage(
+      name: _Paths.ALERTS,
+      page: () => const AlertsView(),
+      binding: AlertsBinding(),
     ),
   ];
 }
