@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../controllers/auth_controller.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashBinding extends Bindings {
@@ -8,5 +9,6 @@ class SplashBinding extends Bindings {
     Get.lazyPut<SplashController>(
       () => SplashController(),
     );
+        
   }
 }

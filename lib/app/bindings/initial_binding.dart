@@ -1,15 +1,16 @@
 import 'package:get/get.dart';
+
+import '../controllers/auth_controller.dart';
 import '../services/auth_service.dart';
-import '../services/user_service.dart';
 import '../services/firestore_service.dart';
-import '../controllers/user_controller.dart';
+import '../services/user_service.dart';
 
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<FirestoreService>(() => FirestoreService());
-    Get.lazyPut<AuthService>(() => AuthService());
-    Get.lazyPut<UserService>(() => UserService());
-    Get.lazyPut<UserController>(() => UserController());
+    Get.put(AuthService(), permanent: true);
+    Get.put(FirestoreService(), permanent: true);
+    Get.put(UserService(), permanent: true);
+
   }
 }

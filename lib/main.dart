@@ -41,7 +41,7 @@ Future<void> main() async {
       splitScreenMode: true,
       builder: (context, child) => MyApp(),
     ),
-  );
+  ); 
 }
 
 class MyApp extends StatelessWidget {

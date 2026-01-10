@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
+import '../../../services/auth_service.dart';
 import '../controllers/staff_home_controller.dart';
 
 class StaffHomeView extends GetView<StaffHomeController> {
   const StaffHomeView({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final AuthService _authservice = Get.find<AuthService>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('StaffHomeView'),
-        centerTitle: true,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _authservice.signOut();
+        },
+        child: const Icon(Icons.add),
       ),
-      body: const Center(
-        child: Text(
-          'StaffHomeView is working',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
+      appBar: AppBar(title: const Text('Staff Home'), centerTitle: true),
+      body: const Center(child: Text('Staff Home')),
     );
   }
 }

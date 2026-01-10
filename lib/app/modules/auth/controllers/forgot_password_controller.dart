@@ -3,45 +3,46 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../utils/exceptions/firebase_exceptions.dart';
-import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/user_service.dart';
 
 class ForgotPasswordController extends GetxController {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final isLoading = false.obs;
+  final isSuccess = false.obs; // track if reset email was sent
 
   final AuthService _authService = Get.find();
+  final UserService _userService = Get.find();
 
-  /// Send password reset email to user
+  /// Send password reset email
   Future<void> resetPassword() async {
     try {
-      // validate email field
-      if (!(formKey.currentState?.validate() ?? false)) {
-        return;
-      }
+      // Validate email
+      if (!(formKey.currentState?.validate() ?? false)) return;
 
       isLoading.value = true;
       final email = emailController.text.trim();
 
-      // check if user exists
-      final userExists = await _authService.userExistsByEmail(email);
+      // Check Email User exists
+      final userExists = await _userService.userExistsByEmail(email);
       if (!userExists) {
         Get.snackbar(
-          'Email Not Found',
-          'No account exists with this email address.',
+          'Error',
+          'User with this email does not exist.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange.withOpacity(0.1),
-          colorText: Colors.orange,
-          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red.withOpacity(0.1),
+          colorText: Colors.red,
         );
         return;
       }
 
-      // send password reset email
+      // Send reset email
       await _authService.sendPasswordResetEmail(email);
 
-      // show success message
+      isSuccess.value = true;
+
+      // Show success snackbar
       Get.snackbar(
         'Success',
         'Password reset email sent to $email. Check your inbox.',
@@ -49,12 +50,6 @@ class ForgotPasswordController extends GetxController {
         backgroundColor: Colors.green.withOpacity(0.1),
         colorText: Colors.green,
         duration: const Duration(seconds: 4),
-      );
-
-      // navigate back to login after success
-      Future.delayed(
-        const Duration(seconds: 2),
-        () => Get.offAllNamed(Routes.SIGN_IN),
       );
     } on FirebaseAuthException catch (e) {
       final errorMessage = AppFirebaseException(e).message;
@@ -76,6 +71,12 @@ class ForgotPasswordController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Navigate back to Login screen
+  void goToLogin() {
+    // Get.offAllNamed(Routes.SIGN_IN);
+    Get.back();
   }
 
   @override

@@ -2,8 +2,12 @@ import 'package:get/get.dart';
 
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
+import '../modules/auth/bindings/forgot_password_binding.dart';
 import '../modules/auth/bindings/verify_email_binding.dart';
+import '../modules/auth/view/forgot_password_view.dart';
 import '../modules/auth/view/verify_email_screen.dart';
+import '../modules/authGate/bindings/auth_gate_binding.dart';
+import '../modules/authGate/views/auth_gate_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/onboard/bindings/onboard_binding.dart';
@@ -16,8 +20,6 @@ import '../modules/signUp/bindings/sign_up_binding.dart';
 import '../modules/signUp/views/sign_up_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
-import '../modules/auth/bindings/forgot_password_binding.dart';
-import '../modules/auth/view/forgot_password_view.dart';
 import '../modules/staffHome/bindings/staff_home_binding.dart';
 import '../modules/staffHome/views/staff_home_view.dart';
 
@@ -80,6 +82,11 @@ class AppPages {
       name: _Paths.FORGOT_PASSWORD,
       page: () => const ForgotPasswordView(),
       binding: ForgotPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.AUTH_GATE,
+      page: () => const AuthGateView(),
+      binding: AuthGateBinding(),
     ),
   ];
 }

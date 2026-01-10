@@ -15,6 +15,7 @@ abstract class Routes {
   static const STAFF_HOME = _Paths.STAFF_HOME;
   static const VERIFY_EMAIL = _Paths.VERIFY_EMAIL;
   static const FORGOT_PASSWORD = _Paths.FORGOT_PASSWORD;
+  static const AUTH_GATE = '/auth-gate';
 }
 
 abstract class _Paths {
@@ -29,4 +30,5 @@ abstract class _Paths {
   static const STAFF_HOME = '/staff-home';
   static const VERIFY_EMAIL = '/verify-email';
   static const FORGOT_PASSWORD = '/forgot-password';
+  static const AUTH_GATE = '/auth-gate';
 }

@@ -121,7 +121,7 @@ class SignInView extends GetView<SignInController> {
           IsTextFieldRequired(fieldName: 'Email Address'.tr),
           SizedBox(height: 6.h),
           TextFormField(
-            controller: controller.emailController,
+            controller: controller.emailController1,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
@@ -196,19 +196,26 @@ class SignInView extends GetView<SignInController> {
           SizedBox(
             width: double.infinity,
             height: 50.h,
-            child: ElevatedButton(
-              onPressed: () => controller.signIn(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black87,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            child: Obx(
+              () => ElevatedButton(
+                onPressed: () => controller.signIn(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black87,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 2,
                 ),
-                elevation: 2,
-              ),
-              child: Text(
-                'Sign In',
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                child: controller.isLoading.value
+                    ? CircularProgressIndicator()
+                    : Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ),

@@ -20,7 +20,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
         title: const Text(''),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.h),
         child: Form(
           key: controller.formKey,
           child: Column(
@@ -31,12 +31,12 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 "Forgot Password".tr,
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               Text(
                 "Enter your email and we will send you a link to reset your password.",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               /// Email
               IsTextFieldRequired(fieldName: 'Email Address'),
@@ -61,8 +61,9 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                     AValidator.validateText(value, 'E-Mail'.tr),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
+              /// Send Reset Button
               SizedBox(
                 width: double.infinity,
                 child: Obx(
@@ -81,6 +82,31 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                         : const Text("Send Reset Link"),
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// Back to Login Button (shown after success)
+              Obx(
+                () => controller.isSuccess.value
+                    ? SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: controller.goToLogin,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.black87),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                          ),
+                          child: const Text(
+                            "Back to Login",
+                            style: TextStyle(color: Colors.black87),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),

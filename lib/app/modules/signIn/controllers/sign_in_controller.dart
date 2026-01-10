@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,103 +6,101 @@ import 'package:get/get.dart';
 import '../../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/user_service.dart';
 
 class SignInController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
 
-  RxBool isObscure = true.obs;
-  RxBool isLoading = false.obs;
+  final emailController1 = TextEditingController();
+  final passwordController = TextEditingController();
+
+  final isObscure = true.obs;
+  final isLoading = false.obs;
+
   final AuthService _authService = Get.find();
+  final UserService _userService = Get.find();
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
-  // sign in user
+  /// ======================
+  /// SIGN IN
+  /// ======================
   Future<void> signIn() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
-      final userCredential = await _authService.signInWithEmailAndPassword(
-        emailController.text.trim(),
-        passwordController.text.trim(),
+
+      await _authService.signIn(
+        email: emailController1.text.trim(),
+        password: passwordController.text.trim(),
       );
 
-      final firebaseUser = userCredential.user;
-      if (firebaseUser == null) {
-        throw Exception('Firebase user creation failed');
-      }
+      /// Refresh verification state
+      final isVerified = await _authService.isEmailVerified();
 
-      if (!firebaseUser.emailVerified) {
+      if (!isVerified) {
+        await _authService.signOut();
+
         Get.snackbar(
           'Email not verified',
-          'Please verify your email to access the app.',
+          'Please verify your email before signing in.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red.withOpacity(0.1),
           colorText: Colors.red,
         );
-
-        // sign them out and they don't access data
-        await FirebaseAuth.instance.signOut();
+        return;
       }
 
-      // fetch role and navigate to home screen
+      /// Fetch user role
+      final role = await _userService.getUserRole();
 
-      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users_global')
-          .doc(firebaseUser.uid)
-          .get();
-
-      if (userDoc.exists) {
-        final Map<String, dynamic> userData =
-            userDoc.data() as Map<String, dynamic>;
-        final String role = userData['role'];
-
-        if (role == 'admin') {
-          Get.offAllNamed(Routes.HOME);
-        } else if (role == 'staff') {
-          Get.offAllNamed(Routes.HOME);
-        } else {
-          Get.snackbar('Error', 'User role not defined. Contact support.');
-          await FirebaseAuth.instance.signOut();
-        }
+      if (role == 'admin') {
+        Get.offAllNamed(Routes.ADMIN_HOME);
+      } else if (role == 'staff') {
+        Get.offAllNamed(Routes.STAFF_HOME);
       } else {
-        Get.snackbar('Error', 'User data not found. Contact support.');
-        await FirebaseAuth.instance.signOut();
+        await _authService.signOut();
+        Get.snackbar(
+          'Access denied',
+          'User role not assigned. Contact support.',
+        );
       }
     } on FirebaseAuthException catch (e) {
-      throw Exception(AppFirebaseException(e).message);
+      Get.snackbar(
+        'Login failed',
+        AppFirebaseException(e).message,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e, stack) {
       if (kDebugMode) {
         debugPrint(e.toString());
         debugPrint(stack.toString());
       }
-      Get.snackbar('error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+
+      Get.snackbar(
+        'Error',
+        'Something went wrong. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  void goToForgotPassword() {
-    Get.toNamed(Routes.FORGOT_PASSWORD);
-  }
+  /// ======================
+  /// NAVIGATION
+  /// ======================
+  void goToForgotPassword() => Get.toNamed(Routes.FORGOT_PASSWORD);
 
-  void goToSignUpStaff() {
-    Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'staff'});
-  }
+  void goToSignUpStaff() =>
+      Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'staff'});
 
-  void goToSignUpAdmin() {
-    Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'admin'});
-  }
+  void goToSignUpAdmin() =>
+      Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'admin'});
 
   @override
   void onClose() {
-    super.onClose();
-    emailController.dispose();
+    emailController1.dispose();
     passwordController.dispose();
+    super.onClose();
   }
 }
