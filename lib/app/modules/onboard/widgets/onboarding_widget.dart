@@ -33,43 +33,48 @@ class OnBoardingWidget extends StatelessWidget {
             child: Image.asset(
               image,
               width: double.infinity,
-              height: double.infinity,
+
+              // fit: BoxFit.cover,
             ),
           ),
 
           /// 2. TEXT SECTION (Changed to 50%)
           Expanded(
-            flex: 3,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: ASizes.defaultSpace),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // Center content vertically in this section
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
-                      color: textWhite,
-                      height: 1.2,
+            flex: 1,
+            child: SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: ASizes.defaultSpace),
+                child: Column(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  // Center content vertically in this section
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.bold,
+                        color: textWhite,
+                        height: 1.2,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.left,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: textGrey,
-                      height: 1.5,
+                    SizedBox(height: 16.h),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: textGrey,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.left,
-                  ),
-                  // Add space below text so it doesn't hit the nav buttons
-                  SizedBox(height: 80.h),
-                ],
+                    // Add space below text so it doesn't hit the nav buttons
+                    SizedBox(height: 80.h),
+                  ],
+                ),
               ),
             ),
           ),

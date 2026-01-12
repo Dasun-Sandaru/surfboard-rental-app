@@ -16,22 +16,17 @@ class OnBoardingDotNavigationWidget extends GetView<OnboardController> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      // Adjusted height to be slightly higher as in the image
-      bottom: ADeviceUtils.getBottomNavigationBarHeight() + 40.h,
-      left: ASizes.defaultSpace,
-      child: SmoothPageIndicator(
-        controller: controller.pageController,
-        count: 3,
-        onDotClicked: controller.dotNavigationClick,
-        effect: ExpandingDotsEffect(
-          activeDotColor: textWhite, // Active is WHITE
-          dotColor: inactiveGrey, // Inactive is DARK GREY
-          dotHeight: 6.h,
-          dotWidth: 8.w,
-          expansionFactor: 3,
-          spacing: 6.w,
-        ),
+    return SmoothPageIndicator(
+      controller: controller.pageController,
+      count: 3,
+      onDotClicked: controller.dotNavigationClick,
+      effect: ExpandingDotsEffect(
+        activeDotColor: textWhite, // Active is WHITE
+        dotColor: inactiveGrey, // Inactive is DARK GREY
+        dotHeight: 6.h,
+        dotWidth: 8.w,
+        expansionFactor: 3,
+        spacing: 6.w,
       ),
     );
   }

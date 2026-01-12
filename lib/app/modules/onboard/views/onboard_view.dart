@@ -43,14 +43,29 @@ class OnboardView extends GetView<OnboardController> {
             ],
           ),
 
-          /// Skip Button (Top Right)
-          const OnBoardingSkipWidget(),
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-          /// Dot Navigation (Bottom Left)
-          const OnBoardingDotNavigationWidget(),
+                children: [
+                  /// Skip Button (Top Right)
+                  const OnBoardingSkipWidget(),
 
-          /// Next Button (Bottom Right)
-          const OnBoardingNextButtonWidget(),
+                  /// Dot Navigation (Bottom Left)
+                  const OnBoardingDotNavigationWidget(),
+
+                  /// Next Button (Bottom Right)
+                  const OnBoardingNextButtonWidget(),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

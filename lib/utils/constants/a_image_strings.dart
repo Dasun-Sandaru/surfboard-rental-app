@@ -16,6 +16,6 @@ class AImageStrings {
 
   // App Onboard
   static const String onboardOne = "assets/onboard_1.png";
-  static const String onboardTwo = "assets/onboard_1.png";
-  static const String onboardThree = "assets/onboard_1.png";
+  static const String onboardTwo = "assets/onboard_2.png";
+  static const String onboardThree = "assets/onboard_3.png";
 }

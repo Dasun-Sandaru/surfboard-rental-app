@@ -49,17 +49,17 @@ class SplashController extends GetxController {
   /// ONBOARDING
   /// ======================
   void _handleOnboarding() {
-    // final isOnboardingShown = box.readData('onboarding_shown') ?? false;
+    final isOnboardingShown = box.readData('onboarding_shown') ?? false;
 
-    // if (!isOnboardingShown) {
-    //   Get.offAllNamed(Routes.ONBOARD);
-    //   return;
-    // }
+    if (!isOnboardingShown) {
+      Get.offAllNamed(Routes.ONBOARD);
+      return;
+    }
 
-    // /// AuthController will take over from here
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   // Get.offAllNamed(Routes.AUTH_GATE);
-    //   Get.put(AuthController(), permanent: true);
-    // });
+    /// AuthController will take over from here
+    Future.delayed(const Duration(seconds: 2), () {
+      // Get.offAllNamed(Routes.AUTH_GATE);
+      Get.put(AuthController(), permanent: true);
+    });
   }
 }

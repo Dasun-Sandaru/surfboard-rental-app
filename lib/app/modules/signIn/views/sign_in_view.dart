@@ -88,8 +88,9 @@ class SignInView extends GetView<SignInController> {
             color: cardDark, // Slightly lighter than bg
             image: DecorationImage(
               // Add your image asset here later
-              image: AssetImage("assets/login_header.png"),
-              // fit: BoxFit.cover,
+              image: AssetImage("assets/login_header.jpg"),
+              fit: BoxFit.cover,
+              opacity: 0.5,
             ),
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(30),

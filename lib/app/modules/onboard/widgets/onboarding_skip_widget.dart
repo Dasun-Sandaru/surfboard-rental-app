@@ -12,25 +12,21 @@ class OnBoardingSkipWidget extends GetView<OnboardController> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: ADeviceUtils.getAppbarHeight(),
-      right: 20.w,
-      child: TextButton(
-        onPressed: () => controller.skipPage(),
-        style: TextButton.styleFrom(
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          // Removed background to make it look cleaner in dark mode
-          backgroundColor: Colors.transparent,
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-        ),
-        child: Text(
-          'Skip',
-          style: TextStyle(
-            color: textSubtle, // Subtle grey color
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-          ),
+    return TextButton(
+      onPressed: () => controller.skipPage(),
+      style: TextButton.styleFrom(
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        // Removed background to make it look cleaner in dark mode
+        backgroundColor: Colors.transparent,
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      ),
+      child: Text(
+        'Skip',
+        style: TextStyle(
+          color: textSubtle, // Subtle grey color
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
