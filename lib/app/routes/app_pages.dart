@@ -12,6 +12,8 @@ import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/manageUsers/bindings/manage_users_binding.dart';
+import '../modules/manageUsers/views/manage_users_view.dart';
 import '../modules/newRental/bindings/new_rental_binding.dart';
 import '../modules/newRental/views/new_rental_view.dart';
 import '../modules/onboard/bindings/onboard_binding.dart';
@@ -26,6 +28,8 @@ import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/staffHome/bindings/staff_home_binding.dart';
 import '../modules/staffHome/views/staff_home_view.dart';
+import '../modules/userDetail/bindings/user_detail_binding.dart';
+import '../modules/userDetail/views/user_detail_view.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -101,6 +105,16 @@ class AppPages {
       name: _Paths.ALERTS,
       page: () => const AlertsView(),
       binding: AlertsBinding(),
+    ),
+    GetPage(
+      name: _Paths.MANAGE_USERS,
+      page: () => const ManageUsersView(),
+      binding: ManageUsersBinding(),
+    ),
+    GetPage(
+      name: _Paths.USER_DETAIL,
+      page: () => const UserDetailView(),
+      binding: UserDetailBinding(),
     ),
   ];
 }

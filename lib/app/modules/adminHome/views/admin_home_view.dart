@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 
 import '../controllers/admin_home_controller.dart';
 
@@ -225,7 +226,11 @@ class AdminHomeView extends GetView<AdminHomeController> {
         return InkWell(
           onTap: () {
             // Handle navigation here
-            // if (index == 0) Get.to(() => UsersView());
+            switch (index) {
+              case 0:
+                Get.toNamed(Routes.MANAGE_USERS);
+                break;
+            }
           },
           borderRadius: BorderRadius.circular(12.r),
           child: Container(

@@ -43,6 +43,20 @@ class UserService {
   }
 
   /// ======================
+  /// GET SHOP ID
+  /// ======================
+  Future<String?> getShopId() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    final doc = await _firestore.collection('users_global').doc(uid).get();
+
+    if (!doc.exists) return null;
+
+    return doc.data()?['shop_id'] as String?;
+  }
+
+  /// ======================
   /// CHECK IF USER EXISTS BY EMAIL
   /// ======================
   Future<bool> userExistsByEmail(String email) async {
@@ -140,6 +154,52 @@ class UserService {
         'is_active': true,
         'created_at': FieldValue.serverTimestamp(),
       },
+    );
+
+    await batch.commit();
+  }
+
+  /// ======================
+  /// CHANGE ACTIVE STATUS
+  /// ======================
+  Future<void> changeActiveStatus(
+    String userId,
+    String shopId,
+    bool isActive,
+  ) async {
+    final batch = _firestore.batch();
+
+    batch.update(_firestore.collection('users_global').doc(userId), {
+      'is_active': isActive,
+    });
+
+    batch.update(
+      _firestore
+          .collection('shops')
+          .doc(shopId)
+          .collection('users')
+          .doc(userId),
+      {'is_active': isActive},
+    );
+
+    await batch.commit();
+  }
+
+  /// ======================
+  /// DELETE USER
+  /// ======================
+  Future<void> deleteUser(String userId, String shopId) async {
+    final batch = _firestore.batch();
+    batch.update(_firestore.collection('users_global').doc(userId), {
+      'is_active': false,
+    });
+    batch.update(
+      _firestore
+          .collection('shops')
+          .doc(shopId)
+          .collection('users')
+          .doc(userId),
+      {'is_active': false},
     );
 
     await batch.commit();

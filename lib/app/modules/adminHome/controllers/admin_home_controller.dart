@@ -16,15 +16,12 @@ class AdminHomeController extends GetxController {
   // void changeIndex(int index) => selectedIndex.value = index;
 
   void changeIndex(int index) {
- 
-      if(index == 1) {
-        Get.toNamed('/new-rental');
-      }
-      else {
-        selectedIndex.value = index;
-      }
+    if (index == 1) {
+      Get.toNamed('/new-rental');
+    } else {
+      selectedIndex.value = index;
     }
-      
+  }
 
   // ---------------------------------------------------------------------------
   // Dashboard Stats (OBSERVABLES)
@@ -66,17 +63,8 @@ class AdminHomeController extends GetxController {
   }
 
   Future<void> _setShopId() async {
-    final user = _authService.currentUser;
-    if (user == null) return;
-
-    final uid = user.uid;
-
-    final UserModel? userModel = await _userService.getUserGlobalData(uid);
-    if (userModel == null) return;
-
-    shopId = userModel.shopId;
-
-    log('shopId <>: $shopId');
+    shopId = await _userService.getShopId();
+    log('shopId: $shopId');
   }
 
   // ---------------------------------------------------------------------------
@@ -137,7 +125,7 @@ class AdminHomeController extends GetxController {
 
   /// Sign out
   Future<void> signOut() async => await _authService.signOut();
-  
+
   @override
   void onClose() {
     _rentalsSub?.cancel();
