@@ -1,9 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/user_model.dart';
+
 class UserService {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
+
+  /// ======================
+  /// GET CURRENT USER
+  /// ======================
+  User? get currentUser => _auth.currentUser;
+
+  /// ======================
+  /// GET USER GLOBAL DATA
+  /// ======================
+
+  Future<UserModel?> getUserGlobalData(String userId) async {
+    final DocumentSnapshot doc = await _firestore
+        .collection('users_global')
+        .doc(userId)
+        .get();
+
+    if (!doc.exists) return null;
+
+    return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+  }
+
+  /// ======================
+  /// GET USER ROLE
+  /// ======================
 
   Future<String?> getUserRole() async {
     final uid = _auth.currentUser?.uid;

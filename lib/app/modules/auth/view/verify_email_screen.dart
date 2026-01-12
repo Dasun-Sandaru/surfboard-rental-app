@@ -9,25 +9,48 @@ import '../controllers/verify_email_controller.dart';
 class VerifyEmailScreen extends GetView<VerifyEmailController> {
   const VerifyEmailScreen({super.key});
 
+  // -- Theme Colors --
+  final Color bgDark = const Color(0xFF101f22);
+  final Color textWhite = const Color(0xFFf0f4f4);
+  final Color textGrey = const Color(0xFF94a3b8);
+  final Color primaryBlue = const Color(0xFF4A90E2);
+  final Color borderDark = const Color(0xFF334155);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      // appBar: AppBar(automaticallyImplyLeading: false),
+      backgroundColor: bgDark,
+      // Optional: Add an AppBar if you want a back button, otherwise leave blank
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Obx(() {
         return Padding(
           padding: EdgeInsets.all(ASizes.defaultPadding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /// 1. Icon
-              Icon(Iconsax.verify, size: 100.w, color: Colors.blueAccent),
+              /// 1. Icon (Glow Effect)
+              Container(
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: primaryBlue.withValues(alpha: 0.1),
+                ),
+                child: Icon(Iconsax.verify, size: 80.w, color: primaryBlue),
+              ),
+
               SizedBox(height: 32.h),
 
               /// 2. Text
               Text(
                 'Verify your email address',
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: textWhite,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 16.h),
@@ -35,48 +58,82 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                 'We have sent a verification link to your email address. Please check your inbox and click the link to activate your account.',
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                ).textTheme.bodyMedium?.copyWith(color: textGrey, height: 1.5),
                 textAlign: TextAlign.center,
               ),
+
               SizedBox(height: 32.h),
 
               /// 3. Continue Button
               SizedBox(
                 width: double.infinity,
-                height: 50.h,
+                height: 54.h,
                 child: ElevatedButton(
-                  // Redirect to Login Page
                   onPressed: controller.goToLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black87,
+                    backgroundColor: primaryBlue,
+                    foregroundColor: textWhite,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 4,
+                  ),
+                  child: Text(
+                    'Back to Login',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: const Text('Back to Login'),
                 ),
               ),
 
-              SizedBox(height: 16.h),
+              SizedBox(height: 24.h),
 
               /// 4. Resend Button
-              TextButton(
-                onPressed: controller.resendVerificationEmail,
-                child: const Text('Resend Email'),
+              SizedBox(
+                width: double.infinity,
+                height: 54.h,
+                child: OutlinedButton(
+                  onPressed: controller.resendVerificationEmail,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: borderDark),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                  ),
+                  child: Text(
+                    'Resend Email',
+                    style: TextStyle(
+                      color: textWhite,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
               ),
 
-              SizedBox(height: 16.h),
+              SizedBox(height: 32.h),
 
-              /// 5. Check Verification Status
-              // TextButton(
-              //   onPressed: controller.checkEmailVerification,
-              //   child: const Text('Check Verification Status'),
-              // ),
+              /// 5. Check Verification Status (Auto-check Indicator)
               if (!controller.isEmailVerified.value)
-                const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                  ),
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 24.h,
+                      width: 24.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(primaryBlue),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      "Waiting for verification...",
+                      style: TextStyle(color: textGrey, fontSize: 12.sp),
+                    ),
+                  ],
                 ),
             ],
           ),

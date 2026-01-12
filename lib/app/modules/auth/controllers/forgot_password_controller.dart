@@ -31,7 +31,7 @@ class ForgotPasswordController extends GetxController {
           'Error',
           'User with this email does not exist.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.1),
+          backgroundColor: Colors.red.withValues(alpha: 0.1),
           colorText: Colors.red,
         );
         return;
@@ -47,7 +47,7 @@ class ForgotPasswordController extends GetxController {
         'Success',
         'Password reset email sent to $email. Check your inbox.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withOpacity(0.1),
+        backgroundColor: Colors.green.withValues(alpha: 0.1),
         colorText: Colors.green,
         duration: const Duration(seconds: 4),
       );
@@ -57,7 +57,7 @@ class ForgotPasswordController extends GetxController {
         'Error',
         errorMessage,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.1),
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
       );
     } catch (e) {
@@ -65,7 +65,7 @@ class ForgotPasswordController extends GetxController {
         'Error',
         'An unexpected error occurred. Please try again.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.1),
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
       );
     } finally {

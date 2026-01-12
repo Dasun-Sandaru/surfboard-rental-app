@@ -1,23 +1,149 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/app/services/user_service.dart';
+
+import '../../../models/user_model.dart';
+import '../../../services/auth_service.dart';
 
 class AdminHomeController extends GetxController {
-  //TODO: Implement AdminHomeController
+  // ---------------------------------------------------------------------------
+  // Bottom Navigation
+  // ---------------------------------------------------------------------------
+  final selectedIndex = 0.obs;
+  // void changeIndex(int index) => selectedIndex.value = index;
 
-  final count = 0.obs;
+  void changeIndex(int index) {
+ 
+      if(index == 1) {
+        Get.toNamed('/new-rental');
+      }
+      else {
+        selectedIndex.value = index;
+      }
+    }
+      
+
+  // ---------------------------------------------------------------------------
+  // Dashboard Stats (OBSERVABLES)
+  // ---------------------------------------------------------------------------
+  final activeRentals = 0.obs;
+  final boardsAvailable = 0.obs;
+  final damagesPending = 0.obs;
+  final totalCustomers = 0.obs;
+
+  // ---------------------------------------------------------------------------
+  // Firestore
+  // ---------------------------------------------------------------------------
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  /// This should come from logged-in admin user
+  /// Example: Get.find<AuthController>().shopId
+  String? shopId;
+
+  // ---------------------------------------------------------------------------
+  // Stream Subscriptions (to cancel later)
+  // ---------------------------------------------------------------------------
+  StreamSubscription? _rentalsSub;
+  StreamSubscription? _inventorySub;
+  StreamSubscription? _customersSub;
+  StreamSubscription? _damagesSub;
+
+  final AuthService _authService = Get.find<AuthService>();
+  final UserService _userService = Get.find<UserService>();
+
   @override
   void onInit() {
     super.onInit();
+    _setShopId();
+
+    _listenActiveRentals();
+    _listenInventory();
+    _listenCustomers();
+    _listenDamages();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> _setShopId() async {
+    final user = _authService.currentUser;
+    if (user == null) return;
+
+    final uid = user.uid;
+
+    final UserModel? userModel = await _userService.getUserGlobalData(uid);
+    if (userModel == null) return;
+
+    shopId = userModel.shopId;
+
+    log('shopId <>: $shopId');
   }
 
+  // ---------------------------------------------------------------------------
+  // REAL-TIME LISTENERS
+  // ---------------------------------------------------------------------------
+
+  /// 1️⃣ Active Rentals
+  void _listenActiveRentals() {
+    _rentalsSub = _firestore
+        .collection('shops')
+        .doc(shopId)
+        .collection('rentals')
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .listen((snapshot) {
+          activeRentals.value = snapshot.docs.length;
+        });
+  }
+
+  /// 2️⃣ Boards Available
+  void _listenInventory() {
+    _inventorySub = _firestore
+        .collection('shops')
+        .doc(shopId)
+        .collection('inventory')
+        .where('status', isEqualTo: 'available')
+        .snapshots()
+        .listen((snapshot) {
+          boardsAvailable.value = snapshot.docs.length;
+        });
+  }
+
+  /// 3️⃣ Total Customers
+  void _listenCustomers() {
+    _customersSub = _firestore
+        .collection('shops')
+        .doc(shopId)
+        .collection('customers')
+        .snapshots()
+        .listen((snapshot) {
+          totalCustomers.value = snapshot.docs.length;
+        });
+  }
+
+  /// 4️⃣ Damages Pending
+  /// Count damage reports where severity exists
+  void _listenDamages() {
+    _damagesSub = _firestore
+        .collection('shops')
+        .doc(shopId)
+        .collection('rentals')
+        .where('status', isEqualTo: 'overdue')
+        .snapshots()
+        .listen((snapshot) {
+          damagesPending.value = snapshot.docs.length;
+        });
+  }
+
+  /// Sign out
+  Future<void> signOut() async => await _authService.signOut();
+  
   @override
   void onClose() {
+    _rentalsSub?.cancel();
+    _inventorySub?.cancel();
+    _customersSub?.cancel();
+    _damagesSub?.cancel();
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

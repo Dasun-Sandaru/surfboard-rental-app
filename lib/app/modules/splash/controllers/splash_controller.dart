@@ -57,7 +57,7 @@ class SplashController extends GetxController {
     }
 
     /// AuthController will take over from here
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 2), () {
       // Get.offAllNamed(Routes.AUTH_GATE);
       Get.put(AuthController(), permanent: true);
     });

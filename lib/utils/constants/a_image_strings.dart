@@ -15,7 +15,7 @@ class AImageStrings {
   static const String dProfile = "assets/default_profile.png";
 
   // App Onboard
-  static const String onboardOne = "assets/onboard_one.png";
-  static const String onboardTwo = "assets/onboard_two.png";
-  static const String onboardThree = "assets/onboard_three.png";
+  static const String onboardOne = "assets/onboard_1.png";
+  static const String onboardTwo = "assets/onboard_2.png";
+  static const String onboardThree = "assets/onboard_3.png";
 }
