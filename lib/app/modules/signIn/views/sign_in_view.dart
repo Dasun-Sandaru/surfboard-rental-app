@@ -150,7 +150,7 @@ class SignInView extends GetView<SignInController> {
           _buildLabel('Email Address'.tr),
           SizedBox(height: 8.h),
           TextFormField(
-            controller: controller.emailController1,
+            controller: controller.emailController,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(color: textWhite), // White text input

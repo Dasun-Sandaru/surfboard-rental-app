@@ -4,207 +4,182 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 
 class UserService {
-  final _firestore = FirebaseFirestore.instance;
+  final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
   /// ======================
-  /// GET CURRENT USER
+  /// AUTH
   /// ======================
   User? get currentUser => _auth.currentUser;
 
   /// ======================
-  /// GET USER GLOBAL DATA
+  /// USER PROFILE (GLOBAL)
   /// ======================
-
-  Future<UserModel?> getUserGlobalData(String userId) async {
-    final DocumentSnapshot doc = await _firestore
-        .collection('users_global')
-        .doc(userId)
-        .get();
-
-    if (!doc.exists) return null;
-
-    return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+  ///
+  Future<void> createUserProfile({
+    required String userId,
+    required String name,
+    required String email,
+    required String phone,
+    required String shopId,
+    required bool isAdmin,
+  }) async {
+    await _db.collection('users').doc(userId).set({
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'is_active': true,
+      'verified': isAdmin ? true : false,
+      'role': isAdmin ? 'admin' : 'staff',
+      'shop_id': shopId,
+      'created_at': FieldValue.serverTimestamp(),
+    });
   }
 
-  /// ======================
-  /// GET USER ROLE
-  /// ======================
-
-  Future<String?> getUserRole() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return null;
-
-    final doc = await _firestore.collection('users_global').doc(uid).get();
-
+  Future<UserModel?> getUser(String userId) async {
+    final doc = await _db.collection('users').doc(userId).get();
     if (!doc.exists) return null;
 
-    return doc.data()?['role'] as String?;
+    return UserModel.fromMap(doc.data()!, doc.id);
   }
 
-  /// ======================
-  /// GET SHOP ID
-  /// ======================
-  Future<String?> getShopId() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return null;
+  /// Fetch role
+  Future<({String shopId, String role})> getUserMembership(
+    String userId,
+  ) async {
+    final doc = await _db.collection('users').doc(userId).get();
 
-    final doc = await _firestore.collection('users_global').doc(uid).get();
+    if (!doc.exists) {
+      throw Exception('User profile not found');
+    }
 
-    if (!doc.exists) return null;
+    final data = doc.data()!;
 
-    return doc.data()?['shop_id'] as String?;
+    final role = data['role'] as String?;
+    final shopId = data['shop_id'] as String?;
+
+    if (role == null || shopId == null) {
+      throw Exception('User not assigned to a shop');
+    }
+
+    return (role: role, shopId: shopId);
   }
 
-  /// ======================
-  /// CHECK IF USER EXISTS BY EMAIL
-  /// ======================
+  Future<String> getShopId() async {
+    final doc = await _db.collection('users').doc(_auth.currentUser!.uid).get();
+    return doc['shop_id'] as String;
+  }
+
+  Future<bool> isUserActive(String userId) async {
+    final doc = await _db.collection('users').doc(userId).get();
+    if (!doc.exists) return false;
+
+    return doc['is_active'] == true;
+  }
+
   Future<bool> userExistsByEmail(String email) async {
-    final snapshot = await _firestore
-        .collection('users_global')
+    final snap = await _db
+        .collection('users')
         .where('email', isEqualTo: email)
         .limit(1)
         .get();
-    return snapshot.docs.isNotEmpty;
+
+    return snap.docs.isNotEmpty;
   }
 
   /// ======================
   /// CREATE SHOP (ADMIN)
   /// ======================
-  Future<void> createShopWithOwner({
-    required String userId,
+  Future<String> createShopWithOwner({
     required String shopName,
     required String location,
     required String contactNumber,
-    required String ownerName,
-    required String ownerEmail,
-    required String phone,
   }) async {
-    final shopRef = _firestore.collection('shops').doc();
-    final shopId = shopRef.id;
-    final shopCode = _generateShopCode();
+    final uid = _auth.currentUser!.uid;
+    final shopRef = _db.collection('shops').doc();
 
-    final batch = _firestore.batch();
+    final batch = _db.batch();
 
+    /// Shop
     batch.set(shopRef, {
       'name': shopName,
       'location': location,
       'contact_number': contactNumber,
       'created_date': FieldValue.serverTimestamp(),
-      'owner_admin_uid': userId,
-      'shop_code': shopCode,
+      'owner_admin_uid': uid,
+      'shop_code': _generateShopCode(),
     });
 
-    batch.set(_firestore.collection('users_global').doc(userId), {
-      'name': ownerName,
-      'email': ownerEmail,
+    /// Membership
+    batch.set(shopRef.collection('members').doc(uid), {
       'role': 'admin',
-      'shop_id': shopId,
-      'phone': phone,
-      'is_active': true,
-      'created_at': FieldValue.serverTimestamp(),
-    });
-
-    batch.set(shopRef.collection('users').doc(userId), {
-      'name': ownerName,
-      'email': ownerEmail,
-      'role': 'admin',
-      'phone': phone,
-      'is_active': true,
-      'created_at': FieldValue.serverTimestamp(),
+      'added_at': FieldValue.serverTimestamp(),
+      'uid': uid,
     });
 
     await batch.commit();
+    return shopRef.id;
   }
 
   /// ======================
-  /// CREATE STAFF
+  /// ADD STAFF TO SHOP
   /// ======================
-  Future<void> createStaffUser({
-    required String userId,
+  Future<void> addStaffToShop({
     required String shopId,
-    required String name,
-    required String email,
-    required String phone,
+    required String userId,
   }) async {
-    final batch = _firestore.batch();
+    await _db
+        .collection('shops')
+        .doc(shopId)
+        .collection('members')
+        .doc(userId)
+        .set({
+          'role': 'staff',
+          'added_at': FieldValue.serverTimestamp(),
+          'uid': userId,
+        });
+  }
 
-    batch.set(_firestore.collection('users_global').doc(userId), {
-      'name': name,
-      'email': email,
-      'role': 'staff',
-      'shop_id': shopId,
-      'phone': phone,
-      'is_active': true,
-      'created_at': FieldValue.serverTimestamp(),
-    });
+  /// ======================
+  /// UPDATE USER PROFILE
+  /// ======================
+  Future<void> updateUserProfile({
+    required String userId,
+    String? name,
+    String? phone,
+  }) async {
+    final data = <String, dynamic>{};
+    if (name != null) data['name'] = name;
+    if (phone != null) data['phone'] = phone;
 
-    batch.set(
-      _firestore
-          .collection('shops')
-          .doc(shopId)
-          .collection('users')
-          .doc(userId),
-      {
-        'name': name,
-        'email': email,
-        'role': 'staff',
-        'phone': phone,
-        'verified': false,
-        'is_active': true,
-        'created_at': FieldValue.serverTimestamp(),
-      },
-    );
-
-    await batch.commit();
+    await _db.collection('users').doc(userId).update(data);
   }
 
   /// ======================
   /// CHANGE ACTIVE STATUS
   /// ======================
-  Future<void> changeActiveStatus(
-    String userId,
-    String shopId,
-    bool isActive,
-  ) async {
-    final batch = _firestore.batch();
-
-    batch.update(_firestore.collection('users_global').doc(userId), {
-      'is_active': isActive,
-    });
-
-    batch.update(
-      _firestore
-          .collection('shops')
-          .doc(shopId)
-          .collection('users')
-          .doc(userId),
-      {'is_active': isActive},
-    );
-
-    await batch.commit();
+  Future<void> changeUserActiveStatus(String userId, bool isActive) async {
+    await _db.collection('users').doc(userId).update({'is_active': isActive});
   }
 
   /// ======================
-  /// DELETE USER
+  /// REMOVE USER FROM SHOP
   /// ======================
-  Future<void> deleteUser(String userId, String shopId) async {
-    final batch = _firestore.batch();
-    batch.update(_firestore.collection('users_global').doc(userId), {
-      'is_active': false,
-    });
-    batch.update(
-      _firestore
-          .collection('shops')
-          .doc(shopId)
-          .collection('users')
-          .doc(userId),
-      {'is_active': false},
-    );
-
-    await batch.commit();
+  Future<void> removeUserFromShop({
+    required String shopId,
+    required String userId,
+  }) async {
+    await _db
+        .collection('shops')
+        .doc(shopId)
+        .collection('members')
+        .doc(userId)
+        .delete();
   }
 
+  /// ======================
+  /// UTIL
+  /// ======================
   String _generateShopCode() {
     final num = DateTime.now().millisecondsSinceEpoch % 10000;
     return 'SURF-$num';

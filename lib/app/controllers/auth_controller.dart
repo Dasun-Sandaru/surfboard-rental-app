@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../utils/storage/app_storage.dart';
 import '../routes/app_pages.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
@@ -11,7 +12,7 @@ import '../services/user_service.dart';
 class AuthController extends GetxController {
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
-  final FirestoreService _firestoreService = Get.find();
+  final AppLocalStorage _storage = AppLocalStorage();
 
   late Rx<User?> firebaseUser;
   StreamSubscription? _userSub;
@@ -46,29 +47,15 @@ class AuthController extends GetxController {
       return;
     }
 
-    // New logic to listen to user document
-    final shopId = await _userService.getShopId();
-    if (shopId != null) {
-      _userSub = _firestoreService
-          .getShopUserStream(shopId, user.uid)
-          .listen((snapshot) {
-        if (snapshot.exists) {
-          final data = snapshot.data() as Map<String, dynamic>;
-          final bool isActive = data['is_active'] ?? true;
-          final bool isUserVerified = data['verified'] ?? false;
+    try {
+      final membership = await _userService.getUserMembership(user.uid);
 
-          if (!isActive || !isUserVerified) {
-            _authService.signOut();
-            Get.offAllNamed(Routes.SIGN_IN);
-          }
-        }
-      });
-    }
+      final role = membership.role;
+      final shopId = membership.shopId;
 
-    // Fetch role
-    final role = await _userService.getUserRole();
+      // Save shopId in local storage for later use
+      _storage.saveData('shopId', shopId);
 
-    Future.delayed(const Duration(seconds: 10), () {
       if (role == 'admin') {
         Get.offAllNamed(Routes.ADMIN_HOME);
       } else if (role == 'staff') {
@@ -76,7 +63,10 @@ class AuthController extends GetxController {
       } else {
         Get.offAllNamed(Routes.SIGN_IN);
       }
-    });
+    } catch (e) {
+      // fallback
+      Get.offAllNamed(Routes.SIGN_IN);
+    }
   }
 
   @override

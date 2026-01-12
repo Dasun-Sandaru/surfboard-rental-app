@@ -6,6 +6,7 @@ class UserModel {
   final String? name;
   final String role; // 'admin' or 'staff'
   final bool isActive;
+  final bool isVerified;
   final String? phone;
   final String? shopId;
   final Timestamp? createdAt;
@@ -18,6 +19,7 @@ class UserModel {
     this.name,
     required this.role,
     this.isActive = true,
+    this.isVerified = false,
     this.phone,
     this.shopId,
     this.createdAt,
@@ -33,6 +35,7 @@ class UserModel {
       name: data['name'] as String?,
       role: data['role'] as String? ?? 'staff',
       isActive: data['is_active'] as bool? ?? true,
+      isVerified: data['verified'] as bool? ?? false,
       phone: data['phone'] as String?,
       shopId: data['shop_id'] as String?,
       createdAt: data['created_at'] as Timestamp?,
@@ -48,6 +51,7 @@ class UserModel {
       'name': name,
       'role': role,
       'is_active': isActive,
+      'verified': isVerified,
       'phone': phone,
       'shop_id': shopId,
       'created_at': createdAt,
@@ -63,6 +67,7 @@ class UserModel {
     String? name,
     String? role,
     bool? isActive,
+    bool? isVerified,
     String? phone,
     String? shopId,
     Timestamp? createdAt,
@@ -75,6 +80,7 @@ class UserModel {
       name: name ?? this.name,
       role: role ?? this.role,
       isActive: isActive ?? this.isActive,
+      isVerified: isVerified ?? this.isVerified,
       phone: phone ?? this.phone,
       shopId: shopId ?? this.shopId,
       createdAt: createdAt ?? this.createdAt,

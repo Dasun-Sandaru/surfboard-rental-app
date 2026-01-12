@@ -54,7 +54,13 @@ class VerifyEmailController extends GetxController {
         // Navigate to role-based home
         final user = _authService.currentUser;
         if (user != null) {
-          final role = await _userService.getUserRole();
+          final membership = await _userService.getUserMembership(
+            _authService.currentUser!.uid,
+          );
+
+          final role = membership.role;
+          // final shopId = membership['shopId']!;
+
           if (role == 'admin') {
             Get.offAllNamed(Routes.ADMIN_HOME);
           } else if (role == 'staff') {

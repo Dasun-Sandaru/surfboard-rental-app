@@ -1,84 +1,82 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
 
 class SignInController extends GetxController {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
-  final emailController1 = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  final isObscure = true.obs;
   final isLoading = false.obs;
+  final isObscure = true.obs;
 
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
 
-  /// ======================
-  /// SIGN IN
-  /// ======================
   Future<void> signIn() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
 
+      /// 1️⃣ Firebase Auth
       await _authService.signIn(
-        email: emailController1.text.trim(),
+        email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      /// Refresh verification state
-      final isVerified = await _authService.isEmailVerified();
+      /// 2️⃣ Email verification
+      // if (!await _authService.isEmailVerified()) {
+      //   await _authService.signOut();
+      //   throw 'Email not verified';
+      // }
 
-      if (!isVerified) {
-        await _authService.signOut();
+      /// 3️⃣ User active check
+      // if (!await _userService.isUserActive(_authService.currentUser!.uid)) {
+      //   await _authService.signOut();
+      //   throw 'User account disabled';
+      // }
 
-        Get.snackbar(
-          'Email not verified',
-          'Please verify your email before signing in.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.1),
-          colorText: Colors.red,
-        );
+      /// 4️⃣ Get shop + role
+      final appUser = await _userService.getUser(_authService.currentUser!.uid);
+
+      if (appUser == null) throw 'User not found';
+
+      final role = appUser.role;
+      final shopId = appUser.shopId;
+      final isActive = appUser.isActive;
+      final isVerified = appUser.isVerified;
+
+      /// 5️⃣ Navigate
+      if (!isActive) {
+        Get.offAllNamed(Routes.AUTH_GATE, arguments: {'gate': 'not-active'});
         return;
       }
 
-      /// Fetch user role
-      final role = await _userService.getUserRole();
-
-      if (role == 'admin') {
-        Get.offAllNamed(Routes.ADMIN_HOME);
-      } else if (role == 'staff') {
-        Get.offAllNamed(Routes.STAFF_HOME);
-      } else {
-        await _authService.signOut();
-        Get.snackbar(
-          'Access denied',
-          'User role not assigned. Contact support.',
-        );
+      if (!isVerified) {
+        Get.offAllNamed(Routes.AUTH_GATE, arguments: {'gate': 'not-verified'});
+        return;
       }
-    } on FirebaseAuthException catch (e) {
+      if (role == 'admin') {
+        Get.offAllNamed(Routes.ADMIN_HOME, arguments: {'shopId': shopId});
+        return;
+      }
+      if (role == 'staff') {
+        Get.offAllNamed(Routes.STAFF_HOME, arguments: {'shopId': shopId});
+        return;
+      }
+    } catch (e) {
+      log(e.toString());
       Get.snackbar(
         'Login failed',
-        AppFirebaseException(e).message,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e, stack) {
-      if (kDebugMode) {
-        debugPrint(e.toString());
-        debugPrint(stack.toString());
-      }
-
-      Get.snackbar(
-        'Error',
-        'Something went wrong. Please try again.',
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -86,20 +84,21 @@ class SignInController extends GetxController {
     }
   }
 
-  /// ======================
-  /// NAVIGATION
-  /// ======================
-  void goToForgotPassword() => Get.toNamed(Routes.FORGOT_PASSWORD);
+  void goToForgotPassword() {
+    Get.toNamed(Routes.FORGOT_PASSWORD);
+  }
 
-  void goToSignUpStaff() =>
-      Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'staff'});
+  void goToSignUpStaff() {
+    Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'staff'});
+  }
 
-  void goToSignUpAdmin() =>
-      Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'admin'});
+  void goToSignUpAdmin() {
+    Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'admin'});
+  }
 
   @override
   void onClose() {
-    emailController1.dispose();
+    emailController.dispose();
     passwordController.dispose();
     super.onClose();
   }

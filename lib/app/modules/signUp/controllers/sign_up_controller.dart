@@ -6,33 +6,35 @@ import 'package:get/get.dart';
 import '../../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
 
 class SignUpController extends GetxController {
-  final GlobalKey<FormState> staffFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> shopFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> ownerFormKey = GlobalKey<FormState>();
+  final ownerFormKey = GlobalKey<FormState>();
+  final staffFormKey = GlobalKey<FormState>();
+  final shopFormKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
-  final shopCodeController = TextEditingController();
 
   final shopNameController = TextEditingController();
   final shopLocationController = TextEditingController();
   final shopContactController = TextEditingController();
+  final shopCodeController = TextEditingController();
 
   final isLoading = false.obs;
-  final currentStep = 0.obs;
   final role = 'staff'.obs;
+  final currentStep = 0.obs;
 
-  RxBool isObscurePassword = true.obs;
-  RxBool isObscureConfirmPassword = true.obs;
+  final isObscurePassword = true.obs;
+  final isObscureConfirmPassword = true.obs;
 
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
+  final ShopService _shopService = Get.find();
 
   @override
   void onInit() {
@@ -43,29 +45,38 @@ class SignUpController extends GetxController {
     }
   }
 
-  /// ======================
-  /// REGISTER ADMIN
-  /// ======================
+  // ======================
+  // REGISTER SHOP OWNER
+  // ======================
   Future<void> registerShopOwner() async {
     if (!(ownerFormKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
 
+      /// Firebase Auth
       final credential = await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      final user = credential.user!;
-      await _userService.createShopWithOwner(
-        userId: user.uid,
+      final uid = credential.user!.uid;
+
+      /// Create shop + admin membership
+      final shopId = await _shopService.createShopWithOwner(
         shopName: shopNameController.text.trim(),
         location: shopLocationController.text.trim(),
         contactNumber: shopContactController.text.trim(),
-        ownerName: nameController.text.trim(),
-        ownerEmail: emailController.text.trim(),
+      );
+
+      /// Create user profile (GLOBAL)
+      await _userService.createUserProfile(
+        userId: uid,
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
         phone: phoneController.text.trim(),
+        shopId: shopId,
+        isAdmin: true,
       );
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
@@ -76,26 +87,31 @@ class SignUpController extends GetxController {
     }
   }
 
-  /// ======================
-  /// REGISTER STAFF
-  /// ======================
+  // ======================
+  // REGISTER STAFF
+  // ======================
   Future<void> registerShopStaff() async {
     if (!(staffFormKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
 
+      /// Firebase Auth
       final credential = await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      await _userService.createStaffUser(
-        userId: credential.user!.uid,
-        shopId: shopCodeController.text.trim(),
+      final uid = credential.user!.uid;
+
+      /// Create user profile (GLOBAL)
+      await _userService.createUserProfile(
+        userId: uid,
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
+        shopId: shopCodeController.text.trim(),
+        isAdmin: false,
       );
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
@@ -106,14 +122,15 @@ class SignUpController extends GetxController {
     }
   }
 
+  // ======================
+  // ERROR HANDLING
+  // ======================
   void _handleError(Object e) {
-    if (kDebugMode) {
-      debugPrint(e.toString());
-    }
+    if (kDebugMode) debugPrint(e.toString());
 
     final message = e is FirebaseAuthException
         ? AppFirebaseException(e).message
-        : 'Something went wrong';
+        : e.toString();
 
     Get.snackbar('Error', message, snackPosition: SnackPosition.BOTTOM);
   }
@@ -131,10 +148,10 @@ class SignUpController extends GetxController {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneController.dispose();
-    shopCodeController.dispose();
     shopNameController.dispose();
     shopLocationController.dispose();
     shopContactController.dispose();
+    shopCodeController.dispose();
     super.onClose();
   }
 }

@@ -26,14 +26,14 @@ class ManageUsersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _setShopId();
+    // _setShopId();
   }
 
-  Future<void> _setShopId() async {
-    shopId = await _userService.getShopId();
-    log('shopId: $shopId');
-    _listenUsers();
-  }
+  // Future<void> _setShopId() async {
+  //   shopId = await _userService.getShopId();
+  //   log('shopId: $shopId');
+  //   _listenUsers();
+  // }
 
   // ---------------------------------------------------------------------------
   // REAL-TIME USERS LISTENER
