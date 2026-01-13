@@ -10,8 +10,9 @@ import '../../../services/user_service.dart';
 
 class ManageUsersController extends GetxController {
   final FirestoreService _firestoreService = Get.find();
+  final UserService _userService = Get.find();
 
-  // This should come from AuthController
+  // This comes from AuthController (current user's shop)
   String? shopId;
 
   final searchTextController = TextEditingController();
@@ -21,57 +22,65 @@ class ManageUsersController extends GetxController {
 
   StreamSubscription? _usersSub;
 
-  final UserService _userService = Get.find();
-
   @override
   void onInit() {
     super.onInit();
-    // _setShopId();
+    _initShopMembers();
   }
 
-  // Future<void> _setShopId() async {
-  //   shopId = await _userService.getShopId();
-  //   log('shopId: $shopId');
-  //   _listenUsers();
-  // }
-
-  // ---------------------------------------------------------------------------
-  // REAL-TIME USERS LISTENER
-  // ---------------------------------------------------------------------------
-  void _listenUsers() {
+  /// Initialize shop members listener
+  Future<void> _initShopMembers() async {
+    shopId = await _userService.getShopIdFromStorage();
     if (shopId == null) {
-      log("shopId is null, cannot listen to users");
+      log("Shop ID not found for current user.");
       return;
     }
+
+    _listenUsers();
+  }
+
+  /// ---------------------------------------------------------------------------
+  /// REAL-TIME SHOP MEMBERS LISTENER
+  /// ---------------------------------------------------------------------------
+  void _listenUsers() {
+    if (shopId == null) return;
+
     _usersSub = _firestoreService.getShopUsers(shopId!).listen((snapshot) {
       final List<Map<String, dynamic>> fetchedUsers = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
-
         final String name = data['name'] ?? '';
         final String email = data['email'] ?? '';
         final String role = (data['role'] ?? 'staff')
             .toString()
             .capitalizeFirst!;
-        final bool isActive = data['is_active'] ?? true;
+        final String phone = data['phone'] ?? '';
 
+
+        final bool isActive = data['is_active'] ?? true;
+        final bool isVerified = data['verified'] ?? false;
+        final String createdAt = data['created_at']?.toDate().toString() ?? '';
         return {
           "id": doc.id,
           "name": name,
           "email": email,
           "role": role,
-          "status": isActive ? "Active" : "Inactive",
+          "phone": phone,
+
+          // "is_active": isActive ? "Active" : "Inactive",
+          // "verified": isVerified ? "Verified" : "Unverified",
+          "is_active": isActive,
+          "verified": isVerified,
+
+          "created_at": createdAt,
           "initials": _getInitials(name),
           "color": _avatarColor(name),
         };
       }).toList();
 
-      // Sort the list to have admins first
+      // Sort admins first
       fetchedUsers.sort((a, b) {
-        if (a['role'] == 'Admin' && b['role'] != 'Admin') {
-          return -1;
-        } else if (a['role'] != 'Admin' && b['role'] == 'Admin') {
-          return 1;
-        }
+        if (a['role'] == 'Admin' && b['role'] != 'Admin') return -1;
+        if (a['role'] != 'Admin' && b['role'] == 'Admin') return 1;
         return 0;
       });
 
@@ -79,20 +88,21 @@ class ManageUsersController extends GetxController {
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // UI ACTIONS
-  // ---------------------------------------------------------------------------
+  /// ---------------------------------------------------------------------------
+  /// UI ACTIONS
+  /// ---------------------------------------------------------------------------
   void addUser() {
     Get.snackbar("Action", "Add User clicked");
   }
 
-  void openUserDetails(Map<String, dynamic> user) {
-    Get.snackbar("User", "Opened ${user['name']}");
+  void viewUserDetails(Map<String, dynamic> user) {
+    log("Viewing details for user: ${user}");
+    Get.toNamed(Routes.USER_DETAIL, arguments: user);
   }
 
-  // ---------------------------------------------------------------------------
-  // HELPERS
-  // ---------------------------------------------------------------------------
+  /// ---------------------------------------------------------------------------
+  /// HELPERS
+  /// ---------------------------------------------------------------------------
   String _getInitials(String name) {
     if (name.isEmpty) return "?";
     final parts = name.trim().split(" ");
@@ -101,18 +111,14 @@ class ManageUsersController extends GetxController {
   }
 
   Color _avatarColor(String input) {
-    final colors = [
-      const Color(0xFF4A90E2),
-      const Color(0xFF6366F1),
-      const Color(0xFFF97316),
-      const Color(0xFF10B981),
-      const Color(0xFFEC4899),
+    const colors = [
+      Color(0xFF4A90E2),
+      Color(0xFF6366F1),
+      Color(0xFFF97316),
+      Color(0xFF10B981),
+      Color(0xFFEC4899),
     ];
     return colors[input.hashCode % colors.length];
-  }
-
-  void viewUserDetails(Map<String, dynamic> user) {
-    Get.toNamed(Routes.USER_DETAIL, arguments: user);
   }
 
   @override

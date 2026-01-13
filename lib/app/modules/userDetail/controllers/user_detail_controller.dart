@@ -1,41 +1,54 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 
+import '../../../services/user_service.dart';
+
 class UserDetailController extends GetxController {
-  
-  // In a real app, you would pass the User Object via arguments
-  // For now, we initialize with the data you provided
-  final user = {
-    "id": "12345",
-    "created_at": "10 January 2026", 
-    "email": "asusvivobook15datalib@gmail.com",
-    "is_active": true,
-    "name": "John",
-    "phone": "0757546437",
-    "role": "staff",
-    "verified": false,
-  }.obs;
+  final UserService _userService = Get.find();
+
+  final user = <String, dynamic>{}.obs;
 
   // Reactive variables for the UI toggles
   final RxBool isActive = true.obs;
   final RxBool isVerified = false.obs;
 
+  String shopId = '0000';
+
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
+    shopId = await _userService.getShopIdFromStorage() ?? '0000';
+
+    if (Get.arguments is Map) {
+      user.assignAll(Map<String, dynamic>.from(Get.arguments));
+    }
+
     // Initialize reactive variables from the passed user data
-    isActive.value = user['is_active'] as bool;
-    isVerified.value = user['verified'] as bool;
+    isActive.value = user['is_active'] as bool? ?? false;
+    isVerified.value = user['verified'] as bool? ?? false;
   }
 
-  void toggleActiveStatus(bool value) {
+  Future<void> toggleActiveStatus(bool value) async {
     isActive.value = value;
-    // TODO: Call Firestore update here
-    Get.snackbar("Status Updated", "User is now ${value ? 'Active' : 'Inactive'}");
+    await _userService.updateUserStatus(
+      userId: user['id'],
+      shopId: shopId,
+      isActive: value,
+    );
+    Get.snackbar(
+      "Status Updated",
+      "User is now ${value ? 'Active' : 'Inactive'}",
+    );
   }
 
-  void toggleVerification() {
+  Future<void> toggleVerification() async {
     isVerified.value = !isVerified.value;
-    // TODO: Call Firestore update here
+    await _userService.updateUserVerification(
+      userId: user['id'],
+      shopId: shopId,
+      verified: isVerified.value,
+    );
     Get.snackbar("Verification Updated", "User verification status changed.");
   }
 
@@ -49,7 +62,7 @@ class UserDetailController extends GetxController {
         // Delete logic
         Get.back(); // Close dialog
         Get.back(); // Go back to list
-      }
+      },
     );
   }
 }

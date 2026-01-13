@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import '../../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
 
 class SignUpController extends GetxController {
@@ -34,7 +33,6 @@ class SignUpController extends GetxController {
 
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
-  final ShopService _shopService = Get.find();
 
   @override
   void onInit() {
@@ -50,11 +48,12 @@ class SignUpController extends GetxController {
   // ======================
   Future<void> registerShopOwner() async {
     if (!(ownerFormKey.currentState?.validate() ?? false)) return;
+    if (!(shopFormKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
 
-      /// Firebase Auth
+      // Firebase Auth
       final credential = await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -62,21 +61,15 @@ class SignUpController extends GetxController {
 
       final uid = credential.user!.uid;
 
-      /// Create shop + admin membership
-      final shopId = await _shopService.createShopWithOwner(
+      // Create user profile, shop, and membership
+      await _userService.registerAdminWithShop(
+        uid: uid,
         shopName: shopNameController.text.trim(),
-        location: shopLocationController.text.trim(),
-        contactNumber: shopContactController.text.trim(),
-      );
-
-      /// Create user profile (GLOBAL)
-      await _userService.createUserProfile(
-        userId: uid,
+        shopLocation: shopLocationController.text.trim(),
+        shopContactNumber: shopContactController.text.trim(),
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
-        shopId: shopId,
-        isAdmin: true,
       );
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
@@ -96,7 +89,7 @@ class SignUpController extends GetxController {
     try {
       isLoading.value = true;
 
-      /// Firebase Auth
+      // Firebase Auth
       final credential = await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -104,14 +97,13 @@ class SignUpController extends GetxController {
 
       final uid = credential.user!.uid;
 
-      /// Create user profile (GLOBAL)
-      await _userService.createUserProfile(
-        userId: uid,
+      // Create user profile and membership
+      await _userService.registerStaff(
+        uid: uid,
+        shopId: shopCodeController.text.trim(),
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
-        shopId: shopCodeController.text.trim(),
-        isAdmin: false,
       );
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);

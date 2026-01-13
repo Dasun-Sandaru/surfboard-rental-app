@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -22,19 +24,19 @@ class UserDetailView extends GetView<UserDetailController> {
           "Staff Details",
           style: TextStyle(color: textWhite, fontSize: 18.sp),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Iconsax.edit, color: textWhite),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: Icon(Iconsax.edit, color: textWhite),
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(ASizes.defaultPadding),
         child: Column(
           children: [
             /// 1. Profile Header
-            _buildProfileHeader(controller),
+            Obx(() => _buildProfileHeader(controller)),
 
             SizedBox(height: 24.h),
 
@@ -65,32 +67,29 @@ class UserDetailView extends GetView<UserDetailController> {
             SizedBox(height: 40.h),
 
             /// Delete Button
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: TextButton.icon(
-            //     onPressed: controller.deleteUser,
-            //     icon: Icon(Iconsax.trash, color: errorRed),
-            //     label: Text("Delete User", style: TextStyle(color: errorRed)),
-            //   ),
-            // ),
-            SizedBox(
-              width: double.infinity,
-              height: 54.h,
-              child: OutlinedButton(
-                onPressed: controller.deleteUser,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: borderDark),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+            Opacity(
+              opacity: controller.user['role'] == 'Admin' ? 0.5 : 1.0,
+              child: SizedBox(
+                width: double.infinity,
+                height: 54.h,
+                child: OutlinedButton(
+                  onPressed: controller.user['role'] == 'Admin'
+                      ? null
+                      : controller.deleteUser,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: borderDark),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                ),
-                child: Text(
-                  "Delete User",
-                  style: TextStyle(
-                    color: errorRed,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16.sp,
+                  child: Text(
+                    "Delete User",
+                    style: TextStyle(
+                      color: errorRed,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.sp,
+                    ),
                   ),
                 ),
               ),
@@ -107,13 +106,20 @@ class UserDetailView extends GetView<UserDetailController> {
   // ===========================================================================
 
   Widget _buildProfileHeader(UserDetailController controller) {
+    log("Building profile header for user: ${controller.user['name']}");
     return Column(
       children: [
         CircleAvatar(
           radius: 40.w,
           backgroundColor: primaryBlue.withOpacity(0.2),
           child: Text(
-            controller.user['name'].toString().substring(0, 1).toUpperCase(),
+            (controller.user['name'] != null &&
+                    controller.user['name'].toString().isNotEmpty)
+                ? controller.user['name']
+                    .toString()
+                    .substring(0, 1)
+                    .toUpperCase()
+                : '',
             style: TextStyle(
               fontSize: 32.sp,
               fontWeight: FontWeight.bold,
@@ -196,7 +202,9 @@ class UserDetailView extends GetView<UserDetailController> {
                   value: controller.isActive.value,
                   activeColor: successGreen,
                   inactiveTrackColor: bgDark,
-                  onChanged: controller.toggleActiveStatus,
+                  onChanged: controller.user['role'] == 'Admin'
+                      ? null
+                      : controller.toggleActiveStatus,
                 ),
               ],
             ),
@@ -238,42 +246,47 @@ class UserDetailView extends GetView<UserDetailController> {
                 ),
 
                 // Custom Verify Button
-                InkWell(
-                  onTap: controller.toggleVerification,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 6.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: controller.isVerified.value
-                          ? successGreen.withOpacity(0.1)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: controller.isVerified.value
-                            ? successGreen
-                            : textGrey,
+                Opacity(
+                  opacity: controller.user['role'] == 'Admin' ? 0.5 : 1.0,
+                  child: InkWell(
+                    onTap: controller.user['role'] == 'Admin'
+                        ? null
+                        : controller.toggleVerification,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          controller.isVerified.value ? "Verified" : "Approve",
-                          style: TextStyle(
-                            color: controller.isVerified.value
-                                ? successGreen
-                                : textGrey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12.sp,
-                          ),
+                      decoration: BoxDecoration(
+                        color: controller.isVerified.value
+                            ? successGreen.withOpacity(0.1)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: controller.isVerified.value
+                              ? successGreen
+                              : textGrey,
                         ),
-                        if (controller.isVerified.value) ...[
-                          SizedBox(width: 4.w),
-                          Icon(Icons.check, size: 14.w, color: successGreen),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            controller.isVerified.value ? "Verified" : "Approve",
+                            style: TextStyle(
+                              color: controller.isVerified.value
+                                  ? successGreen
+                                  : textGrey,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                          if (controller.isVerified.value) ...[
+                            SizedBox(width: 4.w),
+                            Icon(Icons.check, size: 14.w, color: successGreen),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),

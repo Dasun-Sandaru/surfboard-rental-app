@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../utils/storage/app_storage.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/shop_service.dart';
@@ -19,6 +20,7 @@ class SignInController extends GetxController {
 
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
+  final _storage = AppLocalStorage();
 
   Future<void> signIn() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
@@ -53,6 +55,9 @@ class SignInController extends GetxController {
       final shopId = appUser.shopId;
       final isActive = appUser.isActive;
       final isVerified = appUser.isVerified;
+
+      // Save ShopId in local storage for later use
+      _storage.saveData('shop_id', shopId);
 
       /// 5️⃣ Navigate
       if (!isActive) {

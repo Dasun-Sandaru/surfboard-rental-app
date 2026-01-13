@@ -5,11 +5,11 @@ class FirestoreService {
 
   // Global user data
   Stream<DocumentSnapshot> getGlobalUserStream(String uid) {
-    return _db.collection('users_global').doc(uid).snapshots();
+    return _db.collection('users').doc(uid).snapshots();
   }
 
   Future<DocumentSnapshot> getGlobalUser(String uid) {
-    return _db.collection('users_global').doc(uid).get();
+    return _db.collection('users').doc(uid).get();
   }
 
   // Shop reference
@@ -41,10 +41,10 @@ class FirestoreService {
 
   // Shop users
   Stream<DocumentSnapshot> getShopUserStream(String shopId, String uid) {
-    return shopRef(shopId).collection('users').doc(uid).snapshots();
+    return shopRef(shopId).collection('members').doc(uid).snapshots();
   }
 
   Stream<QuerySnapshot> getShopUsers(String shopId) {
-    return shopRef(shopId).collection('users').snapshots();
+    return shopRef(shopId).collection('members').snapshots();
   }
 }

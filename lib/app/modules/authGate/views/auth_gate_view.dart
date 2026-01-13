@@ -9,36 +9,10 @@ import '../controllers/auth_gate_controller.dart';
 class AuthGateView extends GetView<AuthGateController> {
   const AuthGateView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color errorRed = const Color(0xFFEF4444);
-  final Color warningOrange = const Color(0xFFF59E0B);
-  final Color cardDark = const Color(0xFF182c30);
-
   @override
   Widget build(BuildContext context) {
-    // 1. Get the Gate Type from arguments passed during navigation
-    final String gateType = Get.arguments?['gate'] ?? 'unknown';
-
-    // 2. Determine Content based on Gate Type
-    final bool isInactive = gateType == 'not-active';
-
-    // Config based on state
-    final Color mainColor = isInactive ? errorRed : warningOrange;
-    final IconData mainIcon = isInactive
-        ? Iconsax.user_remove
-        : Iconsax.shield_search;
-    final String title = isInactive
-        ? "Account Deactivated"
-        : "Approval Pending";
-    final String description = isInactive
-        ? "Your account has been deactivated by the shop administrator. You no longer have access to the dashboard."
-        : "Your account is currently under review. Please wait for an administrator to verify and approve your access.";
-
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: controller.bgDark,
       body: Padding(
         padding: EdgeInsets.all(ASizes.defaultPadding),
         child: Column(
@@ -51,19 +25,21 @@ class AuthGateView extends GetView<AuthGateController> {
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: mainColor.withOpacity(0.1), // Glow
-                border: Border.all(color: mainColor.withOpacity(0.3), width: 2),
+                color: controller.mainColor.withOpacity(0.1), // Glow
+                border: Border.all(
+                    color: controller.mainColor.withOpacity(0.3), width: 2),
               ),
-              child: Icon(mainIcon, size: 64.w, color: mainColor),
+              child: Icon(controller.mainIcon,
+                  size: 64.w, color: controller.mainColor),
             ),
 
             SizedBox(height: 32.h),
 
             /// 2. Title
             Text(
-              title,
+              controller.title,
               style: TextStyle(
-                color: textWhite,
+                color: controller.textWhite,
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -74,15 +50,16 @@ class AuthGateView extends GetView<AuthGateController> {
 
             /// 3. Description
             Text(
-              description,
-              style: TextStyle(color: textGrey, fontSize: 14.sp, height: 1.5),
+              controller.description,
+              style: TextStyle(
+                  color: controller.textGrey, fontSize: 14.sp, height: 1.5),
               textAlign: TextAlign.center,
             ),
 
             const Spacer(),
 
             /// 4. Contact Admin Button (Optional, mostly for inactive)
-            if (isInactive) ...[
+            if (controller.isInactive) ...[
               SizedBox(
                 width: double.infinity,
                 height: 54.h,
@@ -90,14 +67,14 @@ class AuthGateView extends GetView<AuthGateController> {
                   onPressed: () {
                     // Open Email or Phone logic
                   },
-                  icon: Icon(Iconsax.message, color: textWhite),
-                  label: Text(
+                  icon: Icon(Iconsax.message, color: controller.textWhite),
+                  label: const Text(
                     "Contact Administrator",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: cardDark,
-                    foregroundColor: textWhite,
+                    backgroundColor: controller.cardDark,
+                    foregroundColor: controller.textWhite,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -113,11 +90,7 @@ class AuthGateView extends GetView<AuthGateController> {
               width: double.infinity,
               height: 54.h,
               child: OutlinedButton(
-                onPressed: () {
-                  // Call your logout logic here
-                  // controller.logout();
-                  // Get.offAllNamed(Routes.LOGIN);
-                },
+                onPressed: () => controller.logout(),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.white.withOpacity(0.3)),
                   shape: RoundedRectangleBorder(
@@ -128,7 +101,7 @@ class AuthGateView extends GetView<AuthGateController> {
                 child: Text(
                   "Sign Out",
                   style: TextStyle(
-                    color: textWhite,
+                    color: controller.textWhite,
                     fontWeight: FontWeight.w600,
                     fontSize: 16.sp,
                   ),

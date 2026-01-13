@@ -93,8 +93,11 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   border: Border.all(color: borderDark.withOpacity(0.5)),
                 ),
                 // Using Obx to make the list reactive
-                child: Obx(
-                  () => ListView.separated(
+                child: Obx(() {
+                  if (controller.users.isEmpty) {
+                    return _buildEmptyList();
+                  }
+                  return ListView.separated(
                     itemCount: controller.users.length,
                     padding: EdgeInsets.zero,
                     separatorBuilder: (context, index) =>
@@ -103,8 +106,8 @@ class ManageUsersView extends GetView<ManageUsersController> {
                       final user = controller.users[index];
                       return _buildUserListItem(user);
                     },
-                  ),
-                ),
+                  );
+                }),
               ),
             ),
             SizedBox(height: 20.h),
@@ -117,6 +120,26 @@ class ManageUsersView extends GetView<ManageUsersController> {
   // ===========================================================================
   // HELPER WIDGETS
   // ===========================================================================
+
+  Widget _buildEmptyList() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Iconsax.user_search,
+            size: 60.w,
+            color: textGrey.withOpacity(0.5),
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            'No users found',
+            style: TextStyle(color: textGrey, fontSize: 16.sp),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildUserListItem(Map<String, dynamic> user) {
     final bool isAdmin = user['role'] == 'Admin';
@@ -198,6 +221,29 @@ class ManageUsersView extends GetView<ManageUsersController> {
 
                       SizedBox(width: 8.w),
 
+                      // Verified Badge
+                      if (user['verified'] == true)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 2.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: successGreen.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'Verified',
+                            style: TextStyle(
+                              color: successGreen,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                      SizedBox(width: 8.w),
+
                       // Status Badge
                       Row(
                         children: [
@@ -211,7 +257,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            user['status'],
+                            user['is_active'] ? 'Active' : 'Inactive',
                             style: TextStyle(
                               color: isActive ? successGreen : textGrey,
                               fontSize: 11.sp,

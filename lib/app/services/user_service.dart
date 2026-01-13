@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../utils/storage/app_storage.dart';
 import '../models/user_model.dart';
 
 class UserService {
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
+
+  final _storage = AppLocalStorage();
 
   /// ======================
   /// AUTH
@@ -13,27 +16,96 @@ class UserService {
   User? get currentUser => _auth.currentUser;
 
   /// ======================
-  /// USER PROFILE (GLOBAL)
+  /// USER SHOP ID FROM LOCAL STORAGE
   /// ======================
-  ///
-  Future<void> createUserProfile({
-    required String userId,
+  Future<String?> getShopIdFromStorage() async =>
+      _storage.readData('shop_id') as String?;
+
+  Future<void> registerAdminWithShop({
+    required String uid,
+    required String shopName,
+    required String shopLocation,
+    required String shopContactNumber,
     required String name,
     required String email,
     required String phone,
-    required String shopId,
-    required bool isAdmin,
   }) async {
-    await _db.collection('users').doc(userId).set({
+    final batch = _db.batch();
+
+    final shopRef = _db.collection('shops').doc();
+    final userRef = _db.collection('users').doc(uid);
+    final memberRef = shopRef.collection('members').doc(uid);
+
+    batch.set(userRef, {
       'name': name,
       'email': email,
       'phone': phone,
       'is_active': true,
-      'verified': isAdmin ? true : false,
-      'role': isAdmin ? 'admin' : 'staff',
-      'shop_id': shopId,
+      'verified': true,
+      'role': 'admin',
+      'shop_id': shopRef.id,
       'created_at': FieldValue.serverTimestamp(),
     });
+
+    batch.set(shopRef, {
+      'name': shopName,
+      'location': shopLocation,
+      'contact_number': shopContactNumber,
+      'created_at': FieldValue.serverTimestamp(),
+      'owner_admin_uid': uid,
+    });
+
+    batch.set(memberRef, {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'role': 'admin',
+      'is_active': true,
+      'verified': true,
+      'created_at': FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+  }
+
+  Future<void> registerStaff({
+    required String shopId,
+    required String uid,
+    required String name,
+    required String email,
+    required String phone,
+  }) async {
+    final batch = _db.batch();
+
+    final userRef = _db.collection('users').doc(uid);
+    final memberRef = _db
+        .collection('shops')
+        .doc(shopId)
+        .collection('members')
+        .doc(uid);
+
+    batch.set(userRef, {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'role': 'staff',
+      'shop_id': shopId,
+      'is_active': true,
+      'verified': false,
+      'created_at': FieldValue.serverTimestamp(),
+    });
+
+    batch.set(memberRef, {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'role': 'staff',
+      'is_active': true,
+      'verified': false,
+      'created_at': FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
   }
 
   Future<UserModel?> getUser(String userId) async {
@@ -88,40 +160,6 @@ class UserService {
   }
 
   /// ======================
-  /// CREATE SHOP (ADMIN)
-  /// ======================
-  Future<String> createShopWithOwner({
-    required String shopName,
-    required String location,
-    required String contactNumber,
-  }) async {
-    final uid = _auth.currentUser!.uid;
-    final shopRef = _db.collection('shops').doc();
-
-    final batch = _db.batch();
-
-    /// Shop
-    batch.set(shopRef, {
-      'name': shopName,
-      'location': location,
-      'contact_number': contactNumber,
-      'created_date': FieldValue.serverTimestamp(),
-      'owner_admin_uid': uid,
-      'shop_code': _generateShopCode(),
-    });
-
-    /// Membership
-    batch.set(shopRef.collection('members').doc(uid), {
-      'role': 'admin',
-      'added_at': FieldValue.serverTimestamp(),
-      'uid': uid,
-    });
-
-    await batch.commit();
-    return shopRef.id;
-  }
-
-  /// ======================
   /// ADD STAFF TO SHOP
   /// ======================
   Future<void> addStaffToShop({
@@ -162,6 +200,44 @@ class UserService {
     await _db.collection('users').doc(userId).update({'is_active': isActive});
   }
 
+  Future<void> updateUserStatus({
+    required String userId,
+    required String shopId,
+    required bool isActive,
+  }) async {
+    final batch = _db.batch();
+
+    // Update global user profile
+    batch.update(_db.collection('users').doc(userId), {'is_active': isActive});
+
+    // Update minimal member info for real-time listing
+    batch.update(
+      _db.collection('shops').doc(shopId).collection('members').doc(userId),
+      {'is_active': isActive},
+    );
+
+    await batch.commit();
+  }
+
+  Future<void> updateUserVerification({
+    required String userId,
+    required String shopId,
+    required bool verified,
+  }) async {
+    final batch = _db.batch();
+
+    // Update global user profile
+    batch.update(_db.collection('users').doc(userId), {'verified': verified});
+
+    // Update minimal member info for real-time listing
+    batch.update(
+      _db.collection('shops').doc(shopId).collection('members').doc(userId),
+      {'verified': verified},
+    );
+
+    await batch.commit();
+  }
+
   /// ======================
   /// REMOVE USER FROM SHOP
   /// ======================
@@ -175,13 +251,5 @@ class UserService {
         .collection('members')
         .doc(userId)
         .delete();
-  }
-
-  /// ======================
-  /// UTIL
-  /// ======================
-  String _generateShopCode() {
-    final num = DateTime.now().millisecondsSinceEpoch % 10000;
-    return 'SURF-$num';
   }
 }
