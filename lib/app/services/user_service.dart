@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../utils/constants/a_enums.dart';
 import '../../utils/storage/app_storage.dart';
 import '../models/user_model.dart';
 
@@ -10,17 +11,14 @@ class UserService {
 
   final _storage = AppLocalStorage();
 
-  /// ======================
   /// AUTH
-  /// ======================
   User? get currentUser => _auth.currentUser;
 
-  /// ======================
   /// USER SHOP ID FROM LOCAL STORAGE
-  /// ======================
   Future<String?> getShopIdFromStorage() async =>
       _storage.readData('shop_id') as String?;
 
+  /// REGISTER ADMIN WITH SHOP
   Future<void> registerAdminWithShop({
     required String uid,
     required String shopName,
@@ -42,7 +40,7 @@ class UserService {
       'phone': phone,
       'is_active': true,
       'verified': true,
-      'role': 'admin',
+      'role': UserRole.admin.name,
       'shop_id': shopRef.id,
       'created_at': FieldValue.serverTimestamp(),
     });
@@ -59,7 +57,7 @@ class UserService {
       'name': name,
       'email': email,
       'phone': phone,
-      'role': 'admin',
+      'role': UserRole.admin.name,
       'is_active': true,
       'verified': true,
       'created_at': FieldValue.serverTimestamp(),
@@ -68,6 +66,7 @@ class UserService {
     await batch.commit();
   }
 
+  /// REGISTER STAFF
   Future<void> registerStaff({
     required String shopId,
     required String uid,
@@ -88,7 +87,7 @@ class UserService {
       'name': name,
       'email': email,
       'phone': phone,
-      'role': 'staff',
+      'role': UserRole.staff.name,
       'shop_id': shopId,
       'is_active': true,
       'verified': false,
@@ -99,7 +98,7 @@ class UserService {
       'name': name,
       'email': email,
       'phone': phone,
-      'role': 'staff',
+      'role': UserRole.staff.name,
       'is_active': true,
       'verified': false,
       'created_at': FieldValue.serverTimestamp(),
@@ -108,6 +107,7 @@ class UserService {
     await batch.commit();
   }
 
+  /// FETCH USER
   Future<UserModel?> getUser(String userId) async {
     final doc = await _db.collection('users').doc(userId).get();
     if (!doc.exists) return null;
@@ -115,33 +115,30 @@ class UserService {
     return UserModel.fromMap(doc.data()!, doc.id);
   }
 
-  /// Fetch role
-  Future<({String shopId, String role})> getUserMembership(
-    String userId,
-  ) async {
+  /// Fetch USER'S ROLE
+  Future<UserModel> getUserMembership(String userId) async {
     final doc = await _db.collection('users').doc(userId).get();
 
     if (!doc.exists) {
       throw Exception('User profile not found');
     }
 
-    final data = doc.data()!;
+    final user = UserModel.fromMap(doc.data()!, doc.id);
 
-    final role = data['role'] as String?;
-    final shopId = data['shop_id'] as String?;
-
-    if (role == null || shopId == null) {
+    if (user.shopId == null) {
       throw Exception('User not assigned to a shop');
     }
 
-    return (role: role, shopId: shopId);
+    return user;
   }
 
+  /// FETCH USER'S SHOP ID
   Future<String> getShopId() async {
     final doc = await _db.collection('users').doc(_auth.currentUser!.uid).get();
     return doc['shop_id'] as String;
   }
 
+  /// FETCH SHOP MEMBER STATUS
   Future<bool> isUserActive(String userId) async {
     final doc = await _db.collection('users').doc(userId).get();
     if (!doc.exists) return false;
@@ -149,6 +146,7 @@ class UserService {
     return doc['is_active'] == true;
   }
 
+  /// CHECK IF USER EXISTS BY EMAIL
   Future<bool> userExistsByEmail(String email) async {
     final snap = await _db
         .collection('users')
@@ -159,28 +157,7 @@ class UserService {
     return snap.docs.isNotEmpty;
   }
 
-  /// ======================
-  /// ADD STAFF TO SHOP
-  /// ======================
-  Future<void> addStaffToShop({
-    required String shopId,
-    required String userId,
-  }) async {
-    await _db
-        .collection('shops')
-        .doc(shopId)
-        .collection('members')
-        .doc(userId)
-        .set({
-          'role': 'staff',
-          'added_at': FieldValue.serverTimestamp(),
-          'uid': userId,
-        });
-  }
-
-  /// ======================
   /// UPDATE USER PROFILE
-  /// ======================
   Future<void> updateUserProfile({
     required String userId,
     String? name,
@@ -193,13 +170,7 @@ class UserService {
     await _db.collection('users').doc(userId).update(data);
   }
 
-  /// ======================
   /// CHANGE ACTIVE STATUS
-  /// ======================
-  Future<void> changeUserActiveStatus(String userId, bool isActive) async {
-    await _db.collection('users').doc(userId).update({'is_active': isActive});
-  }
-
   Future<void> updateUserStatus({
     required String userId,
     required String shopId,
@@ -219,6 +190,7 @@ class UserService {
     await batch.commit();
   }
 
+  /// CHANGE VERIFICATION STATUS
   Future<void> updateUserVerification({
     required String userId,
     required String shopId,
@@ -238,9 +210,7 @@ class UserService {
     await batch.commit();
   }
 
-  /// ======================
   /// REMOVE USER FROM SHOP
-  /// ======================
   Future<void> removeUserFromShop({
     required String shopId,
     required String userId,

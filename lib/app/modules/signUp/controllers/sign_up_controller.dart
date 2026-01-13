@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../utils/exceptions/firebase_exceptions.dart';
+import '../../../../utils/common/a_app_error_handler.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/user_service.dart';
@@ -25,7 +24,7 @@ class SignUpController extends GetxController {
   final shopCodeController = TextEditingController();
 
   final isLoading = false.obs;
-  final role = 'staff'.obs;
+  final role = UserRole.staff.obs;
   final currentStep = 0.obs;
 
   final isObscurePassword = true.obs;
@@ -39,7 +38,7 @@ class SignUpController extends GetxController {
     super.onInit();
     final args = Get.arguments;
     if (args != null && args['role'] != null) {
-      role.value = args['role'];
+      role.value = UserRole.fromString(args['role']);
     }
   }
 
@@ -74,7 +73,7 @@ class SignUpController extends GetxController {
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
     } catch (e) {
-      _handleError(e);
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
@@ -108,23 +107,10 @@ class SignUpController extends GetxController {
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
     } catch (e) {
-      _handleError(e);
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
-  }
-
-  // ======================
-  // ERROR HANDLING
-  // ======================
-  void _handleError(Object e) {
-    if (kDebugMode) debugPrint(e.toString());
-
-    final message = e is FirebaseAuthException
-        ? AppFirebaseException(e).message
-        : e.toString();
-
-    Get.snackbar('Error', message, snackPosition: SnackPosition.BOTTOM);
   }
 
   void previousStep() {

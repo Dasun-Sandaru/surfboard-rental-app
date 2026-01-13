@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../utils/constants/a_enums.dart';
+
 class UserModel {
   final String uid;
   final String? email;
   final String? name;
-  final String role; // 'admin' or 'staff'
+  final UserRole role; // 'admin' or 'staff'
   final bool isActive;
   final bool isVerified;
   final String? phone;
@@ -33,7 +35,7 @@ class UserModel {
       uid: documentId,
       email: data['email'] as String?,
       name: data['name'] as String?,
-      role: data['role'] as String? ?? 'staff',
+      role: UserRole.fromString(data['role'] as String? ?? 'staff'),
       isActive: data['is_active'] as bool? ?? true,
       isVerified: data['verified'] as bool? ?? false,
       phone: data['phone'] as String?,
@@ -49,7 +51,7 @@ class UserModel {
     return {
       'email': email,
       'name': name,
-      'role': role,
+      'role': role.name,
       'is_active': isActive,
       'verified': isVerified,
       'phone': phone,
@@ -65,7 +67,7 @@ class UserModel {
     String? uid,
     String? email,
     String? name,
-    String? role,
+    UserRole? role,
     bool? isActive,
     bool? isVerified,
     String? phone,
@@ -90,10 +92,10 @@ class UserModel {
   }
 
   /// Check if user is admin
-  bool get isAdmin => role.toLowerCase() == 'admin';
+  bool get isAdmin => role == UserRole.admin;
 
   /// Check if user is staff
-  bool get isStaff => role.toLowerCase() == 'staff';
+  bool get isStaff => role == UserRole.staff;
 
   @override
   String toString() =>

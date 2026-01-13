@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../utils/constants/a_sizes.dart';
-import '../../../../utils/helper/a_device_utils.dart';
 
 class OnBoardingWidget extends StatelessWidget {
   const OnBoardingWidget({
@@ -21,24 +20,14 @@ class OnBoardingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: bgDark,
-      // Add padding to avoid status bar and give breathing room
-      // padding: EdgeInsets.only(top: ADeviceUtils.getAppbarHeight()),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 1. IMAGE SECTION (Changed to 50% for better balance)
-          Expanded(
-            flex: 2,
-            child: Image.asset(
-              image,
-              width: double.infinity,
+          /// Image Section
+          Expanded(flex: 2, child: Image.asset(image, width: double.infinity)),
 
-              // fit: BoxFit.cover,
-            ),
-          ),
-
-          /// 2. TEXT SECTION (Changed to 50%)
+          /// Text Section
           Expanded(
             flex: 1,
             child: SizedBox(
@@ -46,8 +35,6 @@ class OnBoardingWidget extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: ASizes.defaultSpace),
                 child: Column(
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  // Center content vertically in this section
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -71,7 +58,7 @@ class OnBoardingWidget extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    // Add space below text so it doesn't hit the nav buttons
+
                     SizedBox(height: 80.h),
                   ],
                 ),

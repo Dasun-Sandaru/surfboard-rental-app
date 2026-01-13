@@ -9,16 +9,16 @@ class OnboardController extends GetxController {
   final pageController = PageController();
   final currentPageIndex = 0.obs;
 
-  // update current index when page scroll
+  /// UPDATE PAGE INDICATOR
   void updatePageIndicator(int index) => currentPageIndex.value = index;
 
-  // jump to the specific dot selected page
+  /// JUMP SPECIFIC PAGE
   void dotNavigationClick(int index) {
     currentPageIndex.value = index;
     pageController.jumpToPage(index);
   }
 
-  // update current index & jump to next page
+  /// UPDATE TO NEXT PAGE OR NAVIGATE TO SIGN IN
   void nextPage() {
     if (currentPageIndex.value == 2) {
       saveOnboardingShown();
@@ -29,12 +29,13 @@ class OnboardController extends GetxController {
     }
   }
 
-  // update current index & jump to the last page
+  /// SKIP TO LAST PAGE
   void skipPage() {
     currentPageIndex.value = 2;
     pageController.jumpToPage(2);
   }
 
+  /// SAVE ONBOARDING SHOWN FLAG
   void saveOnboardingShown() async {
     await box.saveData('onboarding_shown', true);
   }

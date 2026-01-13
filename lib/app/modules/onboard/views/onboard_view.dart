@@ -17,7 +17,7 @@ class OnboardView extends GetView<OnboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgDark, // Set dark background here
+      backgroundColor: bgDark,
       body: Stack(
         children: [
           /// Horizontal Scrollable Pages
@@ -50,17 +50,16 @@ class OnboardView extends GetView<OnboardController> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                // crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                 children: [
-                  /// Skip Button (Top Right)
+                  // Skip Button
                   const OnBoardingSkipWidget(),
 
-                  /// Dot Navigation (Bottom Left)
+                  // Dot Navigation
                   const OnBoardingDotNavigationWidget(),
 
-                  /// Next Button (Bottom Right)
+                  // Next Button
                   const OnBoardingNextButtonWidget(),
                 ],
               ),

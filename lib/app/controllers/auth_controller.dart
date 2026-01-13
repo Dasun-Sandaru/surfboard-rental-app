@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../utils/constants/a_enums.dart';
 import '../../utils/storage/app_storage.dart';
 import '../routes/app_pages.dart';
 import '../services/auth_service.dart';
-import '../services/firestore_service.dart';
 import '../services/user_service.dart';
 
 class AuthController extends GetxController {
@@ -21,11 +21,11 @@ class AuthController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // 🔥 Firebase Auth Stream → Rx
+    // Firebase Auth Stream
     firebaseUser = Rx<User?>(_authService.currentUser);
     firebaseUser.bindStream(_authService.authStateChanges);
 
-    // 🔁 Listen to auth changes
+    // Listen to Auth Changes
     ever(firebaseUser, _handleAuthChanged);
   }
 
@@ -38,7 +38,7 @@ class AuthController extends GetxController {
       return;
     }
 
-    // Reload & verify email
+    // Reload & Verify Email
     await user.reload();
     final isVerified = user.emailVerified;
 
@@ -48,23 +48,22 @@ class AuthController extends GetxController {
     }
 
     try {
-      final membership = await _userService.getUserMembership(user.uid);
+      final userModel = await _userService.getUserMembership(user.uid);
 
-      final role = membership.role;
-      final shopId = membership.shopId;
+      final role = userModel.role;
+      final shopId = userModel.shopId;
 
-      // Save shopId in local storage for later use
-      _storage.saveData('shopId', shopId);
+      // Save shopId Locally
+      await _storage.saveData('shopId', shopId);
 
-      if (role == 'admin') {
+      if (role == UserRole.admin) {
         Get.offAllNamed(Routes.ADMIN_HOME);
-      } else if (role == 'staff') {
+      } else if (role == UserRole.staff) {
         Get.offAllNamed(Routes.STAFF_HOME);
       } else {
         Get.offAllNamed(Routes.SIGN_IN);
       }
     } catch (e) {
-      // fallback
       Get.offAllNamed(Routes.SIGN_IN);
     }
   }

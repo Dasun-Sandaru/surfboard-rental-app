@@ -1,12 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../utils/common/a_app_error_handler.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/storage/app_storage.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
 
 class SignInController extends GetxController {
@@ -28,25 +27,13 @@ class SignInController extends GetxController {
     try {
       isLoading.value = true;
 
-      /// 1️⃣ Firebase Auth
+      /// FIREBASE AUTH
       await _authService.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      /// 2️⃣ Email verification
-      // if (!await _authService.isEmailVerified()) {
-      //   await _authService.signOut();
-      //   throw 'Email not verified';
-      // }
-
-      /// 3️⃣ User active check
-      // if (!await _userService.isUserActive(_authService.currentUser!.uid)) {
-      //   await _authService.signOut();
-      //   throw 'User account disabled';
-      // }
-
-      /// 4️⃣ Get shop + role
+      /// GET SHOP ID + ROLE
       final appUser = await _userService.getUser(_authService.currentUser!.uid);
 
       if (appUser == null) throw 'User not found';
@@ -56,10 +43,10 @@ class SignInController extends GetxController {
       final isActive = appUser.isActive;
       final isVerified = appUser.isVerified;
 
-      // Save ShopId in local storage for later use
-      _storage.saveData('shop_id', shopId);
+      // SAVE SHOP ID LOCALLY
+      await _storage.saveData('shop_id', shopId);
 
-      /// 5️⃣ Navigate
+      /// Navigate
       if (!isActive) {
         Get.offAllNamed(Routes.AUTH_GATE, arguments: {'gate': 'not-active'});
         return;
@@ -69,34 +56,32 @@ class SignInController extends GetxController {
         Get.offAllNamed(Routes.AUTH_GATE, arguments: {'gate': 'not-verified'});
         return;
       }
-      if (role == 'admin') {
+      if (role == UserRole.admin) {
         Get.offAllNamed(Routes.ADMIN_HOME, arguments: {'shopId': shopId});
         return;
       }
-      if (role == 'staff') {
+      if (role == UserRole.staff) {
         Get.offAllNamed(Routes.STAFF_HOME, arguments: {'shopId': shopId});
         return;
       }
     } catch (e) {
-      log(e.toString());
-      Get.snackbar(
-        'Login failed',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
   }
 
+  /// NAVIGATE TO FORGOT PASSWORD
   void goToForgotPassword() {
     Get.toNamed(Routes.FORGOT_PASSWORD);
   }
 
+  /// NAVIGATE TO SIGN UP STAFF
   void goToSignUpStaff() {
     Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'staff'});
   }
 
+  /// NAVIGATE TO SIGN UP ADMIN
   void goToSignUpAdmin() {
     Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'admin'});
   }

@@ -5,9 +5,8 @@ class ShopService {
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-  /// ======================
   /// CREATE SHOP + OWNER MEMBERSHIP
-  /// ======================
+
   Future<String> createShopWithOwner({
     required String shopName,
     required String location,

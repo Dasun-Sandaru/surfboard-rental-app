@@ -3,16 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// ======================
   /// AUTH STATE
-  /// ======================
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
 
-  /// ======================
   /// SIGN UP
-  /// ======================
   Future<UserCredential> signUp({
     required String email,
     required String password,
@@ -28,9 +25,7 @@ class AuthService {
     return credential;
   }
 
-  /// ======================
   /// SIGN IN
-  /// ======================
   Future<UserCredential> signIn({
     required String email,
     required String password,
@@ -41,16 +36,12 @@ class AuthService {
     );
   }
 
-  /// ======================
   /// SIGN OUT
-  /// ======================
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  /// ======================
   /// EMAIL VERIFICATION
-  /// ======================
   Future<bool> isEmailVerified() async {
     final user = _auth.currentUser;
     if (user == null) return false;
@@ -59,6 +50,7 @@ class AuthService {
     return _auth.currentUser?.emailVerified ?? false;
   }
 
+  /// RESEND VERIFICATION EMAIL
   Future<void> resendVerificationEmail() async {
     final user = _auth.currentUser;
     if (user != null && !user.emailVerified) {
@@ -66,12 +58,8 @@ class AuthService {
     }
   }
 
-  /// ======================
   /// PASSWORD RESET
-  /// ======================
   Future<void> sendPasswordResetEmail(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
   }
-
-  
 }

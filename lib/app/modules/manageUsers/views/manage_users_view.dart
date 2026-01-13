@@ -143,7 +143,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
 
   Widget _buildUserListItem(Map<String, dynamic> user) {
     final bool isAdmin = user['role'] == 'Admin';
-    final bool isActive = user['status'] == 'Active';
+    final bool isActive = user['is_active'];
     final Color avatarColor = user['color'];
 
     return InkWell(

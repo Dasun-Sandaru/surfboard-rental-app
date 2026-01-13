@@ -65,9 +65,6 @@ class ManageUsersController extends GetxController {
           "email": email,
           "role": role,
           "phone": phone,
-
-          // "is_active": isActive ? "Active" : "Inactive",
-          // "verified": isVerified ? "Verified" : "Unverified",
           "is_active": isActive,
           "verified": isVerified,
 
