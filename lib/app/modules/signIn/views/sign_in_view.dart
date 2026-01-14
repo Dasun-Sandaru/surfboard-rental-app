@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-
-import '../../../../utils/common/is_text_field_required.dart';
 import '../../../../utils/helper/a_validator.dart';
 import '../controllers/sign_in_controller.dart';
 
@@ -26,7 +24,7 @@ class SignInView extends GetView<SignInController> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            /// 1. Hero Image Section
+            /// Hero Image Section
             _buildHeader(context),
 
             Padding(
@@ -35,7 +33,7 @@ class SignInView extends GetView<SignInController> {
                 children: [
                   SizedBox(height: 24.h),
 
-                  /// 2. Welcome Text
+                  /// Welcome Text
                   Text(
                     'Welcome Back!',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -54,17 +52,17 @@ class SignInView extends GetView<SignInController> {
 
                   SizedBox(height: 32.h),
 
-                  /// 3. Main Form
+                  /// Main Form
                   _buildForm(context),
 
                   SizedBox(height: 24.h),
 
-                  /// 4. Divider
+                  /// Divider
                   _buildDivider(context),
 
                   SizedBox(height: 24.h),
 
-                  /// 5. Improved Sign Up Section
+                  /// Sign Up Section
                   _buildSignUpSection(context),
 
                   SizedBox(height: 32.h),
@@ -77,7 +75,9 @@ class SignInView extends GetView<SignInController> {
     );
   }
 
-  /// Helper widget for the top Image/Header
+  /// Helper widgets
+
+  /// Build Header
   Widget _buildHeader(BuildContext context) {
     return Stack(
       children: [
@@ -85,9 +85,8 @@ class SignInView extends GetView<SignInController> {
           height: 220.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: cardDark, // Slightly lighter than bg
+            color: cardDark,
             image: DecorationImage(
-              // Add your image asset here later
               image: AssetImage("assets/login_header.jpg"),
               fit: BoxFit.cover,
               opacity: 0.5,
@@ -98,17 +97,14 @@ class SignInView extends GetView<SignInController> {
             ),
           ),
         ),
-        // Gradient Overlay for smooth transition
+
         Container(
           height: 220.h,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                bgDark.withValues(alpha: 0.9), // Fade into background color
-              ],
+              colors: [Colors.transparent, bgDark.withValues(alpha: 0.9)],
             ),
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(30),
@@ -116,30 +112,30 @@ class SignInView extends GetView<SignInController> {
             ),
           ),
         ),
-        Positioned(
-          bottom: 20.h,
-          left: 20.w,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: primaryBlue.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              "Ride the wave",
-              style: TextStyle(
-                color: textWhite,
-                fontWeight: FontWeight.w600,
-                fontSize: 12.sp,
-              ),
-            ),
-          ),
-        ),
+        // Positioned(
+        //   bottom: 20.h,
+        //   left: 20.w,
+        //   child: Container(
+        //     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+        //     decoration: BoxDecoration(
+        //       color: primaryBlue.withValues(alpha: 0.9),
+        //       borderRadius: BorderRadius.circular(8),
+        //     ),
+        //     child: Text(
+        //       "Ride the wave",
+        //       style: TextStyle(
+        //         color: textWhite,
+        //         fontWeight: FontWeight.w600,
+        //         fontSize: 12.sp,
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
 
-  /// Helper widget for the Form inputs
+  /// Build Form
   Widget _buildForm(BuildContext context) {
     return Form(
       key: controller.formKey,
@@ -150,10 +146,10 @@ class SignInView extends GetView<SignInController> {
           _buildLabel('Email Address'.tr),
           SizedBox(height: 8.h),
           TextFormField(
-            controller: controller.emailController1,
+            controller: controller.emailController,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(color: textWhite), // White text input
+            style: TextStyle(color: textWhite),
             decoration: _inputDecoration(
               hint: 'hello@surfshop.com',
               icon: Iconsax.sms,
@@ -215,7 +211,7 @@ class SignInView extends GetView<SignInController> {
               () => ElevatedButton(
                 onPressed: () => controller.signIn(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue, // Use Theme Blue
+                  backgroundColor: primaryBlue,
                   foregroundColor: textWhite,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -285,7 +281,7 @@ class SignInView extends GetView<SignInController> {
     );
   }
 
-  /// Visual separation with "Or"
+  /// Separation with "Or"
   Widget _buildDivider(BuildContext context) {
     return Row(
       children: [
@@ -342,6 +338,7 @@ class SignInView extends GetView<SignInController> {
     );
   }
 
+  /// Reusable Outline Button
   Widget _buildOutlineButton({
     required String text,
     required IconData icon,

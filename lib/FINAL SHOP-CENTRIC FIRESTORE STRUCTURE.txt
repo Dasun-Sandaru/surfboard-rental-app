@@ -5,7 +5,8 @@
         role                       // "admin" | "staff"
         shop_id                    // Assigned shop
         phone
-        is_active                  // for disabling accounts
+        is_active
+        verified                  // for disabling accounts
         created_at
 
 
@@ -26,6 +27,7 @@
                 role               // "admin" or "staff"
                 phone
                 is_active
+                verified
                 created_at
 
         --------------------------------------------------------------------

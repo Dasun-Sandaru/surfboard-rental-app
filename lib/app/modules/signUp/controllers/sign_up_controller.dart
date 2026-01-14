@@ -1,35 +1,34 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../utils/exceptions/firebase_exceptions.dart';
+import '../../../../utils/common/a_app_error_handler.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/user_service.dart';
 
 class SignUpController extends GetxController {
-  final GlobalKey<FormState> staffFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> shopFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> ownerFormKey = GlobalKey<FormState>();
+  final ownerFormKey = GlobalKey<FormState>();
+  final staffFormKey = GlobalKey<FormState>();
+  final shopFormKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
-  final shopCodeController = TextEditingController();
 
   final shopNameController = TextEditingController();
   final shopLocationController = TextEditingController();
   final shopContactController = TextEditingController();
+  final shopCodeController = TextEditingController();
 
   final isLoading = false.obs;
+  final role = UserRole.staff.obs;
   final currentStep = 0.obs;
-  final role = 'staff'.obs;
 
-  RxBool isObscurePassword = true.obs;
-  RxBool isObscureConfirmPassword = true.obs;
+  final isObscurePassword = true.obs;
+  final isObscureConfirmPassword = true.obs;
 
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
@@ -39,59 +38,63 @@ class SignUpController extends GetxController {
     super.onInit();
     final args = Get.arguments;
     if (args != null && args['role'] != null) {
-      role.value = args['role'];
+      role.value = UserRole.fromString(args['role']);
     }
   }
 
-  /// ======================
-  /// REGISTER ADMIN
-  /// ======================
+  /// REGISTER SHOP OWNER
   Future<void> registerShopOwner() async {
     if (!(ownerFormKey.currentState?.validate() ?? false)) return;
+    if (!(shopFormKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
 
+      // Firebase Auth
       final credential = await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      final user = credential.user!;
-      await _userService.createShopWithOwner(
-        userId: user.uid,
+      final uid = credential.user!.uid;
+
+      // Create User profile, Shop, And Membership
+      await _userService.registerAdminWithShop(
+        uid: uid,
         shopName: shopNameController.text.trim(),
-        location: shopLocationController.text.trim(),
-        contactNumber: shopContactController.text.trim(),
-        ownerName: nameController.text.trim(),
-        ownerEmail: emailController.text.trim(),
+        shopLocation: shopLocationController.text.trim(),
+        shopContactNumber: shopContactController.text.trim(),
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
         phone: phoneController.text.trim(),
       );
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
     } catch (e) {
-      _handleError(e);
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ======================
   /// REGISTER STAFF
-  /// ======================
   Future<void> registerShopStaff() async {
     if (!(staffFormKey.currentState?.validate() ?? false)) return;
 
     try {
       isLoading.value = true;
 
+      // Firebase Auth
       final credential = await _authService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      await _userService.createStaffUser(
-        userId: credential.user!.uid,
+      final uid = credential.user!.uid;
+
+      // Create User Profile And Membership
+      await _userService.registerStaff(
+        uid: uid,
         shopId: shopCodeController.text.trim(),
         name: nameController.text.trim(),
         email: emailController.text.trim(),
@@ -100,24 +103,13 @@ class SignUpController extends GetxController {
 
       Get.offAllNamed(Routes.VERIFY_EMAIL);
     } catch (e) {
-      _handleError(e);
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  void _handleError(Object e) {
-    if (kDebugMode) {
-      debugPrint(e.toString());
-    }
-
-    final message = e is FirebaseAuthException
-        ? AppFirebaseException(e).message
-        : 'Something went wrong';
-
-    Get.snackbar('Error', message, snackPosition: SnackPosition.BOTTOM);
-  }
-
+  /// NEXT STEP IN SIGN UP
   void previousStep() {
     if (currentStep.value > 0) {
       currentStep.value--;
@@ -131,10 +123,10 @@ class SignUpController extends GetxController {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneController.dispose();
-    shopCodeController.dispose();
     shopNameController.dispose();
     shopLocationController.dispose();
     shopContactController.dispose();
+    shopCodeController.dispose();
     super.onClose();
   }
 }

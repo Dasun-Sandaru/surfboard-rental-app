@@ -7,7 +7,7 @@ import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 
 class SplashController extends GetxController {
-  final box = AppLocalStorage();
+  final _storage = AppLocalStorage();
   final updateStatus = 'init'.obs;
 
   @override
@@ -21,9 +21,8 @@ class SplashController extends GetxController {
     _handleOnboarding();
   }
 
-  /// ======================
+
   /// APP UPDATE
-  /// ======================
   Future<void> checkAppUpdate() async {
     try {
       updateStatus.value = 'Checking for updates...';
@@ -45,20 +44,17 @@ class SplashController extends GetxController {
     }
   }
 
-  /// ======================
   /// ONBOARDING
-  /// ======================
   void _handleOnboarding() {
-    final isOnboardingShown = box.readData('onboarding_shown') ?? false;
+    final isOnboardingShown = _storage.readData('onboarding_shown') ?? false;
 
     if (!isOnboardingShown) {
       Get.offAllNamed(Routes.ONBOARD);
       return;
     }
 
-    /// AuthController will take over from here
+    /// AuthController WILL HANDLE AUTH STATE
     Future.delayed(const Duration(seconds: 2), () {
-      // Get.offAllNamed(Routes.AUTH_GATE);
       Get.put(AuthController(), permanent: true);
     });
   }

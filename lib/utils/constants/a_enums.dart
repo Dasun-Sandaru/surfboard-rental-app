@@ -18,7 +18,24 @@ enum PaymentStatus { pending, completed, failed, refunded }
 enum BookingStatus { pending, confirmed, canceled, completed }
 
 // User Role Enum
-enum UserRole { admin, user, guest }
+enum UserRole {
+  admin,
+  staff,
+  guest;
+
+  factory UserRole.fromString(String role) {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return UserRole.admin;
+      case 'staff':
+        return UserRole.staff;
+      default:
+        return UserRole.guest;
+    }
+  }
+
+  String get role => toString().split('.').last;
+}
 
 // Device Type Enum
 enum DeviceType { mobile, tablet, desktop, web }

@@ -21,22 +21,21 @@ class SplashView extends GetView<SplashController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /// 1. Spacer to push logo slightly up visually
             const Spacer(flex: 2),
 
-            /// 2. Animated/Static Logo
+            /// Static Logo
             Container(
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryBlue.withValues(alpha: 0.1), // Subtle glow effect
+                color: primaryBlue.withValues(alpha: 0.1),
               ),
               child: Icon(Icons.surfing, size: 80.sp, color: primaryBlue),
             ),
 
             SizedBox(height: 24.h),
 
-            /// 3. App Name
+            /// App Name
             Text(
               "SURF RENTAL",
               style: TextStyle(
@@ -60,7 +59,7 @@ class SplashView extends GetView<SplashController> {
 
             const Spacer(),
 
-            /// 4. Loading Indicator
+            /// Loading Indicator
             SizedBox(
               width: 24.w,
               height: 24.w,
@@ -72,7 +71,7 @@ class SplashView extends GetView<SplashController> {
 
             SizedBox(height: 16.h),
 
-            /// 5. Dynamic Status Text (from Controller)
+            /// Dynamic Status Text
             Obx(
               () => Text(
                 controller.updateStatus.value,
@@ -80,7 +79,7 @@ class SplashView extends GetView<SplashController> {
               ),
             ),
 
-            SizedBox(height: 40.h), // Safe area margin
+            SizedBox(height: 40.h),
           ],
         ),
       ),

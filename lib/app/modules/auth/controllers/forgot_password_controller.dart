@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../utils/exceptions/firebase_exceptions.dart';
+import '../../../../utils/common/a_app_error_handler.dart';
+import '../../../../utils/common/a_app_snacks.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/user_service.dart';
 
@@ -10,72 +11,47 @@ class ForgotPasswordController extends GetxController {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final isLoading = false.obs;
-  final isSuccess = false.obs; // track if reset email was sent
+  final isSuccess = false.obs;
 
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
 
-  /// Send password reset email
+  /// RESET PASSWORD
   Future<void> resetPassword() async {
     try {
-      // Validate email
       if (!(formKey.currentState?.validate() ?? false)) return;
 
       isLoading.value = true;
       final email = emailController.text.trim();
 
-      // Check Email User exists
+      // Check Email User Exists
       final userExists = await _userService.userExistsByEmail(email);
       if (!userExists) {
-        Get.snackbar(
-          'Error',
+        appSnackBarSuccessAndFailure(
           'User with this email does not exist.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
+          isSuccess: false,
         );
         return;
       }
 
-      // Send reset email
+      // Send Password Reset Email
       await _authService.sendPasswordResetEmail(email);
 
       isSuccess.value = true;
 
-      // Show success snackbar
-      Get.snackbar(
-        'Success',
-        'Password reset email sent to $email. Check your inbox.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withValues(alpha: 0.1),
-        colorText: Colors.green,
-        duration: const Duration(seconds: 4),
-      );
+      // Show Success Snackbar
+      appSnackBarSuccessAndFailure('Password reset email sent to $email.');
     } on FirebaseAuthException catch (e) {
-      final errorMessage = AppFirebaseException(e).message;
-      Get.snackbar(
-        'Error',
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.1),
-        colorText: Colors.red,
-      );
+      AppErrorHandler.handleError(e);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'An unexpected error occurred. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.1),
-        colorText: Colors.red,
-      );
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Navigate back to Login screen
+  /// Navigate Back To Login
   void goToLogin() {
-    // Get.offAllNamed(Routes.SIGN_IN);
     Get.back();
   }
 

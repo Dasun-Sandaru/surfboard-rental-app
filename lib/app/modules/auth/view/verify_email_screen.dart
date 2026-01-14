@@ -20,7 +20,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgDark,
-      // Optional: Add an AppBar if you want a back button, otherwise leave blank
+
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
@@ -32,7 +32,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /// 1. Icon (Glow Effect)
+              /// Icon (Glow Effect)
               Container(
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
@@ -44,7 +44,6 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
 
               SizedBox(height: 32.h),
 
-              /// 2. Text
               Text(
                 'Verify your email address',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -64,7 +63,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
 
               SizedBox(height: 32.h),
 
-              /// 3. Continue Button
+              /// Continue Button
               SizedBox(
                 width: double.infinity,
                 height: 54.h,
@@ -90,7 +89,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
 
               SizedBox(height: 24.h),
 
-              /// 4. Resend Button
+              /// Resend Button
               SizedBox(
                 width: double.infinity,
                 height: 54.h,
@@ -116,7 +115,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
 
               SizedBox(height: 32.h),
 
-              /// 5. Check Verification Status (Auto-check Indicator)
+              /// Check Verification Status (Auto-check Indicator)
               if (!controller.isEmailVerified.value)
                 Column(
                   children: [

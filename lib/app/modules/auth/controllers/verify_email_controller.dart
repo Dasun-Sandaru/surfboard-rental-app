@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../utils/common/a_app_error_handler.dart';
+import '../../../../utils/common/a_app_snacks.dart';
 import '../../../services/auth_service.dart';
-import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/user_service.dart';
 
@@ -27,9 +27,7 @@ class VerifyEmailController extends GetxController {
     _startEmailVerificationCheck();
   }
 
-  /// ======================
-  /// Email verification check
-  /// ======================
+  /// EMAIL VERIFICATION CHECKING
   void _startEmailVerificationCheck() {
     // Initial check
     checkEmailVerification();
@@ -41,6 +39,7 @@ class VerifyEmailController extends GetxController {
     );
   }
 
+  /// CHECK EMAIL VERIFICATION
   Future<void> checkEmailVerification() async {
     try {
       isLoading.value = true;
@@ -51,10 +50,16 @@ class VerifyEmailController extends GetxController {
       if (verified) {
         _verificationTimer?.cancel();
 
-        // Navigate to role-based home
+        // Navigate To Role-Based Home
         final user = _authService.currentUser;
         if (user != null) {
-          final role = await _userService.getUserRole();
+          final membership = await _userService.getUserMembership(
+            _authService.currentUser!.uid,
+          );
+
+          final role = membership.role;
+          // final shopId = membership['shopId']!;
+
           if (role == 'admin') {
             Get.offAllNamed(Routes.ADMIN_HOME);
           } else if (role == 'staff') {
@@ -66,47 +71,24 @@ class VerifyEmailController extends GetxController {
         }
       }
     } catch (e) {
-      debugPrint('Error checking email verification: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to check email verification status',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ======================
-  /// Resend verification email
-  /// ======================
+  /// RESEND VERIFICATION EMAIL
   Future<void> resendVerificationEmail() async {
     if (!canResend) return;
-
     try {
       isLoading.value = true;
       await _authService.resendVerificationEmail();
 
-      Get.snackbar(
-        'Success',
-        'Verification email sent. Please check your inbox.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
-      );
+      appSnackBarSuccessAndFailure('Verification email sent.');
 
       _startResendCooldown();
     } catch (e) {
-      debugPrint('Error resending verification email: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to send verification email',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+      AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
     }
@@ -130,21 +112,13 @@ class VerifyEmailController extends GetxController {
       ? 'Resend Verification Email'
       : 'Resend in ${resendCountdown.value}s';
 
-  /// ======================
-  /// Go back to login
-  /// ======================
+  /// GO TO LOGIN
   Future<void> goToLogin() async {
     try {
       await _authService.signOut();
       Get.offAllNamed(Routes.SIGN_IN);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to sign out',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+      AppErrorHandler.handleError(e);
     }
   }
 

@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../../utils/constants/a_enums.dart';
+import '../../utils/storage/app_storage.dart';
 import '../routes/app_pages.dart';
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
@@ -8,29 +12,33 @@ import '../services/user_service.dart';
 class AuthController extends GetxController {
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
+  final AppLocalStorage _storage = AppLocalStorage();
 
   late Rx<User?> firebaseUser;
+  StreamSubscription? _userSub;
 
   @override
   void onInit() {
     super.onInit();
 
-    // 🔥 Firebase Auth Stream → Rx
+    // Firebase Auth Stream
     firebaseUser = Rx<User?>(_authService.currentUser);
     firebaseUser.bindStream(_authService.authStateChanges);
 
-    // 🔁 Listen to auth changes
+    // Listen to Auth Changes
     ever(firebaseUser, _handleAuthChanged);
   }
 
   /// CENTRAL AUTH ROUTING
   Future<void> _handleAuthChanged(User? user) async {
+    _userSub?.cancel();
+
     if (user == null) {
       Get.offAllNamed(Routes.SIGN_IN);
       return;
     }
 
-    // Reload & verify email
+    // Reload & Verify Email
     await user.reload();
     final isVerified = user.emailVerified;
 
@@ -39,17 +47,30 @@ class AuthController extends GetxController {
       return;
     }
 
-    // Fetch role
-    final role = await _userService.getUserRole();
+    try {
+      final userModel = await _userService.getUserMembership(user.uid);
 
-    Future.delayed(const Duration(seconds: 10), () {
-      if (role == 'admin') {
+      final role = userModel.role;
+      final shopId = userModel.shopId;
+
+      // Save shopId Locally
+      await _storage.saveData('shopId', shopId);
+
+      if (role == UserRole.admin) {
         Get.offAllNamed(Routes.ADMIN_HOME);
-      } else if (role == 'staff') {
+      } else if (role == UserRole.staff) {
         Get.offAllNamed(Routes.STAFF_HOME);
       } else {
         Get.offAllNamed(Routes.SIGN_IN);
       }
-    });
+    } catch (e) {
+      Get.offAllNamed(Routes.SIGN_IN);
+    }
+  }
+
+  @override
+  void onClose() {
+    _userSub?.cancel();
+    super.onClose();
   }
 }
