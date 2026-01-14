@@ -42,9 +42,7 @@ class SignUpController extends GetxController {
     }
   }
 
-  // ======================
-  // REGISTER SHOP OWNER
-  // ======================
+  /// REGISTER SHOP OWNER
   Future<void> registerShopOwner() async {
     if (!(ownerFormKey.currentState?.validate() ?? false)) return;
     if (!(shopFormKey.currentState?.validate() ?? false)) return;
@@ -60,7 +58,7 @@ class SignUpController extends GetxController {
 
       final uid = credential.user!.uid;
 
-      // Create user profile, shop, and membership
+      // Create User profile, Shop, And Membership
       await _userService.registerAdminWithShop(
         uid: uid,
         shopName: shopNameController.text.trim(),
@@ -79,9 +77,7 @@ class SignUpController extends GetxController {
     }
   }
 
-  // ======================
-  // REGISTER STAFF
-  // ======================
+  /// REGISTER STAFF
   Future<void> registerShopStaff() async {
     if (!(staffFormKey.currentState?.validate() ?? false)) return;
 
@@ -96,7 +92,7 @@ class SignUpController extends GetxController {
 
       final uid = credential.user!.uid;
 
-      // Create user profile and membership
+      // Create User Profile And Membership
       await _userService.registerStaff(
         uid: uid,
         shopId: shopCodeController.text.trim(),
@@ -113,6 +109,7 @@ class SignUpController extends GetxController {
     }
   }
 
+  /// NEXT STEP IN SIGN UP
   void previousStep() {
     if (currentStep.value > 0) {
       currentStep.value--;

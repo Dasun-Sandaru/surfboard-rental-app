@@ -12,12 +12,11 @@ class ManageUsersController extends GetxController {
   final FirestoreService _firestoreService = Get.find();
   final UserService _userService = Get.find();
 
-  // This comes from AuthController (current user's shop)
   String? shopId;
 
   final searchTextController = TextEditingController();
 
-  // Users list for UI
+  /// Shop Members List
   final RxList<Map<String, dynamic>> users = <Map<String, dynamic>>[].obs;
 
   StreamSubscription? _usersSub;
@@ -28,7 +27,7 @@ class ManageUsersController extends GetxController {
     _initShopMembers();
   }
 
-  /// Initialize shop members listener
+  /// INITIALIZE SHOP MEMBERS
   Future<void> _initShopMembers() async {
     shopId = await _userService.getShopIdFromStorage();
     if (shopId == null) {
@@ -39,9 +38,7 @@ class ManageUsersController extends GetxController {
     _listenUsers();
   }
 
-  /// ---------------------------------------------------------------------------
   /// REAL-TIME SHOP MEMBERS LISTENER
-  /// ---------------------------------------------------------------------------
   void _listenUsers() {
     if (shopId == null) return;
 
@@ -54,7 +51,6 @@ class ManageUsersController extends GetxController {
             .toString()
             .capitalizeFirst!;
         final String phone = data['phone'] ?? '';
-
 
         final bool isActive = data['is_active'] ?? true;
         final bool isVerified = data['verified'] ?? false;
@@ -74,7 +70,7 @@ class ManageUsersController extends GetxController {
         };
       }).toList();
 
-      // Sort admins first
+      // Sort Admins First
       fetchedUsers.sort((a, b) {
         if (a['role'] == 'Admin' && b['role'] != 'Admin') return -1;
         if (a['role'] != 'Admin' && b['role'] == 'Admin') return 1;
@@ -85,21 +81,17 @@ class ManageUsersController extends GetxController {
     });
   }
 
-  /// ---------------------------------------------------------------------------
-  /// UI ACTIONS
-  /// ---------------------------------------------------------------------------
+  /// UI ACTIONS 
   void addUser() {
     Get.snackbar("Action", "Add User clicked");
   }
 
   void viewUserDetails(Map<String, dynamic> user) {
-    log("Viewing details for user: ${user}");
+    log("Viewing details for user: $user");
     Get.toNamed(Routes.USER_DETAIL, arguments: user);
   }
 
-  /// ---------------------------------------------------------------------------
   /// HELPERS
-  /// ---------------------------------------------------------------------------
   String _getInitials(String name) {
     if (name.isEmpty) return "?";
     final parts = name.trim().split(" ");

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 
 import '../../../services/user_service.dart';
@@ -9,7 +7,6 @@ class UserDetailController extends GetxController {
 
   final user = <String, dynamic>{}.obs;
 
-  // Reactive variables for the UI toggles
   final RxBool isActive = true.obs;
   final RxBool isVerified = false.obs;
 
@@ -24,11 +21,12 @@ class UserDetailController extends GetxController {
       user.assignAll(Map<String, dynamic>.from(Get.arguments));
     }
 
-    // Initialize reactive variables from the passed user data
+    // Initialize status values
     isActive.value = user['is_active'] as bool? ?? false;
     isVerified.value = user['verified'] as bool? ?? false;
   }
 
+  /// UI ACTIONS
   Future<void> toggleActiveStatus(bool value) async {
     isActive.value = value;
     await _userService.updateUserStatus(

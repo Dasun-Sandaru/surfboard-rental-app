@@ -21,9 +21,6 @@ class ManageUsersView extends GetView<ManageUsersController> {
 
   @override
   Widget build(BuildContext context) {
-    // // Put controller if not already bound
-    // final controller = Get.put(UserManagementController());
-
     return Scaffold(
       backgroundColor: bgDark,
       appBar: AAppBar(
@@ -60,7 +57,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
           children: [
             SizedBox(height: 16.h),
 
-            /// 1. Search Bar
+            /// Search Bar
             TextFormField(
               controller: controller.searchTextController,
               style: TextStyle(color: textWhite),
@@ -84,7 +81,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
 
             SizedBox(height: 20.h),
 
-            /// 2. User List
+            /// User List
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -92,7 +89,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: borderDark.withOpacity(0.5)),
                 ),
-                // Using Obx to make the list reactive
+              
                 child: Obx(() {
                   if (controller.users.isEmpty) {
                     return _buildEmptyList();
@@ -117,9 +114,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
     );
   }
 
-  // ===========================================================================
   // HELPER WIDGETS
-  // ===========================================================================
 
   Widget _buildEmptyList() {
     return Center(

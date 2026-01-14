@@ -35,31 +35,31 @@ class UserDetailView extends GetView<UserDetailController> {
         padding: EdgeInsets.all(ASizes.defaultPadding),
         child: Column(
           children: [
-            /// 1. Profile Header
+            /// Profile Header
             Obx(() => _buildProfileHeader(controller)),
 
             SizedBox(height: 24.h),
 
-            /// 2. MANAGEMENT COMPONENT (Active/Verify)
+            /// Management Control (Active/Verify)
             _buildManagementControlCard(controller),
 
             SizedBox(height: 24.h),
 
-            /// 3. Contact Info
+            /// Contact Info
             _buildSectionTitle("Contact Information"),
             SizedBox(height: 12.h),
             _buildContactInfoCard(controller),
 
             SizedBox(height: 24.h),
 
-            /// 4. Performance Stats
+            /// Performance Stats
             _buildSectionTitle("Performance"),
             SizedBox(height: 12.h),
             _buildPerformanceRow(),
 
             SizedBox(height: 24.h),
 
-            /// 5. History
+            /// History
             _buildSectionTitle("Recent Activity"),
             SizedBox(height: 12.h),
             _buildHistoryList(),
@@ -101,10 +101,7 @@ class UserDetailView extends GetView<UserDetailController> {
     );
   }
 
-  // ===========================================================================
   // WIDGET BUILDERS
-  // ===========================================================================
-
   Widget _buildProfileHeader(UserDetailController controller) {
     log("Building profile header for user: ${controller.user['name']}");
     return Column(
@@ -116,9 +113,9 @@ class UserDetailView extends GetView<UserDetailController> {
             (controller.user['name'] != null &&
                     controller.user['name'].toString().isNotEmpty)
                 ? controller.user['name']
-                    .toString()
-                    .substring(0, 1)
-                    .toUpperCase()
+                      .toString()
+                      .substring(0, 1)
+                      .toUpperCase()
                 : '',
             style: TextStyle(
               fontSize: 32.sp,
@@ -169,7 +166,7 @@ class UserDetailView extends GetView<UserDetailController> {
       ),
       child: Column(
         children: [
-          // Row 1: Account Status
+          // Account Status
           Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,7 +212,7 @@ class UserDetailView extends GetView<UserDetailController> {
             child: Divider(color: borderDark),
           ),
 
-          // Row 2: Verification
+          // Verification
           Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -272,7 +269,9 @@ class UserDetailView extends GetView<UserDetailController> {
                       child: Row(
                         children: [
                           Text(
-                            controller.isVerified.value ? "Verified" : "Approve",
+                            controller.isVerified.value
+                                ? "Verified"
+                                : "Approve",
                             style: TextStyle(
                               color: controller.isVerified.value
                                   ? successGreen
@@ -307,26 +306,28 @@ class UserDetailView extends GetView<UserDetailController> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderDark.withOpacity(0.5)),
       ),
-      child: Column(
-        children: [
-          _buildInfoRow(
-            Iconsax.sms,
-            "Email",
-            controller.user['email'].toString(),
-          ),
-          SizedBox(height: 16.h),
-          _buildInfoRow(
-            Iconsax.call,
-            "Phone",
-            controller.user['phone'].toString(),
-          ),
-          SizedBox(height: 16.h),
-          _buildInfoRow(
-            Iconsax.calendar,
-            "Joined",
-            controller.user['created_at'].toString(),
-          ),
-        ],
+      child: Obx(
+        () => Column(
+          children: [
+            _buildInfoRow(
+              Iconsax.sms,
+              "Email",
+              controller.user['email'].toString(),
+            ),
+            SizedBox(height: 16.h),
+            _buildInfoRow(
+              Iconsax.call,
+              "Phone",
+              controller.user['phone'].toString(),
+            ),
+            SizedBox(height: 16.h),
+            _buildInfoRow(
+              Iconsax.calendar,
+              "Joined",
+              controller.user['created_at'].toString(),
+            ),
+          ],
+        ),
       ),
     );
   }

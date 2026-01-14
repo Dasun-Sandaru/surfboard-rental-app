@@ -39,7 +39,7 @@ class ForgotPasswordController extends GetxController {
 
       isSuccess.value = true;
 
-      // Show success snackbar
+      // Show Success Snackbar
       appSnackBarSuccessAndFailure('Password reset email sent to $email.');
     } on FirebaseAuthException catch (e) {
       AppErrorHandler.handleError(e);

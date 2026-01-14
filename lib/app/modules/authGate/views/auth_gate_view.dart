@@ -20,22 +20,27 @@ class AuthGateView extends GetView<AuthGateController> {
           children: [
             const Spacer(),
 
-            /// 1. Status Icon with Glow Effect
+            /// Status Icon with Glow Effect
             Container(
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: controller.mainColor.withOpacity(0.1), // Glow
                 border: Border.all(
-                    color: controller.mainColor.withOpacity(0.3), width: 2),
+                  color: controller.mainColor.withOpacity(0.3),
+                  width: 2,
+                ),
               ),
-              child: Icon(controller.mainIcon,
-                  size: 64.w, color: controller.mainColor),
+              child: Icon(
+                controller.mainIcon,
+                size: 64.w,
+                color: controller.mainColor,
+              ),
             ),
 
             SizedBox(height: 32.h),
 
-            /// 2. Title
+            /// Title
             Text(
               controller.title,
               style: TextStyle(
@@ -48,17 +53,20 @@ class AuthGateView extends GetView<AuthGateController> {
 
             SizedBox(height: 16.h),
 
-            /// 3. Description
+            /// Description
             Text(
               controller.description,
               style: TextStyle(
-                  color: controller.textGrey, fontSize: 14.sp, height: 1.5),
+                color: controller.textGrey,
+                fontSize: 14.sp,
+                height: 1.5,
+              ),
               textAlign: TextAlign.center,
             ),
 
             const Spacer(),
 
-            /// 4. Contact Admin Button (Optional, mostly for inactive)
+            /// Contact Admin Button
             if (controller.isInactive) ...[
               SizedBox(
                 width: double.infinity,
@@ -85,7 +93,7 @@ class AuthGateView extends GetView<AuthGateController> {
               SizedBox(height: 16.h),
             ],
 
-            /// 5. Logout Button (Crucial so they aren't stuck)
+            /// Logout Button (Crucial so they aren't stuck)
             SizedBox(
               width: double.infinity,
               height: 54.h,

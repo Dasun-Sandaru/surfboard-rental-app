@@ -4,17 +4,12 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
-
-import '../../../models/user_model.dart';
 import '../../../services/auth_service.dart';
 
 class AdminHomeController extends GetxController {
-  // ---------------------------------------------------------------------------
-  // Bottom Navigation
-  // ---------------------------------------------------------------------------
   final selectedIndex = 0.obs;
-  // void changeIndex(int index) => selectedIndex.value = index;
 
+  /// Change Bottom Navigation Index
   void changeIndex(int index) {
     if (index == 1) {
       Get.toNamed('/new-rental');
@@ -23,26 +18,19 @@ class AdminHomeController extends GetxController {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Dashboard Stats (OBSERVABLES)
-  // ---------------------------------------------------------------------------
+  // Dashboard Stats
+
   final activeRentals = 0.obs;
   final boardsAvailable = 0.obs;
   final damagesPending = 0.obs;
   final totalCustomers = 0.obs;
 
-  // ---------------------------------------------------------------------------
   // Firestore
-  // ---------------------------------------------------------------------------
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// This should come from logged-in admin user
-  /// Example: Get.find<AuthController>().shopId
   String? shopId;
 
-  // ---------------------------------------------------------------------------
   // Stream Subscriptions (to cancel later)
-  // ---------------------------------------------------------------------------
   StreamSubscription? _rentalsSub;
   StreamSubscription? _inventorySub;
   StreamSubscription? _customersSub;
@@ -67,11 +55,8 @@ class AdminHomeController extends GetxController {
     log('shopId: $shopId');
   }
 
-  // ---------------------------------------------------------------------------
-  // REAL-TIME LISTENERS
-  // ---------------------------------------------------------------------------
-
-  /// 1️⃣ Active Rentals
+  /// REAL-TIME LISTENERS
+  /// Active Rentals
   void _listenActiveRentals() {
     _rentalsSub = _firestore
         .collection('shops')
@@ -84,7 +69,7 @@ class AdminHomeController extends GetxController {
         });
   }
 
-  /// 2️⃣ Boards Available
+  /// Boards Available
   void _listenInventory() {
     _inventorySub = _firestore
         .collection('shops')
@@ -97,7 +82,7 @@ class AdminHomeController extends GetxController {
         });
   }
 
-  /// 3️⃣ Total Customers
+  /// Total Customers
   void _listenCustomers() {
     _customersSub = _firestore
         .collection('shops')
@@ -109,7 +94,7 @@ class AdminHomeController extends GetxController {
         });
   }
 
-  /// 4️⃣ Damages Pending
+  /// Damages Pending
   /// Count damage reports where severity exists
   void _listenDamages() {
     _damagesSub = _firestore

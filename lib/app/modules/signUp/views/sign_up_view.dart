@@ -47,9 +47,7 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  // ===========================================================================
-  // STAFF FORM
-  // ===========================================================================
+  /// STAFF FORM
   Widget _buildStaffForm(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(ASizes.defaultPadding),
@@ -58,7 +56,6 @@ class SignUpView extends GetView<SignUpController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Header Text
             Text(
               "Create Staff Account",
               style: TextStyle(
@@ -194,17 +191,15 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  // ===========================================================================
   // ADMIN STEPPER
-  // ===========================================================================
   Widget _buildAdminStepper(BuildContext context) {
     return Theme(
-      // Override Stepper colors for Dark Mode
+      // Override Stepper Colors For Dark Mode
       data: Theme.of(context).copyWith(
         canvasColor: bgDark,
         colorScheme: ColorScheme.dark(
           primary: primaryBlue,
-          onSurface: textWhite, // Text color for inactive steps
+          onSurface: textWhite,
           background: bgDark,
         ),
       ),
@@ -429,10 +424,7 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  // ===========================================================================
   // HELPER WIDGETS
-  // ===========================================================================
-
   bool _validateShopStep() {
     return controller.shopFormKey.currentState?.validate() ?? false;
   }
@@ -492,7 +484,7 @@ class SignUpView extends GetView<SignUpController> {
           keyboardType: inputType,
           obscureText: isObscure.value,
           validator: validator,
-          style: TextStyle(color: textWhite), // White input text
+          style: TextStyle(color: textWhite),
           decoration: decoration.copyWith(
             suffixIcon: IconButton(
               icon: Icon(
@@ -514,7 +506,7 @@ class SignUpView extends GetView<SignUpController> {
         keyboardType: inputType,
         obscureText: false,
         validator: validator,
-        style: TextStyle(color: textWhite), // White input text
+        style: TextStyle(color: textWhite),
         decoration: decoration,
       );
     }

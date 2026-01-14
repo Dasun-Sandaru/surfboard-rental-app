@@ -13,9 +13,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> tabPages = [
-      _buildDashboardContent(), // Index 0
+      _buildDashboardContent(),
       Container(), // Index 1 (Placeholder, never seen)
-      _buildAlertsContent(), // Index 2
+      _buildAlertsContent(),
     ];
     return Scaffold(
       backgroundColor: bgDark,
@@ -31,9 +31,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
     );
   }
 
-  // ---------------------------------------------------------------------------
   // WIDGET BUILDERS
-  // ---------------------------------------------------------------------------
   Widget _buildDashboardContent() {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -42,12 +40,12 @@ class AdminHomeView extends GetView<AdminHomeController> {
         children: [
           SizedBox(height: 16.h),
 
-          /// 1. Top Bar
+          /// Top Bar
           _buildTopBar(),
 
           SizedBox(height: 24.h),
 
-          /// 2. Welcome Text
+          /// Welcome Text
           Text(
             "Welcome, Admin!",
             style: TextStyle(
@@ -60,12 +58,12 @@ class AdminHomeView extends GetView<AdminHomeController> {
 
           SizedBox(height: 24.h),
 
-          /// 3. Stats Grid (4 items)
+          /// Stats Grid (4 items)
           _buildStatsGrid(),
 
           SizedBox(height: 24.h),
 
-          /// 4. Section Header
+          /// Section Header
           Text(
             "Management",
             style: TextStyle(
@@ -77,7 +75,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
 
           SizedBox(height: 16.h),
 
-          /// 5. Management Grid
+          /// Management Grid
           _buildManagementGrid(),
 
           SizedBox(height: 20.h),
@@ -86,7 +84,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
     );
   }
 
-  /// Tab 2: Alerts (Simple Placeholder)
+  /// Tab 2: Alerts
   Widget _buildAlertsContent() {
     return Center(
       child: Column(
@@ -131,7 +129,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
   }
 
   Widget _buildStatsGrid() {
-    // Data for stats
+    // Data For Stats
     final stats = [
       {
         'title': 'Active Rentals',
@@ -158,7 +156,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         crossAxisCount: 2,
         crossAxisSpacing: 12.w,
         mainAxisSpacing: 12.h,
-        childAspectRatio: 1.4, // Adjust for card height
+        childAspectRatio: 1.4,
       ),
       itemCount: stats.length,
       itemBuilder: (context, index) {
@@ -198,7 +196,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
   }
 
   Widget _buildManagementGrid() {
-    // Data for management menu
+    // Data For Management Menu
     final menuItems = [
       {'title': 'Manage Users', 'sub': 'Staff & admin', 'icon': Iconsax.people},
       {'title': 'Inventory', 'sub': 'Boards & gear', 'icon': Iconsax.box},
@@ -225,7 +223,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
       itemBuilder: (context, index) {
         return InkWell(
           onTap: () {
-            // Handle navigation here
+            // Handle Navigation Here
             switch (index) {
               case 0:
                 Get.toNamed(Routes.MANAGE_USERS);
@@ -239,7 +237,6 @@ class AdminHomeView extends GetView<AdminHomeController> {
               color: cardDark,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: borderDark),
-              // Optional: Add hover effect logic if needed for web
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,7 +276,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
-        color: cardDark.withValues(alpha: 0.95), // Slight transparency
+        color: cardDark.withValues(alpha: 0.95),
         border: Border(top: BorderSide(color: borderDark)),
       ),
       child: Obx(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/auth_service.dart';
 
 class AuthGateController extends GetxController {
   // -- Theme Colors --
@@ -26,11 +25,11 @@ class AuthGateController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // 1. Get the Gate Type from arguments passed during navigation
+    // Get the Gate Type from arguments passed during navigation
     gateType = Get.arguments?['gate'] ?? 'unknown';
-    // 2. Determine Content based on Gate Type
+    // Determine Content based on Gate Type
     isInactive = gateType == 'not-active';
-    // 3. Set UI variables based on state
+    // Set UI variables based on state
     mainColor = isInactive ? errorRed : warningOrange;
     mainIcon = isInactive ? Iconsax.user_remove : Iconsax.shield_search;
     title = isInactive ? "Account Deactivated" : "Approval Pending";
@@ -39,9 +38,8 @@ class AuthGateController extends GetxController {
         : "Your account is currently under review. Please wait for an administrator to verify and approve your access.";
   }
 
-  // -- Logout User --
+  /// Logout User
   Future<void> logout() async {
-    // await AuthService.instance.logout();
     Get.offAllNamed(Routes.SIGN_IN);
   }
 }
