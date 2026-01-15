@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/inventory_controller.dart';
 
 class InventoryListView extends StatelessWidget {
@@ -17,6 +18,7 @@ class InventoryListView extends StatelessWidget {
   final Color textWhite = const Color(0xFFf0f4f4);
   final Color textGrey = const Color(0xFF94a3b8);
   final Color chipDark = const Color(0xFF2a3b42);
+  final Color borderDark = const Color(0xFF334155);
 
   @override
   Widget build(BuildContext context) {
@@ -28,39 +30,32 @@ class InventoryListView extends StatelessWidget {
         centerTitle: true,
         title: Text(
           'Inventory',
-          style: TextStyle(
-            color: textWhite,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.w700),
         ),
         actions: [
           IconButton(
-            onPressed: controller.openSearch,
+            onPressed: () {},
             icon: Icon(Iconsax.search_normal, color: textWhite, size: 24.w),
           ),
-          SizedBox(width: 8.w),
         ],
       ),
       body: Column(
         children: [
-          /// 1. Filter Chips Header
-          _buildFilterHeader(controller),
-          
+          _buildFilterHeader(context, controller),
           SizedBox(height: 16.h),
 
-          /// 2. Inventory List
+          /// Inventory List (Reactive)
           Expanded(
             child: Obx(
               () => ListView.separated(
                 padding: EdgeInsets.fromLTRB(
-                  ASizes.defaultPadding, 
-                  0, 
-                  ASizes.defaultPadding, 
-                  80.h // Bottom padding for FAB
+                  ASizes.defaultPadding,
+                  0,
+                  ASizes.defaultPadding,
+                  80.h,
                 ),
                 itemCount: controller.inventoryItems.length,
-                separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                separatorBuilder: (_, __) => SizedBox(height: 16.h),
                 itemBuilder: (context, index) {
                   final item = controller.inventoryItems[index];
                   return _buildInventoryCard(item, controller);
@@ -70,78 +65,97 @@ class InventoryListView extends StatelessWidget {
           ),
         ],
       ),
-      
-      /// 3. Floating Action Button
-      floatingActionButton: SizedBox(
-        width: 56.w,
-        height: 56.w,
-        child: FloatingActionButton(
-          onPressed: controller.openAddItemScreen,
-          backgroundColor: primaryBlue,
-          shape: const CircleBorder(),
-          elevation: 4,
-          child: Icon(Iconsax.add, color: textWhite, size: 30.w),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryBlue,
+        onPressed: () {
+          Get.toNamed(Routes.ADD_INVENTORY);
+        },
+        child: Icon(Iconsax.add, color: textWhite),
       ),
     );
   }
 
   // ===========================================================================
-  // WIDGET BUILDERS
+  // FILTER HEADER
   // ===========================================================================
 
-  Widget _buildFilterHeader(InventoryController controller) {
+  Widget _buildFilterHeader(BuildContext context, InventoryController controller) {
     return SizedBox(
       height: 40.h,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
         children: [
-          _buildFilterChip(controller, 'Brand', Iconsax.tag),
+          _buildReactiveFilterChip(context, controller, 'Brand', Iconsax.tag),
           SizedBox(width: 12.w),
-          _buildFilterChip(controller, 'Size', Iconsax.ruler),
+          _buildStaticFilterChip(context, controller, 'Size', Iconsax.ruler),
           SizedBox(width: 12.w),
-          _buildFilterChip(
-            controller, 
-            'Status', 
-            Iconsax.bookmark, 
-            isActive: true // Example of active state
-          ),
+          _buildReactiveFilterChip(context, controller, 'Status', Iconsax.bookmark),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(
-    InventoryController controller, 
-    String label, 
+  // ===========================================================================
+  // FILTER CHIPS
+  // ===========================================================================
+
+  Widget _buildReactiveFilterChip(
+    BuildContext context,
+    InventoryController controller,
+    String label,
     IconData icon,
-    {bool isActive = false}
+  ) {
+    return Obx(() {
+      bool isActive = false;
+
+      if (label == 'Status' && controller.selectedStatusFilter.value != null) {
+        isActive = true;
+      }
+
+      if (label == 'Brand' && controller.selectedBrands.isNotEmpty) {
+        isActive = true;
+      }
+
+      return _buildChipUI(context, controller, label, icon, isActive);
+    });
+  }
+
+  Widget _buildStaticFilterChip(
+    BuildContext context,
+    InventoryController controller,
+    String label,
+    IconData icon,
+  ) {
+    return _buildChipUI(context, controller, label, icon, false);
+  }
+
+  Widget _buildChipUI(
+    BuildContext context,
+    InventoryController controller,
+    String label,
+    IconData icon,
+    bool isActive,
   ) {
     final bgColor = isActive ? primaryBlue.withOpacity(0.2) : chipDark;
     final textColor = isActive ? primaryBlue : textWhite;
+    final borderColor = isActive ? primaryBlue : Colors.transparent;
 
     return InkWell(
-      onTap: () => controller.openFilter(label),
+      onTap: () => _showFilterBottomSheet(context, controller, label),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor),
         ),
         child: Row(
           children: [
             Icon(icon, color: textColor, size: 18.w),
             SizedBox(width: 8.w),
-            Text(
-              label,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text(label, style: TextStyle(color: textColor, fontSize: 14.sp)),
             SizedBox(width: 4.w),
             Icon(Iconsax.arrow_down_1, color: textColor, size: 16.w),
           ],
@@ -150,109 +164,143 @@ class InventoryListView extends StatelessWidget {
     );
   }
 
-  Widget _buildInventoryCard(Map<String, dynamic> item, InventoryController controller) {
-    final statusDetails = controller.getStatusDetails(item['status']);
-    final Color statusColor = statusDetails['color'];
-    final String statusText = statusDetails['text'];
+  // ===========================================================================
+  // FILTER BOTTOM SHEET
+  // ===========================================================================
 
-    return InkWell(
-      onTap: () => controller.openItemDetails(item),
-      borderRadius: BorderRadius.circular(16.r),
-      child: Container(
-        padding: EdgeInsets.all(16.w),
+  void _showFilterBottomSheet(
+    BuildContext context,
+    InventoryController controller,
+    String type,
+  ) {
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.all(24.w),
         decoration: BoxDecoration(
           color: cardDark,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ],
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
-              child: Image.network(
-                item['imageUrl'],
-                width: 96.w,
-                height: 96.w,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 96.w,
-                  height: 96.w,
-                  color: bgDark,
-                  child: Icon(Iconsax.image, color: textGrey),
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: textGrey.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            SizedBox(width: 16.w),
-            
-            /// Info & Status
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 4.h),
-                  Text(
-                    item['name'],
-                    style: TextStyle(
-                      color: textWhite,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    item['size'],
-                    style: TextStyle(
-                      color: textGrey,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  
-                  /// Status Badge
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6.w,
-                          height: 6.w,
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: 6.w),
-                        Text(
-                          statusText,
-                          style: TextStyle(
-                            color: statusColor,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            SizedBox(height: 24.h),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Filter by $type",
+                  style: TextStyle(color: textWhite, fontSize: 20.sp, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: controller.resetFilters,
+                  child: Text("Reset", style: TextStyle(color: textGrey)),
+                )
+              ],
+            ),
+
+            SizedBox(height: 16.h),
+
+            if (type == 'Status') _buildStatusFilterOptions(controller),
+            if (type == 'Brand') _buildBrandFilterOptions(controller),
+
+            SizedBox(height: 32.h),
+
+            SizedBox(
+              width: double.infinity,
+              height: 54.h,
+              child: ElevatedButton(
+                onPressed: controller.applyFilters,
+                child: const Text("Apply Filters"),
               ),
             ),
           ],
         ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  // ===========================================================================
+  // FILTER OPTIONS
+  // ===========================================================================
+
+  Widget _buildStatusFilterOptions(InventoryController controller) {
+    return Column(
+      children: ItemStatus.values.map((status) {
+        final details = controller.getStatusDetails(status);
+        return Obx(() {
+          final isSelected = controller.selectedStatusFilter.value == status;
+          return ListTile(
+            onTap: () => controller.setStatusFilter(status),
+            leading: CircleAvatar(backgroundColor: details['color'], radius: 6),
+            title: Text(details['text'], style: TextStyle(color: textWhite)),
+            trailing: isSelected
+                ? Icon(Iconsax.tick_circle, color: primaryBlue)
+                : null,
+          );
+        });
+      }).toList(),
+    );
+  }
+
+  Widget _buildBrandFilterOptions(InventoryController controller) {
+    return Wrap(
+      spacing: 12.w,
+      runSpacing: 12.h,
+      children: controller.availableBrands.map((brand) {
+        return Obx(() {
+          final isSelected = controller.selectedBrands.contains(brand);
+          return FilterChip(
+            label: Text(brand),
+            selected: isSelected,
+            onSelected: (_) => controller.toggleBrandFilter(brand),
+          );
+        });
+      }).toList(),
+    );
+  }
+
+  // ===========================================================================
+  // INVENTORY CARD
+  // ===========================================================================
+
+  Widget _buildInventoryCard(
+    Map<String, dynamic> item,
+    InventoryController controller,
+  ) {
+    final status = controller.getStatusDetails(item['status']);
+
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: cardDark,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(width: 80.w, height: 80.w, color: bgDark),
+          SizedBox(width: 16.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(item['name'], style: TextStyle(color: textWhite, fontWeight: FontWeight.bold)),
+              SizedBox(height: 4.h),
+              Text(status['text'], style: TextStyle(color: status['color'])),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -21,6 +21,8 @@ abstract class Routes {
   static const MANAGE_USERS = _Paths.MANAGE_USERS;
   static const USER_DETAIL = _Paths.USER_DETAIL;
   static const INVENTORY = _Paths.INVENTORY;
+  static const ADD_INVENTORY = _Paths.ADD_INVENTORY;
+  static const SETTINGS = _Paths.SETTINGS;
 }
 
 abstract class _Paths {
@@ -41,4 +43,6 @@ abstract class _Paths {
   static const MANAGE_USERS = '/manage-users';
   static const USER_DETAIL = '/user-detail';
   static const INVENTORY = '/inventory';
+  static const ADD_INVENTORY = '/add-inventory';
+  static const SETTINGS = '/settings';
 }

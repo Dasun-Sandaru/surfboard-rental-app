@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 class AValidator {
   static String? validateText(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return 'field_required'.trParams({'field': fieldName});
+      // return 'field_required'.trParams({'field': fieldName});
+      return '$fieldName is required';
     }
 
     return null;
@@ -76,6 +77,46 @@ class AValidator {
   static String? validateDropDown(String? value, String fieldName) {
     if (value == null || value == '-1') {
       return 'field_required'.trParams({'field': fieldName});
+    }
+
+    return null;
+  }
+
+  static String? validateNumber(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      // return 'field_required'.trParams({'field': fieldName});
+      return '$fieldName is required';
+    }
+
+    final number = num.tryParse(value);
+    if (number == null) {
+      // return 'invalid_number'.trParams({'field': fieldName});
+      return '$fieldName must be a valid number';
+    }
+
+    if (number < 0) {
+      // return 'number_positive'.trParams({'field': fieldName});
+      return '$fieldName must be a positive number';
+    }
+
+    return null;
+  }
+
+  static String? validateAmount(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      // return 'field_required'.trParams({'field': fieldName});
+      return '$fieldName is required';
+    }
+
+    final amount = double.tryParse(value);
+    if (amount == null) {
+      // return 'invalid_amount'.trParams({'field': fieldName});
+      return '$fieldName must be a valid amount';
+    }
+
+    if (amount < 0) {
+      // return 'amount_positive'.trParams({'field': fieldName});
+      return '$fieldName must be a positive amount';
     }
 
     return null;

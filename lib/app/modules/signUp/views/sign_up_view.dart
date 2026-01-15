@@ -514,4 +514,6 @@ class SignUpView extends GetView<SignUpController> {
       );
     }
   }
+
+
 }

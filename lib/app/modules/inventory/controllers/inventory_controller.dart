@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-// Define Status Enum for better type safety
 enum ItemStatus { available, rented, repair }
 
 class InventoryController extends GetxController {
-  
-  // Dummy Data matching your HTML example
+  final Rxn<ItemStatus> selectedStatusFilter = Rxn<ItemStatus>();
+  final RxList<String> selectedBrands = <String>[].obs;
+
+  final List<String> availableBrands = [
+    "Channel Islands",
+    "Firewire",
+    "Pyzel",
+    "Lost",
+    "JS Industries",
+  ];
+
   final RxList<Map<String, dynamic>> inventoryItems = <Map<String, dynamic>>[
     {
       "name": "Channel Islands - Shortboard",
       "size": "6' 2\"",
       "status": ItemStatus.available,
       // Use placeholder images if you don't have real URLs yet
-      "imageUrl": "https://via.placeholder.com/150", 
+      "imageUrl": "https://via.placeholder.com/150",
     },
     {
       "name": "Firewire - Longboard",
@@ -35,25 +43,26 @@ class InventoryController extends GetxController {
     },
   ].obs;
 
-  void openAddItemScreen() {
-    Get.snackbar("Action", "Add Item clicked");
-    // Get.toNamed('/add-item');
+  void toggleBrandFilter(String brand) {
+    selectedBrands.contains(brand)
+        ? selectedBrands.remove(brand)
+        : selectedBrands.add(brand);
   }
 
-  void openSearch() {
-    Get.snackbar("Action", "Search clicked");
+  void setStatusFilter(ItemStatus status) {
+    selectedStatusFilter.value = selectedStatusFilter.value == status
+        ? null
+        : status;
   }
 
-  void openFilter(String filterType) {
-     Get.snackbar("Action", "Filter by $filterType clicked");
-  }
-  
-  void openItemDetails(Map<String, dynamic> item) {
-      Get.snackbar("Action", "Opened ${item['name']}");
-      // Get.toNamed('/item-details', arguments: item);
+  void applyFilters() => Get.back();
+
+  void resetFilters() {
+    selectedStatusFilter.value = null;
+    selectedBrands.clear();
+    Get.back();
   }
 
-  // Helper to get status color and text
   Map<String, dynamic> getStatusDetails(ItemStatus status) {
     switch (status) {
       case ItemStatus.available:

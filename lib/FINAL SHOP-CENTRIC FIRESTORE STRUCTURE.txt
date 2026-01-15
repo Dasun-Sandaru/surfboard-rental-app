@@ -51,8 +51,10 @@
                 size
                 color
                 type
+                volume
                 status              // available | rented | maintenance
                 damage_fee_rule     // rule or fixed amount
+                purchase_cost
                 rental_rate_hour
                 rental_rate_day
                 notes
