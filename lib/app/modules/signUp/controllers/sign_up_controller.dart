@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../utils/common/a_app_error_handler.dart';
+
 import '../../../../utils/constants/a_enums.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/auth_service.dart';
@@ -33,14 +36,17 @@ class SignUpController extends GetxController {
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
 
+
   @override
   void onInit() {
     super.onInit();
-    final args = Get.arguments;
-    if (args != null && args['role'] != null) {
-      role.value = UserRole.fromString(args['role']);
-    }
+    final args = Get.arguments; 
+  if (args != null && args['role'] is UserRole) {
+    role.value = args['role'] as UserRole;
+    log('SignUp role: ${role.value}');
   }
+}
+
 
   /// REGISTER SHOP OWNER
   Future<void> registerShopOwner() async {

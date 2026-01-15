@@ -12,6 +12,8 @@ import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/inventory/bindings/inventory_binding.dart';
+import '../modules/inventory/views/inventory_view.dart';
 import '../modules/manageUsers/bindings/manage_users_binding.dart';
 import '../modules/manageUsers/views/manage_users_view.dart';
 import '../modules/newRental/bindings/new_rental_binding.dart';
@@ -115,6 +117,11 @@ class AppPages {
       name: _Paths.USER_DETAIL,
       page: () => const UserDetailView(),
       binding: UserDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.INVENTORY,
+      page: () => const InventoryListView(),
+      binding: InventoryBinding(),
     ),
   ];
 }

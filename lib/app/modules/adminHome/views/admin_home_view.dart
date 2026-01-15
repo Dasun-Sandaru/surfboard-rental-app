@@ -228,6 +228,12 @@ class AdminHomeView extends GetView<AdminHomeController> {
               case 0:
                 Get.toNamed(Routes.MANAGE_USERS);
                 break;
+              case 1:
+                Get.toNamed(Routes.INVENTORY);
+                break;
+              // case 2:
+              //   Get.toNamed(Routes.RENTALS);
+              //   break;
             }
           },
           borderRadius: BorderRadius.circular(12.r),

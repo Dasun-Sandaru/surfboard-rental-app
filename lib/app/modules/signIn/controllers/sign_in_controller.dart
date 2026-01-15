@@ -78,12 +78,12 @@ class SignInController extends GetxController {
 
   /// NAVIGATE TO SIGN UP STAFF
   void goToSignUpStaff() {
-    Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'staff'});
+    Get.toNamed(Routes.SIGN_UP, arguments: {'role': UserRole.staff});
   }
 
   /// NAVIGATE TO SIGN UP ADMIN
   void goToSignUpAdmin() {
-    Get.toNamed(Routes.SIGN_UP, arguments: {'role': 'admin'});
+    Get.toNamed(Routes.SIGN_UP, arguments: {'role': UserRole.admin});
   }
 
   @override

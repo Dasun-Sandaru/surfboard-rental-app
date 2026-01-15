@@ -20,6 +20,7 @@ abstract class Routes {
   static const ALERTS = _Paths.ALERTS;
   static const MANAGE_USERS = _Paths.MANAGE_USERS;
   static const USER_DETAIL = _Paths.USER_DETAIL;
+  static const INVENTORY = _Paths.INVENTORY;
 }
 
 abstract class _Paths {
@@ -39,4 +40,5 @@ abstract class _Paths {
   static const ALERTS = '/alerts';
   static const MANAGE_USERS = '/manage-users';
   static const USER_DETAIL = '/user-detail';
+  static const INVENTORY = '/inventory';
 }
