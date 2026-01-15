@@ -60,7 +60,7 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// 3. Type
-                    _buildLabel('Type'),
+                    _buildLabel('Surfboard Type'),
                     SizedBox(height: 8.h),
                     _buildTypeDropdown(controller),
 
@@ -74,6 +74,7 @@ class AddInventoryView extends StatelessWidget {
                       hintText: "e.g., Surfline",
                       icon: Icons.storefront,
                       validator: (v) => AValidator.validateText(v, 'Brand'),
+                      textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
@@ -92,6 +93,7 @@ class AddInventoryView extends StatelessWidget {
                                 AValidator.validateNumber(v, 'Size Feet'),
                             icon: Icons.height,
                             inputType: TextInputType.number,
+                            textAction: TextInputAction.next,
                           ),
                         ),
                         SizedBox(width: 16.w),
@@ -104,6 +106,7 @@ class AddInventoryView extends StatelessWidget {
                                 AValidator.validateNumber(v, 'Size Inches'),
                             icon: Icons.straighten,
                             inputType: TextInputType.number,
+                            textAction: TextInputAction.next,
                           ),
                         ),
                       ],
@@ -119,6 +122,8 @@ class AddInventoryView extends StatelessWidget {
                       validator: (v) => AValidator.validateNumber(v, 'Volume'),
                       icon: Icons.water_drop,
                       hintText: "e.g., 34L",
+                      inputType: TextInputType.number,
+                      textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
@@ -132,6 +137,7 @@ class AddInventoryView extends StatelessWidget {
                       validator: (v) => AValidator.validateText(v, 'Color'),
 
                       hintText: "e.g., Blue with stripes",
+                      textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
@@ -148,11 +154,12 @@ class AddInventoryView extends StatelessWidget {
                       ),
                       validator: (v) =>
                           AValidator.validateAmount(v, 'Purchase Cost'),
+                      textAction: TextInputAction.next,
                     ),
 
                     /// rental rate hour
                     SizedBox(height: 20.h),
-                    _buildLabel('Rental Rate'),
+                    _buildLabel('Rental Rate (Hourly)'),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       controller: controller.rentalRateController,
@@ -163,6 +170,7 @@ class AddInventoryView extends StatelessWidget {
                       ),
                       validator: (v) =>
                           AValidator.validateAmount(v, 'Rental Rate'),
+                      textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
@@ -179,6 +187,7 @@ class AddInventoryView extends StatelessWidget {
                       ),
                       validator: (v) =>
                           AValidator.validateAmount(v, 'Rental Rate (Daily)'),
+                      textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
@@ -191,12 +200,12 @@ class AddInventoryView extends StatelessWidget {
                       icon: Icons.note,
                       hintText: "Additional details about the board",
                       inputType: TextInputType.multiline,
-                      textAction: TextInputAction.newline,
+                      textAction: TextInputAction.done,
                       validator: (v) => null,
                     ),
 
                     // Extra space at bottom to ensure scrolling above button
-                    SizedBox(height: 100.h),
+                    SizedBox(height: 50.h),
                   ],
                 ),
               ),
@@ -322,48 +331,14 @@ class AddInventoryView extends StatelessWidget {
     }
   }
 
-  Widget _buildBrandDropdown(AddInventoryController controller) {
-    return Obx(
-      () => Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        decoration: BoxDecoration(
-          color: cardDark,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: borderDark),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: controller.selectedBrand.value.isEmpty
-                ? null
-                : controller.selectedBrand.value,
-            hint: Text(
-              "Select a brand",
-              style: TextStyle(color: textGrey.withOpacity(0.5)),
-            ),
-            dropdownColor: cardDark,
-            icon: Icon(Iconsax.arrow_down_1, color: textGrey),
-            isExpanded: true,
-            style: TextStyle(color: textWhite, fontSize: 16.sp),
-            items: controller.brandList.map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
-            }).toList(),
-            onChanged: (newValue) {
-              if (newValue != null) {
-                controller.selectedBrand.value = newValue;
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildTypeDropdown(AddInventoryController controller) {
     return CustomDropdown<String>(
+      controller: controller.surfboardTypeController,
       hintText: 'Select board type',
       items: controller.list,
       // initialItem: controller.list[0],
       onChanged: (value) {
+        controller.typeController.text = value ?? '';
         log('changing value to: $value');
       },
       validator: (String? value) {
@@ -378,11 +353,20 @@ class AddInventoryView extends StatelessWidget {
         closedBorder: BoxBorder.all(color: borderDark),
         expandedBorder: BoxBorder.all(color: primaryBlue),
         hintStyle: TextStyle(color: textGrey.withOpacity(0.5), fontSize: 16.sp),
-
         listItemStyle: TextStyle(color: textWhite, fontSize: 16.sp),
         headerStyle: TextStyle(color: textWhite, fontSize: 16.sp),
         closedErrorBorder: BoxBorder.all(color: Colors.redAccent),
         errorStyle: TextStyle(color: Colors.redAccent, fontSize: 14.sp),
+        closedSuffixIcon: Icon(
+          Iconsax.arrow_down_2,
+          size: 20.w,
+          color: textGrey,
+        ),
+        expandedSuffixIcon: Icon(
+          Iconsax.arrow_up_2,
+          size: 20.w,
+          color: primaryBlue,
+        ),
       ),
     );
   }
