@@ -12,6 +12,58 @@ import '../../../services/firestore_service.dart';
 import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
 
+// Sample data to add to the inventory
+final List<Map<String, dynamic>> sampleInventoryData = [
+  {
+    'name': 'The Ripper',
+    'type': 'Shortboard',
+    'brand': 'Pyzel',
+    'size_feet': '5',
+    'size_inches': '10',
+    'volume': '28.5',
+    'color': 'White',
+    'purchase_cost': '750',
+    'damage_fee_rule': 'rule',
+    'rental_rate_hour': '15',
+    'rental_rate_day': '60',
+    'note': 'High-performance board for advanced surfers.',
+    'status': 'available',
+    'created_at': FieldValue.serverTimestamp(),
+  },
+  {
+    'name': 'The Cruiser',
+    'type': 'Longboard',
+    'brand': 'CJ Nelson',
+    'size_feet': '9',
+    'size_inches': '2',
+    'volume': '72',
+    'color': 'Blue',
+    'purchase_cost': '1100',
+    'damage_fee_rule': 'rule',
+    'rental_rate_hour': '20',
+    'rental_rate_day': '80',
+    'note': 'Perfect for small waves and beginners.',
+    'status': 'rented',
+    'created_at': FieldValue.serverTimestamp(),
+  },
+  {
+    'name': 'The Glider',
+    'type': 'Fish',
+    'brand': 'Firewire',
+    'size_feet': '6',
+    'size_inches': '4',
+    'volume': '38',
+    'color': 'Yellow',
+    'purchase_cost': '800',
+    'damage_fee_rule': 'rule',
+    'rental_rate_hour': '18',
+    'rental_rate_day': '70',
+    'note': 'Fast and loose, great for a variety of conditions.',
+    'status': 'repair',
+    'created_at': FieldValue.serverTimestamp(),
+  },
+];
+
 class AddInventoryController extends GetxController {
   // -- Form Keys & Controllers --
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -39,17 +91,7 @@ class AddInventoryController extends GetxController {
       'Enter the details of the surfboard you want to add to your inventory.'
           .obs;
 
-  // Dummy Brands List
-  final List<String> brandList = [
-    "Channel Islands",
-    "Firewire",
-    "Pyzel",
-    "Lost",
-    "JS Industries",
-    "Other",
-  ];
-
-  List<String> list = ['Developer', 'Designer', 'Consultant', 'Student'];
+  List<String> surfboardTypelist = ['Shortboard', 'Longboard', 'Funboard'];
 
   late String shopId;
 
@@ -67,29 +109,34 @@ class AddInventoryController extends GetxController {
   }
 
   void saveItem() {
-    if (!formKey.currentState!.validate()) return;
+    // if (!formKey.currentState!.validate()) return;
 
     try {
-      Map<String, dynamic> data = {
-        'name': boardName.value,
-        'type': typeController.text,
-        'brand': brandController.text,
-        'size_feet': sizeFeetController.text,
-        'size_inches': sizeInchesController.text,
-        'volume': volumeController.text,
-        'color': colorController.text,
-        'purchase_cost': costController.text,
-        'damage_fee_rule': 'rule',
-        'rental_rate_hour': rentalRateController.text,
-        'rental_rate_day': rentalRateDayController.text,
-        'note': notesController.text,
-        'status': 'available',
-        'created_at': FieldValue.serverTimestamp(),
-      };
+      // Map<String, dynamic> data = {
+      //   'name': boardName.value,
+      //   'type': typeController.text,
+      //   'brand': brandController.text,
+      //   'size_feet': sizeFeetController.text,
+      //   'size_inches': sizeInchesController.text,
+      //   'volume': volumeController.text,
+      //   'color': colorController.text,
+      //   'purchase_cost': costController.text,
+      //   'damage_fee_rule': 'rule',
+      //   'rental_rate_hour': rentalRateController.text,
+      //   'rental_rate_day': rentalRateDayController.text,
+      //   'note': notesController.text,
+      //   'status': 'available',
+      //   'created_at': FieldValue.serverTimestamp(),
+      // };
 
-      log("Saving Inventory Item: $data");
+      // log("Saving Inventory Item: $data");
 
-      _firestoreService.saveInventoryItem(shopId, data);
+      // _firestoreService.saveInventoryItem(shopId, data);
+
+      for (var element in sampleInventoryData) {
+        _firestoreService.saveInventoryItem(shopId, element);
+        
+      }
 
       appSnackBarSuccessAndFailure('Inventory item added successfully.');
 
@@ -126,6 +173,35 @@ class AddInventoryController extends GetxController {
     typeController.text = '';
     // surfboardTypeController.value = null;
     surfboardTypeController.clear();
+  }
+
+  /// Method to add sample boards to Firestore using a batch write.
+  Future<void> addSampleBoards() async {
+    try {
+      final WriteBatch batch = FirebaseFirestore.instance.batch();
+      final collectionRef = FirebaseFirestore.instance
+          .collection('shops')
+          .doc(shopId)
+          .collection('inventory');
+
+      for (var boardData in sampleInventoryData) {
+        final docRef = collectionRef.doc();
+        // Add 'id' field to the data, similar to saveInventoryItem
+        var dataWithId = {...boardData, 'id': docRef.id};
+        batch.set(docRef, dataWithId);
+      }
+
+      await batch.commit();
+
+      log('Sample boards added successfully!');
+      appSnackBarSuccessAndFailure('Sample boards added successfully.');
+    } on FirebaseException catch (e) {
+      log('Error adding sample boards: $e');
+      AppErrorHandler.handleError(e);
+    } catch (e) {
+      log('Error adding sample boards: $e');
+      AppErrorHandler.handleError(e);
+    }
   }
 
   @override

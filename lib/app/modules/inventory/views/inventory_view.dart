@@ -5,6 +5,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../models/inventory_model.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/inventory_controller.dart';
 
@@ -27,17 +29,22 @@ class InventoryListView extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgDark,
       appBar: AAppBar(
+        showbackArrow: true,
         centerTitle: true,
         title: Text(
           'Inventory',
-          style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.w700),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Iconsax.search_normal, color: textWhite, size: 24.w),
+          style: TextStyle(
+            color: textWhite,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
           ),
-        ],
+        ),
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: Icon(Iconsax.search_normal, color: textWhite, size: 24.w),
+        //   ),
+        // ],
       ),
       body: Column(
         children: [
@@ -46,21 +53,65 @@ class InventoryListView extends StatelessWidget {
 
           /// Inventory List (Reactive)
           Expanded(
-            child: Obx(
-              () => ListView.separated(
-                padding: EdgeInsets.fromLTRB(
-                  ASizes.defaultPadding,
-                  0,
-                  ASizes.defaultPadding,
-                  80.h,
-                ),
-                itemCount: controller.inventoryItems.length,
-                separatorBuilder: (_, __) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) {
-                  final item = controller.inventoryItems[index];
-                  return _buildInventoryCard(item, controller);
-                },
-              ),
+            child: StreamBuilder(
+              stream: controller.inventoryItemsStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: cardDark,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: TextStyle(color: textWhite),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                final items = snapshot.data?.docs ?? [];
+                if (items.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: cardDark,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'No inventory items found.',
+                          style: TextStyle(color: textWhite),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ASizes.defaultPadding,
+                    vertical: 8.h,
+                  ),
+                  itemCount: items.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    // final itemData =
+                    //     items[index].data() as Map<String, dynamic>;
+                    // return _buildInventoryCard(itemData, controller);
+                    final itemData = InventoryModel.fromMap(
+                      items[index].data() as Map<String, dynamic>,
+                    );
+                    return _buildInventoryCard(itemData, controller);
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -79,18 +130,26 @@ class InventoryListView extends StatelessWidget {
   // FILTER HEADER
   // ===========================================================================
 
-  Widget _buildFilterHeader(BuildContext context, InventoryController controller) {
+  Widget _buildFilterHeader(
+    BuildContext context,
+    InventoryController controller,
+  ) {
     return SizedBox(
       height: 40.h,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
         children: [
-          _buildReactiveFilterChip(context, controller, 'Brand', Iconsax.tag),
+          _buildReactiveFilterChip(context, controller, 'Type', Iconsax.tag),
           SizedBox(width: 12.w),
-          _buildStaticFilterChip(context, controller, 'Size', Iconsax.ruler),
-          SizedBox(width: 12.w),
-          _buildReactiveFilterChip(context, controller, 'Status', Iconsax.bookmark),
+          // _buildStaticFilterChip(context, controller, 'Size', Iconsax.ruler),
+          // SizedBox(width: 12.w),
+          // _buildReactiveFilterChip(
+          //   context,
+          //   controller,
+          //   'Status',
+          //   Iconsax.bookmark,
+          // ),
         ],
       ),
     );
@@ -109,11 +168,11 @@ class InventoryListView extends StatelessWidget {
     return Obx(() {
       bool isActive = false;
 
-      if (label == 'Status' && controller.selectedStatusFilter.value != null) {
-        isActive = true;
-      }
+      // if (label == 'Status' && controller.selectedStatusFilter.value != null) {
+      //   isActive = true;
+      // }
 
-      if (label == 'Brand' && controller.selectedBrands.isNotEmpty) {
+      if (label == 'Type' && controller.selectedSurfboardTypes.isNotEmpty) {
         isActive = true;
       }
 
@@ -155,7 +214,10 @@ class InventoryListView extends StatelessWidget {
           children: [
             Icon(icon, color: textColor, size: 18.w),
             SizedBox(width: 8.w),
-            Text(label, style: TextStyle(color: textColor, fontSize: 14.sp)),
+            Text(
+              label,
+              style: TextStyle(color: textColor, fontSize: 14.sp),
+            ),
             SizedBox(width: 4.w),
             Icon(Iconsax.arrow_down_1, color: textColor, size: 16.w),
           ],
@@ -201,19 +263,23 @@ class InventoryListView extends StatelessWidget {
               children: [
                 Text(
                   "Filter by $type",
-                  style: TextStyle(color: textWhite, fontSize: 20.sp, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: textWhite,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 TextButton(
                   onPressed: controller.resetFilters,
                   child: Text("Reset", style: TextStyle(color: textGrey)),
-                )
+                ),
               ],
             ),
 
             SizedBox(height: 16.h),
 
             if (type == 'Status') _buildStatusFilterOptions(controller),
-            if (type == 'Brand') _buildBrandFilterOptions(controller),
+            if (type == 'Type') _buildTypeFilterOptions(controller),
 
             SizedBox(height: 32.h),
 
@@ -255,17 +321,17 @@ class InventoryListView extends StatelessWidget {
     );
   }
 
-  Widget _buildBrandFilterOptions(InventoryController controller) {
+  Widget _buildTypeFilterOptions(InventoryController controller) {
     return Wrap(
       spacing: 12.w,
       runSpacing: 12.h,
-      children: controller.availableBrands.map((brand) {
+      children: controller.surfboardTypes.map((type) {
         return Obx(() {
-          final isSelected = controller.selectedBrands.contains(brand);
+          final isSelected = controller.selectedSurfboardTypes.contains(type);
           return FilterChip(
-            label: Text(brand),
+            label: Text(type),
             selected: isSelected,
-            onSelected: (_) => controller.toggleBrandFilter(brand),
+            onSelected: (_) => controller.toggleTypeFilter(type),
           );
         });
       }).toList(),
@@ -277,10 +343,10 @@ class InventoryListView extends StatelessWidget {
   // ===========================================================================
 
   Widget _buildInventoryCard(
-    Map<String, dynamic> item,
+    InventoryModel item,
     InventoryController controller,
   ) {
-    final status = controller.getStatusDetails(item['status']);
+    final status = controller.getStatusDetails(item.status);
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -295,7 +361,10 @@ class InventoryListView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(item['name'], style: TextStyle(color: textWhite, fontWeight: FontWeight.bold)),
+              Text(
+                item.name,
+                style: TextStyle(color: textWhite, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 4.h),
               Text(status['text'], style: TextStyle(color: status['color'])),
             ],

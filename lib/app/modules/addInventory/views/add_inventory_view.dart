@@ -335,7 +335,7 @@ class AddInventoryView extends StatelessWidget {
     return CustomDropdown<String>(
       controller: controller.surfboardTypeController,
       hintText: 'Select board type',
-      items: controller.list,
+      items: controller.surfboardTypelist,
       // initialItem: controller.list[0],
       onChanged: (value) {
         controller.typeController.text = value ?? '';

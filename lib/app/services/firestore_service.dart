@@ -12,14 +12,19 @@ class FirestoreService {
     return shopRef(shopId).collection('members').snapshots();
   }
 
-  // INSERT INVENTORY ITEM
-  Future<void> saveInventoryItem(String shopId, Map<String, dynamic> data) async {
-  final docRef = shopRef(shopId).collection('inventory').doc();
+  /// INSERT INVENTORY ITEM
+  Future<void> saveInventoryItem(
+    String shopId,
+    Map<String, dynamic> data,
+  ) async {
+    final docRef = shopRef(shopId).collection('inventory').doc();
 
-  await docRef.set({
-    ...data,
-    'id': docRef.id,
-  });
-}
+    await docRef.set({...data, 'id': docRef.id});
+  }
 
+  /// GET INVENTORY ITEMS STREAM
+  Stream<QuerySnapshot> getInventoryItems(String shopId) {
+    print('Fetching inventory items for shopId: $shopId');
+    return shopRef(shopId).collection('inventory').snapshots();
+  }
 }

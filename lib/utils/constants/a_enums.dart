@@ -2,6 +2,9 @@
 
 import 'dart:developer';
 
+// Item Status Enum
+enum ItemStatus { available, rented, repair }
+
 // Upload Status Enum
 enum UploadStatus { uploading, errorDio, errorBankend, success }
 

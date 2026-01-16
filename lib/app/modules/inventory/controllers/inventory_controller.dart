@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-enum ItemStatus { available, rented, repair }
+import '../../../../utils/constants/a_enums.dart';
+import '../../../services/firestore_service.dart';
+import '../../../services/user_service.dart';
 
 class InventoryController extends GetxController {
   final Rxn<ItemStatus> selectedStatusFilter = Rxn<ItemStatus>();
-  final RxList<String> selectedBrands = <String>[].obs;
+  final RxList<String> selectedSurfboardTypes = <String>[].obs;
 
-  final List<String> availableBrands = [
-    "Channel Islands",
-    "Firewire",
-    "Pyzel",
-    "Lost",
-    "JS Industries",
-  ];
+  final FirestoreService _firestoreService = FirestoreService();
+  final UserService _userService = UserService();
+
+  String shopId = '0000';
+
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    shopId = await _userService.getShopIdFromStorage() ?? '0000';
+  }
+
+  /// FETCH INVENTORY ITEMS STREAM
+  Stream get inventoryItemsStream =>
+      _firestoreService.getInventoryItems(shopId);
+
+  final List<String> surfboardTypes = ["Shortboard", "Longboard", "Funboard"];
 
   final RxList<Map<String, dynamic>> inventoryItems = <Map<String, dynamic>>[
     {
@@ -43,10 +54,12 @@ class InventoryController extends GetxController {
     },
   ].obs;
 
-  void toggleBrandFilter(String brand) {
-    selectedBrands.contains(brand)
-        ? selectedBrands.remove(brand)
-        : selectedBrands.add(brand);
+  void toggleTypeFilter(String type) {
+    if (selectedSurfboardTypes.contains(type)) {
+      selectedSurfboardTypes.remove(type);
+    } else {
+      selectedSurfboardTypes.add(type);
+    }
   }
 
   void setStatusFilter(ItemStatus status) {
@@ -59,7 +72,7 @@ class InventoryController extends GetxController {
 
   void resetFilters() {
     selectedStatusFilter.value = null;
-    selectedBrands.clear();
+    selectedSurfboardTypes.clear();
     Get.back();
   }
 
