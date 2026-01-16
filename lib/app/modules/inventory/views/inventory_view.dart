@@ -39,12 +39,6 @@ class InventoryListView extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {},
-        //     icon: Icon(Iconsax.search_normal, color: textWhite, size: 24.w),
-        //   ),
-        // ],
       ),
       body: Column(
         children: [
@@ -53,66 +47,46 @@ class InventoryListView extends StatelessWidget {
 
           /// Inventory List (Reactive)
           Expanded(
-            child: StreamBuilder(
-              stream: controller.inventoryItemsStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Padding(
-                    padding: EdgeInsets.all(16.w),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: cardDark,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: TextStyle(color: textWhite),
-                        ),
-                      ),
-                    ),
+            child: Obx(() {
+              // if (controller.items.isEmpty && controller.isLoading) {
+              //   return const Center(child: CircularProgressIndicator());
+              // }
+
+              if (controller.items.isEmpty) {
+                return const Center(child: Text('No inventory found'));
+              }
+
+              // if (controller.items.isEmpty && !controller.isLoading) {
+              //   return const Center(
+              //     child: Text('No inventory found'),
+              //   );
+              // }
+
+              return ListView.separated(
+                padding: EdgeInsets.symmetric(
+                  horizontal: ASizes.defaultPadding,
+                  vertical: 8.h,
+                ),
+                itemCount: controller.items.length + 1,
+                separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                itemBuilder: (context, index) {
+                  if (index == controller.items.length) {
+                    controller.loadMore();
+                    return controller.hasMore
+                        ? const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : const SizedBox.shrink();
+                  }
+
+                  return _buildInventoryCard(
+                    controller.items[index],
+                    controller,
                   );
-                }
-                final items = snapshot.data?.docs ?? [];
-                if (items.isEmpty) {
-                  return Padding(
-                    padding: EdgeInsets.all(16.w),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: cardDark,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'No inventory items found.',
-                          style: TextStyle(color: textWhite),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                return ListView.separated(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ASizes.defaultPadding,
-                    vertical: 8.h,
-                  ),
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    // final itemData =
-                    //     items[index].data() as Map<String, dynamic>;
-                    // return _buildInventoryCard(itemData, controller);
-                    final itemData = InventoryModel.fromMap(
-                      items[index].data() as Map<String, dynamic>,
-                    );
-                    return _buildInventoryCard(itemData, controller);
-                  },
-                );
-              },
-            ),
+                },
+              );
+            }),
           ),
         ],
       ),
@@ -141,15 +115,6 @@ class InventoryListView extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
         children: [
           _buildReactiveFilterChip(context, controller, 'Type', Iconsax.tag),
-          SizedBox(width: 12.w),
-          // _buildStaticFilterChip(context, controller, 'Size', Iconsax.ruler),
-          // SizedBox(width: 12.w),
-          // _buildReactiveFilterChip(
-          //   context,
-          //   controller,
-          //   'Status',
-          //   Iconsax.bookmark,
-          // ),
         ],
       ),
     );
@@ -168,25 +133,12 @@ class InventoryListView extends StatelessWidget {
     return Obx(() {
       bool isActive = false;
 
-      // if (label == 'Status' && controller.selectedStatusFilter.value != null) {
-      //   isActive = true;
-      // }
-
       if (label == 'Type' && controller.selectedSurfboardTypes.isNotEmpty) {
         isActive = true;
       }
 
       return _buildChipUI(context, controller, label, icon, isActive);
     });
-  }
-
-  Widget _buildStaticFilterChip(
-    BuildContext context,
-    InventoryController controller,
-    String label,
-    IconData icon,
-  ) {
-    return _buildChipUI(context, controller, label, icon, false);
   }
 
   Widget _buildChipUI(
@@ -278,7 +230,6 @@ class InventoryListView extends StatelessWidget {
 
             SizedBox(height: 16.h),
 
-            if (type == 'Status') _buildStatusFilterOptions(controller),
             if (type == 'Type') _buildTypeFilterOptions(controller),
 
             SizedBox(height: 32.h),
@@ -302,25 +253,6 @@ class InventoryListView extends StatelessWidget {
   // FILTER OPTIONS
   // ===========================================================================
 
-  Widget _buildStatusFilterOptions(InventoryController controller) {
-    return Column(
-      children: ItemStatus.values.map((status) {
-        final details = controller.getStatusDetails(status);
-        return Obx(() {
-          final isSelected = controller.selectedStatusFilter.value == status;
-          return ListTile(
-            onTap: () => controller.setStatusFilter(status),
-            leading: CircleAvatar(backgroundColor: details['color'], radius: 6),
-            title: Text(details['text'], style: TextStyle(color: textWhite)),
-            trailing: isSelected
-                ? Icon(Iconsax.tick_circle, color: primaryBlue)
-                : null,
-          );
-        });
-      }).toList(),
-    );
-  }
-
   Widget _buildTypeFilterOptions(InventoryController controller) {
     return Wrap(
       spacing: 12.w,
@@ -331,7 +263,7 @@ class InventoryListView extends StatelessWidget {
           return FilterChip(
             label: Text(type),
             selected: isSelected,
-            onSelected: (_) => controller.toggleTypeFilter(type),
+            onSelected: (_) => controller.toggleSurfboardType(type),
           );
         });
       }).toList(),
@@ -346,7 +278,7 @@ class InventoryListView extends StatelessWidget {
     InventoryModel item,
     InventoryController controller,
   ) {
-    final status = controller.getStatusDetails(item.status);
+    // final status = controller.getStatusDetails(item.status);
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -366,7 +298,7 @@ class InventoryListView extends StatelessWidget {
                 style: TextStyle(color: textWhite, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 4.h),
-              Text(status['text'], style: TextStyle(color: status['color'])),
+              // Text(status['text'], style: TextStyle(color: status['color'])),
             ],
           ),
         ],

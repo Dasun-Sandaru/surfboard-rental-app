@@ -23,8 +23,25 @@ class FirestoreService {
   }
 
   /// GET INVENTORY ITEMS STREAM
-  Stream<QuerySnapshot> getInventoryItems(String shopId) {
-    print('Fetching inventory items for shopId: $shopId');
-    return shopRef(shopId).collection('inventory').snapshots();
+  Future<QuerySnapshot> getInventoryPage({
+    required String shopId,
+    List<String>? types,
+    DocumentSnapshot? lastDocument,
+    int limit = 10,
+  }) {
+    Query query = shopRef(shopId)
+        .collection('inventory')
+        // .orderBy('createdAt', descending: true)
+        .limit(limit);
+
+    if (types != null && types.isNotEmpty) {
+      query = query.where('type', whereIn: types);
+    }
+
+    // if (lastDocument != null) {
+    //   query = query.startAfterDocument(lastDocument);
+    // }
+
+    return query.get();
   }
 }

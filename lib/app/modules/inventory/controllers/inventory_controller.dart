@@ -1,89 +1,87 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../utils/constants/a_enums.dart';
+import '../../../models/inventory_model.dart';
 import '../../../services/firestore_service.dart';
 import '../../../services/user_service.dart';
 
 class InventoryController extends GetxController {
-  final Rxn<ItemStatus> selectedStatusFilter = Rxn<ItemStatus>();
-  final RxList<String> selectedSurfboardTypes = <String>[].obs;
-
   final FirestoreService _firestoreService = FirestoreService();
   final UserService _userService = UserService();
 
+  final RxList<InventoryModel> items = <InventoryModel>[].obs;
+  final RxList<String> selectedSurfboardTypes = <String>[].obs;
+
+  DocumentSnapshot? lastDocument;
+  bool isLoading = false;
+  bool hasMore = true;
+
   String shopId = '0000';
+  final List<String> surfboardTypes = [
+    "Shortboard",
+    "Fish",
+    "Longboard",
+    "Consultant",
+  ];
 
   @override
   Future<void> onInit() async {
     super.onInit();
     shopId = await _userService.getShopIdFromStorage() ?? '0000';
+    loadMore();
   }
 
-  /// FETCH INVENTORY ITEMS STREAM
-  Stream get inventoryItemsStream =>
-      _firestoreService.getInventoryItems(shopId);
+  Future<void> loadMore() async {
+    if (isLoading || !hasMore) return;
 
-  final List<String> surfboardTypes = ["Shortboard", "Longboard", "Funboard"];
+    isLoading = true;
 
-  final RxList<Map<String, dynamic>> inventoryItems = <Map<String, dynamic>>[
-    {
-      "name": "Channel Islands - Shortboard",
-      "size": "6' 2\"",
-      "status": ItemStatus.available,
-      // Use placeholder images if you don't have real URLs yet
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-    {
-      "name": "Firewire - Longboard",
-      "size": "9' 0\"",
-      "status": ItemStatus.rented,
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-    {
-      "name": "Pyzel - Funboard",
-      "size": "7' 6\"",
-      "status": ItemStatus.repair,
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-    {
-      "name": "Lost - Shortboard",
-      "size": "5' 10\"",
-      "status": ItemStatus.available,
-      "imageUrl": "https://via.placeholder.com/150",
-    },
-  ].obs;
+    final snapshot = await _firestoreService.getInventoryPage(
+      shopId: shopId,
+      types: selectedSurfboardTypes,
+      lastDocument: lastDocument,
+      // types: ["Shortboard", "Fish"],
+    );
 
-  void toggleTypeFilter(String type) {
+    if (snapshot.docs.isNotEmpty) {
+      lastDocument = snapshot.docs.last;
+
+      items.addAll(
+        snapshot.docs.map(
+          (doc) => InventoryModel.fromMap(doc.data() as Map<String, dynamic>),
+        ),
+      );
+    }
+
+    if (snapshot.docs.length < 10) {
+      hasMore = false;
+    }
+
+    isLoading = false;
+  }
+
+  void applyFilters() {
+    items.clear();
+    lastDocument = null;
+    hasMore = true;
+    Get.back();
+    loadMore();
+  }
+
+  void resetFilters() {
+    selectedSurfboardTypes.clear();
+    applyFilters();
+  }
+
+  void toggleSurfboardType(String type) {
     if (selectedSurfboardTypes.contains(type)) {
       selectedSurfboardTypes.remove(type);
     } else {
       selectedSurfboardTypes.add(type);
     }
-  }
 
-  void setStatusFilter(ItemStatus status) {
-    selectedStatusFilter.value = selectedStatusFilter.value == status
-        ? null
-        : status;
-  }
-
-  void applyFilters() => Get.back();
-
-  void resetFilters() {
-    selectedStatusFilter.value = null;
-    selectedSurfboardTypes.clear();
-    Get.back();
-  }
-
-  Map<String, dynamic> getStatusDetails(ItemStatus status) {
-    switch (status) {
-      case ItemStatus.available:
-        return {'color': const Color(0xFF28a745), 'text': 'Available'};
-      case ItemStatus.rented:
-        return {'color': const Color(0xFF6F42C1), 'text': 'Rented'};
-      case ItemStatus.repair:
-        return {'color': const Color(0xFFFFC107), 'text': 'Repair'};
-    }
+    // applyFilters();
   }
 }
