@@ -1,26 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../utils/constants/a_enums.dart';
 
 class InventoryModel {
-  String id;
-  String name;
-  String type;
-  String brand;
-  String sizeFeet;
-  String sizeInches;
-  String sizeTotalInches;
-  String volume;
-  String color;
-  String purchaseCost;
-  String damageFeeRule;
-  String rentalRateHour;
-  String rentalRateDay;
-  String note;
-  ItemStatus status;
-  Timestamp createdAt;
+  final String id;
+  final String imageUrl;
+  final String name;
+  final String type;
+  final String brand;
+
+  /// Size (NUMERIC)
+  final int sizeFeet;
+  final int sizeInches;
+  final int sizeTotalInches;
+
+  final int volume;
+  final String color;
+  final int purchaseCost;
+  final String damageFeeRule;
+  final int rentalRateHour;
+  final int rentalRateDay;
+  final String note;
+  final ItemStatus status;
+  final Timestamp createdAt;
+
   InventoryModel({
     required this.id,
+    required this.imageUrl,
     required this.name,
     required this.type,
     required this.brand,
@@ -38,42 +43,52 @@ class InventoryModel {
     required this.createdAt,
   });
 
-  String get sizeUnit => "ft";
+  /// Computed display value
+  String get displaySize => "$sizeFeet' $sizeInches\"";
 
-  /// Create InventoryModel from Firestore map
+  /// Firestore → Model
   factory InventoryModel.fromMap(Map<String, dynamic> data) {
     return InventoryModel(
       id: data['id'] as String,
+      imageUrl: data['image_url'] as String,
       name: data['name'] as String,
       type: data['type'] as String,
       brand: data['brand'] as String,
-      sizeFeet: data['size_feet'] as String,
-      sizeInches: data['size_inches'] as String,
-      sizeTotalInches: data['size_total_inches'] as String,
-      volume: data['volume'] as String,
+
+      sizeFeet: (data['size_feet'] as num).toInt(),
+      sizeInches: (data['size_inches'] as num).toInt(),
+      sizeTotalInches: (data['size_total_inches'] as num).toInt(),
+
+      volume: (data['volume'] as num).toInt(),
       color: data['color'] as String,
-      purchaseCost: data['purchase_cost'] as String,
+      purchaseCost: (data['purchase_cost'] as num).toInt(),
       damageFeeRule: data['damage_fee_rule'] as String,
-      rentalRateHour: data['rental_rate_hour'] as String,
-      rentalRateDay: data['rental_rate_day'] as String,
+      rentalRateHour: (data['rental_rate_hour'] as num).toInt(),
+      rentalRateDay: (data['rental_rate_day'] as num).toInt(),
       note: data['note'] as String,
+
       status: ItemStatus.values.firstWhere(
-        (e) => e.toString().split('.').last == data['status'],
+        (e) => e.name == data['status'],
         orElse: () => ItemStatus.available,
       ),
-      createdAt: data['created_at'],
+
+      createdAt: data['created_at'] as Timestamp,
     );
   }
 
+  /// Model → Firestore
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
       'id': id,
+      'image_url': imageUrl,
       'name': name,
       'type': type,
       'brand': brand,
+
       'size_feet': sizeFeet,
       'size_inches': sizeInches,
       'size_total_inches': sizeTotalInches,
+
       'volume': volume,
       'color': color,
       'purchase_cost': purchaseCost,
@@ -81,7 +96,8 @@ class InventoryModel {
       'rental_rate_hour': rentalRateHour,
       'rental_rate_day': rentalRateDay,
       'note': note,
-      'status': status.toString().split('.').last,
+
+      'status': status.name,
       'created_at': createdAt,
     };
   }

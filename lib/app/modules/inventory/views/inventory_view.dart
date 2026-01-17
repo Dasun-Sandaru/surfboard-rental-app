@@ -134,8 +134,20 @@ class InventoryListView extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
         children: [
-          _buildReactiveFilterChip(context, controller, 'Type', Iconsax.tag),
-          _buildReactiveFilterChip(context, controller, 'Size', Iconsax.size),
+          Obx(() => _buildChipUI(
+                context,
+                controller,
+                'Type',
+                Iconsax.tag,
+                controller.selectedSurfboardTypes.isNotEmpty,
+              )),
+          Obx(() => _buildChipUI(
+                context,
+                controller,
+                'Size',
+                Iconsax.size,
+                controller.isSizeFilterActive.value,
+              )),
         ],
       ),
     );
@@ -144,30 +156,6 @@ class InventoryListView extends StatelessWidget {
   // ===========================================================================
   // FILTER CHIPS
   // ===========================================================================
-
-  Widget _buildReactiveFilterChip(
-    BuildContext context,
-    InventoryController controller,
-    String label,
-    IconData icon,
-  ) {
-    return Obx(() {
-      bool isActive = false;
-
-      // By unconditionally checking the observable here, we ensure GetX is always happy.
-      final isTypeFilterActive = controller.selectedSurfboardTypes.isNotEmpty;
-
-      if (label == 'Type' && isTypeFilterActive) {
-        isActive = true;
-      } else if (label == 'Size' &&
-          (controller.feetSizeController.text.isNotEmpty ||
-              controller.inchesSizeController.text.isNotEmpty)) {
-        isActive = true;
-      }
-
-      return _buildChipUI(context, controller, label, icon, isActive);
-    });
-  }
 
   Widget _buildChipUI(
     BuildContext context,
@@ -413,7 +401,7 @@ class InventoryListView extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  item.type,
+                  item.status.name.toUpperCase(),
                   style: TextStyle(color: textGrey, fontSize: 12.sp),
                 ),
                 SizedBox(height: 8.h),
@@ -424,7 +412,7 @@ class InventoryListView extends StatelessWidget {
                     Text(
                       '"${item.sizeFeet} ${item.sizeInches} ${item.sizeTotalInches}"',
                       style: TextStyle(color: textGrey, fontSize: 12.sp),
-                    )
+                    ),
                   ],
                 ),
               ],

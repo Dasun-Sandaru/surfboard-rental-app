@@ -21,6 +21,7 @@ class InventoryController extends GetxController {
   bool hasMore = true;
 
   RxBool isLessThan = false.obs;
+  RxBool isSizeFilterActive = false.obs;
 
   String shopId = '0000';
   final List<String> surfboardTypes = [
@@ -39,7 +40,23 @@ class InventoryController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     shopId = await _userService.getShopIdFromStorage() ?? '0000';
+    feetSizeController.addListener(_updateSizeFilterState);
+    inchesSizeController.addListener(_updateSizeFilterState);
     loadMore();
+  }
+
+  @override
+  void onClose() {
+    feetSizeController.removeListener(_updateSizeFilterState);
+    inchesSizeController.removeListener(_updateSizeFilterState);
+    feetSizeController.dispose();
+    inchesSizeController.dispose();
+    super.onClose();
+  }
+
+  void _updateSizeFilterState() {
+    isSizeFilterActive.value =
+        feetSizeController.text.isNotEmpty || inchesSizeController.text.isNotEmpty;
   }
 
   Future<void> loadMore() async {
@@ -77,16 +94,17 @@ class InventoryController extends GetxController {
     isLoading = false;
   }
 
-  void applyFilters() {
+  void applyFilters({bool validate = true}) {
     // items.clear();
     // lastDocument = null;
     // hasMore = true;
     // Get.back();
     // loadMore();
 
-
     // Validate the form
-    if (sizeFormKey.currentState != null && !sizeFormKey.currentState!.validate()) {
+    if (validate &&
+        sizeFormKey.currentState != null &&
+        !sizeFormKey.currentState!.validate()) {
       return;
     }
 
@@ -103,7 +121,7 @@ class InventoryController extends GetxController {
     inchesSizeController.clear();
     isLessThan.value = false;
 
-    applyFilters();
+    applyFilters(validate: false);
   }
 
   void toggleSurfboardType(String type) {
