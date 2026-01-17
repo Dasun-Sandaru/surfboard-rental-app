@@ -8,6 +8,8 @@ import '../../../services/firestore_service.dart';
 import '../../../services/user_service.dart';
 
 class InventoryController extends GetxController {
+  final GlobalKey<FormState> sizeFormKey = GlobalKey<FormState>();
+
   final FirestoreService _firestoreService = FirestoreService();
   final UserService _userService = UserService();
 
@@ -18,6 +20,8 @@ class InventoryController extends GetxController {
   bool isLoading = false;
   bool hasMore = true;
 
+  RxBool isLessThan = false.obs;
+
   String shopId = '0000';
   final List<String> surfboardTypes = [
     "Shortboard",
@@ -25,6 +29,11 @@ class InventoryController extends GetxController {
     "Longboard",
     "Consultant",
   ];
+
+  final feetSizeController = TextEditingController();
+  final inchesSizeController = TextEditingController();
+
+  // String
 
   @override
   Future<void> onInit() async {
@@ -42,7 +51,13 @@ class InventoryController extends GetxController {
       shopId: shopId,
       types: selectedSurfboardTypes,
       lastDocument: lastDocument,
-      // types: ["Shortboard", "Fish"],
+      sizeFeet: feetSizeController.text.isNotEmpty
+          ? feetSizeController.text
+          : null,
+      sizeInches: inchesSizeController.text.isNotEmpty
+          ? inchesSizeController.text
+          : null,
+      isLessThan: isLessThan.value,
     );
 
     if (snapshot.docs.isNotEmpty) {
@@ -63,15 +78,31 @@ class InventoryController extends GetxController {
   }
 
   void applyFilters() {
+    // items.clear();
+    // lastDocument = null;
+    // hasMore = true;
+    // Get.back();
+    // loadMore();
+
+
+    // Validate the form
+    if (sizeFormKey.currentState != null && !sizeFormKey.currentState!.validate()) {
+      return;
+    }
+
     items.clear();
     lastDocument = null;
     hasMore = true;
-    Get.back();
     loadMore();
+    Get.back();
   }
 
   void resetFilters() {
     selectedSurfboardTypes.clear();
+    feetSizeController.clear();
+    inchesSizeController.clear();
+    isLessThan.value = false;
+
     applyFilters();
   }
 
@@ -83,5 +114,10 @@ class InventoryController extends GetxController {
     }
 
     // applyFilters();
+  }
+
+  /// toggle Less Than / Greater Than for size filter
+  void toggleLessThan() {
+    isLessThan.value = !isLessThan.value;
   }
 }

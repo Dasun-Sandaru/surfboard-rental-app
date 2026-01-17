@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
@@ -26,22 +28,53 @@ class FirestoreService {
   Future<QuerySnapshot> getInventoryPage({
     required String shopId,
     List<String>? types,
+    String? sizeFeet,
+    String? sizeInches,
+    bool? isLessThan,
     DocumentSnapshot? lastDocument,
     int limit = 10,
   }) {
-    Query query = shopRef(shopId)
-        .collection('inventory')
-        // .orderBy('createdAt', descending: true)
-        .limit(limit);
+    int totalInches = 0;
+
+    Query query = shopRef(
+      shopId,
+    ).collection('inventory').orderBy('size_total_inches').limit(limit);
 
     if (types != null && types.isNotEmpty) {
       query = query.where('type', whereIn: types);
     }
 
-    // if (lastDocument != null) {
-    //   query = query.startAfterDocument(lastDocument);
-    // }
+    if (sizeFeet != null && sizeFeet.isNotEmpty) {
+      final feet = int.tryParse(sizeFeet) ?? 0;
+      final inches = int.tryParse(sizeInches ?? '0') ?? 0;
+
+      totalInches = (feet * 12) + inches;
+
+      if (isLessThan == true) {
+        query = query.where(
+          'size_total_inches',
+          isLessThanOrEqualTo: totalInches.toString(),
+        );
+      } else {
+        query = query.where(
+          'size_total_inches',
+          isGreaterThanOrEqualTo: totalInches.toString(),
+        );
+      }
+    }
+
+    // query = query.where('size_total_inches', isLessThanOrEqualTo: '76');
+
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
+    }
+
+    log(
+      'Query Parameters: types=$types, sizeFeet=$sizeFeet, sizeInches=$sizeInches,totalInches=$totalInches, isLessThan=$isLessThan,lastDocument=${lastDocument?.id}, limit=$limit',
+    );
 
     return query.get();
   }
+
+
 }

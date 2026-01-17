@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import 'package:surfboard_rental_app/utils/helper/a_validator.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -53,7 +54,26 @@ class InventoryListView extends StatelessWidget {
               // }
 
               if (controller.items.isEmpty) {
-                return const Center(child: Text('No inventory found'));
+                return Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        // decoration: BoxDecoration(
+                        //   color: cardDark,
+                        //   borderRadius: BorderRadius.circular(16),
+                        // ),
+                        child: const Center(
+                          child: Text(
+                            'No inventory found',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               // if (controller.items.isEmpty && !controller.isLoading) {
@@ -115,6 +135,7 @@ class InventoryListView extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
         children: [
           _buildReactiveFilterChip(context, controller, 'Type', Iconsax.tag),
+          _buildReactiveFilterChip(context, controller, 'Size', Iconsax.size),
         ],
       ),
     );
@@ -133,7 +154,14 @@ class InventoryListView extends StatelessWidget {
     return Obx(() {
       bool isActive = false;
 
-      if (label == 'Type' && controller.selectedSurfboardTypes.isNotEmpty) {
+      // By unconditionally checking the observable here, we ensure GetX is always happy.
+      final isTypeFilterActive = controller.selectedSurfboardTypes.isNotEmpty;
+
+      if (label == 'Type' && isTypeFilterActive) {
+        isActive = true;
+      } else if (label == 'Size' &&
+          (controller.feetSizeController.text.isNotEmpty ||
+              controller.inchesSizeController.text.isNotEmpty)) {
         isActive = true;
       }
 
@@ -156,6 +184,7 @@ class InventoryListView extends StatelessWidget {
       onTap: () => _showFilterBottomSheet(context, controller, label),
       borderRadius: BorderRadius.circular(20),
       child: Container(
+        margin: EdgeInsets.only(right: 12.w),
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         decoration: BoxDecoration(
           color: bgColor,
@@ -231,6 +260,7 @@ class InventoryListView extends StatelessWidget {
             SizedBox(height: 16.h),
 
             if (type == 'Type') _buildTypeFilterOptions(controller),
+            if (type == 'Size') _buildSizeFilterOptions(controller),
 
             SizedBox(height: 32.h),
 
@@ -270,10 +300,89 @@ class InventoryListView extends StatelessWidget {
     );
   }
 
+  Widget _buildSizeFilterOptions(InventoryController controller) {
+    return Form(
+      key: controller.sizeFormKey, // optional but recommended
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          /// Label
+          Expanded(
+            flex: 2,
+            child: Text(
+              "Surfboard Size",
+              style: TextStyle(color: textWhite, fontSize: 14.sp),
+            ),
+          ),
+
+          // SizedBox(width: 12.w),
+
+          /// Less / Greater toggle
+          Obx(
+            () => InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: controller.toggleLessThan,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: primaryBlue.withOpacity(0.15),
+                ),
+                child: Icon(
+                  controller.isLessThan.value
+                      ? Icons
+                            .chevron_left_rounded // <
+                      : Icons.chevron_right_rounded, // >
+                  color: primaryBlue,
+                  size: 22,
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(width: 12.w),
+
+          /// Feet input
+          Expanded(
+            child: TextFormField(
+              controller: controller.feetSizeController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Ft',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              style: TextStyle(color: textWhite),
+              validator: (v) => AValidator.validateSurfboardFeet(v),
+            ),
+          ),
+
+          SizedBox(width: 12.w),
+
+          /// Inches input
+          Expanded(
+            child: TextFormField(
+              controller: controller.inchesSizeController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'In',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              style: TextStyle(color: textWhite),
+              validator: (v) => AValidator.validateSurfboardInches(v),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ===========================================================================
   // INVENTORY CARD
   // ===========================================================================
-
   Widget _buildInventoryCard(
     InventoryModel item,
     InventoryController controller,
@@ -290,16 +399,36 @@ class InventoryListView extends StatelessWidget {
         children: [
           Container(width: 80.w, height: 80.w, color: bgDark),
           SizedBox(width: 16.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.name,
-                style: TextStyle(color: textWhite, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.h),
-              // Text(status['text'], style: TextStyle(color: status['color'])),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: TextStyle(
+                    color: textWhite,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  item.type,
+                  style: TextStyle(color: textGrey, fontSize: 12.sp),
+                ),
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    Icon(Iconsax.size, size: 16.sp, color: textGrey),
+                    SizedBox(width: 4.w),
+                    Text(
+                      '"${item.sizeFeet} ${item.sizeInches} ${item.sizeTotalInches}"',
+                      style: TextStyle(color: textGrey, fontSize: 12.sp),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

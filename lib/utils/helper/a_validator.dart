@@ -121,4 +121,46 @@ class AValidator {
 
     return null;
   }
+
+  // static String? validateSurfboardSize(String? feetValue, String? inchesValue) {
+  //   if ((feetValue == null || feetValue.isEmpty) &&
+  //       (inchesValue == null || inchesValue.isEmpty)) {
+  //     return 'surfboard_size_required'.tr;
+  //   }
+
+  //   final feet = int.tryParse(feetValue ?? '0') ?? 0;
+  //   final inches = int.tryParse(inchesValue ?? '0') ?? 0;
+
+  //   if (feet < 0 || inches < 0 || inches >= 12) {
+  //     return 'invalid_surfboard_size'.tr;
+  //   }
+
+  //   return null;
+  // }
+
+  static String? validateSurfboardFeet(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'surfboard_size_required'.tr;
+    }
+
+    final feet = int.tryParse(value);
+    if (feet == null || feet < 0) {
+      return 'invalid_surfboard_size'.tr;
+    }
+
+    return null;
+  }
+
+  static String? validateSurfboardInches(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'surfboard_size_required'.tr;
+    }
+
+    final inches = int.tryParse(value);
+    if (inches == null || inches < 0 || inches >= 12) {
+      return 'invalid_surfboard_size'.tr;
+    }
+
+    return null;
+  }
 }

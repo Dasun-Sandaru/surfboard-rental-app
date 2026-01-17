@@ -9,6 +9,7 @@ class InventoryModel {
   String brand;
   String sizeFeet;
   String sizeInches;
+  String sizeTotalInches;
   String volume;
   String color;
   String purchaseCost;
@@ -25,6 +26,7 @@ class InventoryModel {
     required this.brand,
     required this.sizeFeet,
     required this.sizeInches,
+    required this.sizeTotalInches,
     required this.volume,
     required this.color,
     required this.purchaseCost,
@@ -36,6 +38,8 @@ class InventoryModel {
     required this.createdAt,
   });
 
+  String get sizeUnit => "ft";
+
   /// Create InventoryModel from Firestore map
   factory InventoryModel.fromMap(Map<String, dynamic> data) {
     return InventoryModel(
@@ -45,6 +49,7 @@ class InventoryModel {
       brand: data['brand'] as String,
       sizeFeet: data['size_feet'] as String,
       sizeInches: data['size_inches'] as String,
+      sizeTotalInches: data['size_total_inches'] as String,
       volume: data['volume'] as String,
       color: data['color'] as String,
       purchaseCost: data['purchase_cost'] as String,
@@ -68,6 +73,7 @@ class InventoryModel {
       'brand': brand,
       'size_feet': sizeFeet,
       'size_inches': sizeInches,
+      'size_total_inches': sizeTotalInches,
       'volume': volume,
       'color': color,
       'purchase_cost': purchaseCost,
