@@ -20,7 +20,7 @@ class InventoryModel {
   final int rentalRateHour;
   final int rentalRateDay;
   final String note;
-  final ItemStatus status;
+  final InventoryStatus status;
   final Timestamp createdAt;
 
   InventoryModel({
@@ -67,9 +67,9 @@ class InventoryModel {
       rentalRateDay: (data['rental_rate_day'] as num).toInt(),
       note: data['note'] as String,
 
-      status: ItemStatus.values.firstWhere(
+      status: InventoryStatus.values.firstWhere(
         (e) => e.name == data['status'],
-        orElse: () => ItemStatus.available,
+        orElse: () => InventoryStatus.available,
       ),
 
       createdAt: data['created_at'] as Timestamp,

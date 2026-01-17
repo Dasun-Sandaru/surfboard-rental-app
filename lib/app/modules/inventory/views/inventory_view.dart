@@ -279,7 +279,7 @@ class InventoryListView extends StatelessWidget {
         return Obx(() {
           final isSelected = controller.selectedSurfboardTypes.contains(type);
           return FilterChip(
-            label: Text(type),
+            label: Text(type.name),
             selected: isSelected,
             onSelected: (_) => controller.toggleSurfboardType(type),
           );

@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 
 import '../../../../utils/common/a_app_error_handler.dart';
 import '../../../../utils/common/a_app_snacks.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../services/firestore_service.dart';
 import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
@@ -17,7 +18,7 @@ final List<Map<String, dynamic>> sampleInventoryData = [
   {
     'image_url': '000',
     'name': 'The Ripper',
-    'type': 'Shortboard',
+    'type': SurfBoardType.shortboard.name,
     'brand': 'Pyzel',
     'size_feet': 5,
     'size_inches': 10,
@@ -35,7 +36,7 @@ final List<Map<String, dynamic>> sampleInventoryData = [
   {
     'image_url': '000',
     'name': 'The Cruiser',
-    'type': 'Longboard',
+    'type': SurfBoardType.longboard.name,
     'brand': 'CJ Nelson',
     'size_feet': 9,
     'size_inches': 2,
@@ -53,7 +54,7 @@ final List<Map<String, dynamic>> sampleInventoryData = [
   {
     'image_url': '000',
     'name': 'The Glider',
-    'type': 'Fish',
+    'type': SurfBoardType.fish.name,
     'brand': 'Firewire',
     'size_feet': 6,
     'size_inches': 4,
@@ -85,7 +86,7 @@ class AddInventoryController extends GetxController {
   final rentalRateDayController = TextEditingController();
   final notesController = TextEditingController();
 
-  final SingleSelectController<String> surfboardTypeController =
+  final SingleSelectController<SurfBoardType?> surfboardTypeController =
       SingleSelectController(null);
 
   // Size Controllers
@@ -97,7 +98,7 @@ class AddInventoryController extends GetxController {
       'Enter the details of the surfboard you want to add to your inventory.'
           .obs;
 
-  List<String> surfboardTypelist = ['Shortboard', 'Longboard', 'Funboard'];
+  List<SurfBoardType> surfboardTypelist = SurfBoardType.values;
 
   late String shopId;
 
@@ -157,7 +158,7 @@ class AddInventoryController extends GetxController {
   void updateBoardName() {
     /// Format -: Size Brand Volume ex: 5' 9" Kelly Slater 34L Shortboard
     boardName.value =
-        "${sizeFeetController.text}' ${sizeInchesController.text}\" ${brandController.text} ${volumeController.text} L ${typeController.text}";
+        "${sizeFeetController.text}' ${sizeInchesController.text}\" ${brandController.text} ${volumeController.text} L ${surfboardTypeController.value?.name}";
   }
 
   void clearForm() {

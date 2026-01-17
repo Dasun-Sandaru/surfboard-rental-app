@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
@@ -332,17 +333,22 @@ class AddInventoryView extends StatelessWidget {
   }
 
   Widget _buildTypeDropdown(AddInventoryController controller) {
-    return CustomDropdown<String>(
+    return CustomDropdown<SurfBoardType>(
       controller: controller.surfboardTypeController,
       hintText: 'Select board type',
       items: controller.surfboardTypelist,
-      // initialItem: controller.list[0],
+      // headerBuilder: (context, result) {
+      //   return Text(result.name, style: TextStyle(color: textWhite, fontSize: 16.sp));
+      // },
+      // listItemBuilder: (context, item) {
+      //   return Text(item.name, style: TextStyle(color: textWhite, fontSize: 16.sp));
+      // },
       onChanged: (value) {
-        controller.typeController.text = value ?? '';
-        log('changing value to: $value');
+        controller.typeController.text = value?.name ?? '';
+        log('changing value to: ${value?.name}');
       },
-      validator: (String? value) {
-        if (value == null || value.isEmpty) {
+      validator: (SurfBoardType? value) {
+        if (value == null) {
           return 'Please select a board type';
         }
         return null;
@@ -353,8 +359,8 @@ class AddInventoryView extends StatelessWidget {
         closedBorder: BoxBorder.all(color: borderDark),
         expandedBorder: BoxBorder.all(color: primaryBlue),
         hintStyle: TextStyle(color: textGrey.withOpacity(0.5), fontSize: 16.sp),
-        listItemStyle: TextStyle(color: textWhite, fontSize: 16.sp),
-        headerStyle: TextStyle(color: textWhite, fontSize: 16.sp),
+        // listItemStyle is not needed when using listItemBuilder
+        // headerStyle is not needed when using headerBuilder
         closedErrorBorder: BoxBorder.all(color: Colors.redAccent),
         errorStyle: TextStyle(color: Colors.redAccent, fontSize: 14.sp),
         closedSuffixIcon: Icon(

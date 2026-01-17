@@ -14,7 +14,7 @@ class InventoryController extends GetxController {
   final UserService _userService = UserService();
 
   final RxList<InventoryModel> items = <InventoryModel>[].obs;
-  final RxList<String> selectedSurfboardTypes = <String>[].obs;
+  final RxList<SurfBoardType> selectedSurfboardTypes = <SurfBoardType>[].obs;
 
   DocumentSnapshot? lastDocument;
   bool isLoading = false;
@@ -24,12 +24,7 @@ class InventoryController extends GetxController {
   RxBool isSizeFilterActive = false.obs;
 
   String shopId = '0000';
-  final List<String> surfboardTypes = [
-    "Shortboard",
-    "Fish",
-    "Longboard",
-    "Consultant",
-  ];
+  final List<SurfBoardType> surfboardTypes = SurfBoardType.values;
 
   final feetSizeController = TextEditingController();
   final inchesSizeController = TextEditingController();
@@ -66,7 +61,7 @@ class InventoryController extends GetxController {
 
     final snapshot = await _firestoreService.getInventoryPage(
       shopId: shopId,
-      types: selectedSurfboardTypes,
+      types: selectedSurfboardTypes.map((e) => e.name).toList(),
       lastDocument: lastDocument,
       sizeFeet: feetSizeController.text.isNotEmpty
           ? feetSizeController.text
@@ -124,7 +119,7 @@ class InventoryController extends GetxController {
     applyFilters(validate: false);
   }
 
-  void toggleSurfboardType(String type) {
+  void toggleSurfboardType(SurfBoardType type) {
     if (selectedSurfboardTypes.contains(type)) {
       selectedSurfboardTypes.remove(type);
     } else {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 import '../views/inventory_config_view.dart';
 
@@ -30,14 +31,7 @@ class SettingsController extends GetxController {
     "Torq"
   ].obs;
 
-  final RxList<String> boardTypes = <String>[
-    "Shortboard",
-    "Longboard",
-    "Funboard",
-    "Fish",
-    "Gun",
-    "Soft Top"
-  ].obs;
+  final RxList<SurfBoardType> boardTypes = RxList<SurfBoardType>.from(SurfBoardType.values);
 
   // -- Text Controller for Dialogs --
   final textInputController = TextEditingController();
@@ -60,7 +54,7 @@ class SettingsController extends GetxController {
   }
 
   // Generic function to add item to a list
-  void addItem(String title, RxList<String> list) {
+  void addItem(String title, RxList<dynamic> list) {
     textInputController.clear();
     Get.defaultDialog(
       title: "Add $title",
@@ -89,7 +83,7 @@ class SettingsController extends GetxController {
   }
 
   // Generic function to remove item
-  void removeItem(String item, RxList<String> list) {
+  void removeItem(dynamic item, RxList<dynamic> list) {
     Get.defaultDialog(
       title: "Remove Item",
       middleText: "Delete '$item' from the list?",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/settings_controller.dart';
@@ -42,16 +43,14 @@ class InventoryConfigView extends StatelessWidget {
           children: [
             /// 1. Brands Tab
             _buildListManager(
-              items: controller.brands, 
+              items: controller.brands,
               onAdd: () => controller.addItem("Brand", controller.brands),
               onRemove: (item) => controller.removeItem(item, controller.brands),
             ),
 
             /// 2. Board Types Tab
             _buildListManager(
-              items: controller.boardTypes, 
-              onAdd: () => controller.addItem("Board Type", controller.boardTypes),
-              onRemove: (item) => controller.removeItem(item, controller.boardTypes),
+              items: controller.boardTypes,
             ),
           ],
         ),
@@ -60,9 +59,9 @@ class InventoryConfigView extends StatelessWidget {
   }
 
   Widget _buildListManager({
-    required RxList<String> items,
-    required VoidCallback onAdd,
-    required Function(String) onRemove,
+    required RxList<dynamic> items,
+    VoidCallback? onAdd,
+    Function(dynamic)? onRemove,
   }) {
     return Stack(
       children: [
@@ -72,6 +71,7 @@ class InventoryConfigView extends StatelessWidget {
           separatorBuilder: (c, i) => SizedBox(height: 12.h),
           itemBuilder: (context, index) {
             final item = items[index];
+            final title = item is String ? item : (item as SurfBoardType).name;
             return Container(
               decoration: BoxDecoration(
                 color: cardDark,
@@ -79,16 +79,17 @@ class InventoryConfigView extends StatelessWidget {
                 border: Border.all(color: borderDark),
               ),
               child: ListTile(
-                title: Text(item, style: TextStyle(color: textWhite, fontWeight: FontWeight.w500)),
-                trailing: IconButton(
+                title: Text(title, style: TextStyle(color: textWhite, fontWeight: FontWeight.w500)),
+                trailing: onRemove != null ? IconButton(
                   icon: Icon(Iconsax.trash, color: Colors.redAccent, size: 20.w),
                   onPressed: () => onRemove(item),
-                ),
+                ) : null,
               ),
             );
           },
         )),
         
+        if (onAdd != null)
         Positioned(
           bottom: 24.h,
           right: 24.w,
