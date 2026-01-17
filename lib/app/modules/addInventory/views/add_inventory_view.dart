@@ -35,7 +35,9 @@ class AddInventoryView extends StatelessWidget {
         leadingOnPressed: () => Get.back(),
         centerTitle: true,
         title: Text(
-          "Add Board",
+          controller.mode == InventoryFormMode.edit
+              ? "Edit Board"
+              : "Add Board",
           style: TextStyle(
             color: textWhite,
             fontSize: 18.sp,
@@ -232,7 +234,9 @@ class AddInventoryView extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Save Item",
+                  controller.mode == InventoryFormMode.edit
+                      ? "Update Board Details"
+                      : "Add Board Details",
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
@@ -336,16 +340,32 @@ class AddInventoryView extends StatelessWidget {
     return CustomDropdown<SurfBoardType>(
       controller: controller.surfboardTypeController,
       hintText: 'Select board type',
-      items: controller.surfboardTypelist,
-      // headerBuilder: (context, result) {
-      //   return Text(result.name, style: TextStyle(color: textWhite, fontSize: 16.sp));
-      // },
-      // listItemBuilder: (context, item) {
-      //   return Text(item.name, style: TextStyle(color: textWhite, fontSize: 16.sp));
-      // },
+      items: SurfBoardType.values,
+      headerBuilder: (context, selectedItem, _) {
+        return Text(
+          selectedItem.name,
+          style: TextStyle(color: textWhite, fontSize: 16.sp),
+        );
+      },
+      listItemBuilder: (context, item, isSelected, onItemSelect) {
+        return Material(
+          color: isSelected ? primaryBlue.withOpacity(0.2) : cardDark,
+          child: InkWell(
+            onTap: onItemSelect,
+            splashColor: primaryBlue.withOpacity(0.1),
+            child: Text(
+              item.name,
+              style: TextStyle(
+                color: isSelected ? primaryBlue : textWhite,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 16.sp,
+              ),
+            ),
+          ),
+        );
+      },
       onChanged: (value) {
-        controller.typeController.text = value?.name ?? '';
-        log('changing value to: ${value?.name}');
+        controller.surfboardTypeController.value = value;
       },
       validator: (SurfBoardType? value) {
         if (value == null) {
@@ -359,8 +379,6 @@ class AddInventoryView extends StatelessWidget {
         closedBorder: BoxBorder.all(color: borderDark),
         expandedBorder: BoxBorder.all(color: primaryBlue),
         hintStyle: TextStyle(color: textGrey.withOpacity(0.5), fontSize: 16.sp),
-        // listItemStyle is not needed when using listItemBuilder
-        // headerStyle is not needed when using headerBuilder
         closedErrorBorder: BoxBorder.all(color: Colors.redAccent),
         errorStyle: TextStyle(color: Colors.redAccent, fontSize: 14.sp),
         closedSuffixIcon: Icon(

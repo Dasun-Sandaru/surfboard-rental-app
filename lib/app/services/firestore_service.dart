@@ -96,6 +96,23 @@ class FirestoreService {
   }) {
     return shopRef(shopId).collection('inventory').doc(itemId).snapshots();
   }
+
+  /// UPDATE INVENTORY ITEM
+  Future<void> updateInventoryItem({
+    required String shopId,
+    required String itemId,
+    required Map<String, dynamic> data,
+  }) async {
+    await shopRef(shopId).collection('inventory').doc(itemId).update(data);
+  }
+
+  /// GET SINGLE INVENTORY ITEM (ONE TIME)
+  Future<DocumentSnapshot> getInventoryItemOnce({
+    required String shopId,
+    required String itemId,
+  }) {
+    return shopRef(shopId).collection('inventory').doc(itemId).get();
+  }
 }
 
 

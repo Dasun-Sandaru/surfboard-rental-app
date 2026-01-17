@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
+import '../../../../utils/constants/a_enums.dart';
+import '../../../routes/app_pages.dart';
 import '../../../services/firestore_service.dart';
 import '../../../services/user_service.dart';
 
@@ -33,7 +35,10 @@ class ItemDetailsController extends GetxController {
   }
 
   void editItem() {
-    Get.snackbar("Action", "Edit Item Clicked");
+    Get.toNamed(
+      Routes.ADD_INVENTORY,
+      arguments: {'mode': InventoryFormMode.edit, 'itemId': itemId},
+    );
   }
 
   void deleteItem() {
@@ -51,6 +56,4 @@ class ItemDetailsController extends GetxController {
   void viewDamageFees() {
     Get.snackbar("Action", "View Damage Fees Clicked");
   }
-
-  
 }

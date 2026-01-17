@@ -112,6 +112,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                   _buildDetailRow("Item ID", item.id),
                   _buildDetailRow("Name", item.name),
                   _buildDetailRow("Brand", item.brand),
+                  _buildDetailRow("Color", item.color),
                   _buildDetailRow("Type", item.type),
                   _buildDetailRow("Volume", '${item.volume}L'),
                   _buildDetailRow(

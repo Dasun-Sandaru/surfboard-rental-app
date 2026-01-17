@@ -113,7 +113,9 @@ class InventoryListView extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryBlue,
         onPressed: () {
-          Get.toNamed(Routes.ADD_INVENTORY);
+          Get.toNamed(Routes.ADD_INVENTORY, arguments: {
+            'mode': InventoryFormMode.add,
+          });
         },
         child: Icon(Iconsax.add, color: textWhite),
       ),
