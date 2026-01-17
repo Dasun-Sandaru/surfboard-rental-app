@@ -28,6 +28,7 @@ class FirestoreService {
   Future<QuerySnapshot> getInventoryPage({
     required String shopId,
     List<String>? types,
+    List<String>? statuses,
     String? sizeFeet,
     String? sizeInches,
     bool? isLessThan,
@@ -45,6 +46,11 @@ class FirestoreService {
     // Apply type filtering if types are provided
     if (types != null && types.isNotEmpty) {
       query = query.where('type', whereIn: types);
+    }
+
+    // Apply status filtering if statuses are provided
+    if (statuses != null && statuses.isNotEmpty) {
+      query = query.where('status', whereIn: statuses);
     }
 
     // Apply size filtering if sizeFeet is provided
@@ -75,7 +81,7 @@ class FirestoreService {
 
     // Log the query parameters for debugging purposes
     log(
-      'Query Parameters: types=$types, sizeFeet=$sizeFeet, sizeInches=$sizeInches, totalInches=$totalInches, isLessThan=$isLessThan, lastDocument=${lastDocument?.id}, limit=$limit',
+      'Query Parameters: types=$types, statuses=$statuses, sizeFeet=$sizeFeet, sizeInches=$sizeInches, totalInches=$totalInches, isLessThan=$isLessThan, lastDocument=${lastDocument?.id}, limit=$limit',
       name: 'InventoryService', // Adding a name for easier log filtering
     );
 
@@ -83,8 +89,15 @@ class FirestoreService {
     return query.get();
   }
 
-
+  /// GET SINGLE INVENTORY ITEM
+  Stream<DocumentSnapshot> getInventoryItem({
+    required String shopId,
+    required String itemId,
+  }) {
+    return shopRef(shopId).collection('inventory').doc(itemId).snapshots();
+  }
 }
+
 
   // // Example 1: Get first page of all inventory for a shop
   // print('Fetching initial inventory...');

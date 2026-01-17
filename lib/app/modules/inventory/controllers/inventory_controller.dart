@@ -15,6 +15,7 @@ class InventoryController extends GetxController {
 
   final RxList<InventoryModel> items = <InventoryModel>[].obs;
   final RxList<SurfBoardType> selectedSurfboardTypes = <SurfBoardType>[].obs;
+  final RxList<InventoryStatus> selectedStatuses = <InventoryStatus>[].obs;
 
   DocumentSnapshot? lastDocument;
   bool isLoading = false;
@@ -25,6 +26,7 @@ class InventoryController extends GetxController {
 
   String shopId = '0000';
   final List<SurfBoardType> surfboardTypes = SurfBoardType.values;
+  final List<InventoryStatus> inventoryStatuses = InventoryStatus.values;
 
   final feetSizeController = TextEditingController();
   final inchesSizeController = TextEditingController();
@@ -62,6 +64,7 @@ class InventoryController extends GetxController {
     final snapshot = await _firestoreService.getInventoryPage(
       shopId: shopId,
       types: selectedSurfboardTypes.map((e) => e.name).toList(),
+      statuses: selectedStatuses.map((e) => e.name).toList(),
       lastDocument: lastDocument,
       sizeFeet: feetSizeController.text.isNotEmpty
           ? feetSizeController.text
@@ -90,11 +93,6 @@ class InventoryController extends GetxController {
   }
 
   void applyFilters({bool validate = true}) {
-    // items.clear();
-    // lastDocument = null;
-    // hasMore = true;
-    // Get.back();
-    // loadMore();
 
     // Validate the form
     if (validate &&
@@ -112,6 +110,7 @@ class InventoryController extends GetxController {
 
   void resetFilters() {
     selectedSurfboardTypes.clear();
+    selectedStatuses.clear();
     feetSizeController.clear();
     inchesSizeController.clear();
     isLessThan.value = false;
@@ -125,8 +124,14 @@ class InventoryController extends GetxController {
     } else {
       selectedSurfboardTypes.add(type);
     }
+  }
 
-    // applyFilters();
+  void toggleStatus(InventoryStatus status) {
+    if (selectedStatuses.contains(status)) {
+      selectedStatuses.remove(status);
+    } else {
+      selectedStatuses.add(status);
+    }
   }
 
   /// toggle Less Than / Greater Than for size filter

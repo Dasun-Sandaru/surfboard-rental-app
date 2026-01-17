@@ -23,6 +23,7 @@ abstract class Routes {
   static const INVENTORY = _Paths.INVENTORY;
   static const ADD_INVENTORY = _Paths.ADD_INVENTORY;
   static const SETTINGS = _Paths.SETTINGS;
+  static const ITEM_DETAILS = _Paths.ITEM_DETAILS;
 }
 
 abstract class _Paths {
@@ -45,4 +46,5 @@ abstract class _Paths {
   static const INVENTORY = '/inventory';
   static const ADD_INVENTORY = '/add-inventory';
   static const SETTINGS = '/settings';
+  static const ITEM_DETAILS = '/item-details';
 }

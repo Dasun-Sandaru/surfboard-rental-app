@@ -134,20 +134,33 @@ class InventoryListView extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
         children: [
-          Obx(() => _buildChipUI(
-                context,
-                controller,
-                'Type',
-                Iconsax.tag,
-                controller.selectedSurfboardTypes.isNotEmpty,
-              )),
-          Obx(() => _buildChipUI(
-                context,
-                controller,
-                'Size',
-                Iconsax.size,
-                controller.isSizeFilterActive.value,
-              )),
+          Obx(
+            () => _buildChipUI(
+              context,
+              controller,
+              'Type',
+              Iconsax.tag,
+              controller.selectedSurfboardTypes.isNotEmpty,
+            ),
+          ),
+          Obx(
+            () => _buildChipUI(
+              context,
+              controller,
+              'Status',
+              Iconsax.status,
+              controller.selectedStatuses.isNotEmpty,
+            ),
+          ),
+          Obx(
+            () => _buildChipUI(
+              context,
+              controller,
+              'Size',
+              Iconsax.ruler,
+              controller.isSizeFilterActive.value,
+            ),
+          ),
         ],
       ),
     );
@@ -248,6 +261,7 @@ class InventoryListView extends StatelessWidget {
             SizedBox(height: 16.h),
 
             if (type == 'Type') _buildTypeFilterOptions(controller),
+            if (type == 'Status') _buildStatusFilterOptions(controller),
             if (type == 'Size') _buildSizeFilterOptions(controller),
 
             SizedBox(height: 32.h),
@@ -282,6 +296,23 @@ class InventoryListView extends StatelessWidget {
             label: Text(type.name),
             selected: isSelected,
             onSelected: (_) => controller.toggleSurfboardType(type),
+          );
+        });
+      }).toList(),
+    );
+  }
+
+  Widget _buildStatusFilterOptions(InventoryController controller) {
+    return Wrap(
+      spacing: 12.w,
+      runSpacing: 12.h,
+      children: controller.inventoryStatuses.map((status) {
+        return Obx(() {
+          final isSelected = controller.selectedStatuses.contains(status);
+          return FilterChip(
+            label: Text(status.name),
+            selected: isSelected,
+            onSelected: (_) => controller.toggleStatus(status),
           );
         });
       }).toList(),
@@ -377,48 +408,53 @@ class InventoryListView extends StatelessWidget {
   ) {
     // final status = controller.getStatusDetails(item.status);
 
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: cardDark,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(width: 80.w, height: 80.w, color: bgDark),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  style: TextStyle(
-                    color: textWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.sp,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  item.status.name.toUpperCase(),
-                  style: TextStyle(color: textGrey, fontSize: 12.sp),
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Icon(Iconsax.size, size: 16.sp, color: textGrey),
-                    SizedBox(width: 4.w),
-                    Text(
-                      '"${item.sizeFeet} ${item.sizeInches} ${item.sizeTotalInches}"',
-                      style: TextStyle(color: textGrey, fontSize: 12.sp),
+    return InkWell(
+      onTap: () {
+        Get.toNamed(Routes.ITEM_DETAILS, arguments: item.id);
+      },
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: cardDark,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(width: 80.w, height: 80.w, color: bgDark),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: TextStyle(
+                      color: textWhite,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    item.status.name.toUpperCase(),
+                    style: TextStyle(color: textGrey, fontSize: 12.sp),
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(Iconsax.size, size: 16.sp, color: textGrey),
+                      SizedBox(width: 4.w),
+                      Text(
+                        '"${item.sizeFeet} ${item.sizeInches} ${item.sizeTotalInches}"',
+                        style: TextStyle(color: textGrey, fontSize: 12.sp),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
