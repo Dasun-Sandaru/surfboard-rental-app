@@ -366,6 +366,7 @@ class AddInventoryView extends StatelessWidget {
       },
       onChanged: (value) {
         controller.surfboardTypeController.value = value;
+        controller.updateBoardName();
       },
       validator: (SurfBoardType? value) {
         if (value == null) {

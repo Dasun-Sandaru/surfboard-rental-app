@@ -1,4 +1,3 @@
-
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -116,6 +115,8 @@ class AddInventoryController extends GetxController {
       'status': 'available',
       'updated_at': FieldValue.serverTimestamp(),
     };
+
+    print('Data to be saved/updated: $data' + 'item id: $itemId');
 
     if (mode == InventoryFormMode.edit && itemId != null) {
       await _firestoreService.updateInventoryItem(
