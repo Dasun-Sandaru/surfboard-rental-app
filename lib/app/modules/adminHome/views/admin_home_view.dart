@@ -200,6 +200,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
     final menuItems = [
       {'title': 'Manage Users', 'sub': 'Staff & admin', 'icon': Iconsax.people},
       {'title': 'Inventory', 'sub': 'Boards & gear', 'icon': Iconsax.box},
+      {'title': 'Customers', 'sub': 'Customer list', 'icon': Iconsax.user},
       {'title': 'Rentals', 'sub': 'Rental history', 'icon': Iconsax.receipt},
       {'title': 'Reports', 'sub': 'Performance', 'icon': Iconsax.chart},
       {
@@ -231,7 +232,10 @@ class AdminHomeView extends GetView<AdminHomeController> {
               case 1:
                 Get.toNamed(Routes.INVENTORY);
                 break;
-              case 5:
+              case 2:
+                Get.toNamed(Routes.CUSTOMER_LIST);
+                break;
+              case 6:
                 Get.toNamed(Routes.SETTINGS);
                 break;
               // case 2:

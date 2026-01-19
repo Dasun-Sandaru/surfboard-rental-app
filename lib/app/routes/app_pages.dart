@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/addEditCustomer/bindings/add_edit_customer_binding.dart';
+import '../modules/addEditCustomer/views/add_edit_customer_view.dart';
 import '../modules/addInventory/bindings/add_inventory_binding.dart';
 import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
@@ -12,6 +14,10 @@ import '../modules/auth/view/forgot_password_view.dart';
 import '../modules/auth/view/verify_email_screen.dart';
 import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
+import '../modules/customerDetails/bindings/customer_details_binding.dart';
+import '../modules/customerDetails/views/customer_details_view.dart';
+import '../modules/customerList/bindings/customer_list_binding.dart';
+import '../modules/customerList/views/customer_list_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/inventory/bindings/inventory_binding.dart';
@@ -143,6 +149,21 @@ class AppPages {
       name: _Paths.ITEM_DETAILS,
       page: () => const ItemDetailsView(),
       binding: ItemDetailsBinding(),
+    ),
+    GetPage(
+      name: _Paths.CUSTOMER_LIST,
+      page: () => const CustomerListView(),
+      binding: CustomerListBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADD_EDIT_CUSTOMER,
+      page: () => const AddEditCustomerView(),
+      binding: AddEditCustomerBinding(),
+    ),
+    GetPage(
+      name: _Paths.CUSTOMER_DETAILS,
+      page: () => const CustomerDetailsView(),
+      binding: CustomerDetailsBinding(),
     ),
   ];
 }
