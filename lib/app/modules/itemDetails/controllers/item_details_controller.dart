@@ -54,10 +54,7 @@ class ItemDetailsController extends GetxController {
   }
 
   void viewDamageFees() {
-    // Get.snackbar("Action", "View Damage Fees Clicked");
-    Get.toNamed(
-      Routes.DAMAGE_FEE,
-      arguments: itemId,
-    );
+    // Get.snackbar("Action", "View Damage Fees Clicked $itemId");
+    Get.toNamed(Routes.DAMAGE_FEE, arguments: itemId);
   }
 }

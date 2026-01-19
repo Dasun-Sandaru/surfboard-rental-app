@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/damage_fee_controller.dart';
 
-class DamageFeeView extends StatelessWidget {
+class DamageFeeView extends GetView<DamageFeeController> {
   const DamageFeeView({super.key});
 
   // -- Theme Colors --
@@ -21,8 +22,6 @@ class DamageFeeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DamageFeeController());
-
     return Scaffold(
       backgroundColor: bgDark,
       appBar: AAppBar(
@@ -40,16 +39,37 @@ class DamageFeeView extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // List Content
-          Obx(() => ListView.separated(
-            padding: EdgeInsets.fromLTRB(ASizes.defaultPadding, ASizes.defaultPadding, ASizes.defaultPadding, 100.h),
-            itemCount: controller.damageRules.length,
-            separatorBuilder: (context, index) => SizedBox(height: 12.h),
-            itemBuilder: (context, index) {
-              final rule = controller.damageRules[index];
-              return _buildDamageRuleCard(rule, controller);
-            },
-          )),
+          // Loading State
+          Obx(() {
+            if (controller.isLoading.value) {
+              return Center(
+                child: CircularProgressIndicator(color: primaryBlue),
+              );
+            }
+
+            // Empty State
+            if (controller.damageRules.isEmpty) {
+              return _buildEmptyList();
+            }
+
+            // List Content
+            return Obx(
+              () => ListView.separated(
+                padding: EdgeInsets.fromLTRB(
+                  ASizes.defaultPadding,
+                  ASizes.defaultPadding,
+                  ASizes.defaultPadding,
+                  100.h,
+                ),
+                itemCount: controller.damageRules.length,
+                separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                itemBuilder: (context, index) {
+                  final rule = controller.damageRules[index];
+                  return _buildDamageRuleCard(rule, controller);
+                },
+              ),
+            );
+          }),
 
           // Floating Action Button (Centered at bottom like HTML)
           Positioned(
@@ -65,7 +85,9 @@ class DamageFeeView extends StatelessWidget {
                     backgroundColor: primaryBlue,
                     foregroundColor: textWhite,
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                     elevation: 4,
                   ),
                   child: Row(
@@ -75,7 +97,10 @@ class DamageFeeView extends StatelessWidget {
                       SizedBox(width: 8.w),
                       Text(
                         "Add Damage Rule",
-                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -88,15 +113,22 @@ class DamageFeeView extends StatelessWidget {
     );
   }
 
-  Widget _buildDamageRuleCard(Map<String, dynamic> rule, DamageFeeController controller) {
-    final bool isActive = rule['active_status'];
+  Widget _buildDamageRuleCard(
+    DamageFeeModel rule,
+    DamageFeeController controller,
+  ) {
+    final bool isActive = rule.activeStatus;
 
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isActive ? borderDark.withOpacity(0.5) : borderDark.withOpacity(0.2)),
+        border: Border.all(
+          color: isActive
+              ? borderDark.withOpacity(0.5)
+              : borderDark.withOpacity(0.2),
+        ),
       ),
       child: Row(
         children: [
@@ -106,7 +138,7 @@ class DamageFeeView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  rule['damage_type'],
+                  rule.damageType,
                   style: TextStyle(
                     color: isActive ? textWhite : textGrey,
                     fontSize: 16.sp,
@@ -115,16 +147,13 @@ class DamageFeeView extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  "\$${rule['fee_amount'].toStringAsFixed(2)}",
-                  style: TextStyle(
-                    color: textGrey,
-                    fontSize: 14.sp,
-                  ),
+                  "\$${rule.feeAmount.toStringAsFixed(2)}",
+                  style: TextStyle(color: textGrey, fontSize: 14.sp),
                 ),
-                if(rule['description'] != null && rule['description'].isNotEmpty) ...[
-                   SizedBox(height: 4.h),
-                   Text(
-                    rule['description'],
+                if (rule.description.isNotEmpty) ...[
+                  SizedBox(height: 4.h),
+                  Text(
+                    rule.description,
                     style: TextStyle(
                       color: textGrey.withOpacity(0.6),
                       fontSize: 12.sp,
@@ -133,7 +162,7 @@ class DamageFeeView extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ]
+                ],
               ],
             ),
           ),
@@ -143,33 +172,33 @@ class DamageFeeView extends StatelessWidget {
             children: [
               // Edit Button
               _buildIconButton(
-                icon: Iconsax.edit, 
-                color: textGrey, 
-                bgColor: bgDark, 
-                onTap: () => controller.openAddEditDialog(rule: rule)
+                icon: Iconsax.edit,
+                color: textGrey,
+                bgColor: bgDark,
+                onTap: () => controller.openAddEditDialog(rule: rule),
               ),
-              
+
               SizedBox(width: 8.w),
-              
+
               // Delete Button
               _buildIconButton(
-                icon: Iconsax.trash, 
-                color: errorRed, 
-                bgColor: errorRed.withOpacity(0.1), 
-                onTap: () => controller.deleteRule(rule['id'])
+                icon: Iconsax.trash,
+                color: errorRed,
+                bgColor: errorRed.withOpacity(0.1),
+                onTap: () => controller.deleteRule(rule.id!),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
   }
 
   Widget _buildIconButton({
-    required IconData icon, 
-    required Color color, 
-    required Color bgColor, 
-    required VoidCallback onTap
+    required IconData icon,
+    required Color color,
+    required Color bgColor,
+    required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
@@ -177,11 +206,29 @@ class DamageFeeView extends StatelessWidget {
       child: Container(
         height: 40.w,
         width: 40.w,
-        decoration: BoxDecoration(
-          color: bgColor,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
         child: Icon(icon, color: color, size: 20.w),
+      ),
+    );
+  }
+
+  Widget _buildEmptyList() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Iconsax.warning_2, size: 64.w, color: textGrey),
+          SizedBox(height: 16.h),
+          Text(
+            "No damage fee rules found.",
+            style: TextStyle(color: textGrey, fontSize: 16.sp),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            "Tap the button below to add a new rule.",
+            style: TextStyle(color: textGrey.withOpacity(0.7), fontSize: 14.sp),
+          ),
+        ],
       ),
     );
   }

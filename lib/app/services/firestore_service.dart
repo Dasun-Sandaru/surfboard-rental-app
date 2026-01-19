@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -112,6 +113,18 @@ class FirestoreService {
     required String itemId,
   }) {
     return shopRef(shopId).collection('inventory').doc(itemId).get();
+  }
+
+  /// ADD DAMAGE FEE TO ITEM
+  Future<void> addDamageFeeToItem({
+    required String shopId,
+    required String itemId,
+    required DamageFeeModel feeData,
+  }) async {
+    final itemRef = shopRef(shopId).collection('inventory').doc(itemId);
+    final feesCollection = itemRef.collection('damage_fees');
+
+    await feesCollection.add(feeData.toMap());
   }
 }
 
