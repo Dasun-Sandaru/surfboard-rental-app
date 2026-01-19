@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 class AValidator {
   static String? validateText(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return 'field_required'.trParams({'field': fieldName});
+      // return 'field_required'.trParams({'field': fieldName});
+      return '$fieldName is required';
     }
 
     return null;
@@ -76,6 +77,88 @@ class AValidator {
   static String? validateDropDown(String? value, String fieldName) {
     if (value == null || value == '-1') {
       return 'field_required'.trParams({'field': fieldName});
+    }
+
+    return null;
+  }
+
+  static String? validateNumber(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      // return 'field_required'.trParams({'field': fieldName});
+      return '$fieldName is required';
+    }
+
+    final number = num.tryParse(value);
+    if (number == null) {
+      // return 'invalid_number'.trParams({'field': fieldName});
+      return '$fieldName must be a valid number';
+    }
+
+    if (number < 0) {
+      // return 'number_positive'.trParams({'field': fieldName});
+      return '$fieldName must be a positive number';
+    }
+
+    return null;
+  }
+
+  static String? validateAmount(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      // return 'field_required'.trParams({'field': fieldName});
+      return '$fieldName is required';
+    }
+
+    final amount = double.tryParse(value);
+    if (amount == null) {
+      // return 'invalid_amount'.trParams({'field': fieldName});
+      return '$fieldName must be a valid amount';
+    }
+
+    if (amount < 0) {
+      // return 'amount_positive'.trParams({'field': fieldName});
+      return '$fieldName must be a positive amount';
+    }
+
+    return null;
+  }
+
+  // static String? validateSurfboardSize(String? feetValue, String? inchesValue) {
+  //   if ((feetValue == null || feetValue.isEmpty) &&
+  //       (inchesValue == null || inchesValue.isEmpty)) {
+  //     return 'surfboard_size_required'.tr;
+  //   }
+
+  //   final feet = int.tryParse(feetValue ?? '0') ?? 0;
+  //   final inches = int.tryParse(inchesValue ?? '0') ?? 0;
+
+  //   if (feet < 0 || inches < 0 || inches >= 12) {
+  //     return 'invalid_surfboard_size'.tr;
+  //   }
+
+  //   return null;
+  // }
+
+  static String? validateSurfboardFeet(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'surfboard_size_required'.tr;
+    }
+
+    final feet = int.tryParse(value);
+    if (feet == null || feet < 0) {
+      return 'invalid_surfboard_size'.tr;
+    }
+
+    return null;
+  }
+
+  static String? validateSurfboardInches(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'surfboard_size_required'.tr;
+    }
+
+    final inches = int.tryParse(value);
+    if (inches == null || inches < 0 || inches >= 12) {
+      return 'invalid_surfboard_size'.tr;
     }
 
     return null;

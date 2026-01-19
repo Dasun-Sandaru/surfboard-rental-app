@@ -47,15 +47,18 @@
         /inventory (Subcollection)
             /{itemId}
                 name
-                brand
-                size
-                color
                 type
-                status              // available | rented | maintenance
+                brand
+                size_feet
+                size_inches
+                volume
+                color
+                purchase_cost
                 damage_fee_rule     // rule or fixed amount
                 rental_rate_hour
                 rental_rate_day
-                notes
+                note
+                status              // available | rented | maintenance
                 created_at
 
         --------------------------------------------------------------------

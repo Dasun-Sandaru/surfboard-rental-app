@@ -31,11 +31,17 @@ class UserModel {
 
   /// Create UserModel from Firestore map
   factory UserModel.fromMap(Map<String, dynamic> data, String documentId) {
+    final roleString = data['role'] as String? ?? 'staff';
+    final role = UserRole.values.firstWhere(
+      (e) => e.name == roleString,
+      orElse: () => UserRole.staff,
+    );
+
     return UserModel(
       uid: documentId,
       email: data['email'] as String?,
       name: data['name'] as String?,
-      role: UserRole.fromString(data['role'] as String? ?? 'staff'),
+      role: role,
       isActive: data['is_active'] as bool? ?? true,
       isVerified: data['verified'] as bool? ?? false,
       phone: data['phone'] as String?,

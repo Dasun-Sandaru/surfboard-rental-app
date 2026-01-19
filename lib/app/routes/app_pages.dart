@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/addInventory/bindings/add_inventory_binding.dart';
+import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
 import '../modules/alerts/bindings/alerts_binding.dart';
@@ -12,12 +14,18 @@ import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/inventory/bindings/inventory_binding.dart';
+import '../modules/inventory/views/inventory_view.dart';
+import '../modules/itemDetails/bindings/item_details_binding.dart';
+import '../modules/itemDetails/views/item_details_view.dart';
 import '../modules/manageUsers/bindings/manage_users_binding.dart';
 import '../modules/manageUsers/views/manage_users_view.dart';
 import '../modules/newRental/bindings/new_rental_binding.dart';
 import '../modules/newRental/views/new_rental_view.dart';
 import '../modules/onboard/bindings/onboard_binding.dart';
 import '../modules/onboard/views/onboard_view.dart';
+import '../modules/settings/bindings/settings_binding.dart';
+import '../modules/settings/views/settings_view.dart';
 import '../modules/shopSetup/bindings/shop_setup_binding.dart';
 import '../modules/shopSetup/views/shop_setup_view.dart';
 import '../modules/signIn/bindings/sign_in_binding.dart';
@@ -115,6 +123,26 @@ class AppPages {
       name: _Paths.USER_DETAIL,
       page: () => const UserDetailView(),
       binding: UserDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.INVENTORY,
+      page: () => const InventoryListView(),
+      binding: InventoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADD_INVENTORY,
+      page: () => const AddInventoryView(),
+      binding: AddInventoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.SETTINGS,
+      page: () => const SettingsView(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: _Paths.ITEM_DETAILS,
+      page: () => const ItemDetailsView(),
+      binding: ItemDetailsBinding(),
     ),
   ];
 }

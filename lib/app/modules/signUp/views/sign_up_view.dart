@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/helper/a_validator.dart';
 import '../controllers/sign_up_controller.dart';
 
@@ -29,7 +30,9 @@ class SignUpView extends GetView<SignUpController> {
         centerTitle: true,
         title: Obx(
           () => Text(
-            controller.role.value == 'staff' ? 'Join the Team' : 'Setup Shop',
+            controller.role.value == UserRole.staff
+                ? 'Join the Team'
+                : 'Setup Shop',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: textWhite,
@@ -39,7 +42,7 @@ class SignUpView extends GetView<SignUpController> {
       ),
       body: SafeArea(
         child: Obx(
-          () => controller.role.value == 'staff'
+          () => controller.role.value == UserRole.staff
               ? _buildStaffForm(context)
               : _buildAdminStepper(context),
         ),
@@ -511,4 +514,6 @@ class SignUpView extends GetView<SignUpController> {
       );
     }
   }
+
+
 }
