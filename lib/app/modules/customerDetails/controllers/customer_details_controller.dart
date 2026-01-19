@@ -1,20 +1,34 @@
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart'; // Add this package for calls/emails
+import 'package:surfboard_rental_app/app/models/customer_model.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../routes/app_pages.dart'; // Add this package for calls/emails
 
 class CustomerDetailsController extends GetxController {
-  
-  // Dummy Customer Data (Replace with Get.arguments later)
-  final customer = {
-    "id": "CUST-001",
-    "first_name": "Kai",
-    "last_name": "Smith",
-    "phone": "(808) 555-0123",
-    "email": "kai.smith@example.com",
-    "nic": "N987654321",
-    "notes": "Prefers longboards. Always returns on time.",
-    "imageUrl": "https://via.placeholder.com/150", 
-    "created_at": "2024-01-15",
-  }.obs;
+  late final Rx<CustomerModel> customer;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Get customer from navigation arguments
+    final arg = Get.arguments;
+    if (arg is CustomerModel) {
+      customer = arg.obs;
+    } else {
+      // Create a default/placeholder customer if none provided
+      customer = CustomerModel(
+        id: "N/A",
+        firstName: "Unknown",
+        lastName: "Customer",
+        phone: "N/A",
+        nic: "N/A",
+        email: "N/A",
+        notes: "No data available",
+        imageUrl: null,
+        createdAt: null,
+      ).obs;
+    }
+  }
 
   // Dummy History Data
   final history = <Map<String, dynamic>>[
@@ -36,18 +50,18 @@ class CustomerDetailsController extends GetxController {
       "date": "20 Jul 2024",
       "items": "Soft Top (8'0\")",
       "duration": "4 Hours",
-      "cost": "\$15.00",
+      "cost": "\5.00",
       "status": "Returned",
     },
   ].obs;
 
   void editCustomer() {
     // Navigate to Edit Screen with current data
-    Get.toNamed('/add-edit-customer', arguments: customer);
+    Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: customer.value);
   }
 
   void makeCall() async {
-    final Uri launchUri = Uri(scheme: 'tel', path: customer['phone']);
+    final Uri launchUri = Uri(scheme: 'tel', path: customer.value.phone);
     if (await canLaunchUrl(launchUri)) {
       await launchUri;
     } else {

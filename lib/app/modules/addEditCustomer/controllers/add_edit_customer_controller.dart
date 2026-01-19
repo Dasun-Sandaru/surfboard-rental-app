@@ -22,7 +22,7 @@ class AddEditCustomerController extends GetxController {
 
   // State Variables
   final RxBool isEditMode = false.obs;
-  final RxString customerId = ''.obs;
+  final Rx<CustomerModel?> currentCustomer = Rx<CustomerModel?>(null);
 
   String shopId = '0000';
 
@@ -30,18 +30,18 @@ class AddEditCustomerController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     // Check arguments to see if we are editing
-    if (Get.arguments != null && Get.arguments is Map) {
-      final data = Get.arguments as Map<String, dynamic>;
+    if (Get.arguments != null && Get.arguments is CustomerModel) {
+      final customer = Get.arguments as CustomerModel;
       isEditMode.value = true;
-      customerId.value = data['id'] ?? '';
+      currentCustomer.value = customer;
 
-      // Populate fields
-      firstNameController.text = data['first_name'] ?? '';
-      lastNameController.text = data['last_name'] ?? '';
-      phoneController.text = data['phone'] ?? '';
-      nicController.text = data['nic'] ?? '';
-      emailController.text = data['email'] ?? '';
-      notesController.text = data['notes'] ?? '';
+      // Populate fields with customer data
+      firstNameController.text = customer.firstName;
+      lastNameController.text = customer.lastName;
+      phoneController.text = customer.phone;
+      nicController.text = customer.nic;
+      emailController.text = customer.email;
+      notesController.text = customer.notes;
     }
 
     shopId = await _userService.getShopIdFromStorage() ?? '0000';
@@ -50,33 +50,44 @@ class AddEditCustomerController extends GetxController {
   void saveCustomer() {
     if (!formKey.currentState!.validate()) return;
 
-    final customerData = {
-      "first_name": firstNameController.text.trim(),
-      "last_name": lastNameController.text.trim(),
-      "phone": phoneController.text.trim(),
-      "nic": nicController.text.trim(),
-      "email": emailController.text.trim(),
-      "notes": notesController.text.trim(),
-      "created_at": isEditMode.value ? null : DateTime.now().toIso8601String(),
-    };
+    final customer = CustomerModel(
+      id: isEditMode.value ? currentCustomer.value!.id : null,
+      firstName: firstNameController.text.trim(),
+      lastName: lastNameController.text.trim(),
+      phone: phoneController.text.trim(),
+      nic: nicController.text.trim(),
+      email: emailController.text.trim(),
+      notes: notesController.text.trim(),
+      createdAt: isEditMode.value
+          ? currentCustomer.value!.createdAt
+          : DateTime.now().toIso8601String(),
+      imageUrl: isEditMode.value ? currentCustomer.value!.imageUrl : null,
+    );
 
-    log('Customer Data: $customerData');
+    log('Customer Data: ${customer.toMap()}');
 
     if (isEditMode.value) {
-      // _customerService.updateCustomer(shopId, customerId, data)
-    } else {
-      _customerService.addCustomer(
+      // Update existing customer
+      _customerService.updateCustomer(
         shopId,
-        CustomerModel.fromJson(customerData),
+        currentCustomer.value!.id!,
+        customer,
       );
-
+      Get.snackbar(
+        'Customer Updated',
+        'Customer has been updated successfully.',
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      );
+    } else {
+      // Add new customer
+      _customerService.addCustomer(shopId, customer);
       Get.snackbar(
         'Customer Added',
         'Customer has been added successfully.',
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
       );
-
       // Clear fields
       clearForm();
     }

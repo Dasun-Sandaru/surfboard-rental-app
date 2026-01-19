@@ -26,9 +26,9 @@ class CustomerService {
   Future<void> updateCustomer(
     String shopId,
     String customerId,
-    Map<String, dynamic> data,
+    CustomerModel data,
   ) async {
-    await shopRef(shopId).collection('customers').doc(customerId).update(data);
+    await shopRef(shopId).collection('customers').doc(customerId).update(data.toMap());
   }
 
   Future<void> deleteCustomer(String shopId, String customerId) async {

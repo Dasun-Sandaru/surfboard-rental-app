@@ -7,8 +7,7 @@ import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/customer_details_controller.dart';
 
-
-class CustomerDetailsView extends StatelessWidget {
+class CustomerDetailsView extends GetView<CustomerDetailsController> {
   const CustomerDetailsView({super.key});
 
   // -- Theme Colors --
@@ -23,8 +22,6 @@ class CustomerDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CustomerDetailsController());
-
     return Scaffold(
       backgroundColor: bgDark,
       appBar: AAppBar(
@@ -54,27 +51,29 @@ class CustomerDetailsView extends StatelessWidget {
           SizedBox(width: 8.w),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(ASizes.defaultPadding),
-        child: Column(
-          children: [
-            /// 1. Profile Header & Actions
-            _buildProfileHeader(controller),
+      body: Obx(
+        () => SingleChildScrollView(
+          padding: EdgeInsets.all(ASizes.defaultPadding),
+          child: Column(
+            children: [
+              /// 1. Profile Header & Actions
+              _buildProfileHeader(controller),
 
-            SizedBox(height: 24.h),
+              SizedBox(height: 24.h),
 
-            /// 2. Personal Info Card
-            _buildInfoCard(controller),
+              /// 2. Personal Info Card
+              _buildInfoCard(controller),
 
-            SizedBox(height: 24.h),
+              SizedBox(height: 24.h),
 
-            /// 3. History Section
-            _buildSectionHeader("Rental History"),
-            SizedBox(height: 12.h),
-            _buildHistoryList(controller),
-            
-            SizedBox(height: 40.h),
-          ],
+              /// 3. History Section
+              _buildSectionHeader("Rental History"),
+              SizedBox(height: 12.h),
+              _buildHistoryList(controller),
+
+              SizedBox(height: 40.h),
+            ],
+          ),
         ),
       ),
     );
@@ -97,14 +96,28 @@ class CustomerDetailsView extends StatelessWidget {
           child: CircleAvatar(
             radius: 40.w,
             backgroundColor: cardDark,
-            backgroundImage: NetworkImage(controller.customer['imageUrl']!),
+            backgroundImage:
+                controller.customer.value.imageUrl != null &&
+                    controller.customer.value.imageUrl!.isNotEmpty
+                ? NetworkImage(controller.customer.value.imageUrl!)
+                : null,
+            child:
+                controller.customer.value.imageUrl == null ||
+                    controller.customer.value.imageUrl!.isEmpty
+                ? Text(
+                    controller.customer.value.firstName.isNotEmpty
+                        ? controller.customer.value.firstName[0]
+                        : 'C',
+                    style: TextStyle(color: textWhite, fontSize: 32.sp),
+                  )
+                : null,
           ),
         ),
         SizedBox(height: 12.h),
-        
+
         // Name
         Text(
-          "${controller.customer['first_name']} ${controller.customer['last_name']}",
+          "${controller.customer.value.firstName} ${controller.customer.value.lastName}",
           style: TextStyle(
             color: textWhite,
             fontSize: 22.sp,
@@ -112,7 +125,7 @@ class CustomerDetailsView extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4.h),
-        
+
         // ID Badge
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
@@ -121,10 +134,7 @@ class CustomerDetailsView extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: borderDark),
           ),
-          child: Text(
-            "ID: ${controller.customer['id']}",
-            style: TextStyle(color: textGrey, fontSize: 12.sp),
-          ),
+          child: Text("ID: ${controller.customer.value.id}"),
         ),
 
         SizedBox(height: 20.h),
@@ -134,21 +144,21 @@ class CustomerDetailsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildActionButton(
-              icon: Iconsax.call, 
-              label: "Call", 
-              onTap: controller.makeCall
+              icon: Iconsax.call,
+              label: "Call",
+              onTap: controller.makeCall,
             ),
             SizedBox(width: 16.w),
             _buildActionButton(
-              icon: Iconsax.sms, 
-              label: "Message", 
-              onTap: controller.makeCall // Reuse for now or add SMS logic
+              icon: Iconsax.sms,
+              label: "Message",
+              onTap: controller.makeCall, // Reuse for now or add SMS logic
             ),
             SizedBox(width: 16.w),
             _buildActionButton(
-              icon: Iconsax.direct, 
-              label: "Email", 
-              onTap: controller.sendEmail
+              icon: Iconsax.direct,
+              label: "Email",
+              onTap: controller.sendEmail,
             ),
           ],
         ),
@@ -156,7 +166,11 @@ class CustomerDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton({required IconData icon, required String label, required VoidCallback onTap}) {
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -172,7 +186,10 @@ class CustomerDetailsView extends StatelessWidget {
           children: [
             Icon(icon, color: primaryBlue, size: 24.w),
             SizedBox(height: 6.h),
-            Text(label, style: TextStyle(color: textWhite, fontSize: 12.sp)),
+            Text(
+              label,
+              style: TextStyle(color: textWhite, fontSize: 12.sp),
+            ),
           ],
         ),
       ),
@@ -189,21 +206,45 @@ class CustomerDetailsView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildDetailRow("Phone", controller.customer['phone']!, Iconsax.call),
+          _buildDetailRow(
+            "Phone",
+            controller.customer.value.phone,
+            Iconsax.call,
+          ),
           Divider(color: borderDark, height: 24.h),
-          _buildDetailRow("Email", controller.customer['email']!, Iconsax.sms),
+          _buildDetailRow(
+            "Email",
+            controller.customer.value.email,
+            Iconsax.sms,
+          ),
           Divider(color: borderDark, height: 24.h),
-          _buildDetailRow("NIC / Passport", controller.customer['nic']!, Iconsax.card),
+          _buildDetailRow(
+            "NIC / Passport",
+            controller.customer.value.nic,
+            Iconsax.card,
+          ),
           Divider(color: borderDark, height: 24.h),
-          _buildDetailRow("Notes", controller.customer['notes']!, Iconsax.note, isMultiLine: true),
+          _buildDetailRow(
+            "Notes",
+            controller.customer.value.notes,
+            Iconsax.note,
+            isMultiLine: true,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, IconData icon, {bool isMultiLine = false}) {
+  Widget _buildDetailRow(
+    String label,
+    String value,
+    IconData icon, {
+    bool isMultiLine = false,
+  }) {
     return Row(
-      crossAxisAlignment: isMultiLine ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      crossAxisAlignment: isMultiLine
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
       children: [
         Icon(icon, color: textGrey, size: 20.w),
         SizedBox(width: 16.w),
@@ -211,13 +252,16 @@ class CustomerDetailsView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: textGrey, fontSize: 12.sp)),
+              Text(
+                label,
+                style: TextStyle(color: textGrey, fontSize: 12.sp),
+              ),
               SizedBox(height: 2.h),
               Text(
                 value,
                 style: TextStyle(
-                  color: textWhite, 
-                  fontSize: 14.sp, 
+                  color: textWhite,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   height: 1.4,
                 ),
@@ -244,86 +288,106 @@ class CustomerDetailsView extends StatelessWidget {
   }
 
   Widget _buildHistoryList(CustomerDetailsController controller) {
-    return Obx(() => ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: controller.history.length,
-      separatorBuilder: (c, i) => SizedBox(height: 12.h),
-      itemBuilder: (context, index) {
-        final item = controller.history[index];
-        final bool isLate = item['status'] == "Late Return";
-        final Color statusColor = isLate ? warningOrange : successGreen;
+    return Obx(
+      () => ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.history.length,
+        separatorBuilder: (c, i) => SizedBox(height: 12.h),
+        itemBuilder: (context, index) {
+          final item = controller.history[index];
+          final bool isLate = item['status'] == "Late Return";
+          final Color statusColor = isLate ? warningOrange : successGreen;
 
-        return Container(
-          padding: EdgeInsets.all(12.w),
-          decoration: BoxDecoration(
-            color: cardDark,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: borderDark),
-          ),
-          child: Row(
-            children: [
-              // Date Box
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: bgDark,
-                  borderRadius: BorderRadius.circular(8),
+          return Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: cardDark,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderDark),
+            ),
+            child: Row(
+              children: [
+                // Date Box
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: bgDark,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        item['date'].split(' ')[0], // Day
+                        style: TextStyle(
+                          color: textWhite,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        item['date'].split(' ')[1], // Month
+                        style: TextStyle(color: textGrey, fontSize: 12.sp),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      item['date'].split(' ')[0], // Day
-                      style: TextStyle(color: textWhite, fontSize: 16.sp, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      item['date'].split(' ')[1], // Month
-                      style: TextStyle(color: textGrey, fontSize: 12.sp),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 16.w),
-              
-              // Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item['items'],
-                      style: TextStyle(color: textWhite, fontSize: 14.sp, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(Iconsax.clock, size: 14.w, color: textGrey),
-                        SizedBox(width: 4.w),
-                        Text("${item['duration']} • ${item['cost']}", style: TextStyle(color: textGrey, fontSize: 12.sp)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                SizedBox(width: 16.w),
 
-              // Status Pill
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
+                // Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['items'],
+                        style: TextStyle(
+                          color: textWhite,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Icon(Iconsax.clock, size: 14.w, color: textGrey),
+                          SizedBox(width: 4.w),
+                          Text(
+                            "${item['duration']} • ${item['cost']}",
+                            style: TextStyle(color: textGrey, fontSize: 12.sp),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                child: Text(
-                  item['status'],
-                  style: TextStyle(color: statusColor, fontSize: 10.sp, fontWeight: FontWeight.bold),
+
+                // Status Pill
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    item['status'],
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
-    ));
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }

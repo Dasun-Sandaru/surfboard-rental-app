@@ -2,90 +2,112 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
-import '../../../../utils/common/a_app_bar.dart';
+import '../../../models/customer_model.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/customer_list_controller.dart';
 
-class CustomerListView extends StatelessWidget {
+class CustomerListView extends GetView<CustomerListController> {
   const CustomerListView({super.key});
 
-  // -- Theme Colors --
   final Color bgDark = const Color(0xFF101f22);
   final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
   final Color textWhite = const Color(0xFFf0f4f4);
   final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
+  final Color primaryBlue = const Color(0xFF4A90E2);
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CustomerListController());
-
     return Scaffold(
       backgroundColor: bgDark,
-      appBar: AAppBar(
-        showbackArrow: true,
-        title: Text(
-          'Customer List',
-          style: TextStyle(
-            color: textWhite,
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: AppBar(
         backgroundColor: bgDark,
-
+        title: Text('Customers', style: TextStyle(color: textWhite)),
+        centerTitle: true,
+        elevation: 0,
+        iconTheme: IconThemeData(color: textWhite),
         actions: [
           IconButton(
-            icon: Icon(Iconsax.add_circle, color: primaryBlue, size: 24.w),
             onPressed: () => controller.addCustomer(),
+            icon: Icon(Iconsax.user_add, color: textWhite),
           ),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            /// 2. Search Bar (Sticky-like position)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
-              child: TextFormField(
-                controller: controller.searchTextController,
-                style: TextStyle(color: textWhite),
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Iconsax.search_normal,
-                    size: 20.w,
-                    color: textGrey,
+            /// 1. Header & Search
+            Container(
+              padding: EdgeInsets.all(ASizes.defaultPadding),
+              color: bgDark,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 16.h),
+                  TextField(
+                    controller: controller.searchController,
+                    onChanged: controller.onSearchChanged,
+                    style: TextStyle(color: textWhite),
+                    decoration: InputDecoration(
+                      hintText: "Search name...",
+                      hintStyle: TextStyle(color: textGrey),
+                      prefixIcon: Icon(Iconsax.search_normal, color: textGrey),
+                      filled: true,
+                      fillColor: cardDark,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                    ),
                   ),
-                  hintText: 'Search by name or phone...',
-                  hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
-                  filled: true,
-                  fillColor: cardDark,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                ),
+                ],
               ),
             ),
 
-            SizedBox(height: 16.h),
-
-            /// 3. Customer List
+            /// 2. Paged List
             Expanded(
-              child: Obx(
-                () => ListView.separated(
+              child: RefreshIndicator(
+                onRefresh: controller.refreshCustomers,
+                color: const Color(0xFF4A90E2),
+                child: PagedListView<dynamic, CustomerModel>.separated(
+                  pagingController: controller.pagingController,
                   padding: EdgeInsets.symmetric(
                     horizontal: ASizes.defaultPadding,
                   ),
-                  itemCount: controller.customers.length,
                   separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    final customer = controller.customers[index];
-                    return _buildCustomerCard(customer, controller);
-                  },
+                  builderDelegate: PagedChildBuilderDelegate<CustomerModel>(
+                    itemBuilder: (context, customer, index) =>
+                        _buildCustomerCard(customer),
+
+                    // -- Loading Indicators --
+                    firstPageProgressIndicatorBuilder: (_) => Center(
+                      child: CircularProgressIndicator(color: primaryBlue),
+                    ),
+                    newPageProgressIndicatorBuilder: (_) => Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: CircularProgressIndicator(color: primaryBlue),
+                      ),
+                    ),
+
+                    // -- Empty State --
+                    noItemsFoundIndicatorBuilder: (_) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Iconsax.people, size: 48.w, color: textGrey),
+                          SizedBox(height: 8.h),
+                          Text(
+                            "No customers found",
+                            style: TextStyle(color: textGrey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -95,75 +117,43 @@ class CustomerListView extends StatelessWidget {
     );
   }
 
-  // ===========================================================================
-  // WIDGET BUILDERS
-  // ===========================================================================
-
-  Widget _buildCustomerCard(
-    Map<String, dynamic> customer,
-    CustomerListController controller,
-  ) {
+  Widget _buildCustomerCard(CustomerModel customer) {
     return InkWell(
-      onTap: () => controller.openCustomerDetails(customer),
-      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
+      },
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: cardDark,
-          borderRadius: BorderRadius.circular(16),
-          // Optional: Add subtle border if cards blend too much
-          border: Border.all(color: borderDark.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            /// Avatar
-            Container(
-              height: 56.w,
-              width: 56.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: NetworkImage(customer['imageUrl']),
-                  fit: BoxFit.cover,
-                ),
-                border: Border.all(
-                  color: borderDark,
-                ), // Small border around avatar
+            CircleAvatar(
+              backgroundColor: const Color(0xFF4A90E2).withOpacity(0.2),
+              child: Text(
+                customer.firstName.isNotEmpty ? customer.firstName[0] : "C",
+                style: TextStyle(color: textWhite),
               ),
             ),
-
             SizedBox(width: 16.w),
-
-            /// Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    customer['name'],
-                    style: TextStyle(
-                      color: textWhite,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${customer.firstName} ${customer.lastName}",
+                  style: TextStyle(
+                    color: textWhite,
+                    fontWeight: FontWeight.bold,
                   ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    customer['phone'],
-                    style: TextStyle(color: textGrey, fontSize: 14.sp),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    "Last Rental: ${customer['lastRental']}",
-                    style: TextStyle(color: textGrey, fontSize: 12.sp),
-                  ),
-                ],
-              ),
+                ),
+                Text(
+                  customer.phone,
+                  style: TextStyle(color: textGrey, fontSize: 12.sp),
+                ),
+              ],
             ),
-
-            /// Arrow
-            Icon(Iconsax.arrow_right_3, color: textGrey, size: 20.w),
           ],
         ),
       ),
