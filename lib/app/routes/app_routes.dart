@@ -24,6 +24,9 @@ abstract class Routes {
   static const ADD_INVENTORY = _Paths.ADD_INVENTORY;
   static const SETTINGS = _Paths.SETTINGS;
   static const ITEM_DETAILS = _Paths.ITEM_DETAILS;
+  static const CUSTOMER_LIST = _Paths.CUSTOMER_LIST;
+  static const ADD_EDIT_CUSTOMER = _Paths.ADD_EDIT_CUSTOMER;
+  static const CUSTOMER_DETAILS = _Paths.CUSTOMER_DETAILS;
 }
 
 abstract class _Paths {
@@ -47,4 +50,7 @@ abstract class _Paths {
   static const ADD_INVENTORY = '/add-inventory';
   static const SETTINGS = '/settings';
   static const ITEM_DETAILS = '/item-details';
+  static const CUSTOMER_LIST = '/customer-list';
+  static const ADD_EDIT_CUSTOMER = '/add-edit-customer';
+  static const CUSTOMER_DETAILS = '/customer-details';
 }
