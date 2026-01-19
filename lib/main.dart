@@ -72,4 +72,4 @@ class MyApp extends StatelessWidget {
       translations: AppTranslations(),
     );
   }
-}
+} 
