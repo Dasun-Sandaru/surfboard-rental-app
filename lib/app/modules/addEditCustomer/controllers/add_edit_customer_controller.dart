@@ -24,7 +24,7 @@ class AddEditCustomerController extends GetxController {
   final RxBool isEditMode = false.obs;
   final Rx<CustomerModel?> currentCustomer = Rx<CustomerModel?>(null);
 
-  String shopId = '0000';
+  String? shopId;
 
   @override
   Future<void> onInit() async {
@@ -44,11 +44,16 @@ class AddEditCustomerController extends GetxController {
       notesController.text = customer.notes;
     }
 
-    shopId = await _userService.getShopIdFromStorage() ?? '0000';
+    shopId = await _userService.getShopIdFromStorage();
   }
 
   void saveCustomer() {
     if (!formKey.currentState!.validate()) return;
+
+    if (shopId == null) {
+      Get.snackbar('Error', 'Shop ID not found. Please restart the app.');
+      return;
+    }
 
     final customer = CustomerModel(
       id: isEditMode.value ? currentCustomer.value!.id : null,
@@ -69,7 +74,7 @@ class AddEditCustomerController extends GetxController {
     if (isEditMode.value) {
       // Update existing customer
       _customerService.updateCustomer(
-        shopId,
+        shopId!,
         currentCustomer.value!.id!,
         customer,
       );
@@ -81,7 +86,7 @@ class AddEditCustomerController extends GetxController {
       );
     } else {
       // Add new customer
-      _customerService.addCustomer(shopId, customer);
+      _customerService.addCustomer(shopId!, customer);
       Get.snackbar(
         'Customer Added',
         'Customer has been added successfully.',

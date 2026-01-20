@@ -43,16 +43,16 @@ class AdminHomeController extends GetxController {
   void onInit() {
     super.onInit();
     _setShopId();
-
-    _listenActiveRentals();
-    _listenInventory();
-    _listenCustomers();
-    _listenDamages();
   }
 
   Future<void> _setShopId() async {
     shopId = await _userService.getShopId();
     log('shopId: $shopId');
+    
+    _listenActiveRentals();
+    _listenInventory();
+    _listenCustomers();
+    _listenDamages();
   }
 
   /// REAL-TIME LISTENERS

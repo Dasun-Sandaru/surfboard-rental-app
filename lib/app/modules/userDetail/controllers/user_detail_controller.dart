@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
 
+import '../../../models/user_model.dart';
 import '../../../services/user_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 class UserDetailController extends GetxController {
+  static const String _logName = 'UserDetailController';
   final UserService _userService = Get.find();
 
-  final user = <String, dynamic>{}.obs;
+  final Rx<UserModel?> user = Rx<UserModel?>(null);
 
   final RxBool isActive = true.obs;
   final RxBool isVerified = false.obs;
@@ -15,39 +18,65 @@ class UserDetailController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    shopId = await _userService.getShopIdFromStorage() ?? '0000';
+    try {
+      shopId = await _userService.getShopIdFromStorage() ?? '0000';
 
-    if (Get.arguments is Map) {
-      user.assignAll(Map<String, dynamic>.from(Get.arguments));
+      if (Get.arguments is UserModel) {
+        user.value = Get.arguments as UserModel;
+        isActive.value = user.value?.isActive ?? false;
+        isVerified.value = user.value?.isVerified ?? false;
+      }
+    } catch (e) {
+      AppSnackBar.error(title: 'Error', message: 'Failed to load user: $e');
     }
-
-    // Initialize status values
-    isActive.value = user['is_active'] as bool? ?? false;
-    isVerified.value = user['verified'] as bool? ?? false;
   }
 
   /// UI ACTIONS
   Future<void> toggleActiveStatus(bool value) async {
-    isActive.value = value;
-    await _userService.updateUserStatus(
-      userId: user['id'],
-      shopId: shopId,
-      isActive: value,
-    );
-    Get.snackbar(
-      "Status Updated",
-      "User is now ${value ? 'Active' : 'Inactive'}",
-    );
+    try {
+      if (user.value == null) {
+        AppSnackBar.error(title: 'Error', message: 'User data not available');
+        return;
+      }
+
+      isActive.value = value;
+      await _userService.updateUserStatus(
+        userId: user.value!.uid,
+        shopId: shopId,
+        isActive: value,
+      );
+      AppSnackBar.success(
+        title: 'Status Updated',
+        message: 'User is now ${value ? 'Active' : 'Inactive'}',
+      );
+    } catch (e) {
+      AppSnackBar.error(title: 'Error', message: 'Failed to update status: $e');
+    }
   }
 
   Future<void> toggleVerification() async {
-    isVerified.value = !isVerified.value;
-    await _userService.updateUserVerification(
-      userId: user['id'],
-      shopId: shopId,
-      verified: isVerified.value,
-    );
-    Get.snackbar("Verification Updated", "User verification status changed.");
+    try {
+      if (user.value == null) {
+        AppSnackBar.error(title: 'Error', message: 'User data not available');
+        return;
+      }
+
+      isVerified.value = !isVerified.value;
+      await _userService.updateUserVerification(
+        userId: user.value!.uid,
+        shopId: shopId,
+        verified: isVerified.value,
+      );
+      AppSnackBar.success(
+        title: 'Verification Updated',
+        message: 'User verification status changed.',
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Failed to update verification: $e',
+      );
+    }
   }
 
   void deleteUser() {

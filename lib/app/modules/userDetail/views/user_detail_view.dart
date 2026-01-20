@@ -8,6 +8,8 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../models/user_model.dart';
 import '../controllers/user_detail_controller.dart';
 
 class UserDetailView extends GetView<UserDetailController> {
@@ -68,12 +70,14 @@ class UserDetailView extends GetView<UserDetailController> {
 
             /// Delete Button
             Opacity(
-              opacity: controller.user['role'] == 'Admin' ? 0.5 : 1.0,
+              opacity: controller.user.value?.role == UserRole.admin
+                  ? 0.5
+                  : 1.0,
               child: SizedBox(
                 width: double.infinity,
                 height: 54.h,
                 child: OutlinedButton(
-                  onPressed: controller.user['role'] == 'Admin'
+                  onPressed: controller.user.value?.role == UserRole.admin
                       ? null
                       : controller.deleteUser,
                   style: OutlinedButton.styleFrom(
@@ -103,16 +107,16 @@ class UserDetailView extends GetView<UserDetailController> {
 
   // WIDGET BUILDERS
   Widget _buildProfileHeader(UserDetailController controller) {
-    log("Building profile header for user: ${controller.user['name']}");
+    log("Building profile header for user: ${controller.user.value?.name}");
     return Column(
       children: [
         CircleAvatar(
           radius: 40.w,
           backgroundColor: primaryBlue.withOpacity(0.2),
           child: Text(
-            (controller.user['name'] != null &&
-                    controller.user['name'].toString().isNotEmpty)
-                ? controller.user['name']
+            (controller.user.value?.name != null &&
+                    controller.user.value!.name!.toString().isNotEmpty)
+                ? controller.user.value!.name!
                       .toString()
                       .substring(0, 1)
                       .toUpperCase()
@@ -126,7 +130,7 @@ class UserDetailView extends GetView<UserDetailController> {
         ),
         SizedBox(height: 12.h),
         Text(
-          controller.user['name'].toString(),
+          controller.user.value?.name?.toString() ?? 'N/A',
           style: TextStyle(
             color: textWhite,
             fontSize: 22.sp,
@@ -142,7 +146,7 @@ class UserDetailView extends GetView<UserDetailController> {
             border: Border.all(color: primaryBlue.withOpacity(0.3)),
           ),
           child: Text(
-            controller.user['role'].toString().toUpperCase(),
+            controller.user.value?.role.name.toUpperCase() ?? 'N/A',
             style: TextStyle(
               color: primaryBlue,
               fontSize: 12.sp,
@@ -199,7 +203,7 @@ class UserDetailView extends GetView<UserDetailController> {
                   value: controller.isActive.value,
                   activeColor: successGreen,
                   inactiveTrackColor: bgDark,
-                  onChanged: controller.user['role'] == 'Admin'
+                  onChanged: controller.user.value!.role == UserRole.admin
                       ? null
                       : controller.toggleActiveStatus,
                 ),
@@ -244,9 +248,11 @@ class UserDetailView extends GetView<UserDetailController> {
 
                 // Custom Verify Button
                 Opacity(
-                  opacity: controller.user['role'] == 'Admin' ? 0.5 : 1.0,
+                  opacity: controller.user.value!.role == UserRole.admin
+                      ? 0.5
+                      : 1.0,
                   child: InkWell(
-                    onTap: controller.user['role'] == 'Admin'
+                    onTap: controller.user.value!.role == UserRole.admin
                         ? null
                         : controller.toggleVerification,
                     borderRadius: BorderRadius.circular(20),
@@ -312,19 +318,19 @@ class UserDetailView extends GetView<UserDetailController> {
             _buildInfoRow(
               Iconsax.sms,
               "Email",
-              controller.user['email'].toString(),
+              controller.user.value!.email.toString(),
             ),
             SizedBox(height: 16.h),
             _buildInfoRow(
               Iconsax.call,
               "Phone",
-              controller.user['phone'].toString(),
+              controller.user.value!.phone.toString(),
             ),
             SizedBox(height: 16.h),
             _buildInfoRow(
               Iconsax.calendar,
               "Joined",
-              controller.user['created_at'].toString(),
+              controller.user.value!.createdAt.toString(),
             ),
           ],
         ),

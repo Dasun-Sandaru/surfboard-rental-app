@@ -57,65 +57,55 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
       ),
       body: GetBuilder<ItemDetailsController>(
         builder: (ctrl) {
-          if (ctrl.itemStream == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          return Obx(() {
+            if (ctrl.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return StreamBuilder<DocumentSnapshot>(
-            stream: ctrl.itemStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (snapshot.hasError) {
-                return const Center(child: Text("Error loading item"));
-              }
-
-              if (!snapshot.hasData || !snapshot.data!.exists) {
-                return const Center(child: Text("Item not found"));
-              }
-
-              final item = InventoryModel.fromMap(
-                snapshot.data!.data() as Map<String, dynamic>,
+            if (ctrl.item.value == null) {
+              return const Center(
+                child: Text('Item not found'),
               );
+            }
 
-              return ListView(
-                padding: EdgeInsets.all(16.w),
-                children: [
-                  /// Image placeholder
-                  Container(
-                    height: 200.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: cardDark,
-                      borderRadius: BorderRadius.circular(16),
-                      image: item.imageUrl.isNotEmpty && item.imageUrl != '000'
-                          ? DecorationImage(
-                              image: NetworkImage(item.imageUrl),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: item.imageUrl.isEmpty || item.imageUrl == '000'
-                        ? const Center(
-                            child: Text(
-                              "No Image",
-                              style: TextStyle(color: Colors.white),
-                            ),
+            final item = ctrl.item.value!;
+
+            return ListView(
+              padding: EdgeInsets.all(16.w),
+              children: [
+                /// Image placeholder
+                Container(
+                  height: 200.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: cardDark,
+                    borderRadius: BorderRadius.circular(16),
+                    image: item.imageUrl.isNotEmpty && item.imageUrl != '000'
+                        ? DecorationImage(
+                            image: NetworkImage(item.imageUrl),
+                            fit: BoxFit.cover,
                           )
                         : null,
                   ),
+                  child: item.imageUrl.isEmpty || item.imageUrl == '000'
+                      ? const Center(
+                          child: Text(
+                            "No Image",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      : null,
+                ),
 
-                  SizedBox(height: 16.h),
+                SizedBox(height: 16.h),
 
-                  _buildDetailRow("Item ID", item.id),
-                  _buildDetailRow("Name", item.name),
-                  _buildDetailRow("Brand", item.brand),
-                  _buildDetailRow("Color", item.color),
-                  _buildDetailRow("Type", item.type),
-                  _buildDetailRow("Volume", '${item.volume}L'),
-                  _buildDetailRow(
+                _buildDetailRow("Item ID", item.id),
+                _buildDetailRow("Name", item.name),
+                _buildDetailRow("Brand", item.brand),
+                _buildDetailRow("Color", item.color),
+                _buildDetailRow("Type", item.type),
+                _buildDetailRow("Volume", '${item.volume}L'),
+                _buildDetailRow(
                     "Size",
                     "${item.sizeFeet}' ${item.sizeInches}\"",
                   ),

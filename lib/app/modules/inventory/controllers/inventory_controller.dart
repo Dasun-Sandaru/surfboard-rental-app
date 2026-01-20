@@ -1,30 +1,32 @@
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/inventory_model.dart';
-import '../../../services/firestore_service.dart';
+import '../../../services/inventory_service.dart';
 import '../../../services/user_service.dart';
 
 class InventoryController extends GetxController {
+  static const String _logName = 'InventoryController';
   final GlobalKey<FormState> sizeFormKey = GlobalKey<FormState>();
 
-  final FirestoreService _firestoreService = FirestoreService();
+  final InventoryService _inventoryService = InventoryService();
   final UserService _userService = UserService();
 
   final RxList<InventoryModel> items = <InventoryModel>[].obs;
   final RxList<SurfBoardType> selectedSurfboardTypes = <SurfBoardType>[].obs;
   final RxList<InventoryStatus> selectedStatuses = <InventoryStatus>[].obs;
-
-  DocumentSnapshot? lastDocument;
-  bool isLoading = false;
-  bool hasMore = true;
+  final RxBool isLoading = false.obs;
+  final RxBool hasMoreItems = true.obs;
 
   RxBool isLessThan = false.obs;
   RxBool isSizeFilterActive = false.obs;
 
-  String shopId = '0000';
+  String? shopId;
+  DocumentSnapshot? lastDocument;
   final List<SurfBoardType> surfboardTypes = SurfBoardType.values;
   final List<InventoryStatus> inventoryStatuses = InventoryStatus.values;
 
@@ -36,10 +38,19 @@ class InventoryController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    shopId = await _userService.getShopIdFromStorage() ?? '0000';
-    feetSizeController.addListener(_updateSizeFilterState);
-    inchesSizeController.addListener(_updateSizeFilterState);
-    loadMore();
+    try {
+      shopId = await _userService.getShopIdFromStorage();
+      log('Initialized with shopId: $shopId', name: _logName);
+      feetSizeController.addListener(_updateSizeFilterState);
+      inchesSizeController.addListener(_updateSizeFilterState);
+      loadMore();
+    } catch (e) {
+      log('Error in onInit: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'Initialization Error',
+        message: 'Failed to initialize inventory: $e',
+      );
+    }
   }
 
   @override
@@ -53,69 +64,117 @@ class InventoryController extends GetxController {
 
   void _updateSizeFilterState() {
     isSizeFilterActive.value =
-        feetSizeController.text.isNotEmpty || inchesSizeController.text.isNotEmpty;
+        feetSizeController.text.isNotEmpty ||
+        inchesSizeController.text.isNotEmpty;
   }
 
   Future<void> loadMore() async {
-    if (isLoading || !hasMore) return;
+    try {
+      if (isLoading.value || !hasMoreItems.value) return;
 
-    isLoading = true;
+      isLoading.value = true;
+      log('Loading more items...', name: _logName);
 
-    final snapshot = await _firestoreService.getInventoryPage(
-      shopId: shopId,
-      types: selectedSurfboardTypes.map((e) => e.name).toList(),
-      statuses: selectedStatuses.map((e) => e.name).toList(),
-      lastDocument: lastDocument,
-      sizeFeet: feetSizeController.text.isNotEmpty
-          ? feetSizeController.text
-          : null,
-      sizeInches: inchesSizeController.text.isNotEmpty
-          ? inchesSizeController.text
-          : null,
-      isLessThan: isLessThan.value,
-    );
+      if (shopId == null) {
+        log('Shop ID is null, cannot load items.', name: _logName);
+        isLoading.value = false;
+        hasMoreItems.value = false; // Stop further attempts
+        return;
+      }
 
-    if (snapshot.docs.isNotEmpty) {
-      lastDocument = snapshot.docs.last;
-
-      items.addAll(
-        snapshot.docs.map(
-          (doc) => InventoryModel.fromMap(doc.data() as Map<String, dynamic>),
-        ),
+      final snapshot = await _inventoryService.getInventoryPage(
+        shopId: shopId!,
+        types: selectedSurfboardTypes.map((e) => e.name).toList(),
+        statuses: selectedStatuses.map((e) => e.name).toList(),
+        lastDocument: lastDocument,
+        sizeFeet: feetSizeController.text.isNotEmpty
+            ? feetSizeController.text
+            : null,
+        sizeInches: inchesSizeController.text.isNotEmpty
+            ? inchesSizeController.text
+            : null,
+        isLessThan: isLessThan.value,
       );
-    }
 
-    if (snapshot.docs.length < 10) {
-      hasMore = false;
-    }
+      if (snapshot.docs.isNotEmpty) {
+        lastDocument = snapshot.docs.last;
+        items.addAll(
+          snapshot.docs.map(
+            (doc) => InventoryModel.fromMap(doc.data() as Map<String, dynamic>),
+          ),
+        );
+        log('Loaded ${snapshot.docs.length} items', name: _logName);
+      }
 
-    isLoading = false;
+      if (snapshot.docs.length < 10) {
+        hasMoreItems.value = false;
+      }
+    } catch (e) {
+      log('Error loading more items: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'Load Error',
+        message: 'Failed to load inventory items: $e',
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void applyFilters({bool validate = true}) {
+    try {
+      log('Applying filters...', name: _logName);
 
-    // Validate the form
-    if (validate &&
-        sizeFormKey.currentState != null &&
-        !sizeFormKey.currentState!.validate()) {
-      return;
+      // Validate the form
+      if (validate &&
+          sizeFormKey.currentState != null &&
+          !sizeFormKey.currentState!.validate()) {
+        AppSnackBar.warning(
+          title: 'Validation Error',
+          message: 'Please check the size filters',
+        );
+        return;
+      }
+
+      items.clear();
+      lastDocument = null;
+      hasMoreItems.value = true;
+      loadMore();
+      Get.back();
+
+      log('Filters applied successfully', name: _logName);
+    } catch (e) {
+      log('Error applying filters: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'Filter Error',
+        message: 'Failed to apply filters: $e',
+      );
     }
-
-    items.clear();
-    lastDocument = null;
-    hasMore = true;
-    loadMore();
-    Get.back();
   }
 
   void resetFilters() {
-    selectedSurfboardTypes.clear();
-    selectedStatuses.clear();
-    feetSizeController.clear();
-    inchesSizeController.clear();
-    isLessThan.value = false;
+    try {
+      log('Resetting filters...', name: _logName);
 
-    applyFilters(validate: false);
+      selectedSurfboardTypes.clear();
+      selectedStatuses.clear();
+      feetSizeController.clear();
+      inchesSizeController.clear();
+      isLessThan.value = false;
+
+      applyFilters(validate: false);
+
+      log('Filters reset successfully', name: _logName);
+      AppSnackBar.info(
+        title: 'Filters Reset',
+        message: 'All filters have been cleared',
+      );
+    } catch (e) {
+      log('Error resetting filters: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'Reset Error',
+        message: 'Failed to reset filters: $e',
+      );
+    }
   }
 
   void toggleSurfboardType(SurfBoardType type) {

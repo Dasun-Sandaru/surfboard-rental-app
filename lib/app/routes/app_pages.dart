@@ -18,6 +18,8 @@ import '../modules/customerDetails/bindings/customer_details_binding.dart';
 import '../modules/customerDetails/views/customer_details_view.dart';
 import '../modules/customerList/bindings/customer_list_binding.dart';
 import '../modules/customerList/views/customer_list_view.dart';
+import '../modules/damageFee/bindings/damage_fee_binding.dart';
+import '../modules/damageFee/views/damage_fee_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/inventory/bindings/inventory_binding.dart';
@@ -164,6 +166,11 @@ class AppPages {
       name: _Paths.CUSTOMER_DETAILS,
       page: () => const CustomerDetailsView(),
       binding: CustomerDetailsBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAMAGE_FEE,
+      page: () => const DamageFeeView(),
+      binding: DamageFeeBinding(),
     ),
   ];
 }
