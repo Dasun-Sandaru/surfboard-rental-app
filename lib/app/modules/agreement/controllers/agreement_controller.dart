@@ -1,10 +1,16 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'package:surfboard_rental_app/app/services/pdf_service.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../models/damage_fee_model.dart';
 import '../../../models/inventory_model.dart';
 import '../../../models/new_rental_pass_model.dart';
+import '../../../models/shop_model.dart';
 import '../../../services/damage_fee_service.dart';
 import '../../../services/user_service.dart';
 
@@ -12,6 +18,7 @@ class AgreementController extends GetxController {
   // -- Services --
   final DamageFeeService _damageFeeService = DamageFeeService();
   final UserService _userService = Get.find();
+  final PdfService _pdfService = PdfService();
 
   // -- Agreement Data --
   final Rxn<NewRentalPassModel> newRentalPassData = Rxn<NewRentalPassModel>();
@@ -20,9 +27,6 @@ class AgreementController extends GetxController {
   final RxInt currentStep = 0.obs;
   final PageController pageController = PageController();
 
-  // -- 1. Board Details --
-  final RxString selectedBoard = ''.obs;
-
   // -- 2. Duration & Pricing --
   final rentalPriceController = TextEditingController();
   final RxString rentalDuration = '1 Day'.obs;
@@ -30,18 +34,14 @@ class AgreementController extends GetxController {
   final depositController = TextEditingController();
 
   // -- 3. Damage Fees --
-  // Using DamageFeeModel list instead of hardcoded map
   final RxList<DamageFeeModel> availableDamageFees = <DamageFeeModel>[].obs;
   final RxMap<String, bool> selectedDamageFees = <String, bool>{}.obs;
 
+  // -- 4. Signature --
+  final Rxn<Uint8List> customerSignature = Rxn<Uint8List>();
+
   // -- Derived Data from newRentalPassData --
-
-  // Customer data
   CustomerModel? get customer => newRentalPassData.value?.customer;
-  // String get customerName =>
-  //     "${customer?.firstName ?? ''} ${customer?.lastName ?? ''}";
-
-  // Board data (assumes single item rental for now)
   InventoryModel? get board {
     final items = newRentalPassData.value?.items;
     if (items != null && items.isNotEmpty) {
@@ -50,26 +50,15 @@ class AgreementController extends GetxController {
     return null;
   }
 
-  // String? get boardName => board?.name;
-
-  // // Rental dates & times
-  // String? get startDateTime => newRentalPassData.value?.startDateTimeString;
-  // String? get dueDateTime => newRentalPassData.value?.dueDateTimeString;
-  // int? get rentalHours => newRentalPassData.value?.rentalDurationHours;
-  // double? get rentalDays => newRentalPassData.value?.rentalDurationDays;
-
   @override
   void onInit() {
     super.onInit();
-    // Get the NewRentalPassModel passed from NewRentalController
     if (Get.arguments != null && Get.arguments is NewRentalPassModel) {
       newRentalPassData.value = Get.arguments as NewRentalPassModel;
-      // Fetch damage fees for the selected board
       _loadDamageFees();
     }
   }
 
-  /// Fetch damage fees from database for the selected item
   Future<void> _loadDamageFees() async {
     try {
       final itemId = board?.id;
@@ -79,12 +68,10 @@ class AgreementController extends GetxController {
         return;
       }
 
-      // Bind the stream to the RxList
       availableDamageFees.bindStream(
         _damageFeeService.streamDamageRules(shopId: shopId, itemId: itemId),
       );
 
-      // Add a listener to reset selections when fees change
       ever(availableDamageFees, (fees) {
         selectedDamageFees.clear();
         for (var fee in fees) {
@@ -106,7 +93,6 @@ class AgreementController extends GetxController {
 
   void nextStep() {
     if (currentStep.value < 4) {
-      // Assuming 5 steps total
       currentStep.value++;
       pageController.animateToPage(
         currentStep.value,
@@ -114,8 +100,7 @@ class AgreementController extends GetxController {
         curve: Curves.easeInOut,
       );
     } else {
-      // Submit / Generate Agreement
-      Get.snackbar("Success", "Agreement Generated!");
+      _generateAgreement();
     }
   }
 
@@ -130,19 +115,45 @@ class AgreementController extends GetxController {
     }
   }
 
+  void _generateAgreement() async {
+    final rentalData = newRentalPassData.value;
+    if (rentalData == null) {
+      Get.snackbar("Error", "Cannot generate agreement: missing rental data.");
+      return;
+    }
+
+    // TODO: Get Shop data from a service instead of placeholder
+    final shopData = ShopModel();
+
+    final rentalPrice = double.tryParse(rentalPriceController.text) ?? 0.0;
+    final deposit = requireDeposit.value
+        ? (double.tryParse(depositController.text) ?? 0.0)
+        : 0.0;
+    final selectedFees = getSelectedDamageFees();
+
+    final pdfData = await _pdfService.generateAgreementPdf(
+      rentalData: rentalData,
+      shopData: shopData,
+      rentalFee: rentalPrice,
+      deposit: deposit,
+      selectedDamageFees: selectedFees,
+      customerSignature: customerSignature.value,
+    );
+
+    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfData);
+  }
+
   void toggleDamageFee(String feeId, bool enabled) {
     selectedDamageFees[feeId] = enabled;
     selectedDamageFees.refresh();
   }
 
-  /// Get selected damage fees with their details
   List<DamageFeeModel> getSelectedDamageFees() {
     return availableDamageFees
         .where((fee) => selectedDamageFees[fee.id] == true)
         .toList();
   }
 
-  /// Calculate total damage fees
   double getTotalDamageFees() {
     return getSelectedDamageFees().fold<double>(
       0.0,

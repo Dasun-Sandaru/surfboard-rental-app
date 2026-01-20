@@ -30,6 +30,7 @@ abstract class Routes {
   static const DAMAGE_FEE = _Paths.DAMAGE_FEE;
   static const AGREEMENT_WIZARD = _Paths.AGREEMENT_WIZARD;
   static const CREATE_RENTAL = _Paths.CREATE_RENTAL;
+  static const SIGNATURE = _Paths.SIGNATURE;
 }
 
 abstract class _Paths {
@@ -59,4 +60,5 @@ abstract class _Paths {
   static const DAMAGE_FEE = '/damage-fee';
   static const AGREEMENT_WIZARD = '/agreement-wizard';
   static const CREATE_RENTAL = '/create-rental';
+  static const SIGNATURE = '/signature';
 }

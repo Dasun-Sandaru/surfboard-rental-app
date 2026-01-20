@@ -16,7 +16,6 @@ import '../modules/auth/view/forgot_password_view.dart';
 import '../modules/auth/view/verify_email_screen.dart';
 import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
-
 import '../modules/customerDetails/bindings/customer_details_binding.dart';
 import '../modules/customerDetails/views/customer_details_view.dart';
 import '../modules/customerList/bindings/customer_list_binding.dart';
@@ -43,6 +42,8 @@ import '../modules/signIn/bindings/sign_in_binding.dart';
 import '../modules/signIn/views/sign_in_view.dart';
 import '../modules/signUp/bindings/sign_up_binding.dart';
 import '../modules/signUp/views/sign_up_view.dart';
+import '../modules/signature/bindings/signature_binding.dart';
+import '../modules/signature/views/signature_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/staffHome/bindings/staff_home_binding.dart';
@@ -181,6 +182,10 @@ class AppPages {
       page: () => const AgreementWizardView(),
       binding: AgreementBinding(),
     ),
-    
+    GetPage(
+      name: _Paths.SIGNATURE,
+      page: () => const SignaturePadView(),
+      binding: SignatureBinding(),
+    ),
   ];
 }

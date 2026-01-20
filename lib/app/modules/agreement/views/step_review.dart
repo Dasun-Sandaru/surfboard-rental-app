@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../models/new_rental_pass_model.dart';
+import '../../signature/views/signature_view.dart';
 import '../controllers/agreement_controller.dart';
 
 class StepReview extends GetView<AgreementController> {
@@ -23,8 +26,10 @@ class StepReview extends GetView<AgreementController> {
       final rentalData = controller.newRentalPassData.value;
       if (rentalData == null) {
         return const Center(
-          child: Text("No rental data available.",
-              style: TextStyle(color: textGrey)),
+          child: Text(
+            "No rental data available.",
+            style: TextStyle(color: textGrey),
+          ),
         );
       }
 
@@ -73,8 +78,7 @@ class StepReview extends GetView<AgreementController> {
       _buildSectionHeader("Renter Information"),
       _buildSummaryRow("Name", "${customer.firstName} ${customer.lastName}"),
       _buildSummaryRow("Email", customer.email),
-      if (customer.phone.isNotEmpty)
-        _buildSummaryRow("Phone", customer.phone),
+      if (customer.phone.isNotEmpty) _buildSummaryRow("Phone", customer.phone),
     ]);
   }
 
@@ -135,7 +139,10 @@ class StepReview extends GetView<AgreementController> {
         Text(
           "Damage Policy Agreement",
           style: TextStyle(
-              color: textWhite, fontSize: 16.sp, fontWeight: FontWeight.bold),
+            color: textWhite,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         SizedBox(height: 12.h),
         _buildSectionCard(
@@ -143,17 +150,21 @@ class StepReview extends GetView<AgreementController> {
               ? [
                   Text(
                     "No specific damage fees applied. General wear and tear is expected.",
-                    style:
-                        TextStyle(color: textGrey, fontStyle: FontStyle.italic),
-                  )
+                    style: TextStyle(
+                      color: textGrey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ]
               : selectedFees
-                  .map((fee) => _buildSummaryRow(
+                    .map(
+                      (fee) => _buildSummaryRow(
                         fee.damageType,
                         "\$${fee.feeAmount.toStringAsFixed(2)}",
                         valueColor: errorRed,
-                      ))
-                  .toList(),
+                      ),
+                    )
+                    .toList(),
         ),
       ],
     );
@@ -172,26 +183,42 @@ class StepReview extends GetView<AgreementController> {
           ),
         ),
         SizedBox(height: 12.h),
-        Container(
-          height: 150.h,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFFf0f4f4),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Stack(
-            children: [
-              Center(
-                child: Text(
-                  "Sign Here",
-                  style: TextStyle(
-                    color: Colors.grey.withOpacity(0.5),
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
+        // Inside StepReview widget
+        InkWell(
+          onTap: () async {
+            // Open Signature Screen and wait for result
+            final result = await Get.to(() => const SignaturePadView());
+
+            if (result != null && result is Uint8List) {
+              // Update controller with the signature image bytes
+              controller.customerSignature.value = result;
+            }
+          },
+          child: Container(
+            height: 150.h,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFf0f4f4),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Obx(() {
+              if (controller.customerSignature.value != null) {
+                // Show Signed Image
+                return Image.memory(controller.customerSignature.value!);
+              } else {
+                // Show Placeholder
+                return Center(
+                  child: Text(
+                    "Tap to Sign",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ),
-            ],
+                );
+              }
+            }),
           ),
         ),
       ],
@@ -242,13 +269,20 @@ class StepReview extends GetView<AgreementController> {
       child: Text(
         title,
         style: TextStyle(
-            color: primaryBlue, fontSize: 16.sp, fontWeight: FontWeight.bold),
+          color: primaryBlue,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value,
-      {Color? valueColor, bool isBold = false}) {
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    Color? valueColor,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
@@ -271,4 +305,3 @@ class StepReview extends GetView<AgreementController> {
     );
   }
 }
-
