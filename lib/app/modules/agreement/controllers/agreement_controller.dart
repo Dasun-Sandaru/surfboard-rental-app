@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
+import 'package:surfboard_rental_app/app/models/rental_model.dart';
+import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/app/services/pdf_service.dart';
+
+import 'package:surfboard_rental_app/app/services/rental_service.dart';
+import 'package:surfboard_rental_app/app/services/shop_service.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../models/damage_fee_model.dart';
@@ -19,6 +24,8 @@ class AgreementController extends GetxController {
   final DamageFeeService _damageFeeService = DamageFeeService();
   final UserService _userService = Get.find();
   final PdfService _pdfService = PdfService();
+  final ShopService _shopService = ShopService();
+  final RentalService _rentalService = RentalService();
 
   // -- Agreement Data --
   final Rxn<NewRentalPassModel> newRentalPassData = Rxn<NewRentalPassModel>();
@@ -26,6 +33,11 @@ class AgreementController extends GetxController {
   // -- Step Management --
   final RxInt currentStep = 0.obs;
   final PageController pageController = PageController();
+
+  // -- Post-Generation State --
+  final RxBool isAgreementGenerated = false.obs;
+  final RxBool isCreatingRental = false.obs;
+  final Rxn<Uint8List> generatedPdfData = Rxn<Uint8List>();
 
   // -- 2. Duration & Pricing --
   final rentalPriceController = TextEditingController();
@@ -92,7 +104,7 @@ class AgreementController extends GetxController {
   }
 
   void nextStep() {
-    if (currentStep.value < 4) {
+    if (currentStep.value < 3) {
       currentStep.value++;
       pageController.animateToPage(
         currentStep.value,
@@ -122,8 +134,14 @@ class AgreementController extends GetxController {
       return;
     }
 
-    // TODO: Get Shop data from a service instead of placeholder
-    final shopData = ShopModel();
+    final shopId = await _userService.getShopIdFromStorage();
+    if (shopId == null) {
+      Get.snackbar("Error", "Cannot generate agreement: missing shop ID.");
+      return;
+    }
+
+    final shopDoc = await _shopService.getShop(shopId);
+    final shopData = ShopModel.fromFirestore(shopDoc);
 
     final rentalPrice = double.tryParse(rentalPriceController.text) ?? 0.0;
     final deposit = requireDeposit.value
@@ -134,13 +152,72 @@ class AgreementController extends GetxController {
     final pdfData = await _pdfService.generateAgreementPdf(
       rentalData: rentalData,
       shopData: shopData,
+      shopId: shopId,
       rentalFee: rentalPrice,
       deposit: deposit,
       selectedDamageFees: selectedFees,
       customerSignature: customerSignature.value,
     );
 
-    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfData);
+    generatedPdfData.value = pdfData;
+    isAgreementGenerated.value = true;
+  }
+
+  Future<void> showGeneratedPdf() async {
+    if (generatedPdfData.value != null) {
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => generatedPdfData.value!,
+      );
+    } else {
+      Get.snackbar('Error', 'PDF not generated yet.');
+    }
+  }
+
+  Future<void> createRental() async {
+    if (generatedPdfData.value == null) {
+      Get.snackbar("Error", "Please generate the agreement first.");
+      return;
+    }
+
+    isCreatingRental.value = true;
+
+    try {
+      final shopId = await _userService.getShopIdFromStorage();
+      final userId = _userService.currentUser!.uid;
+
+      if (shopId == null || customer == null || board == null) {
+        Get.snackbar("Error", "Missing required data to create rental.");
+        return;
+      }
+
+      // Calculate Due Time
+      final now = DateTime.now();
+      int rentalDays = int.tryParse(rentalDuration.value.split(' ')[0]) ?? 1;
+      final dueTime = now.add(Duration(days: rentalDays));
+
+      final newRental = RentalModel(
+        shopId: shopId,
+        customerId: customer!.id!,
+        itemId: board!.id,
+        startTime: now,
+        dueTime: dueTime,
+        status: 'active',
+        rentedByUserId: userId,
+      );
+
+      final rentalId = await _rentalService.createRental(
+        shopId,
+        newRental,
+        generatedPdfData.value!,
+      );
+
+      Get.snackbar("Success", "Rental created successfully with ID: $rentalId");
+      Get.offAllNamed(Routes.HOME);
+    } catch (e) {
+      Get.snackbar("Error", "Failed to create rental: $e");
+    } finally {
+      isCreatingRental.value = false;
+    }
   }
 
   void toggleDamageFee(String feeId, bool enabled) {

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
 import '../../../services/auth_service.dart';
 
@@ -13,7 +14,8 @@ class AdminHomeController extends GetxController {
   void changeIndex(int index) {
     if (index == 1) {
       Get.toNamed('/new-rental');
-    } else {
+    }
+    else {
       selectedIndex.value = index;
     }
   }

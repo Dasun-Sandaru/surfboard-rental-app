@@ -74,34 +74,97 @@ class AgreementWizardView extends StatelessWidget {
           ),
 
           // -- Bottom Button --
-          Container(
-            padding: EdgeInsets.all(ASizes.defaultPadding),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54.h,
-              child: ElevatedButton(
-                onPressed: controller.nextStep,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: Obx(
-                  () => Text(
-                    controller.currentStep.value == 3
-                        ? "Generate Agreement"
-                        : "Continue",
-                    style: TextStyle(
-                      color: textWhite,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
+          Obx(() {
+            if (!controller.isAgreementGenerated.value) {
+              return Container(
+                padding: EdgeInsets.all(ASizes.defaultPadding),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54.h,
+                  child: ElevatedButton(
+                    onPressed: controller.nextStep,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Obx(
+                      () => Text(
+                        controller.currentStep.value == 3
+                            ? "Generate Agreement"
+                            : "Continue",
+                        style: TextStyle(
+                          color: textWhite,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
+              );
+            } else {
+              return Container(
+                padding: EdgeInsets.all(ASizes.defaultPadding),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 54.h,
+                        child: OutlinedButton(
+                          onPressed: controller.showGeneratedPdf,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: primaryBlue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Text(
+                            "View Agreement",
+                            style: TextStyle(
+                              color: primaryBlue,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: ASizes.spaceBtwItems),
+                    Expanded(
+                      child: SizedBox(
+                        height: 54.h,
+                        child: ElevatedButton(
+                          onPressed: controller.createRental,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryBlue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Obx(() {
+                            if (controller.isCreatingRental.value) {
+                              return const CircularProgressIndicator(
+                                  color: Colors.white);
+                            }
+                            return Text(
+                              "Create Rental",
+                              style: TextStyle(
+                                color: textWhite,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }),
         ],
       ),
     );
