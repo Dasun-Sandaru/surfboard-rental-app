@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -10,122 +7,16 @@ class FirestoreService {
     return _db.collection('shops').doc(shopId);
   }
 
-  /// GET SHOP USERS STREAM
-  Stream<QuerySnapshot> getShopUsers(String shopId) {
-    return shopRef(shopId).collection('members').snapshots();
-  }
-
-  /// INSERT INVENTORY ITEM
-  Future<void> saveInventoryItem(
-    String shopId,
-    Map<String, dynamic> data,
-  ) async {
-    final docRef = shopRef(shopId).collection('inventory').doc();
-
-    await docRef.set({...data, 'id': docRef.id});
-  }
-
-  /// GET INVENTORY ITEMS STREAM
-  Future<QuerySnapshot> getInventoryPage({
-    required String shopId,
-    List<String>? types,
-    List<String>? statuses,
-    String? sizeFeet,
-    String? sizeInches,
-    bool? isLessThan,
-    DocumentSnapshot? lastDocument,
-    int limit = 10,
-  }) {
-    int totalInches = 0;
-
-    // Start with the base query for the shop's inventory, ordered by size_total_inches
-    // and limited by the specified count.
-    Query query = shopRef(
-      shopId,
-    ).collection('inventory').orderBy('size_total_inches').limit(limit);
-
-    // Apply type filtering if types are provided
-    if (types != null && types.isNotEmpty) {
-      query = query.where('type', whereIn: types);
-    }
-
-    // Apply status filtering if statuses are provided
-    if (statuses != null && statuses.isNotEmpty) {
-      query = query.where('status', whereIn: statuses);
-    }
-
-    // Apply size filtering if sizeFeet is provided
-    if (sizeFeet != null && sizeFeet.isNotEmpty) {
-      final feet = int.tryParse(sizeFeet) ?? 0;
-      final inches = int.tryParse(sizeInches ?? '0') ?? 0;
-
-      totalInches = (feet * 12) + inches;
-
-      // Apply 'less than or equal to' or 'greater than or equal to' based on isLessThan flag
-      if (isLessThan == true) {
-        query = query.where(
-          'size_total_inches',
-          isLessThanOrEqualTo: totalInches, // Corrected: Pass int directly
-        );
-      } else {
-        query = query.where(
-          'size_total_inches',
-          isGreaterThanOrEqualTo: totalInches, // Corrected: Pass int directly
-        );
-      }
-    }
-
-    // Apply pagination starting after the last fetched document
-    if (lastDocument != null) {
-      query = query.startAfterDocument(lastDocument);
-    }
-
-    // Log the query parameters for debugging purposes
-    log(
-      'Query Parameters: types=$types, statuses=$statuses, sizeFeet=$sizeFeet, sizeInches=$sizeInches, totalInches=$totalInches, isLessThan=$isLessThan, lastDocument=${lastDocument?.id}, limit=$limit',
-      name: 'InventoryService', // Adding a name for easier log filtering
-    );
-
-    // Execute the query and return the result
-    return query.get();
-  }
-
-  /// GET SINGLE INVENTORY ITEM
-  Stream<DocumentSnapshot> getInventoryItem({
-    required String shopId,
-    required String itemId,
-  }) {
-    return shopRef(shopId).collection('inventory').doc(itemId).snapshots();
-  }
-
-  /// UPDATE INVENTORY ITEM
-  Future<void> updateInventoryItem({
-    required String shopId,
-    required String itemId,
-    required Map<String, dynamic> data,
-  }) async {
-    await shopRef(shopId).collection('inventory').doc(itemId).update(data);
-  }
-
-  /// GET SINGLE INVENTORY ITEM (ONE TIME)
-  Future<DocumentSnapshot> getInventoryItemOnce({
-    required String shopId,
-    required String itemId,
-  }) {
-    return shopRef(shopId).collection('inventory').doc(itemId).get();
-  }
-
-  /// ADD DAMAGE FEE TO ITEM
-  Future<void> addDamageFeeToItem({
-    required String shopId,
-    required String itemId,
-    required DamageFeeModel feeData,
-  }) async {
-    final itemRef = shopRef(shopId).collection('inventory').doc(itemId);
-    final feesCollection = itemRef.collection('damage_fees');
-
-    await feesCollection.add(feeData.toMap());
-  }
+  /// ═══════════════════════════════════════════════════════════════════════
+  /// NOTE: This service has been refactored for better code organization.
+  ///
+  /// Moved to specialized services:
+  /// • Inventory operations → InventoryService
+  /// • Shop member management → ShopService
+  /// • Customer operations → CustomerService
+  ///
+  /// Keep FirestoreService minimal for any remaining generic operations.
+  /// ═══════════════════════════════════════════════════════════════════════
 }
 
 

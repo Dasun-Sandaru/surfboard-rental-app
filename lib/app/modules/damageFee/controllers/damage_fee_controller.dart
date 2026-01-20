@@ -1,22 +1,26 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
+import 'package:surfboard_rental_app/app/services/damage_fee_service.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import 'package:surfboard_rental_app/utils/common/custom_dropdown.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+
+import 'package:surfboard_rental_app/app/services/user_service.dart';
 
 class DamageFeeController extends GetxController {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final DamageFeeService _damageFeeService = DamageFeeService();
+  final UserService _userService = Get.find();
 
   // State Variables
   final RxList<DamageFeeModel> damageRules = <DamageFeeModel>[].obs;
   final RxBool isLoading = false.obs;
 
   // Shop ID & Item ID
-  late String shopId;
+  String? shopId;
   late String itemId;
 
   // Controllers for Add/Edit Dialog
@@ -28,9 +32,12 @@ class DamageFeeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
     try {
-      // Get actual shop ID from storage or arguments
-      shopId = 'M8hBGr4o3Vbgcm2xbTPK'; // Replace with actual shop ID
+      shopId = await _userService.getShopIdFromStorage();
 
       // Get item ID from navigation arguments
       if (Get.arguments == null || Get.arguments is! String) {
@@ -39,14 +46,12 @@ class DamageFeeController extends GetxController {
       itemId = Get.arguments as String;
 
       log('Initialized with itemId: $itemId', name: 'DamageFeeController');
-      fetchDamageRules();
+      await fetchDamageRules();
     } catch (e) {
       log('Error in onInit: $e', name: 'DamageFeeController');
-      Get.snackbar(
-        'Error',
-        'Failed to initialize: $e',
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
+      AppSnackBar.error(
+        title: 'Initialization Error',
+        message: 'Failed to initialize: $e',
       );
       Get.back();
     }
@@ -57,33 +62,23 @@ class DamageFeeController extends GetxController {
   // ---------------------------------------------------------------------------
   Future<void> fetchDamageRules() async {
     try {
+      if (shopId == null) {
+        throw Exception('Shop ID not available');
+      }
       isLoading.value = true;
-      final snapshot = await _db
-          .collection('shops')
-          .doc(shopId)
-          .collection('inventory')
-          .doc(itemId)
-          .collection('damage_fees')
-          .orderBy('created_at', descending: true)
-          .get();
-
-      damageRules.value = snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return DamageFeeModel.fromJson(data);
-      }).toList();
-
+      damageRules.value = await _damageFeeService.fetchDamageRules(
+        shopId: shopId!,
+        itemId: itemId,
+      );
       log(
         'Fetched ${damageRules.length} damage rules',
         name: 'DamageFeeController',
       );
     } catch (e) {
       log('Error fetching damage rules: $e', name: 'DamageFeeController');
-      Get.snackbar(
-        'Error',
-        'Failed to load damage rules: $e',
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Failed to load damage rules: $e',
       );
     } finally {
       isLoading.value = false;
@@ -108,37 +103,22 @@ class DamageFeeController extends GetxController {
   // ---------------------------------------------------------------------------
   Future<void> _addRule(DamageFeeModel damageRule) async {
     try {
-      final docRef = await _db
-          .collection('shops')
-          .doc(shopId)
-          .collection('inventory')
-          .doc(itemId)
-          .collection('damage_fees')
-          .add({
-            ...damageRule.toMap(),
-            'created_at': FieldValue.serverTimestamp(),
-            'updated_at': FieldValue.serverTimestamp(),
-          });
-
-      // Add the ID to the model and update local list
-      final addedRule = damageRule.copyWith(id: docRef.id);
-      damageRules.add(addedRule);
-
-      log('Added damage rule: ${addedRule.id}', name: 'DamageFeeController');
-      Get.snackbar(
-        'Success',
-        'Damage rule added successfully',
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
+      if (shopId == null) {
+        throw Exception('Shop ID not available');
+      }
+      await _damageFeeService.addDamageRule(
+        shopId: shopId!,
+        itemId: itemId,
+        damageRule: damageRule,
+      );
+      log('Added damage rule: ${damageRule.id}', name: 'DamageFeeController');
+      AppSnackBar.success(
+        title: 'Success',
+        message: 'Damage rule added successfully',
       );
     } catch (e) {
       log('Error adding rule: $e', name: 'DamageFeeController');
-      Get.snackbar(
-        'Error',
-        'Failed to add rule: $e',
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+      AppSnackBar.error(title: 'Error', message: 'Failed to add rule: $e');
     }
   }
 
@@ -147,44 +127,25 @@ class DamageFeeController extends GetxController {
   // ---------------------------------------------------------------------------
   Future<void> _updateRule(DamageFeeModel damageRule) async {
     try {
+      if (shopId == null) {
+        throw Exception('Shop ID not available');
+      }
       if (damageRule.id == null) {
         throw Exception('Rule ID is null');
       }
-
-      await _db
-          .collection('shops')
-          .doc(shopId)
-          .collection('inventory')
-          .doc(itemId)
-          .collection('damage_fees')
-          .doc(damageRule.id)
-          .update({
-            ...damageRule.toMap(),
-            'updated_at': FieldValue.serverTimestamp(),
-          });
-
-      // Update local list
-      final index = damageRules.indexWhere((rule) => rule.id == damageRule.id);
-      if (index != -1) {
-        damageRules[index] = damageRule;
-        damageRules.refresh();
-      }
-
+      await _damageFeeService.updateDamageRule(
+        shopId: shopId!,
+        itemId: itemId,
+        damageRule: damageRule,
+      );
       log('Updated damage rule: ${damageRule.id}', name: 'DamageFeeController');
-      Get.snackbar(
-        'Success',
-        'Damage rule updated successfully',
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
+      AppSnackBar.success(
+        title: 'Success',
+        message: 'Damage rule updated successfully',
       );
     } catch (e) {
       log('Error updating rule: $e', name: 'DamageFeeController');
-      Get.snackbar(
-        'Error',
-        'Failed to update rule: $e',
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+      AppSnackBar.error(title: 'Error', message: 'Failed to update rule: $e');
     }
   }
 
@@ -193,32 +154,22 @@ class DamageFeeController extends GetxController {
   // ---------------------------------------------------------------------------
   Future<void> deleteRule(String id) async {
     try {
-      await _db
-          .collection('shops')
-          .doc(shopId)
-          .collection('inventory')
-          .doc(itemId)
-          .collection('damage_fees')
-          .doc(id)
-          .delete();
-
-      damageRules.removeWhere((item) => item.id == id);
-
+      if (shopId == null) {
+        throw Exception('Shop ID not available');
+      }
+      await _damageFeeService.deleteDamageRule(
+        shopId: shopId!,
+        itemId: itemId,
+        ruleId: id,
+      );
       log('Deleted damage rule: $id', name: 'DamageFeeController');
-      Get.snackbar(
-        'Success',
-        'Damage rule removed successfully',
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
+      AppSnackBar.success(
+        title: 'Success',
+        message: 'Damage rule deleted successfully',
       );
     } catch (e) {
       log('Error deleting rule: $e', name: 'DamageFeeController');
-      Get.snackbar(
-        'Error',
-        'Failed to delete rule: $e',
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-      );
+      AppSnackBar.error(title: 'Error', message: 'Failed to delete rule: $e');
     }
   }
 

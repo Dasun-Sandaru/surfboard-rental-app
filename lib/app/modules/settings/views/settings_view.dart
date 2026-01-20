@@ -122,8 +122,8 @@ class SettingsView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(controller.userProfile['name']!, style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-              Text(controller.userProfile['email']!, style: TextStyle(color: textGrey, fontSize: 14.sp)),
+              Text(controller.userProfile.value['name']!, style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+              Text(controller.userProfile.value['email']!, style: TextStyle(color: textGrey, fontSize: 14.sp)),
             ],
           ),
           Spacer(),

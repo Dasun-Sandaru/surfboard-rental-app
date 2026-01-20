@@ -5,6 +5,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../models/user_model.dart';
 import '../controllers/manage_users_controller.dart';
 
 class ManageUsersView extends GetView<ManageUsersController> {
@@ -89,7 +91,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: borderDark.withOpacity(0.5)),
                 ),
-              
+
                 child: Obx(() {
                   if (controller.users.isEmpty) {
                     return _buildEmptyList();
@@ -136,10 +138,9 @@ class ManageUsersView extends GetView<ManageUsersController> {
     );
   }
 
-  Widget _buildUserListItem(Map<String, dynamic> user) {
-    final bool isAdmin = user['role'] == 'Admin';
-    final bool isActive = user['is_active'];
-    final Color avatarColor = user['color'];
+  Widget _buildUserListItem(UserModel user) {
+    final bool isAdmin = user.role == UserRole.admin;
+    final bool isActive = user.isActive;
 
     return InkWell(
       onTap: () => controller.viewUserDetails(user),
@@ -152,14 +153,16 @@ class ManageUsersView extends GetView<ManageUsersController> {
               height: 48.w,
               width: 48.w,
               decoration: BoxDecoration(
-                color: avatarColor.withOpacity(0.2),
+                color: controller
+                    .avatarColor(user.name ?? 'User')
+                    .withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
-                  user['initials'],
+                  controller.getInitials(user.name ?? ''),
                   style: TextStyle(
-                    color: avatarColor,
+                    color: controller.avatarColor(user.name ?? 'User'),
                     fontWeight: FontWeight.bold,
                     fontSize: 16.sp,
                   ),
@@ -175,7 +178,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user['name'],
+                    user.name ?? 'Unknown',
                     style: TextStyle(
                       color: textWhite,
                       fontWeight: FontWeight.w600,
@@ -184,7 +187,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    user['email'],
+                    user.email ?? 'No email',
                     style: TextStyle(color: textGrey, fontSize: 13.sp),
                   ),
                   SizedBox(height: 8.h),
@@ -205,7 +208,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          user['role'],
+                          user.role.name.capitalizeFirst ?? 'Staff',
                           style: TextStyle(
                             color: isAdmin ? primaryBlue : textGrey,
                             fontSize: 10.sp,
@@ -217,7 +220,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                       SizedBox(width: 8.w),
 
                       // Verified Badge
-                      if (user['verified'] == true)
+                      if (user.isVerified == true)
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 8.w,
@@ -252,7 +255,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            user['is_active'] ? 'Active' : 'Inactive',
+                            user.isActive ? 'Active' : 'Inactive',
                             style: TextStyle(
                               color: isActive ? successGreen : textGrey,
                               fontSize: 11.sp,

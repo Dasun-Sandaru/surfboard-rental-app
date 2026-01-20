@@ -92,7 +92,7 @@ class InventoryListView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   if (index == controller.items.length) {
                     controller.loadMore();
-                    return controller.hasMore
+                    return controller.hasMoreItems.value
                         ? const Padding(
                             padding: EdgeInsets.all(16),
                             child: Center(child: CircularProgressIndicator()),
@@ -113,9 +113,10 @@ class InventoryListView extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryBlue,
         onPressed: () {
-          Get.toNamed(Routes.ADD_INVENTORY, arguments: {
-            'mode': InventoryFormMode.add,
-          });
+          Get.toNamed(
+            Routes.ADD_INVENTORY,
+            arguments: {'mode': InventoryFormMode.add},
+          );
         },
         child: Icon(Iconsax.add, color: textWhite),
       ),

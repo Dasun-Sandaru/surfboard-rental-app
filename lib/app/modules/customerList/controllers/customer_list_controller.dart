@@ -6,6 +6,7 @@ import 'dart:async';
 
 import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';
+import '../../../services/user_service.dart';
 
 class CustomerListController extends GetxController {
   final PagingController<DocumentSnapshot?, CustomerModel> pagingController =
@@ -14,6 +15,8 @@ class CustomerListController extends GetxController {
   final TextEditingController searchController = TextEditingController();
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final UserService _userService = Get.find();
+  String? shopId;
   static const int _limit = 15;
   Timer? _debounce;
   String _currentSearchTerm = '';
@@ -21,7 +24,11 @@ class CustomerListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Attach the listener to fetch data
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    shopId = await _userService.getShopIdFromStorage();
     pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
@@ -39,11 +46,13 @@ class CustomerListController extends GetxController {
   // 1. FETCH PAGE LOGIC
   // ---------------------------------------------------------------------------
   Future<void> _fetchPage(DocumentSnapshot? pageKey) async {
+    if (shopId == null) {
+      pagingController.error = "Shop ID could not be retrieved.";
+      return;
+    }
     try {
-      Query query = _db
-          .collection('shops')
-          .doc('M8hBGr4o3Vbgcm2xbTPK')
-          .collection('customers');
+      Query query =
+          _db.collection('shops').doc(shopId!).collection('customers');
 
       // A. APPLY SEARCH OR SORT
       if (_currentSearchTerm.isNotEmpty) {

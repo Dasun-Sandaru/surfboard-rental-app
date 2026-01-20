@@ -1,24 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/app/services/auth_service.dart';
+import 'package:surfboard_rental_app/app/services/shop_service.dart';
+import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
+import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';
 
 class SettingsController extends GetxController {
-  
-  // -- Dummy User/Shop Data --
-  final userProfile = {
-    "name": "Admin User",
-    "role": "Owner",
-    "email": "admin@surfshop.com",
-    "image": "https://via.placeholder.com/150"
-  }.obs;
+  final UserService _userService = Get.find();
+  final ShopService _shopService = Get.find();
+  final AuthService _authService = Get.find();
 
-  final shopProfile = {
-    "name": "Aloha Surf Rentals",
-    "location": "Ahangama, Sri Lanka",
-    "id": "SHOP-8821"
-  }.obs;
+  final Rx<Map<String, dynamic>> userProfile = Rx<Map<String, dynamic>>({});
+  final Rx<Map<String, dynamic>> shopProfile = Rx<Map<String, dynamic>>({});
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      // Get current user's data
+      final currentUser = _authService.currentUser;
+      if (currentUser == null) throw 'User not logged in';
+      
+      final userModel = await _userService.getUser(currentUser.uid);
+      if (userModel == null) throw 'User data not found in Firestore';
+
+      userProfile.value = {
+        "name": userModel.name,
+        "role": userModel.role.name,
+        "email": userModel.email,
+        "image": '',
+      };
+
+      // Get shop data
+      final shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null) throw 'Shop ID not found in storage';
+
+      final shopDoc = await _shopService.getShop(shopId);
+      if (!shopDoc.exists) throw 'Shop data not found in Firestore';
+      final shopData = shopDoc.data() as Map<String, dynamic>;
+      shopProfile.value = {
+        "name": shopData['name'] ?? 'No Shop Name',
+        "location": shopData['location'] ?? 'No Location',
+        "id": shopDoc.id,
+      };
+
+    } catch (e) {
+      AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
+    }
+  }
+
 
   // -- Inventory Configuration Data --
   // In a real app, these would come from Firebase
@@ -28,10 +65,12 @@ class SettingsController extends GetxController {
     "Pyzel",
     "Lost",
     "JS Industries",
-    "Torq"
+    "Torq",
   ].obs;
 
-  final RxList<SurfBoardType> boardTypes = RxList<SurfBoardType>.from(SurfBoardType.values);
+  final RxList<SurfBoardType> boardTypes = RxList<SurfBoardType>.from(
+    SurfBoardType.values,
+  );
 
   // -- Text Controller for Dialogs --
   final textInputController = TextEditingController();
@@ -48,8 +87,8 @@ class SettingsController extends GetxController {
       onConfirm: () {
         // Auth Logic
         Get.back();
-        Get.offAllNamed('/login'); 
-      }
+        Get.offAllNamed('/login');
+      },
     );
   }
 
@@ -75,10 +114,12 @@ class SettingsController extends GetxController {
         if (textInputController.text.isNotEmpty) {
           list.add(textInputController.text.trim());
           Get.back();
-          Get.snackbar("Success", "$title added successfully", 
-            backgroundColor: Colors.green.withOpacity(0.1), colorText: Colors.green);
+          AppSnackBar.success(
+            title: 'Success',
+            message: '$title added successfully',
+          );
         }
-      }
+      },
     );
   }
 
@@ -94,10 +135,10 @@ class SettingsController extends GetxController {
       onConfirm: () {
         list.remove(item);
         Get.back();
-      }
+      },
     );
   }
-  
+
   void navigateToInventorySettings() {
     Get.to(() => const InventoryConfigView());
   }
