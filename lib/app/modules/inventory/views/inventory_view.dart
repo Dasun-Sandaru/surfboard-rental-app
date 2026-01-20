@@ -26,6 +26,7 @@ class InventoryListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(InventoryController());
+    final isSelectionMode = Get.arguments?['selectMode'] ?? false;
 
     return Scaffold(
       backgroundColor: bgDark,
@@ -33,7 +34,7 @@ class InventoryListView extends StatelessWidget {
         showbackArrow: true,
         centerTitle: true,
         title: Text(
-          'Inventory',
+          isSelectionMode ? 'Select Board' : 'Inventory',
           style: TextStyle(
             color: textWhite,
             fontSize: 18.sp,
@@ -110,16 +111,18 @@ class InventoryListView extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryBlue,
-        onPressed: () {
-          Get.toNamed(
-            Routes.ADD_INVENTORY,
-            arguments: {'mode': InventoryFormMode.add},
-          );
-        },
-        child: Icon(Iconsax.add, color: textWhite),
-      ),
+      floatingActionButton: !isSelectionMode
+          ? FloatingActionButton(
+              backgroundColor: primaryBlue,
+              onPressed: () {
+                Get.toNamed(
+                  Routes.ADD_INVENTORY,
+                  arguments: {'mode': InventoryFormMode.add},
+                );
+              },
+              child: Icon(Iconsax.add, color: textWhite),
+            )
+          : null,
     );
   }
 
@@ -409,11 +412,16 @@ class InventoryListView extends StatelessWidget {
     InventoryModel item,
     InventoryController controller,
   ) {
+    final isSelectionMode = Get.arguments?['selectMode'] ?? false;
     // final status = controller.getStatusDetails(item.status);
 
     return InkWell(
       onTap: () {
-        Get.toNamed(Routes.ITEM_DETAILS, arguments: item.id);
+        if (isSelectionMode) {
+          Get.back(result: item);
+        } else {
+          Get.toNamed(Routes.ITEM_DETAILS, arguments: item.id);
+        }
       },
       child: Container(
         padding: EdgeInsets.all(16.w),

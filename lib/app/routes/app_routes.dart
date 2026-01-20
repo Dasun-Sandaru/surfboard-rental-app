@@ -28,7 +28,7 @@ abstract class Routes {
   static const ADD_EDIT_CUSTOMER = _Paths.ADD_EDIT_CUSTOMER;
   static const CUSTOMER_DETAILS = _Paths.CUSTOMER_DETAILS;
   static const DAMAGE_FEE = _Paths.DAMAGE_FEE;
-  static const AGREEMENT_LIST = _Paths.AGREEMENT_LIST;
+  static const AGREEMENT_WIZARD = _Paths.AGREEMENT_WIZARD;
   static const CREATE_RENTAL = _Paths.CREATE_RENTAL;
 }
 
@@ -57,6 +57,6 @@ abstract class _Paths {
   static const ADD_EDIT_CUSTOMER = '/add-edit-customer';
   static const CUSTOMER_DETAILS = '/customer-details';
   static const DAMAGE_FEE = '/damage-fee';
-  static const AGREEMENT_LIST = '/agreement-list';
+  static const AGREEMENT_WIZARD = '/agreement-wizard';
   static const CREATE_RENTAL = '/create-rental';
 }

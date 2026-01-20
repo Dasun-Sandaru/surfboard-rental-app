@@ -122,6 +122,11 @@ class CustomerListView extends GetView<CustomerListController> {
       onTap: () {
         Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
       },
+      onLongPress: () {
+        if (controller.isSelectionMode) {
+          Get.back(result: customer);
+        }
+      },
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(

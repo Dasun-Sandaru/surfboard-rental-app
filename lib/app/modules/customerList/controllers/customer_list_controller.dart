@@ -20,18 +20,24 @@ class CustomerListController extends GetxController {
   static const int _limit = 15;
   Timer? _debounce;
   String _currentSearchTerm = '';
+  bool isSelectionMode = false;
 
   @override
   void onInit() {
     super.onInit();
-    _initialize();
+    // Register listener immediately
+    pagingController.addPageRequestListener((pageKey) async {
+      await _fetchPage(pageKey);
+    });
+    // Then initialize and fetch
+    _initializeAndFetch();
   }
 
-  Future<void> _initialize() async {
+  Future<void> _initializeAndFetch() async {
+    isSelectionMode = Get.arguments?['selectMode'] ?? false;
     shopId = await _userService.getShopIdFromStorage();
-    pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey);
-    });
+    // Trigger initial fetch only after shopId is ready
+    pagingController.refresh();
   }
 
   @override
@@ -51,8 +57,10 @@ class CustomerListController extends GetxController {
       return;
     }
     try {
-      Query query =
-          _db.collection('shops').doc(shopId!).collection('customers');
+      Query query = _db
+          .collection('shops')
+          .doc(shopId!)
+          .collection('customers');
 
       // A. APPLY SEARCH OR SORT
       if (_currentSearchTerm.isNotEmpty) {

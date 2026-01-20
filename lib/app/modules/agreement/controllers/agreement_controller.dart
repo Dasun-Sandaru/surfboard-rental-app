@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../models/rental_agreement_data.dart';
+
 class AgreementController extends GetxController {
   // -- Step Management --
   final RxInt currentStep = 0.obs;
   final PageController pageController = PageController();
+
+  final rentalPassModel = Rxn<NewRentalPassModel>();
 
   // -- 1. Board Details --
   final RxString selectedBoard = ''.obs;
@@ -25,6 +29,13 @@ class AgreementController extends GetxController {
         "Major Ding": {"enabled": false, "price": 0.0},
         "Buckled Board": {"enabled": false, "price": 0.0},
       }.obs;
+
+
+  @override
+  onInit() {
+    super.onInit();
+
+  }
 
   void nextStep() {
     if (currentStep.value < 4) {

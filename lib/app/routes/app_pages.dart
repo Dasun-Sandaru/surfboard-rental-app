@@ -7,7 +7,7 @@ import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
 import '../modules/agreement/bindings/agreement_binding.dart';
-import '../modules/agreement/views/agreement_view.dart';
+import '../modules/agreement/views/agreement_wizard_view.dart';
 import '../modules/alerts/bindings/alerts_binding.dart';
 import '../modules/alerts/views/alerts_view.dart';
 import '../modules/auth/bindings/forgot_password_binding.dart';
@@ -176,7 +176,7 @@ class AppPages {
       binding: DamageFeeBinding(),
     ),
     GetPage(
-      name: _Paths.AGREEMENT_LIST,
+      name: _Paths.AGREEMENT_WIZARD,
       // page: () => const AgreementView(),
       page: () => const AgreementWizardView(),
       binding: AgreementBinding(),

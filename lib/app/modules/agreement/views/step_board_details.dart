@@ -11,47 +11,61 @@ class StepBoardDetails extends GetView<AgreementController> {
   Widget build(BuildContext context) {
     final Color textWhite = const Color(0xFFf0f4f4);
     final Color textGrey = const Color(0xFF94a3b8);
-    
+
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("What are they renting?", style: TextStyle(color: textWhite, fontSize: 24.sp, fontWeight: FontWeight.bold)),
+          Text(
+            "What are they renting?",
+            style: TextStyle(
+              color: textWhite,
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SizedBox(height: 8.h),
-          Text("Select the board and accessories.", style: TextStyle(color: textGrey, fontSize: 16.sp)),
-          
+          Text(
+            "Select the board and accessories.",
+            style: TextStyle(color: textGrey, fontSize: 16.sp),
+          ),
+
           SizedBox(height: 32.h),
 
           // Board Dropdown (Simulated)
           // In real app use your Inventory List here
-          _buildSelectionCard("Select Board", Iconsax.box, "Channel Islands Fish 6'2\""),
+          _buildSelectionCard(
+            "Select Board",
+            Iconsax.box,
+            "Channel Islands Fish 6'2\"",
+          ),
 
           SizedBox(height: 24.h),
-          
-          Text("Accessories", style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12.h),
-          Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
-            children: ["Leash", "Fins", "Wax", "Board Bag"].map((item) {
-              return Obx(() {
-                final isSelected = controller.selectedAccessories.contains(item);
-                return ChoiceChip(
-                  label: Text(item),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if(selected) controller.selectedAccessories.add(item);
-                    else controller.selectedAccessories.remove(item);
-                  },
-                  selectedColor: const Color(0xFF4A90E2),
-                  backgroundColor: const Color(0xFF182c30),
-                  labelStyle: TextStyle(color: isSelected ? Colors.white : textGrey),
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                );
-              });
-            }).toList(),
-          )
+
+          // Text("Accessories", style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+          // SizedBox(height: 12.h),
+          // Wrap(
+          //   spacing: 12.w,
+          //   runSpacing: 12.h,
+          //   children: ["Leash", "Fins", "Wax", "Board Bag"].map((item) {
+          //     return Obx(() {
+          //       final isSelected = controller.selectedAccessories.contains(item);
+          //       return ChoiceChip(
+          //         label: Text(item),
+          //         selected: isSelected,
+          //         onSelected: (selected) {
+          //           if(selected) controller.selectedAccessories.add(item);
+          //           else controller.selectedAccessories.remove(item);
+          //         },
+          //         selectedColor: const Color(0xFF4A90E2),
+          //         backgroundColor: const Color(0xFF182c30),
+          //         labelStyle: TextStyle(color: isSelected ? Colors.white : textGrey),
+          //         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          //       );
+          //     });
+          //   }).toList(),
+          // )
         ],
       ),
     );
@@ -72,8 +86,21 @@ class StepBoardDetails extends GetView<AgreementController> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: const Color(0xFF94a3b8), fontSize: 12.sp)),
-              Text(value, style: TextStyle(color: const Color(0xFFf0f4f4), fontSize: 16.sp, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(
+                  color: const Color(0xFF94a3b8),
+                  fontSize: 12.sp,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  color: const Color(0xFFf0f4f4),
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const Spacer(),
