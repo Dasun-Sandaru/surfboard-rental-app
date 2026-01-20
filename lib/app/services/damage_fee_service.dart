@@ -138,4 +138,40 @@ class DamageFeeService {
       rethrow;
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // STREAM DAMAGE RULES FROM FIRESTORE
+  // ---------------------------------------------------------------------------
+  Stream<List<DamageFeeModel>> streamDamageRules({
+    required String shopId,
+    required String itemId,
+  }) {
+    try {
+      log(
+        'Streaming damage rules for shopId: $shopId, itemId: $itemId',
+        name: logName,
+      );
+
+      final query = _db
+          .collection('shops')
+          .doc(shopId)
+          .collection('inventory')
+          .doc(itemId)
+          .collection('damage_fees')
+          .orderBy('created_at', descending: true);
+
+      return query.snapshots().map((snapshot) {
+        final damageRules = snapshot.docs.map((doc) {
+          final data = doc.data();
+          data['id'] = doc.id;
+          return DamageFeeModel.fromJson(data);
+        }).toList();
+        log('Streamed ${damageRules.length} damage rules', name: logName);
+        return damageRules;
+      });
+    } catch (e) {
+      log('Error streaming damage rules: $e', name: logName);
+      return Stream.value([]); // Return empty stream on error
+    }
+  }
 }

@@ -79,18 +79,18 @@ class AgreementController extends GetxController {
         return;
       }
 
-      final fees = await _damageFeeService.fetchDamageRules(
-        shopId: shopId,
-        itemId: itemId,
+      // Bind the stream to the RxList
+      availableDamageFees.bindStream(
+        _damageFeeService.streamDamageRules(shopId: shopId, itemId: itemId),
       );
 
-      availableDamageFees.value = fees;
-
-      // Initialize selection map (all disabled by default)
-      selectedDamageFees.clear();
-      for (var fee in fees) {
-        selectedDamageFees[fee.id!] = false;
-      }
+      // Add a listener to reset selections when fees change
+      ever(availableDamageFees, (fees) {
+        selectedDamageFees.clear();
+        for (var fee in fees) {
+          selectedDamageFees[fee.id!] = false;
+        }
+      });
     } catch (e) {
       Get.snackbar('Error', 'Failed to load damage fees: $e');
     }

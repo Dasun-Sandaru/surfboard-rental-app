@@ -140,10 +140,12 @@ class StepDamageFees extends GetView<AgreementController> {
                       SizedBox(height: 24.h),
                       ElevatedButton(
                         onPressed: () {
-                          Get.toNamed(
-                            Routes.ITEM_DETAILS,
-                            arguments: {'itemId': controller.board?.id},
-                          );
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            Get.toNamed(
+                              Routes.ITEM_DETAILS,
+                              arguments: {'itemId': controller.board?.id},
+                            );
+                          });
                         },
                         child: Text("Add Damage Fees"),
                       ),
