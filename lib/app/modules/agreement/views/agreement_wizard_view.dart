@@ -10,9 +10,7 @@ import 'step_damage_fees.dart';
 import 'step_pricing.dart';
 import 'step_review.dart';
 
-
 // Import sub-steps (defined below)
-
 
 class AgreementWizardView extends StatelessWidget {
   const AgreementWizardView({super.key});
@@ -37,6 +35,17 @@ class AgreementWizardView extends StatelessWidget {
             style: TextStyle(color: textWhite, fontSize: 16.sp),
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              controller.previousStep();
+            },
+            icon: Text(
+              "Previous",
+              style: TextStyle(color: textWhite, fontSize: 14.sp),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [

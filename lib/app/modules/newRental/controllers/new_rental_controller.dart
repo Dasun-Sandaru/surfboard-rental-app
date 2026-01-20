@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import '../../../models/customer_model.dart';
 import '../../../models/inventory_model.dart';
-import '../../../models/rental_agreement_data.dart'; // Add intl package for date formatting
+import '../../../models/new_rental_pass_model.dart'; // Add intl package for date formatting
 
 class NewRentalController extends GetxController {
   // -- State Variables --

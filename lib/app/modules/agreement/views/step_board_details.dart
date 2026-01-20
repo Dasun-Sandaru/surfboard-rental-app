@@ -35,10 +35,12 @@ class StepBoardDetails extends GetView<AgreementController> {
 
           // Board Dropdown (Simulated)
           // In real app use your Inventory List here
-          _buildSelectionCard(
-            "Select Board",
-            Iconsax.box,
-            "Channel Islands Fish 6'2\"",
+          Obx(
+            () => _buildSelectionCard(
+              "Selected Board",
+              Iconsax.box,
+              controller.board?.name ?? "No board selected",
+            ),
           ),
 
           SizedBox(height: 24.h),

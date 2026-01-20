@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../models/rental_agreement_data.dart';
+import '../../../models/customer_model.dart';
+import '../../../models/damage_fee_model.dart';
+import '../../../models/inventory_model.dart';
+import '../../../models/new_rental_pass_model.dart';
+import '../../../services/damage_fee_service.dart';
+import '../../../services/user_service.dart';
 
 class AgreementController extends GetxController {
+  // -- Services --
+  final DamageFeeService _damageFeeService = DamageFeeService();
+  final UserService _userService = Get.find();
+
+  // -- Agreement Data --
+  final Rxn<NewRentalPassModel> newRentalPassData = Rxn<NewRentalPassModel>();
+
   // -- Step Management --
   final RxInt currentStep = 0.obs;
   final PageController pageController = PageController();
 
-  final rentalPassModel = Rxn<NewRentalPassModel>();
-
   // -- 1. Board Details --
   final RxString selectedBoard = ''.obs;
-  final RxList<String> selectedAccessories = <String>[].obs;
 
   // -- 2. Duration & Pricing --
   final rentalPriceController = TextEditingController();
@@ -21,20 +30,78 @@ class AgreementController extends GetxController {
   final depositController = TextEditingController();
 
   // -- 3. Damage Fees --
-  // We use a Map to store enabled state and price
-  final RxMap<String, Map<String, dynamic>> damageFees =
-      <String, Map<String, dynamic>>{
-        "Broken Fin": {"enabled": false, "price": 0.0},
-        "Snapped Leash": {"enabled": false, "price": 0.0},
-        "Major Ding": {"enabled": false, "price": 0.0},
-        "Buckled Board": {"enabled": false, "price": 0.0},
-      }.obs;
+  // Using DamageFeeModel list instead of hardcoded map
+  final RxList<DamageFeeModel> availableDamageFees = <DamageFeeModel>[].obs;
+  final RxMap<String, bool> selectedDamageFees = <String, bool>{}.obs;
 
+  // -- Derived Data from newRentalPassData --
+
+  // Customer data
+  CustomerModel? get customer => newRentalPassData.value?.customer;
+  // String get customerName =>
+  //     "${customer?.firstName ?? ''} ${customer?.lastName ?? ''}";
+
+  // Board data (assumes single item rental for now)
+  InventoryModel? get board {
+    final items = newRentalPassData.value?.items;
+    if (items != null && items.isNotEmpty) {
+      return items.first;
+    }
+    return null;
+  }
+
+  // String? get boardName => board?.name;
+
+  // // Rental dates & times
+  // String? get startDateTime => newRentalPassData.value?.startDateTimeString;
+  // String? get dueDateTime => newRentalPassData.value?.dueDateTimeString;
+  // int? get rentalHours => newRentalPassData.value?.rentalDurationHours;
+  // double? get rentalDays => newRentalPassData.value?.rentalDurationDays;
 
   @override
-  onInit() {
+  void onInit() {
     super.onInit();
+    // Get the NewRentalPassModel passed from NewRentalController
+    if (Get.arguments != null && Get.arguments is NewRentalPassModel) {
+      newRentalPassData.value = Get.arguments as NewRentalPassModel;
+      // Fetch damage fees for the selected board
+      _loadDamageFees();
+    }
+  }
 
+  /// Fetch damage fees from database for the selected item
+  Future<void> _loadDamageFees() async {
+    try {
+      final itemId = board?.id;
+      final shopId = await _userService.getShopIdFromStorage();
+
+      if (itemId == null || shopId == null) {
+        return;
+      }
+
+      final fees = await _damageFeeService.fetchDamageRules(
+        shopId: shopId,
+        itemId: itemId,
+      );
+
+      availableDamageFees.value = fees;
+
+      // Initialize selection map (all disabled by default)
+      selectedDamageFees.clear();
+      for (var fee in fees) {
+        selectedDamageFees[fee.id!] = false;
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load damage fees: $e');
+    }
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    rentalPriceController.dispose();
+    depositController.dispose();
+    super.onClose();
   }
 
   void nextStep() {
@@ -63,12 +130,23 @@ class AgreementController extends GetxController {
     }
   }
 
-  void toggleDamageFee(String key, bool enabled) {
-    damageFees[key]!['enabled'] = enabled;
-    damageFees.refresh();
+  void toggleDamageFee(String feeId, bool enabled) {
+    selectedDamageFees[feeId] = enabled;
+    selectedDamageFees.refresh();
   }
 
-  void updateDamagePrice(String key, String price) {
-    damageFees[key]!['price'] = double.tryParse(price) ?? 0.0;
+  /// Get selected damage fees with their details
+  List<DamageFeeModel> getSelectedDamageFees() {
+    return availableDamageFees
+        .where((fee) => selectedDamageFees[fee.id] == true)
+        .toList();
+  }
+
+  /// Calculate total damage fees
+  double getTotalDamageFees() {
+    return getSelectedDamageFees().fold<double>(
+      0.0,
+      (sum, fee) => sum + fee.feeAmount,
+    );
   }
 }
