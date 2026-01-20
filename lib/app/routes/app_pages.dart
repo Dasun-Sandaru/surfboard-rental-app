@@ -6,6 +6,8 @@ import '../modules/addInventory/bindings/add_inventory_binding.dart';
 import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
+import '../modules/agreement/bindings/agreement_binding.dart';
+import '../modules/agreement/views/agreement_view.dart';
 import '../modules/alerts/bindings/alerts_binding.dart';
 import '../modules/alerts/views/alerts_view.dart';
 import '../modules/auth/bindings/forgot_password_binding.dart';
@@ -14,6 +16,7 @@ import '../modules/auth/view/forgot_password_view.dart';
 import '../modules/auth/view/verify_email_screen.dart';
 import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
+
 import '../modules/customerDetails/bindings/customer_details_binding.dart';
 import '../modules/customerDetails/views/customer_details_view.dart';
 import '../modules/customerList/bindings/customer_list_binding.dart';
@@ -172,5 +175,12 @@ class AppPages {
       page: () => const DamageFeeView(),
       binding: DamageFeeBinding(),
     ),
+    GetPage(
+      name: _Paths.AGREEMENT_LIST,
+      // page: () => const AgreementView(),
+      page: () => const AgreementWizardView(),
+      binding: AgreementBinding(),
+    ),
+    
   ];
 }
