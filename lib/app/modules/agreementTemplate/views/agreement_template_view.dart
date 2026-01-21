@@ -143,7 +143,7 @@ class AgreementTemplateListView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    template['title'],
+                    template['templateName'],
                     style: TextStyle(
                       color: textWhite,
                       fontSize: 16.sp,
