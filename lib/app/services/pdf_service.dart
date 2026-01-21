@@ -6,7 +6,7 @@ import 'package:surfboard_rental_app/app/models/agreement_template_model.dart';
 import 'package:surfboard_rental_app/app/models/customer_model.dart';
 import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
 import 'package:surfboard_rental_app/app/models/inventory_model.dart';
-import 'package:surfboard_rental_app/app/models/new_rental_pass_model.dart';
+import 'package:surfboard_rental_app/app/models/init_rental_model.dart';
 import 'package:surfboard_rental_app/app/models/shop_model.dart';
 import 'package:surfboard_rental_app/app/services/agreement_template_service.dart';
 
@@ -15,7 +15,7 @@ class PdfService {
 
   /// Generate agreement PDF using a template
   Future<Uint8List> generateAgreementPdf({
-    required NewRentalPassModel rentalData,
+    required InitRentalModel rentalData,
     required ShopModel shopData,
     required String shopId,
     required double rentalFee,
@@ -50,7 +50,7 @@ class PdfService {
   /// Generate PDF from template (internal method)
   Future<Uint8List> _generatePdfFromTemplate({
     required AgreementTemplateModel template,
-    required NewRentalPassModel rentalData,
+    required InitRentalModel rentalData,
     required ShopModel shopData,
     required double rentalFee,
     required double deposit,
@@ -197,7 +197,7 @@ class PdfService {
     );
   }
 
-  pw.Widget _buildRentalPeriod(NewRentalPassModel rentalData) {
+  pw.Widget _buildRentalPeriod(InitRentalModel rentalData) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [

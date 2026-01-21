@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
 import '../../../models/inventory_model.dart';
-import '../../../models/new_rental_pass_model.dart'; // Add intl package for date formatting
+import '../../../models/init_rental_model.dart'; // Add intl package for date formatting
 
 class NewRentalController extends GetxController {
   // -- State Variables --
@@ -21,6 +22,7 @@ class NewRentalController extends GetxController {
     hour: TimeOfDay.now().hour + 1,
     minute: 0,
   ).obs;
+  final Rx<RentType> rentType = RentType.hourly.obs;
 
   final RxDouble estimatedTotal = 0.0.obs;
 
@@ -162,50 +164,45 @@ class NewRentalController extends GetxController {
         dueTime.value.minute,
       );
 
-      if (dueDateTime.isBefore(startDateTime) ||
-          dueDateTime == startDateTime) {
+      if (dueDateTime.isBefore(startDateTime) || dueDateTime == startDateTime) {
         estimatedTotal.value = 0.0;
         return;
       }
 
       final Duration difference = dueDateTime.difference(startDateTime);
-
-      final int days = difference.inDays;
-      int hours = difference.inHours % 24;
-      final int minutes = difference.inMinutes % 60;
-
-      // If there are minutes, count it as a full hour.
-      if (minutes > 0) {
-        hours++;
-      }
-
-      // If rental is just for hours (less than a day)
-      if (days == 0) {
-        // But if hourly charge is more than a day's rate, charge daily rate.
-        if (hours * hourlyRate > dailyRate) {
-          estimatedTotal.value = dailyRate;
-        } else {
-          estimatedTotal.value = (hours * hourlyRate).toDouble();
+      if (rentType.value == RentType.hourly) {
+        final int hours = difference.inHours;
+        final int minutes = difference.inMinutes % 60;
+        double total = (hours * hourlyRate).toDouble();
+        if (minutes > 0) {
+          total += hourlyRate;
         }
-        return;
-      }
-
-      // For rentals of 1 day or more
-      double total = (days * dailyRate).toDouble();
-      double remainingHoursCost = (hours * hourlyRate).toDouble();
-
-      if (remainingHoursCost > dailyRate) {
-        total += dailyRate;
+        estimatedTotal.value = total;
       } else {
-        total += remainingHoursCost;
+        final int days = difference.inDays;
+        int hours = difference.inHours % 24;
+        final int minutes = difference.inMinutes % 60;
+        if (minutes > 0) {
+          hours++;
+        }
+        double total = (days * dailyRate).toDouble();
+        double remainingHoursCost = (hours * hourlyRate).toDouble();
+
+        if (remainingHoursCost > dailyRate) {
+          total += dailyRate;
+        } else {
+          total += remainingHoursCost;
+        }
+        estimatedTotal.value = total;
       }
 
-      estimatedTotal.value = total;
       log('Estimated Total Rental: \$${estimatedTotal.value}');
     } catch (e, stackTrace) {
       log('Error in calculateTotal: $e', error: e, stackTrace: stackTrace);
       Get.snackbar(
-          'Calculation Error', 'Could not calculate the total rental cost.');
+        'Calculation Error',
+        'Could not calculate the total rental cost.',
+      );
       estimatedTotal.value = 0.0;
     }
   }
@@ -231,13 +228,14 @@ class NewRentalController extends GetxController {
     }
 
     // Create agreement data model
-    final agreementData = NewRentalPassModel(
+    final agreementData = InitRentalModel(
       customer: selectedCustomer.value!,
       items: selectedItems,
       startDate: startDate.value,
       startTime: startTime.value,
       dueDate: dueDate.value,
       dueTime: dueTime.value,
+      rentType: rentType.value,
     );
 
     // Pass data model to the Agreement Wizard

@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import '../../utils/constants/a_enums.dart';
 import 'customer_model.dart';
 import 'inventory_model.dart';
 
-class NewRentalPassModel {
+class InitRentalModel {
   final CustomerModel customer;
   final List<InventoryModel> items;
   final DateTime startDate;
   final TimeOfDay startTime;
   final DateTime dueDate;
   final TimeOfDay dueTime;
+  final RentType rentType;
+  final double? estimatedTotal;
 
-  NewRentalPassModel({
+  InitRentalModel({
     required this.customer,
     required this.items,
     required this.startDate,
     required this.startTime,
     required this.dueDate,
     required this.dueTime,
+    required this.rentType,
+    this.estimatedTotal,
   });
 
   /// Convert to Map for passing via arguments
@@ -28,12 +33,14 @@ class NewRentalPassModel {
       'startTime': startTime,
       'dueDate': dueDate,
       'dueTime': dueTime,
+      'rentType': rentType.name,
+      'estimatedTotal': estimatedTotal,
     };
   }
 
   /// Reconstruct from Map
-  factory NewRentalPassModel.fromMap(Map<String, dynamic> data) {
-    return NewRentalPassModel(
+  factory InitRentalModel.fromMap(Map<String, dynamic> data) {
+    return InitRentalModel(
       customer: CustomerModel.fromJson(
         data['customer'] as Map<String, dynamic>,
       ),
@@ -44,6 +51,12 @@ class NewRentalPassModel {
       startTime: data['startTime'] as TimeOfDay,
       dueDate: data['dueDate'] as DateTime,
       dueTime: data['dueTime'] as TimeOfDay,
+      rentType: enumFromString(
+        RentType.values,
+        data['rentType'],
+        RentType.hourly,
+      ),
+      estimatedTotal: data['estimatedTotal'] as double?,
     );
   }
 

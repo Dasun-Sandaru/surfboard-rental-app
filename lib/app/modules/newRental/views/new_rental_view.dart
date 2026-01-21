@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
@@ -112,6 +113,7 @@ class NewRentalView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = controller.selectedItems[index];
                   return _buildSelectedItemCard(
+                    controller,
                     item,
                     () => controller.removeItem(index),
                   );
@@ -168,6 +170,42 @@ class NewRentalView extends StatelessWidget {
   // ===========================================================================
   // WIDGET BUILDERS
   // ===========================================================================
+
+  Widget _buildRentTypeSelector(NewRentalController controller) {
+    return Obx(
+      () => SizedBox(
+        width: double.infinity,
+        child: SegmentedButton<RentType>(
+          segments: const [
+            ButtonSegment(
+              value: RentType.hourly,
+              label: Text("Hourly"),
+              icon: Icon(Iconsax.clock),
+            ),
+            ButtonSegment(
+              value: RentType.daily,
+              label: Text("Daily"),
+              icon: Icon(Iconsax.calendar),
+            ),
+          ],
+          selected: {controller.rentType.value},
+          onSelectionChanged: (newSelection) {
+            controller.rentType.value = newSelection.first;
+            controller.calculateTotal();
+          },
+          style: SegmentedButton.styleFrom(
+            backgroundColor: cardDark,
+            foregroundColor: textGrey,
+            selectedForegroundColor: textWhite,
+            selectedBackgroundColor: primaryBlue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildSectionLabel(String text) {
     return Text(
@@ -359,7 +397,8 @@ class NewRentalView extends StatelessWidget {
   }
 
   // -- Selected Item Card --
-  Widget _buildSelectedItemCard(InventoryModel item, VoidCallback onRemove) {
+  Widget _buildSelectedItemCard(
+      NewRentalController controller, InventoryModel item, VoidCallback onRemove) {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
@@ -367,57 +406,64 @@ class NewRentalView extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderDark),
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Thumbnail
-          Container(
-            height: 50.w,
-            width: 50.w,
-            decoration: BoxDecoration(
-              color: bgDark,
-              borderRadius: BorderRadius.circular(8),
-              image: item.imageUrl.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(item.imageUrl),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-            child: item.imageUrl.isEmpty
-                ? Icon(Iconsax.image, color: textGrey)
-                : null,
-          ),
-
-          SizedBox(width: 12.w),
-
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  style: TextStyle(
-                    color: textWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          Row(
+            children: [
+              // Thumbnail
+              Container(
+                height: 50.w,
+                width: 50.w,
+                decoration: BoxDecoration(
+                  color: bgDark,
+                  borderRadius: BorderRadius.circular(8),
+                  image: item.imageUrl.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(item.imageUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
-                Text(
-                  item.displaySize,
-                  style: TextStyle(color: textGrey, fontSize: 12.sp),
-                ),
-              ],
-            ),
-          ),
+                child: item.imageUrl.isEmpty
+                    ? Icon(Iconsax.image, color: textGrey)
+                    : null,
+              ),
 
-          // Remove Button
-          IconButton(
-            onPressed: onRemove,
-            icon: Icon(Iconsax.minus_cirlce, color: const Color(0xFFEF4444)),
+              SizedBox(width: 12.w),
+
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      style: TextStyle(
+                        color: textWhite,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      item.displaySize,
+                      style: TextStyle(color: textGrey, fontSize: 12.sp),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Remove Button
+              IconButton(
+                onPressed: onRemove,
+                icon:
+                    Icon(Iconsax.minus_cirlce, color: const Color(0xFFEF4444)),
+              ),
+            ],
           ),
+          SizedBox(height: 12.h),
+          _buildRentTypeSelector(controller),
         ],
       ),
     );

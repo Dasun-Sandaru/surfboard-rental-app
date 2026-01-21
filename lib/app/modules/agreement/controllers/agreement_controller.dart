@@ -11,10 +11,12 @@ import 'package:surfboard_rental_app/app/services/pdf_service.dart';
 import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/shop_service.dart';
 
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
 import '../../../models/damage_fee_model.dart';
 import '../../../models/inventory_model.dart';
-import '../../../models/new_rental_pass_model.dart';
+import '../../../models/init_rental_model.dart';
+import '../../../models/security_deposit_model.dart';
 import '../../../models/shop_model.dart';
 import '../../../services/damage_fee_service.dart';
 import '../../../services/user_service.dart';
@@ -28,7 +30,7 @@ class AgreementController extends GetxController {
   final RentalService _rentalService = RentalService();
 
   // -- Agreement Data --
-  final Rxn<NewRentalPassModel> newRentalPassData = Rxn<NewRentalPassModel>();
+  final Rxn<InitRentalModel> initRentalModel = Rxn<InitRentalModel>();
 
   // -- Step Management --
   final RxInt currentStep = 0.obs;
@@ -52,21 +54,139 @@ class AgreementController extends GetxController {
   // -- 4. Signature --
   final Rxn<Uint8List> customerSignature = Rxn<Uint8List>();
 
-  // -- Derived Data from newRentalPassData --
-  CustomerModel? get customer => newRentalPassData.value?.customer;
+  // -- Derived Data from initRentalModel --
+  CustomerModel? get customer => initRentalModel.value?.customer;
   InventoryModel? get board {
-    final items = newRentalPassData.value?.items;
+    final items = initRentalModel.value?.items;
     if (items != null && items.isNotEmpty) {
       return items.first;
     }
     return null;
   }
 
+  double get suggestedPrice {
+    final rentalData = initRentalModel.value;
+    if (rentalData == null || rentalData.items.isEmpty) {
+      return 0.0;
+    }
+
+    final item = rentalData.items.first;
+    final double hourlyRate = item.rentalRateHour.toDouble();
+    final double dailyRate = item.rentalRateDay.toDouble();
+
+    final startDateTime = DateTime(
+      rentalData.startDate.year,
+      rentalData.startDate.month,
+      rentalData.startDate.day,
+      rentalData.startTime.hour,
+      rentalData.startTime.minute,
+    );
+
+    final dueDateTime = DateTime(
+      rentalData.dueDate.year,
+      rentalData.dueDate.month,
+      rentalData.dueDate.day,
+      rentalData.dueTime.hour,
+      rentalData.dueTime.minute,
+    );
+
+    if (!dueDateTime.isAfter(startDateTime)) {
+      return 0.0;
+    }
+
+    final difference = dueDateTime.difference(startDateTime);
+
+    /// -----------------------
+    /// HOURLY RENT
+    /// -----------------------
+    if (rentalData.rentType == RentType.hourly) {
+      int hours = difference.inHours;
+
+      // Minimum 1 hour
+      if (hours == 0) {
+        hours = 1;
+      }
+
+      final int remainingMinutes = difference.inMinutes % 60;
+
+      // Add extra hour only if grace period exceeded
+      if (remainingMinutes > 15) {
+        hours += 1;
+      }
+
+      return hours * hourlyRate;
+    }
+    /// -----------------------
+    /// DAILY RENT
+    /// -----------------------
+    else {
+      int days = difference.inDays;
+
+      // Minimum 1 day
+      if (days == 0) {
+        days = 1;
+      }
+
+      // Any extra time counts as another day
+      if (difference > Duration(days: days)) {
+        days += 1;
+      }
+
+      return days * dailyRate;
+    }
+  }
+
+  String get formattedDuration {
+    final rentalData = initRentalModel.value;
+    if (rentalData == null) {
+      return "0h";
+    }
+
+    final startDateTime = DateTime(
+      rentalData.startDate.year,
+      rentalData.startDate.month,
+      rentalData.startDate.day,
+      rentalData.startTime.hour,
+      rentalData.startTime.minute,
+    );
+
+    final dueDateTime = DateTime(
+      rentalData.dueDate.year,
+      rentalData.dueDate.month,
+      rentalData.dueDate.day,
+      rentalData.dueTime.hour,
+      rentalData.dueTime.minute,
+    );
+
+    if (dueDateTime.isBefore(startDateTime) || dueDateTime == startDateTime) {
+      return "0h";
+    }
+
+    final difference = dueDateTime.difference(startDateTime);
+    int totalHours = difference.inHours;
+    if (difference.inMinutes % 60 > 0) {
+      totalHours++;
+    }
+
+    final days = totalHours ~/ 24;
+    final remainingHours = totalHours % 24;
+
+    if (days > 0) {
+      String duration = "$days d";
+      if (remainingHours > 0) {
+        duration += " ${remainingHours}h";
+      }
+      return duration;
+    } else {
+      return "$totalHours h";
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
-    if (Get.arguments != null && Get.arguments is NewRentalPassModel) {
-      newRentalPassData.value = Get.arguments as NewRentalPassModel;
+    if (Get.arguments != null && Get.arguments is InitRentalModel) {
+      initRentalModel.value = Get.arguments as InitRentalModel;
       _loadDamageFees();
     }
   }
@@ -128,7 +248,7 @@ class AgreementController extends GetxController {
   }
 
   void _generateAgreement() async {
-    final rentalData = newRentalPassData.value;
+    final rentalData = initRentalModel.value;
     if (rentalData == null) {
       Get.snackbar("Error", "Cannot generate agreement: missing rental data.");
       return;
@@ -185,7 +305,7 @@ class AgreementController extends GetxController {
       final shopId = await _userService.getShopIdFromStorage();
       final userId = _userService.currentUser!.uid;
 
-      final rentalData = newRentalPassData.value;
+      final rentalData = initRentalModel.value;
       final customerId = customer?.id;
 
       if (shopId == null ||
@@ -216,10 +336,27 @@ class AgreementController extends GetxController {
         shopId: shopId,
         customerId: customerId,
         itemId: board!.id,
+        staffId: userId,
         startTime: startDateTime,
-        dueTime: dueDateTime,
-        status: 'active',
-        rentedByUserId: userId,
+        expectedReturnTime: dueDateTime,
+        actualReturnTime: null,
+        status: RentalStatus.active,
+
+        rentType: initRentalModel.value!.rentType,
+        paymentStatus: PaymentStatus.unpaid,
+        rate: double.tryParse(rentalPriceController.text) ?? 0.0,
+        amountExpected: double.tryParse(rentalPriceController.text) ?? 0.0,
+        amountPaid: 0.0,
+        securityDeposit: SecurityDepositModel(
+          enabled: requireDeposit.value,
+          amount: requireDeposit.value
+              ? (double.tryParse(depositController.text) ?? 0.0)
+              : 0.0,
+          paid: 0.0,
+          refunded: 0.0,
+        ),
+        agreementLink: null,
+        createdAt: DateTime.now(),
       );
 
       final rentalId = await _rentalService.createRental(
@@ -253,5 +390,71 @@ class AgreementController extends GetxController {
       0.0,
       (sum, fee) => sum + fee.feeAmount,
     );
+  }
+
+  Future<void> printRentalSubmitData() async {
+    final shopId = await _userService.getShopIdFromStorage();
+    final userId = _userService.currentUser!.uid;
+
+    final rentalData = initRentalModel.value;
+    final customerId = customer?.id;
+
+    if (shopId == null ||
+        customerId == null ||
+        board == null ||
+        rentalData == null) {
+      Get.snackbar("Error", "Missing required data to create rental.");
+      return;
+    }
+
+    final startDateTime = DateTime(
+      rentalData.startDate.year,
+      rentalData.startDate.month,
+      rentalData.startDate.day,
+      rentalData.startTime.hour,
+      rentalData.startTime.minute,
+    );
+
+    final dueDateTime = DateTime(
+      rentalData.dueDate.year,
+      rentalData.dueDate.month,
+      rentalData.dueDate.day,
+      rentalData.dueTime.hour,
+      rentalData.dueTime.minute,
+    );
+    final newRental = RentalModel(
+      shopId: shopId,
+      customerId: customerId,
+      itemId: board!.id,
+      staffId: userId,
+      startTime: startDateTime,
+      expectedReturnTime: dueDateTime,
+      actualReturnTime: null,
+      status: RentalStatus.active,
+
+      rentType: initRentalModel.value!.rentType,
+      paymentStatus: PaymentStatus.unpaid,
+
+      rate:
+          (initRentalModel.value!.rentType == RentType.hourly
+                  ? initRentalModel.value!.items.first.rentalRateHour
+                  : initRentalModel.value!.items.first.rentalRateDay)
+              .toDouble(),
+
+      amountExpected: double.tryParse(rentalPriceController.text) ?? 0.0,
+      amountPaid: 0.0,
+      securityDeposit: SecurityDepositModel(
+        enabled: requireDeposit.value,
+        amount: requireDeposit.value
+            ? (double.tryParse(depositController.text) ?? 0.0)
+            : 0.0,
+        paid: 0.0,
+        refunded: 0.0,
+      ),
+      agreementLink: null,
+      createdAt: DateTime.now(),
+    );
+
+    print('Rental Submission Data: ${{newRental.toMap()}}');
   }
 }

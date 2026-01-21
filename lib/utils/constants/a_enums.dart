@@ -10,6 +10,20 @@ enum InventoryFormMode { add, edit }
 
 enum DamageType { fin_damaged, board_cracked, leash_broken, lost }
 
+enum RentalStatus { active, completed, overdue }
+
+enum RentType { hourly, daily }
+
+enum PaymentStatus { unpaid, partial, paid }
+
+extension EnumParser on Enum {
+  String get value => name;
+}
+
+T enumFromString<T extends Enum>(List<T> values, String value, T fallback) {
+  return values.firstWhere((e) => e.name == value, orElse: () => fallback);
+}
+
 // Damage Type Helper with descriptions
 class DamageTypeHelper {
   static const Map<String, DamageTypeData> damageTypes = {

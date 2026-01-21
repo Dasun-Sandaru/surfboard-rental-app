@@ -25,6 +25,11 @@ class AgreementWizardView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgDark,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          controller.printRentalSubmitData();
+        },
+      ),
       appBar: AAppBar(
         showbackArrow: true,
         leadingOnPressed: controller.previousStep, // Back goes to previous step
@@ -146,7 +151,8 @@ class AgreementWizardView extends StatelessWidget {
                           child: Obx(() {
                             if (controller.isCreatingRental.value) {
                               return const CircularProgressIndicator(
-                                  color: Colors.white);
+                                color: Colors.white,
+                              );
                             }
                             return Text(
                               "Create Rental",

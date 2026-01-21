@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../controllers/agreement_controller.dart';
 
 class StepPricing extends GetView<AgreementController> {
@@ -35,9 +36,9 @@ class StepPricing extends GetView<AgreementController> {
               "Set the duration and total price.",
               style: TextStyle(color: textGrey, fontSize: 16.sp),
             ),
-      
+
             SizedBox(height: 32.h),
-      
+
             // Duration Selector
             Text(
               "Duration",
@@ -48,20 +49,20 @@ class StepPricing extends GetView<AgreementController> {
               ),
             ),
             SizedBox(height: 12.h),
-      
-            // Display passed duration from NewRentalPassModel
+
+            // Display passed duration from InitRentalModel
             Obx(() {
-              final rentalData = controller.newRentalPassData.value;
+              final rentalData = controller.initRentalModel.value;
               if (rentalData == null) {
                 return Text(
                   "No duration data",
                   style: TextStyle(color: textGrey),
                 );
               }
-      
+
               final hours = rentalData.rentalDurationHours;
               final days = rentalData.rentalDurationDays;
-      
+
               return Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
@@ -80,7 +81,10 @@ class StepPricing extends GetView<AgreementController> {
                           children: [
                             Text(
                               "Start",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
+                              style: TextStyle(
+                                color: textGrey,
+                                fontSize: 12.sp,
+                              ),
                             ),
                             SizedBox(height: 4.h),
                             Text(
@@ -93,13 +97,20 @@ class StepPricing extends GetView<AgreementController> {
                             ),
                           ],
                         ),
-                        Icon(Iconsax.arrow_right, color: primaryBlue, size: 20.w),
+                        Icon(
+                          Iconsax.arrow_right,
+                          color: primaryBlue,
+                          size: 20.w,
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
                               "Due",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
+                              style: TextStyle(
+                                color: textGrey,
+                                fontSize: 12.sp,
+                              ),
                             ),
                             SizedBox(height: 4.h),
                             Text(
@@ -116,51 +127,25 @@ class StepPricing extends GetView<AgreementController> {
                     ),
                     Divider(color: borderDark, height: 24.h),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Column(
-                          children: [
-                            Text(
-                              "Hours",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              "$hours hrs",
-                              style: TextStyle(
-                                color: primaryBlue,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text(
-                              "Days",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              "${days.toStringAsFixed(1)} days",
-                              style: TextStyle(
-                                color: primaryBlue,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          controller.formattedDuration,
+                          style: TextStyle(
+                            color: primaryBlue,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               );
             }),
-      
+
             SizedBox(height: 32.h),
-      
+
             // Rental Price Section
             Text(
               "Rental Price",
@@ -171,22 +156,21 @@ class StepPricing extends GetView<AgreementController> {
               ),
             ),
             SizedBox(height: 12.h),
-      
+
             Obx(() {
-              final rentalData = controller.newRentalPassData.value;
+              final rentalData = controller.initRentalModel.value;
               if (rentalData == null || rentalData.items.isEmpty) {
-                return Text("No rental data", style: TextStyle(color: textGrey));
+                return Text(
+                  "No rental data",
+                  style: TextStyle(color: textGrey),
+                );
               }
-      
+
               final item = rentalData.items.first;
-              final hours = rentalData.rentalDurationHours;
-              final days = rentalData.rentalDurationDays;
-      
-              // Calculate suggested price based on daily rate
-              final suggestedPrice = (item.rentalRateDay * days).toStringAsFixed(
-                2,
-              );
-      
+              final suggestedPriceString =
+                  controller.suggestedPrice.toStringAsFixed(2);
+              controller.rentalPriceController.text = suggestedPriceString;
+
               return Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
@@ -206,7 +190,10 @@ class StepPricing extends GetView<AgreementController> {
                           children: [
                             Text(
                               "Hourly Rate",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
+                              style: TextStyle(
+                                color: textGrey,
+                                fontSize: 12.sp,
+                              ),
                             ),
                             SizedBox(height: 4.h),
                             Text(
@@ -224,7 +211,10 @@ class StepPricing extends GetView<AgreementController> {
                           children: [
                             Text(
                               "Daily Rate",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
+                              style: TextStyle(
+                                color: textGrey,
+                                fontSize: 12.sp,
+                              ),
                             ),
                             SizedBox(height: 4.h),
                             Text(
@@ -242,11 +232,14 @@ class StepPricing extends GetView<AgreementController> {
                           children: [
                             Text(
                               "Duration",
-                              style: TextStyle(color: textGrey, fontSize: 12.sp),
+                              style: TextStyle(
+                                color: textGrey,
+                                fontSize: 12.sp,
+                              ),
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              "${days.toStringAsFixed(1)} days",
+                              controller.formattedDuration,
                               style: TextStyle(
                                 color: primaryBlue,
                                 fontSize: 14.sp,
@@ -280,7 +273,7 @@ class StepPricing extends GetView<AgreementController> {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                "\$$suggestedPrice",
+                                "\$$suggestedPriceString",
                                 style: TextStyle(
                                   color: primaryBlue,
                                   fontSize: 16.sp,
@@ -292,7 +285,7 @@ class StepPricing extends GetView<AgreementController> {
                           ElevatedButton(
                             onPressed: () {
                               controller.rentalPriceController.text =
-                                  suggestedPrice;
+                                  suggestedPriceString;
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryBlue,
@@ -315,9 +308,9 @@ class StepPricing extends GetView<AgreementController> {
                 ),
               );
             }),
-      
+
             SizedBox(height: 16.h),
-      
+
             // Total Rental Price Input
             _buildMoneyInput(
               label: "Total Rental Price",
@@ -327,9 +320,9 @@ class StepPricing extends GetView<AgreementController> {
               borderDark: borderDark,
               textWhite: textWhite,
             ),
-      
+
             SizedBox(height: 32.h),
-      
+
             // Deposit Section
             Container(
               padding: EdgeInsets.all(16.w),
@@ -359,7 +352,7 @@ class StepPricing extends GetView<AgreementController> {
                       activeColor: primaryBlue,
                     ),
                   ),
-      
+
                   // Show input only if enabled
                   Obx(() {
                     if (controller.requireDeposit.value) {

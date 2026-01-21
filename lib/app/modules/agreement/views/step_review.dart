@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../../../models/new_rental_pass_model.dart';
+import '../../../models/init_rental_model.dart';
 import '../../signature/views/signature_view.dart';
 import '../controllers/agreement_controller.dart';
 
@@ -23,7 +23,7 @@ class StepReview extends GetView<AgreementController> {
   Widget build(BuildContext context) {
     // This Obx will wrap the main content to react to data model changes
     return Obx(() {
-      final rentalData = controller.newRentalPassData.value;
+      final rentalData = controller.initRentalModel.value;
       if (rentalData == null) {
         return const Center(
           child: Text(
@@ -72,7 +72,7 @@ class StepReview extends GetView<AgreementController> {
 
   // --- Section Widgets ---
 
-  Widget _buildCustomerInfo(NewRentalPassModel rentalData) {
+  Widget _buildCustomerInfo(InitRentalModel rentalData) {
     final customer = rentalData.customer;
     return _buildSectionCard([
       _buildSectionHeader("Renter Information"),
@@ -82,7 +82,7 @@ class StepReview extends GetView<AgreementController> {
     ]);
   }
 
-  Widget _buildRentalDetails(NewRentalPassModel rentalData) {
+  Widget _buildRentalDetails(InitRentalModel rentalData) {
     final board = rentalData.items.first;
     return _buildSectionCard([
       _buildSectionHeader("Rental Details"),
