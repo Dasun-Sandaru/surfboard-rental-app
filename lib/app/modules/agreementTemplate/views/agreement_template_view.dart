@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../models/agreement_template_model.dart';
 import '../controllers/agreement_template_controller.dart';
 
 class AgreementTemplateListView extends StatelessWidget {
@@ -23,6 +25,11 @@ class AgreementTemplateListView extends StatelessWidget {
     final controller = Get.put(AgreementTemplateController());
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: controller.addDefaultTemplate,
+        backgroundColor: primaryBlue,
+        child: Icon(Iconsax.add, color: textWhite, size: 28.w),
+      ),
       backgroundColor: bgDark,
       appBar: AAppBar(
         showbackArrow: true,
@@ -80,20 +87,49 @@ class AgreementTemplateListView extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(ASizes.defaultPadding),
               child: Obx(
-                () => ListView.separated(
-                  padding:
-                      EdgeInsets.zero, // Padding handled inside tiles or header
-                  itemCount: controller.templates.length,
-                  separatorBuilder: (context, index) => Divider(
-                    color: borderDark.withOpacity(0.3),
-                    height: 1,
-                    thickness: 1,
-                  ),
-                  itemBuilder: (context, index) {
-                    final template = controller.templates[index];
-                    return _buildTemplateTile(template, controller);
-                  },
-                ),
+                () {
+                  if (controller.isLoading.value) {
+                    return Center(
+                        child: CircularProgressIndicator(color: primaryBlue));
+                  }
+
+                  if (controller.templates.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Iconsax.document_text_1,
+                              size: 60, color: textGrey),
+                          SizedBox(height: 16.h),
+                          Text(
+                            'No Templates Found',
+                            style: TextStyle(color: textWhite, fontSize: 16.sp),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Add a new template to get started.',
+                            style: TextStyle(color: textGrey, fontSize: 14.sp),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: EdgeInsets
+                        .zero, // Padding handled inside tiles or header
+                    itemCount: controller.templates.length,
+                    separatorBuilder: (context, index) => Divider(
+                      color: borderDark.withOpacity(0.3),
+                      height: 1,
+                      thickness: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      final template = controller.templates[index];
+                      return _buildTemplateTile(template, controller);
+                    },
+                  );
+                },
               ),
             ),
           ),
@@ -107,7 +143,7 @@ class AgreementTemplateListView extends StatelessWidget {
   // ===========================================================================
 
   Widget _buildTemplateTile(
-    Map<String, dynamic> template,
+    AgreementTemplateModel template,
     AgreementTemplateController controller,
   ) {
     return InkWell(
@@ -143,7 +179,7 @@ class AgreementTemplateListView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    template['templateName'],
+                    template.templateName,
                     style: TextStyle(
                       color: textWhite,
                       fontSize: 16.sp,
@@ -154,7 +190,7 @@ class AgreementTemplateListView extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "Last Updated: ${template['updatedAt']}",
+                    "Last Updated: ${DateFormat.yMMMd().format(template.updatedAt)}",
                     style: TextStyle(color: textGrey, fontSize: 13.sp),
                   ),
                 ],

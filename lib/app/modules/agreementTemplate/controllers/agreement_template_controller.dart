@@ -4,106 +4,126 @@ import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
 import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
 
+import '../../../models/agreement_template_model.dart';
+import '../../../services/agreement_template_service.dart';
+import '../../../services/user_service.dart';
+
 class AgreementTemplateController extends GetxController {
   final formKey = GlobalKey<FormState>();
+  final UserService _userService = Get.find();
+  final AgreementTemplateService _templateService = AgreementTemplateService();
   final searchTextController = TextEditingController();
   final templateNameController = TextEditingController();
   final contentController = TextEditingController();
 
   final isEditing = false.obs;
-  final _editedTemplate = Rx<Map<String, dynamic>>({});
+  final isLoading = false.obs;
+  final _editedTemplate = Rx<AgreementTemplateModel?>(null);
 
-  // Dummy Template Data
-  final RxList<Map<String, dynamic>> templates = <Map<String, dynamic>>[
-    {
-      "id": "1",
-      "templateName": "Standard Daily Rental",
-      "sections": {"content": "This is the content for Standard Daily Rental."},
-      "updatedAt": "Oct 26, 2023",
-    },
-    {
-      "id": "2",
-      "templateName": "Waiver & Liability - Minors",
-      "sections": {
-        "content": "This is the content for Waiver & Liability - Minors."
-      },
-      "updatedAt": "Oct 15, 2023",
-    },
-    {
-      "id": "3",
-      "templateName": "Group Lesson Agreement",
-      "sections": {"content": "This is the content for Group Lesson Agreement."},
-      "updatedAt": "Sep 30, 2023",
-    },
-    {
-      "id": "4",
-      "templateName": "Advanced Equipment Policy",
-      "sections": {"content": "This is the content for Advanced Equipment Policy."},
-      "updatedAt": "Sep 12, 2023",
-    },
-  ].obs;
+  final RxList<AgreementTemplateModel> templates =
+      <AgreementTemplateModel>[].obs;
+  String? shopId;
+
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    isLoading.value = true;
+    shopId = await _userService.getShopIdFromStorage();
+    if (shopId != null) {
+      await fetchTemplates();
+    }
+    isLoading.value = false;
+  }
+
+  Future<void> fetchTemplates() async {
+    if (shopId == null) return;
+    isLoading.value = true;
+    try {
+      final fetchedTemplates = await _templateService.getShopTemplates(shopId!);
+      templates.assignAll(fetchedTemplates);
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to fetch templates.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   void addTemplate() {
     isEditing.value = false;
-    _editedTemplate.value = {};
+    _editedTemplate.value = null;
     templateNameController.clear();
     contentController.clear();
     Get.to(() => const AddEditAgreementTemplateView());
   }
 
-  void editTemplate(Map<String, dynamic> template) {
+  void editTemplate(AgreementTemplateModel template) {
     isEditing.value = true;
     _editedTemplate.value = template;
-    templateNameController.text = template['templateName'];
-    contentController.text = template['sections']['content'];
+    templateNameController.text = template.templateName;
+    // Assuming 'content' is the key for the main section.
+    // This might need adjustment based on your data structure.
+    contentController.text = template.sections['content'] ?? '';
     Get.to(() => const AddEditAgreementTemplateView());
   }
 
-  void saveTemplate() {
+  Future<void> saveTemplate() async {
     if (formKey.currentState!.validate()) {
-      if (isEditing.value) {
-        // Update existing template
-        final index = templates
-            .indexWhere((t) => t['id'] == _editedTemplate.value['id']);
-        if (index != -1) {
-          templates[index] = {
-            "id": _editedTemplate.value['id'],
-            "templateName": templateNameController.text,
-            "sections": {"content": contentController.text},
-            "updatedAt": "Nov 03, 2023", // Ideally use a date formatter
-          };
+      isLoading.value = true;
+      try {
+        final sections = {'content': contentController.text};
+        if (isEditing.value && _editedTemplate.value != null) {
+          // Update existing template
+          await _templateService.updateTemplate(
+            shopId: shopId!,
+            templateId: _editedTemplate.value!.id!,
+            templateName: templateNameController.text,
+            sections: sections,
+          );
+        } else {
+          // Add new template
+          await _templateService.createTemplate(
+            shopId: shopId!,
+            templateName: templateNameController.text,
+            sections: sections,
+          );
         }
-      } else {
-        // Add new template
-        templates.add({
-          "id": (templates.length + 1).toString(),
-          "templateName": templateNameController.text,
-          "sections": {"content": contentController.text},
-          "updatedAt": "Nov 03, 2023", // Ideally use a date formatter
-        });
+        await fetchTemplates(); // Refresh the list
+        Get.back(); // Go back to the list view
+        Get.snackbar(
+          "Success",
+          "Template saved successfully!",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } catch (e) {
+        Get.snackbar(
+          "Error",
+          "Failed to save template.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      } finally {
+        isLoading.value = false;
       }
-      templates.refresh();
-      Get.back(); // Go back to the list view
-      Get.snackbar(
-        "Success",
-        "Template saved successfully!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     }
   }
 
   void previewTemplate() {
     // 1. Create sample data
-    final customer = {
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-    };
+    final customer = {"name": "John Doe", "email": "john.doe@example.com"};
     final rental = {
       "startDate": DateFormat('MMM dd, yyyy').format(DateTime.now()),
-      "endDate": DateFormat('MMM dd, yyyy')
-          .format(DateTime.now().add(const Duration(days: 3))),
+      "endDate": DateFormat(
+        'MMM dd, yyyy',
+      ).format(DateTime.now().add(const Duration(days: 3))),
       "totalCost": "150.00",
     };
 
@@ -123,7 +143,7 @@ class AgreementTemplateController extends GetxController {
       title: "Template Preview",
       contentWidget: Text(
         content,
-        style: const TextStyle(color: textGrey, fontSize: 14),
+        style: const TextStyle(fontSize: 14),
       ),
       confirmText: "Close",
       onConfirm: () => Get.back(),
@@ -136,5 +156,11 @@ class AgreementTemplateController extends GetxController {
     templateNameController.dispose();
     contentController.dispose();
     super.onClose();
+  }
+
+  void addDefaultTemplate() {
+    AgreementTemplateService agreementTemplateService =
+        AgreementTemplateService();
+    agreementTemplateService.createDefaultTemplate(shopId!);
   }
 }

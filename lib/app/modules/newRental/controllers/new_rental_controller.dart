@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -12,9 +14,7 @@ class NewRentalController extends GetxController {
   final RxList<InventoryModel> selectedItems = <InventoryModel>[].obs;
 
   final Rx<DateTime> startDate = DateTime.now().obs;
-  final Rx<DateTime> dueDate = DateTime.now()
-      .add(const Duration(days: 1))
-      .obs; // Default 1 day
+  final Rx<DateTime> dueDate = DateTime.now().obs;
 
   final Rx<TimeOfDay> startTime = TimeOfDay.now().obs;
   final Rx<TimeOfDay> dueTime = TimeOfDay(
@@ -136,14 +136,78 @@ class NewRentalController extends GetxController {
   }
 
   void calculateTotal() {
-    // Simple logic: Sum of item prices * days
-    // In a real app, parse the 'cost' string to double
-    // double days = endDate.value.difference(startDate.value).inDays.toDouble();
-    // if (days < 1) days = 1;
+    try {
+      if (selectedItems.isEmpty) {
+        estimatedTotal.value = 0.0;
+        return;
+      }
 
-    // For demo, just static calculation
-    estimatedTotal.value =
-        selectedItems.length * 25.0; // Dummy $25/day per item
+      final item = selectedItems.first;
+      final double dailyRate = item.rentalRateDay.toDouble();
+      final double hourlyRate = item.rentalRateHour.toDouble();
+
+      final startDateTime = DateTime(
+        startDate.value.year,
+        startDate.value.month,
+        startDate.value.day,
+        startTime.value.hour,
+        startTime.value.minute,
+      );
+
+      final dueDateTime = DateTime(
+        dueDate.value.year,
+        dueDate.value.month,
+        dueDate.value.day,
+        dueTime.value.hour,
+        dueTime.value.minute,
+      );
+
+      if (dueDateTime.isBefore(startDateTime) ||
+          dueDateTime == startDateTime) {
+        estimatedTotal.value = 0.0;
+        return;
+      }
+
+      final Duration difference = dueDateTime.difference(startDateTime);
+
+      final int days = difference.inDays;
+      int hours = difference.inHours % 24;
+      final int minutes = difference.inMinutes % 60;
+
+      // If there are minutes, count it as a full hour.
+      if (minutes > 0) {
+        hours++;
+      }
+
+      // If rental is just for hours (less than a day)
+      if (days == 0) {
+        // But if hourly charge is more than a day's rate, charge daily rate.
+        if (hours * hourlyRate > dailyRate) {
+          estimatedTotal.value = dailyRate;
+        } else {
+          estimatedTotal.value = (hours * hourlyRate).toDouble();
+        }
+        return;
+      }
+
+      // For rentals of 1 day or more
+      double total = (days * dailyRate).toDouble();
+      double remainingHoursCost = (hours * hourlyRate).toDouble();
+
+      if (remainingHoursCost > dailyRate) {
+        total += dailyRate;
+      } else {
+        total += remainingHoursCost;
+      }
+
+      estimatedTotal.value = total;
+      log('Estimated Total Rental: \$${estimatedTotal.value}');
+    } catch (e, stackTrace) {
+      log('Error in calculateTotal: $e', error: e, stackTrace: stackTrace);
+      Get.snackbar(
+          'Calculation Error', 'Could not calculate the total rental cost.');
+      estimatedTotal.value = 0.0;
+    }
   }
 
   void proceedToAgreement() {

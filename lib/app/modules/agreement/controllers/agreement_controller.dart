@@ -185,22 +185,39 @@ class AgreementController extends GetxController {
       final shopId = await _userService.getShopIdFromStorage();
       final userId = _userService.currentUser!.uid;
 
-      if (shopId == null || customer == null || board == null) {
+      final rentalData = newRentalPassData.value;
+      final customerId = customer?.id;
+
+      if (shopId == null ||
+          customerId == null ||
+          board == null ||
+          rentalData == null) {
         Get.snackbar("Error", "Missing required data to create rental.");
         return;
       }
 
-      // Calculate Due Time
-      final now = DateTime.now();
-      int rentalDays = int.tryParse(rentalDuration.value.split(' ')[0]) ?? 1;
-      final dueTime = now.add(Duration(days: rentalDays));
+      final startDateTime = DateTime(
+        rentalData.startDate.year,
+        rentalData.startDate.month,
+        rentalData.startDate.day,
+        rentalData.startTime.hour,
+        rentalData.startTime.minute,
+      );
+
+      final dueDateTime = DateTime(
+        rentalData.dueDate.year,
+        rentalData.dueDate.month,
+        rentalData.dueDate.day,
+        rentalData.dueTime.hour,
+        rentalData.dueTime.minute,
+      );
 
       final newRental = RentalModel(
         shopId: shopId,
-        customerId: customer!.id!,
+        customerId: customerId,
         itemId: board!.id,
-        startTime: now,
-        dueTime: dueTime,
+        startTime: startDateTime,
+        dueTime: dueDateTime,
         status: 'active',
         rentedByUserId: userId,
       );
