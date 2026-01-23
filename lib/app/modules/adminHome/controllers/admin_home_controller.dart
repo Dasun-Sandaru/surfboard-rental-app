@@ -3,7 +3,9 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 
 class AdminHomeController extends GetxController {
@@ -48,7 +50,7 @@ class AdminHomeController extends GetxController {
   Future<void> _setShopId() async {
     shopId = await _userService.getShopId();
     log('shopId: $shopId');
-    
+
     _listenActiveRentals();
     _listenInventory();
     _listenCustomers();
@@ -62,7 +64,7 @@ class AdminHomeController extends GetxController {
         .collection('shops')
         .doc(shopId)
         .collection('rentals')
-        .where('status', isEqualTo: 'active')
+        .where('status', isEqualTo: RentalStatus.active.value)
         .snapshots()
         .listen((snapshot) {
           activeRentals.value = snapshot.docs.length;
@@ -75,7 +77,7 @@ class AdminHomeController extends GetxController {
         .collection('shops')
         .doc(shopId)
         .collection('inventory')
-        .where('status', isEqualTo: 'available')
+        .where('status', isEqualTo: InventoryStatus.available.value)
         .snapshots()
         .listen((snapshot) {
           boardsAvailable.value = snapshot.docs.length;
@@ -101,7 +103,7 @@ class AdminHomeController extends GetxController {
         .collection('shops')
         .doc(shopId)
         .collection('rentals')
-        .where('status', isEqualTo: 'overdue')
+        .where('status', isEqualTo: RentalStatus.overdue.value)
         .snapshots()
         .listen((snapshot) {
           damagesPending.value = snapshot.docs.length;

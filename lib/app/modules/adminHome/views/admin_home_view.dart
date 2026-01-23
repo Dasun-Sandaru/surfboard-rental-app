@@ -235,6 +235,15 @@ class AdminHomeView extends GetView<AdminHomeController> {
               case 2:
                 Get.toNamed(Routes.CUSTOMER_LIST);
                 break;
+              // case 3:
+              //   Get.toNamed(Routes.RENTAL_HISTORY);
+              //   break;
+              // case 4:
+              //   Get.toNamed(Routes.REPORTS);
+              //   break;
+              case 5:
+                Get.toNamed(Routes.AGREEMENT_TEMPLATE);
+                break;
               case 6:
                 Get.toNamed(Routes.SETTINGS);
                 break;

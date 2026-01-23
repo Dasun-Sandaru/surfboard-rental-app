@@ -46,7 +46,7 @@ class DamageFeeController extends GetxController {
       itemId = Get.arguments as String;
 
       log('Initialized with itemId: $itemId', name: 'DamageFeeController');
-      await fetchDamageRules();
+      _setupDamageRulesStream();
     } catch (e) {
       log('Error in onInit: $e', name: 'DamageFeeController');
       AppSnackBar.error(
@@ -58,29 +58,30 @@ class DamageFeeController extends GetxController {
   }
 
   // ---------------------------------------------------------------------------
-  // 1. FETCH DAMAGE RULES FROM FIRESTORE
+  // 1. SETUP DAMAGE RULES STREAM FROM FIRESTORE
   // ---------------------------------------------------------------------------
-  Future<void> fetchDamageRules() async {
+  void _setupDamageRulesStream() {
     try {
       if (shopId == null) {
         throw Exception('Shop ID not available');
       }
       isLoading.value = true;
-      damageRules.value = await _damageFeeService.fetchDamageRules(
+
+      // Bind the stream
+      damageRules.bindStream(_damageFeeService.streamDamageRules(
         shopId: shopId!,
         itemId: itemId,
-      );
-      log(
-        'Fetched ${damageRules.length} damage rules',
-        name: 'DamageFeeController',
-      );
+      ));
+
+      // Listen for the first data event to stop the loader
+      ever(damageRules, (_) => isLoading.value = false);
     } catch (e) {
-      log('Error fetching damage rules: $e', name: 'DamageFeeController');
+      log('Error setting up damage rules stream: $e',
+          name: 'DamageFeeController');
       AppSnackBar.error(
         title: 'Error',
         message: 'Failed to load damage rules: $e',
       );
-    } finally {
       isLoading.value = false;
     }
   }
@@ -101,7 +102,7 @@ class DamageFeeController extends GetxController {
   // ---------------------------------------------------------------------------
   // 3. ADD DAMAGE RULE TO FIRESTORE
   // ---------------------------------------------------------------------------
-  Future<void> _addRule(DamageFeeModel damageRule) async {
+  Future<bool> _addRule(DamageFeeModel damageRule) async {
     try {
       if (shopId == null) {
         throw Exception('Shop ID not available');
@@ -111,21 +112,20 @@ class DamageFeeController extends GetxController {
         itemId: itemId,
         damageRule: damageRule,
       );
-      log('Added damage rule: ${damageRule.id}', name: 'DamageFeeController');
-      AppSnackBar.success(
-        title: 'Success',
-        message: 'Damage rule added successfully',
-      );
+      log('Added damage rule: ${damageRule.damageType}',
+          name: 'DamageFeeController');
+      return true;
     } catch (e) {
       log('Error adding rule: $e', name: 'DamageFeeController');
       AppSnackBar.error(title: 'Error', message: 'Failed to add rule: $e');
+      return false;
     }
   }
 
   // ---------------------------------------------------------------------------
   // 4. UPDATE DAMAGE RULE IN FIRESTORE
   // ---------------------------------------------------------------------------
-  Future<void> _updateRule(DamageFeeModel damageRule) async {
+  Future<bool> _updateRule(DamageFeeModel damageRule) async {
     try {
       if (shopId == null) {
         throw Exception('Shop ID not available');
@@ -138,14 +138,13 @@ class DamageFeeController extends GetxController {
         itemId: itemId,
         damageRule: damageRule,
       );
-      log('Updated damage rule: ${damageRule.id}', name: 'DamageFeeController');
-      AppSnackBar.success(
-        title: 'Success',
-        message: 'Damage rule updated successfully',
-      );
+      log('Updated damage rule: ${damageRule.id}',
+          name: 'DamageFeeController');
+      return true;
     } catch (e) {
       log('Error updating rule: $e', name: 'DamageFeeController');
       AppSnackBar.error(title: 'Error', message: 'Failed to update rule: $e');
+      return false;
     }
   }
 
@@ -280,13 +279,22 @@ class DamageFeeController extends GetxController {
                     damageType: typeController.text,
                   );
 
+            bool success = false;
             if (isEdit) {
-              await _updateRule(damageRule);
+              success = await _updateRule(damageRule);
             } else {
-              await _addRule(damageRule);
+              success = await _addRule(damageRule);
             }
 
-            Get.back();
+            if (success) {
+              Get.back();
+              AppSnackBar.success(
+                title: 'Success',
+                message: isEdit
+                    ? 'Damage rule updated successfully'
+                    : 'Damage rule added successfully',
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF4A90E2), // Primary Blue

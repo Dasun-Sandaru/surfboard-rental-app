@@ -6,6 +6,10 @@ import '../modules/addInventory/bindings/add_inventory_binding.dart';
 import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
+import '../modules/agreement/bindings/agreement_binding.dart';
+import '../modules/agreement/views/agreement_wizard_view.dart';
+import '../modules/agreementTemplate/bindings/agreement_template_binding.dart';
+import '../modules/agreementTemplate/views/agreement_template_view.dart';
 import '../modules/alerts/bindings/alerts_binding.dart';
 import '../modules/alerts/views/alerts_view.dart';
 import '../modules/auth/bindings/forgot_password_binding.dart';
@@ -40,6 +44,8 @@ import '../modules/signIn/bindings/sign_in_binding.dart';
 import '../modules/signIn/views/sign_in_view.dart';
 import '../modules/signUp/bindings/sign_up_binding.dart';
 import '../modules/signUp/views/sign_up_view.dart';
+import '../modules/signature/bindings/signature_binding.dart';
+import '../modules/signature/views/signature_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/staffHome/bindings/staff_home_binding.dart';
@@ -171,6 +177,22 @@ class AppPages {
       name: _Paths.DAMAGE_FEE,
       page: () => const DamageFeeView(),
       binding: DamageFeeBinding(),
+    ),
+    GetPage(
+      name: _Paths.AGREEMENT_WIZARD,
+      // page: () => const AgreementView(),
+      page: () => const AgreementWizardView(),
+      binding: AgreementBinding(),
+    ),
+    GetPage(
+      name: _Paths.SIGNATURE,
+      page: () => const SignaturePadView(),
+      binding: SignatureBinding(),
+    ),
+    GetPage(
+      name: _Paths.AGREEMENT_TEMPLATE,
+      page: () => const AgreementTemplateListView(),
+      binding: AgreementTemplateBinding(),
     ),
   ];
 }

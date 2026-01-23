@@ -25,7 +25,14 @@ class ItemDetailsController extends GetxController {
   void onInit() {
     super.onInit();
     try {
-      itemId = Get.arguments as String;
+      dynamic args = Get.arguments;
+      if (args is String) {
+        itemId = args;
+      } else if (args is Map && args.containsKey('itemId')) {
+        itemId = args['itemId'];
+      } else {
+        throw 'ItemId not found in arguments';
+      }
       log('Initialized with itemId: $itemId', name: _logName);
     } catch (e) {
       log('Error in onInit: $e', name: _logName);
