@@ -160,35 +160,54 @@ class AdminHomeView extends GetView<AdminHomeController> {
       ),
       itemCount: stats.length,
       itemBuilder: (context, index) {
-        return Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: cardDark,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: borderDark),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                stats[index]['title']!,
-                style: TextStyle(
-                  color: textWhite,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
+        return InkWell(
+          onTap: () {
+            // Handle Navigation Here
+            switch (index) {
+              case 0:
+                Get.toNamed(Routes.RENTALS);
+                break;
+              // case 1:
+              //   Get.toNamed(Routes.INVENTORY);
+              //   break;
+              // case 2:
+              //   Get.toNamed(Routes.DAMAGE_CHECK);
+              //   break;
+              // case 3:
+              //   Get.toNamed(Routes.CUSTOMER_LIST);
+              //   break;
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: cardDark,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: borderDark),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  stats[index]['title']!,
+                  style: TextStyle(
+                    color: textWhite,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                stats[index]['count']!,
-                style: TextStyle(
-                  color: textWhite,
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
+                SizedBox(height: 8.h),
+                Text(
+                  stats[index]['count']!,
+                  style: TextStyle(
+                    color: textWhite,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

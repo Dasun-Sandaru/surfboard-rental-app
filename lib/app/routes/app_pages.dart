@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
 
+import '../modules/rentals/bindings/rentals_binding.dart';
+import '../modules/rentals/views/rentals_view.dart';
+import '../modules/rentalDetail/bindings/rental_detail_binding.dart';
+import '../modules/rentalDetail/views/rental_detail_view.dart';
 import '../modules/addEditCustomer/bindings/add_edit_customer_binding.dart';
 import '../modules/addEditCustomer/views/add_edit_customer_view.dart';
 import '../modules/addInventory/bindings/add_inventory_binding.dart';
@@ -193,6 +197,16 @@ class AppPages {
       name: _Paths.AGREEMENT_TEMPLATE,
       page: () => const AgreementTemplateListView(),
       binding: AgreementTemplateBinding(),
+    ),
+    GetPage(
+      name: _Paths.RENTALS,
+      page: () => const RentalsView(),
+      binding: RentalsBinding(),
+    ),
+    GetPage(
+      name: _Paths.RENTAL_DETAIL,
+      page: () => const RentalDetailView(),
+      binding: RentalDetailBinding(),
     ),
   ];
 }
