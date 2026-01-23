@@ -1,15 +1,28 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/app/models/payment_model.dart';
+import 'package:surfboard_rental_app/app/routes/app_pages.dart';
+import 'package:surfboard_rental_app/app/services/rental_service.dart';
+import 'package:surfboard_rental_app/app/services/user_service.dart';
 
-import '../../../../utils/constants/a_enums.dart';
 import '../../../models/rental_model.dart';
-import '../../../models/security_deposit_model.dart';
 
 class BoardInspectionController extends GetxController {
-  // Reactive Rental Model
-  late Rx<RentalModel> rental;
+  final RentalService _rentalService = Get.find();
+  final UserService _userService = Get.find();
+
+  // Controller Status
+  final status = RxStatus.loading().obs;
+
+  // Data
+  late String rentalId;
+  final rental = Rx<RentalModel?>(null);
+  Stream<RentalModel> rentalStream = Stream.empty();
+  StreamSubscription? _rentalStreamSub;
+  final RxList<PaymentModel> paymentHistory = <PaymentModel>[].obs;
 
   // For the real-time countdown timer
   Timer? _timer;
@@ -17,33 +30,115 @@ class BoardInspectionController extends GetxController {
   final RxString timeRemaining = "00:00:00".obs;
   final Rx<Color> timeColor = Colors.white.obs;
 
+  // Firestore reference
+  late FirebaseFirestore _firestore;
+
   @override
   void onInit() {
     super.onInit();
-    // 1. Get arguments passed from the previous screen (Active Rentals List)
-    if (Get.arguments != null && Get.arguments is RentalModel) {
-      rental = (Get.arguments as RentalModel).obs;
-    } else {
-      rental = _getDummyRental().obs;
+    _firestore = FirebaseFirestore.instance;
+    rentalId = Get.arguments;
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _loadRentalData();
+  }
+
+  Future<void> _loadRentalData() async {
+    status.value = RxStatus.loading();
+    final String? shopId = await _userService.getShopIdFromStorage();
+
+    if (shopId == null) {
+      status.value = RxStatus.error('Could not retrieve shop ID.');
+      Get.snackbar('Error', 'Could not retrieve shop ID.');
+      return;
     }
 
-    // 2. Start the timer to update the time remaining every second
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTimer());
-    _updateTimer(); // Initial call to set the value immediately
+    rentalStream = _rentalService.streamRentalById(shopId, rentalId);
+    _rentalStreamSub = rentalStream.listen((rentalData) {
+      rental.value = rentalData;
+      _setupPaymentListener();
+      _updateTimer();
+      status.value = RxStatus.success();
+    }, onError: (error) {
+      status.value = RxStatus.error(error.toString());
+      Get.snackbar('Error', 'Failed to load rental data.');
+    });
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (rental.value != null) {
+        _updateTimer();
+      }
+    });
   }
 
   @override
   void onClose() {
-    _timer?.cancel(); // Dispose the timer to prevent memory leaks
+    _timer?.cancel();
+    _rentalStreamSub?.cancel();
     super.onClose();
   }
 
-  // --- Core Business Logic ---
+  // --- Listener Methods ---
+  void _setupPaymentListener() {
+    if (rental.value == null) return;
+    _firestore
+        .collection('shops')
+        .doc(rental.value!.shopId)
+        .collection('rentals')
+        .doc(rental.value!.id)
+        .collection('payments')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            final payments = snapshot.docs
+                .map((doc) => PaymentModel.fromSnapshot(doc))
+                .toList();
+            paymentHistory.assignAll(payments);
+          },
+          onError: (e) {
+            print('Error listening to payments: $e');
+          },
+        );
+  }
 
-  // Calculate Balance (Positive = Customer Owes, Negative = Refund Due)
+  // --- Navigation ---
+  void goToCustomerDetails() {
+    if (rental.value?.customerId != null) {
+      Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: rental.value!.customerId);
+    }
+  }
+
+  void goToItemDetails() {
+    if (rental.value?.itemId != null) {
+      Get.toNamed(Routes.ITEM_DETAILS, arguments: rental.value!.itemId);
+    }
+  }
+
+  void goToStaffDetails() {
+    if (rental.value?.staffId != null) {
+      Get.toNamed(Routes.USER_DETAIL, arguments: rental.value!.staffId);
+    }
+  }
+
+
+  // --- Getters ---
   double get balanceDue =>
-      rental.value.amountExpected - rental.value.amountPaid;
+      (rental.value?.amountExpected ?? 0) - (rental.value?.amountPaid ?? 0);
 
+  String get staffName => rental.value?.staffId ?? '';
+
+  String get customerName => rental.value?.customerId ?? '';
+
+  String get boardName => rental.value?.itemId ?? '';
+
+  double get totalPaymentsMade =>
+      paymentHistory.fold(0.0, (sum, payment) => sum + payment.amount);
+
+  // --- Actions ---
   void reportNoDamage() {
     // Logic: If balance is 0, just close. If balance exists, show Payment Dialog.
     if (balanceDue.abs() > 0.01) {
@@ -60,8 +155,9 @@ class BoardInspectionController extends GetxController {
 
   // -- Timer Logic --
   void _updateTimer() {
+    if (rental.value == null) return;
     final now = DateTime.now();
-    final dueTime = rental.value.expectedReturnTime;
+    final dueTime = rental.value!.expectedReturnTime;
     final difference = dueTime.difference(now);
 
     if (difference.isNegative) {
@@ -144,32 +240,6 @@ class BoardInspectionController extends GetxController {
           ),
         ],
       ),
-    );
-  }
-
-  // --- Dummy Data ---
-  RentalModel _getDummyRental() {
-    return RentalModel(
-      id: "R-1001",
-      shopId: "S-01",
-      customerId: "C-99",
-      itemId: "LB-017",
-      staffId: "ST-01",
-      startTime: DateTime.now().subtract(const Duration(hours: 4)),
-      expectedReturnTime: DateTime.now().add(const Duration(minutes: 1, seconds: 30)),
-      status: RentalStatus.active,
-      rentType: RentType.hourly,
-      paymentStatus: PaymentStatus.partial,
-      rate: 15.0,
-      amountExpected: 60.0,
-      amountPaid: 20.0,
-      securityDeposit: SecurityDepositModel(
-        enabled: true,
-        amount: 100.0,
-        paid: 200.0,
-        refunded: 0.0,
-      ),
-      createdAt: DateTime.now(),
     );
   }
 }

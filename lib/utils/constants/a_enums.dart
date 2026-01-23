@@ -10,11 +10,39 @@ enum InventoryFormMode { add, edit }
 
 enum DamageType { fin_damaged, board_cracked, leash_broken, lost }
 
-enum RentalStatus { active, completed, overdue }
+
+
+enum RentalStatus {
+active,
+completed,
+overdue,
+cancelled,
+}
+
+enum LedgerSide {
+debit, // customer owes shop
+credit, // shop owes customer
+}
+
+enum PaymentCategory {
+rental(LedgerSide.debit),
+deposit(LedgerSide.debit),
+lateFee(LedgerSide.debit),
+damageFee(LedgerSide.debit),
+refund(LedgerSide.credit);
+
+
+final LedgerSide side;
+const PaymentCategory(this.side);
+}
 
 enum RentType { hourly, daily }
 
 enum PaymentStatus { unpaid, partial, paid }
+
+enum PaymentType { rental_fee, damage_fee, security_deposit }
+
+enum PaymentMethod { cash, card, online }
 
 extension EnumParser on Enum {
   String get value => name;

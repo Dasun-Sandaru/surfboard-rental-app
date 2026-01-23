@@ -52,6 +52,15 @@ class UserModel {
     );
   }
 
+
+
+  /// Create UserModel from Firestore snapshot
+  
+  factory UserModel.fromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
+    return UserModel.fromMap(data, doc.id);
+  }
   /// Convert UserModel to map for Firestore
   Map<String, dynamic> toMap() {
     return {

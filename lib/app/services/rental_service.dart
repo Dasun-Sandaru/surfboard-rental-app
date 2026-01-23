@@ -88,34 +88,16 @@ class RentalService {
     }
   }
 
+  // Stream rental by ID
+  Stream<RentalModel> streamRentalById(String shopId, String rentalId) {
+    final docRef = _shopRef(shopId).collection('rentals').doc(rentalId);
 
-  
+    return docRef.snapshots().map((doc) {
+      return RentalModel.fromSnapshot(doc);
+    });
+  }
 
-  // Future<List<RentalModel>> getRentals(String shopId) async {
-  //   try {
-  //     log('Fetching rentals for shop: $shopId', name: logName);
-
-  //     final querySnapshot = await _shopRef(shopId)
-  //         .collection('rentals')
-  //         .orderBy('createdAt', descending: true)
-  //         .get();
-
-  //     final rentals = querySnapshot.docs
-  //         .map((doc) => RentalModel.fromMap(doc.data() as Map<String, dynamic>))
-  //         .toList();
-
-  //     log('Fetched ${rentals.length} rentals', name: logName);
-  //     return rentals;
-  //   } catch (e) {
-  //     log('Error fetching rentals: $e', name: logName);
-  //     rethrow;
-  //   }
-  // }
-
-  Future<void> deleteRental(
-    String shopId,
-    String rentalId,
-  ) async {
+  Future<void> deleteRental(String shopId, String rentalId) async {
     try {
       log('Deleting rental: $rentalId', name: logName);
 
@@ -130,10 +112,7 @@ class RentalService {
     }
   }
 
-  Future<void> updateRental(
-    String shopId,
-    RentalModel rentalData,
-  ) async {
+  Future<void> updateRental(String shopId, RentalModel rentalData) async {
     try {
       log('Updating rental: ${rentalData.id}', name: logName);
 
@@ -174,8 +153,4 @@ class RentalService {
       rethrow;
     }
   }
-
-
-
-
 }
