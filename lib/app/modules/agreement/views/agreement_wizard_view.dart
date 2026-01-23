@@ -25,11 +25,6 @@ class AgreementWizardView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgDark,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.printRentalSubmitData();
-        },
-      ),
       appBar: AAppBar(
         showbackArrow: true,
         leadingOnPressed: controller.previousStep, // Back goes to previous step

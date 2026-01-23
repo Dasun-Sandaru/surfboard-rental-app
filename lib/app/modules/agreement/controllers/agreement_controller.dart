@@ -10,6 +10,7 @@ import 'package:surfboard_rental_app/app/services/pdf_service.dart';
 
 import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/shop_service.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
@@ -182,6 +183,7 @@ class AgreementController extends GetxController {
     }
   }
 
+  RxBool isAgree = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -189,6 +191,12 @@ class AgreementController extends GetxController {
       initRentalModel.value = Get.arguments as InitRentalModel;
       _loadDamageFees();
     }
+    // Listeners to invalidate generated agreement on data change
+    rentalPriceController.addListener(_onInputChanged);
+    depositController.addListener(_onInputChanged);
+    ever(requireDeposit, (_) => _onInputChanged());
+    ever(selectedDamageFees, (_) => _onInputChanged());
+    ever(customerSignature, (_) => _onInputChanged());
   }
 
   Future<void> _loadDamageFees() async {
@@ -223,7 +231,46 @@ class AgreementController extends GetxController {
     super.onClose();
   }
 
+  void _onInputChanged() {
+    if (isAgreementGenerated.value) {
+      isAgreementGenerated.value = false;
+      generatedPdfData.value = null; // Also clear the old PDF
+      AppSnackBar.info(
+        title: 'Agreement Outdated',
+        message: 'Your changes require the agreement to be re-generated.',
+      );
+    }
+  }
+
   void nextStep() {
+    // Validate before incrementing to avoid having to revert the step.
+    if (currentStep.value == 1) {
+      if (rentalPriceController.text.isEmpty) {
+        AppSnackBar.warning(
+          title: "Validation Error",
+          message: "Rental price is required.",
+        );
+        return;
+      }
+
+      if (requireDeposit.value && depositController.text.isEmpty) {
+        AppSnackBar.warning(
+          title: "Validation Error",
+          message: "Deposit amount is required.",
+        );
+        return;
+      }
+    }
+
+    // if (currentStep.value == 2) {
+    //   if (selectedDamageFees.isEmpty) {
+    //     AppSnackBar.warning(
+    //       title: "Validation Error",
+    //       message: "Please select at least one damage fee option.",
+    //     );
+    //     return;
+    //   }
+    // }
     if (currentStep.value < 3) {
       currentStep.value++;
       pageController.animateToPage(
@@ -236,7 +283,15 @@ class AgreementController extends GetxController {
     }
   }
 
+  void regenerateAgreement() {
+    _generateAgreement();
+  }
+
   void previousStep() {
+    if (isAgreementGenerated.value) {
+      isAgreementGenerated.value = false;
+      generatedPdfData.value = null;
+    }
     if (currentStep.value > 0) {
       currentStep.value--;
       pageController.animateToPage(
@@ -250,13 +305,27 @@ class AgreementController extends GetxController {
   void _generateAgreement() async {
     final rentalData = initRentalModel.value;
     if (rentalData == null) {
-      Get.snackbar("Error", "Cannot generate agreement: missing rental data.");
+      AppSnackBar.error(
+        title: "Error",
+        message: "Cannot generate agreement: missing rental data.",
+      );
+      return;
+    }
+
+    if (isAgree.value == false) {
+      AppSnackBar.warning(
+        title: "Agreement Required",
+        message: "You must agree to the terms before generating the agreement.",
+      );
       return;
     }
 
     final shopId = await _userService.getShopIdFromStorage();
     if (shopId == null) {
-      Get.snackbar("Error", "Cannot generate agreement: missing shop ID.");
+      AppSnackBar.error(
+        title: "Error",
+        message: "Cannot generate agreement: missing shop ID.",
+      );
       return;
     }
 
@@ -390,71 +459,5 @@ class AgreementController extends GetxController {
       0.0,
       (sum, fee) => sum + fee.feeAmount,
     );
-  }
-
-  Future<void> printRentalSubmitData() async {
-    final shopId = await _userService.getShopIdFromStorage();
-    final userId = _userService.currentUser!.uid;
-
-    final rentalData = initRentalModel.value;
-    final customerId = customer?.id;
-
-    if (shopId == null ||
-        customerId == null ||
-        board == null ||
-        rentalData == null) {
-      Get.snackbar("Error", "Missing required data to create rental.");
-      return;
-    }
-
-    final startDateTime = DateTime(
-      rentalData.startDate.year,
-      rentalData.startDate.month,
-      rentalData.startDate.day,
-      rentalData.startTime.hour,
-      rentalData.startTime.minute,
-    );
-
-    final dueDateTime = DateTime(
-      rentalData.dueDate.year,
-      rentalData.dueDate.month,
-      rentalData.dueDate.day,
-      rentalData.dueTime.hour,
-      rentalData.dueTime.minute,
-    );
-    final newRental = RentalModel(
-      shopId: shopId,
-      customerId: customerId,
-      itemId: board!.id,
-      staffId: userId,
-      startTime: startDateTime,
-      expectedReturnTime: dueDateTime,
-      actualReturnTime: null,
-      status: RentalStatus.active,
-
-      rentType: initRentalModel.value!.rentType,
-      paymentStatus: PaymentStatus.unpaid,
-
-      rate:
-          (initRentalModel.value!.rentType == RentType.hourly
-                  ? initRentalModel.value!.items.first.rentalRateHour
-                  : initRentalModel.value!.items.first.rentalRateDay)
-              .toDouble(),
-
-      amountExpected: double.tryParse(rentalPriceController.text) ?? 0.0,
-      amountPaid: 0.0,
-      securityDeposit: SecurityDepositModel(
-        enabled: requireDeposit.value,
-        amount: requireDeposit.value
-            ? (double.tryParse(depositController.text) ?? 0.0)
-            : 0.0,
-        paid: 0.0,
-        refunded: 0.0,
-      ),
-      agreementLink: null,
-      createdAt: DateTime.now(),
-    );
-
-    print('Rental Submission Data: ${{newRental.toMap()}}');
   }
 }

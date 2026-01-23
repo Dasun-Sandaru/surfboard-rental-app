@@ -22,6 +22,7 @@ class InventoryController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool hasMoreItems = true.obs;
 
+  final RxBool isSelectMode = false.obs;
   RxBool isLessThan = false.obs;
   RxBool isSizeFilterActive = false.obs;
 
@@ -39,6 +40,13 @@ class InventoryController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     try {
+      if (Get.arguments != null && Get.arguments is Map) {
+        final Map args = Get.arguments as Map;
+        if (args['selectMode'] == true) {
+          isSelectMode.value = true;
+          selectedStatuses.add(InventoryStatus.available);
+        }
+      }
       shopId = await _userService.getShopIdFromStorage();
       log('Initialized with shopId: $shopId', name: _logName);
       feetSizeController.addListener(_updateSizeFilterState);
@@ -156,7 +164,9 @@ class InventoryController extends GetxController {
       log('Resetting filters...', name: _logName);
 
       selectedSurfboardTypes.clear();
-      selectedStatuses.clear();
+      if (!isSelectMode.value) {
+        selectedStatuses.clear();
+      }
       feetSizeController.clear();
       inchesSizeController.clear();
       isLessThan.value = false;
@@ -186,6 +196,13 @@ class InventoryController extends GetxController {
   }
 
   void toggleStatus(InventoryStatus status) {
+    if (isSelectMode.value) {
+      AppSnackBar.info(
+        title: 'Filter Locked',
+        message: 'Only available items can be selected in this mode.',
+      );
+      return;
+    }
     if (selectedStatuses.contains(status)) {
       selectedStatuses.remove(status);
     } else {

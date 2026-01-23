@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/app/models/rental_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../utils/constants/a_enums.dart';
+
 class RentalService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'RentalService';
@@ -23,14 +25,17 @@ class RentalService {
 
       final filePath = 'shops/$shopId/rentals/$rentalId/agreement.pdf';
 
-      await supabase.storage.from('agreements').uploadBinary(
+      await supabase.storage
+          .from('agreements')
+          .uploadBinary(
             filePath,
             pdfData,
             fileOptions: const FileOptions(contentType: 'application/pdf'),
           );
 
-      final String publicUrl =
-          supabase.storage.from('agreements').getPublicUrl(filePath);
+      final String publicUrl = supabase.storage
+          .from('agreements')
+          .getPublicUrl(filePath);
 
       log('Agreement PDF uploaded: $publicUrl', name: logName);
       return publicUrl;
@@ -73,7 +78,7 @@ class RentalService {
           .doc(shopId)
           .collection('inventory')
           .doc(rentalData.itemId)
-          .update({'status': 'Rented'});
+          .update({'status': InventoryStatus.rented.name});
 
       log('Rental created: $rentalId', name: logName);
       return rentalId;

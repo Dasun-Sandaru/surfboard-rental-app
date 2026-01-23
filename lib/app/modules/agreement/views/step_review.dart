@@ -229,8 +229,10 @@ class StepReview extends GetView<AgreementController> {
     return Row(
       children: [
         Checkbox(
-          value: true,
-          onChanged: (v) {},
+          value: controller.isAgree.value,
+          onChanged: (v) {
+            controller.isAgree.value = v ?? false;
+          },
           activeColor: primaryBlue,
           checkColor: textWhite,
           side: BorderSide(color: borderDark),
