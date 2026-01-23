@@ -34,6 +34,7 @@ abstract class Routes {
   static const AGREEMENT_TEMPLATE = _Paths.AGREEMENT_TEMPLATE;
   static const RENTALS = _Paths.RENTALS;
   static const RENTAL_DETAIL = _Paths.RENTAL_DETAIL;
+  static const BOARD_INSPECTION = _Paths.BOARD_INSPECTION;
 }
 
 abstract class _Paths {
@@ -67,4 +68,5 @@ abstract class _Paths {
   static const AGREEMENT_TEMPLATE = '/agreement-template';
   static const RENTALS = '/rentals';
   static const RENTAL_DETAIL = '/rental-detail';
+  static const BOARD_INSPECTION = '/board-inspection';
 }

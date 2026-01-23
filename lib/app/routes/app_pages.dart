@@ -1,9 +1,5 @@
 import 'package:get/get.dart';
 
-import '../modules/rentals/bindings/rentals_binding.dart';
-import '../modules/rentals/views/rentals_view.dart';
-import '../modules/rentalDetail/bindings/rental_detail_binding.dart';
-import '../modules/rentalDetail/views/rental_detail_view.dart';
 import '../modules/addEditCustomer/bindings/add_edit_customer_binding.dart';
 import '../modules/addEditCustomer/views/add_edit_customer_view.dart';
 import '../modules/addInventory/bindings/add_inventory_binding.dart';
@@ -22,6 +18,8 @@ import '../modules/auth/view/forgot_password_view.dart';
 import '../modules/auth/view/verify_email_screen.dart';
 import '../modules/authGate/bindings/auth_gate_binding.dart';
 import '../modules/authGate/views/auth_gate_view.dart';
+import '../modules/boardInspection/bindings/board_inspection_binding.dart';
+import '../modules/boardInspection/views/board_inspection_view.dart';
 import '../modules/customerDetails/bindings/customer_details_binding.dart';
 import '../modules/customerDetails/views/customer_details_view.dart';
 import '../modules/customerList/bindings/customer_list_binding.dart';
@@ -40,6 +38,10 @@ import '../modules/newRental/bindings/new_rental_binding.dart';
 import '../modules/newRental/views/new_rental_view.dart';
 import '../modules/onboard/bindings/onboard_binding.dart';
 import '../modules/onboard/views/onboard_view.dart';
+import '../modules/rentalDetail/bindings/rental_detail_binding.dart';
+import '../modules/rentalDetail/views/rental_detail_view.dart';
+import '../modules/rentals/bindings/rentals_binding.dart';
+import '../modules/rentals/views/rentals_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
 import '../modules/shopSetup/bindings/shop_setup_binding.dart';
@@ -207,6 +209,11 @@ class AppPages {
       name: _Paths.RENTAL_DETAIL,
       page: () => const RentalDetailView(),
       binding: RentalDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.BOARD_INSPECTION,
+      page: () => const BoardInspectionView(),
+      binding: BoardInspectionBinding(),
     ),
   ];
 }

@@ -111,7 +111,8 @@ class RentalsController extends GetxController {
   }
 
   void selectRental(RentalModel rental) {
-    Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
+    // Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
+    Get.toNamed(Routes.BOARD_INSPECTION, arguments: rental);
   }
 
   void addRental() {
