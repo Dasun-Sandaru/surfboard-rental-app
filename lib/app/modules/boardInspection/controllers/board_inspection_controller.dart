@@ -57,15 +57,18 @@ class BoardInspectionController extends GetxController {
     }
 
     rentalStream = _rentalService.streamRentalById(shopId, rentalId);
-    _rentalStreamSub = rentalStream.listen((rentalData) {
-      rental.value = rentalData;
-      _setupPaymentListener();
-      _updateTimer();
-      status.value = RxStatus.success();
-    }, onError: (error) {
-      status.value = RxStatus.error(error.toString());
-      Get.snackbar('Error', 'Failed to load rental data.');
-    });
+    _rentalStreamSub = rentalStream.listen(
+      (rentalData) {
+        rental.value = rentalData;
+        _setupPaymentListener();
+        _updateTimer();
+        status.value = RxStatus.success();
+      },
+      onError: (error) {
+        status.value = RxStatus.error(error.toString());
+        Get.snackbar('Error', 'Failed to load rental data.');
+      },
+    );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (rental.value != null) {
@@ -124,7 +127,6 @@ class BoardInspectionController extends GetxController {
     }
   }
 
-
   // --- Getters ---
   double get balanceDue =>
       (rental.value?.amountExpected ?? 0) - (rental.value?.amountPaid ?? 0);
@@ -149,8 +151,10 @@ class BoardInspectionController extends GetxController {
   }
 
   void reportDamage() {
-    // For this example, we simulate a $50 fee
-    _showSettlementDialog(damageFee: 50.0);
+    Get.toNamed(
+      Routes.DAMAGE_REPORT,
+      arguments: {'rentalId': rental.value!.id, 'itemId': rental.value!.itemId},
+    );
   }
 
   // -- Timer Logic --

@@ -64,7 +64,7 @@ class AdminHomeController extends GetxController {
         .collection('shops')
         .doc(shopId)
         .collection('rentals')
-        .where('status', isEqualTo: RentalStatus.active.value)
+        .where('status', isEqualTo: RentalStatus.active.name)
         .snapshots()
         .listen((snapshot) {
           activeRentals.value = snapshot.docs.length;
@@ -77,7 +77,7 @@ class AdminHomeController extends GetxController {
         .collection('shops')
         .doc(shopId)
         .collection('inventory')
-        .where('status', isEqualTo: InventoryStatus.available.value)
+        .where('status', isEqualTo: InventoryStatus.available.name)
         .snapshots()
         .listen((snapshot) {
           boardsAvailable.value = snapshot.docs.length;
@@ -103,7 +103,7 @@ class AdminHomeController extends GetxController {
         .collection('shops')
         .doc(shopId)
         .collection('rentals')
-        .where('status', isEqualTo: RentalStatus.overdue.value)
+        .where('status', isEqualTo: RentalStatus.overdue.name)
         .snapshots()
         .listen((snapshot) {
           damagesPending.value = snapshot.docs.length;

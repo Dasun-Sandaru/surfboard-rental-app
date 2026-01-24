@@ -35,6 +35,8 @@ abstract class Routes {
   static const RENTALS = _Paths.RENTALS;
   static const RENTAL_DETAIL = _Paths.RENTAL_DETAIL;
   static const BOARD_INSPECTION = _Paths.BOARD_INSPECTION;
+  static const PAYMENTS = _Paths.PAYMENTS;
+  static const DAMAGE_REPORT = _Paths.DAMAGE_REPORT;
 }
 
 abstract class _Paths {
@@ -69,4 +71,6 @@ abstract class _Paths {
   static const RENTALS = '/rentals';
   static const RENTAL_DETAIL = '/rental-detail';
   static const BOARD_INSPECTION = '/board-inspection';
+  static const PAYMENTS = '/payments';
+  static const DAMAGE_REPORT = '/damage-report';
 }

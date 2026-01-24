@@ -26,6 +26,8 @@ import '../modules/customerList/bindings/customer_list_binding.dart';
 import '../modules/customerList/views/customer_list_view.dart';
 import '../modules/damageFee/bindings/damage_fee_binding.dart';
 import '../modules/damageFee/views/damage_fee_view.dart';
+import '../modules/damageReport/bindings/damage_report_binding.dart';
+import '../modules/damageReport/views/damage_report_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/inventory/bindings/inventory_binding.dart';
@@ -40,6 +42,8 @@ import '../modules/onboard/bindings/onboard_binding.dart';
 import '../modules/onboard/views/onboard_view.dart';
 import '../modules/rentalDetail/bindings/rental_detail_binding.dart';
 import '../modules/rentalDetail/views/rental_detail_view.dart';
+import '../modules/rentalPayments/bindings/rental_payment_binding.dart';
+import '../modules/rentalPayments/views/rental_payment_view.dart';
 import '../modules/rentals/bindings/rentals_binding.dart';
 import '../modules/rentals/views/rentals_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
@@ -214,6 +218,16 @@ class AppPages {
       name: _Paths.BOARD_INSPECTION,
       page: () => const BoardInspectionView(),
       binding: BoardInspectionBinding(),
+    ),
+    GetPage(
+      name: _Paths.PAYMENTS,
+      page: () => const RentalPaymentView(),
+      binding: RentalPaymentBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAMAGE_REPORT,
+      page: () => const DamageReportView(),
+      binding: DamageReportBinding(),
     ),
   ];
 }
