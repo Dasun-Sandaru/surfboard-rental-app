@@ -50,18 +50,18 @@ class PaymentService {
 
   // ---------------- STREAM PAYMENTS ----------------
   Stream<List<PaymentModel>> paymentStream(String shopId, String rentalId) {
-    return _paymentRef(shopId, rentalId)
-        .orderBy('createdAt')
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(
-                (d) => PaymentModel.fromSnapshot(
-                  d as DocumentSnapshot<Map<String, dynamic>>,
-                ),
-              )
-              .toList(),
-        );
+    return _paymentRef(shopId, rentalId).orderBy('timestamp').snapshots().map((
+      snapshot,
+    ) {
+      log("Payments fetched: ${snapshot.docs.length}", name: logName);
+      return snapshot.docs
+          .map(
+            (d) => PaymentModel.fromSnapshot(
+              d as DocumentSnapshot<Map<String, dynamic>>,
+            ),
+          )
+          .toList();
+    });
   }
 
   // ---------------- ONE-TIME FETCH ----------------
@@ -70,7 +70,7 @@ class PaymentService {
       final snapshot = await _paymentRef(
         shopId,
         rentalId,
-      ).orderBy('createdAt').get();
+      ).orderBy('timestamp').get();
 
       return snapshot.docs
           .map(

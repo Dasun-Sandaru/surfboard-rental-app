@@ -4,11 +4,31 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/damage_report_model.dart';
 import '../models/damage_photo_model.dart';
+import '../models/payment_model.dart';
 import '../../utils/constants/a_enums.dart';
 
 class DamageReportService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  // -----------------------------
+  // Create Payment for Damage Fee
+  // -----------------------------
+  Future<void> createPayment({
+    required String shopId,
+    required String rentalId,
+    required PaymentModel payment,
+  }) async {
+    final ref = _db
+        .collection('shops')
+        .doc(shopId)
+        .collection('rentals')
+        .doc(rentalId)
+        .collection('payments')
+        .doc();
+
+    await ref.set(payment.toMap());
+  }
 
   // -----------------------------
   // Upload Photo (Firebase)

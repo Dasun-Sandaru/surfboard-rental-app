@@ -5,15 +5,18 @@ import 'package:image_picker/image_picker.dart';
 import '../../../models/damage_fee_model.dart';
 import '../../../models/damage_report_model.dart';
 import '../../../models/damage_photo_model.dart';
+import '../../../models/payment_model.dart';
 import '../../../../utils/constants/a_enums.dart';
 
 import '../../../services/damage_fee_service.dart';
 import '../../../services/damage_report_service.dart';
+import '../../../services/rental_service.dart';
 import '../../../services/user_service.dart';
 
 class DamageReportController extends GetxController {
   final DamageFeeService _damageFeeService = DamageFeeService();
   final DamageReportService _damageReportService = DamageReportService();
+  final RentalService _rentalService = RentalService();
   final UserService _userService = Get.find<UserService>();
 
   // -- State --
@@ -215,6 +218,30 @@ class DamageReportController extends GetxController {
             photo: photoModel,
           );
         }
+
+        // 4. Create Payment Record (Charge)
+        final paymentModel = PaymentModel(
+          rentalId: rentalId!,
+          amount: fee.feeAmount,
+          category: PaymentCategory.damageFee,
+          method: PaymentMethod.cash, // Defaulting to cash for charge record
+          handledBy: userId,
+          timestamp: DateTime.now(),
+          note: "Damage Fee: ${fee.damageType}",
+        );
+
+        await _damageReportService.createPayment(
+          shopId: shopId,
+          rentalId: rentalId!,
+          payment: paymentModel,
+        );
+
+        // 5. Update Rental Ledger (Amount Expected)
+        await _rentalService.addDamageCharge(
+          shopId: shopId,
+          rentalId: rentalId!,
+          amount: fee.feeAmount,
+        );
       }
 
       // Close loading dialog

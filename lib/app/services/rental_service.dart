@@ -153,4 +153,23 @@ class RentalService {
       rethrow;
     }
   }
+
+  Future<void> addDamageCharge({
+    required String shopId,
+    required String rentalId,
+    required double amount,
+  }) async {
+    try {
+      log(
+        'Adding damage charge of $amount to rental: $rentalId',
+        name: logName,
+      );
+      final rentalRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+      await rentalRef.update({'amountExpected': FieldValue.increment(amount)});
+      log('Damage charge added to rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error adding damage charge: $e', name: logName);
+      rethrow;
+    }
+  }
 }

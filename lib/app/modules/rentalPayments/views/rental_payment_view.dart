@@ -47,109 +47,119 @@ class RentalPaymentView extends StatelessWidget {
               child: Column(
                 children: [
                   /// 1. Customer Card
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: cardDark,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: borderDark),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 28.w,
-                          backgroundImage: NetworkImage(
-                            controller.customerImage,
+                  Obx(
+                    () => Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: cardDark,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderDark),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28.w,
+                            backgroundImage: NetworkImage(
+                              controller.customerImage,
+                            ),
+                            onBackgroundImageError: (exception, stackTrace) {
+                              // Fallback handled by using a default icon over it or just plain color
+                            },
+                            child: controller.customerImage.isEmpty
+                                ? Icon(Iconsax.user, color: textWhite)
+                                : null,
                           ),
-                        ),
-                        SizedBox(width: 16.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              controller.customerName,
-                              style: TextStyle(
-                                color: textWhite,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
+                          SizedBox(width: 16.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                controller.customerName,
+                                style: TextStyle(
+                                  color: textWhite,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              "Rental #${controller.rentalId}",
-                              style: TextStyle(
-                                color: textGrey,
-                                fontSize: 14.sp,
+                              SizedBox(height: 4.h),
+                              Text(
+                                "Rental #${controller.rentalId}",
+                                style: TextStyle(
+                                  color: textGrey,
+                                  fontSize: 14.sp,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
                   SizedBox(height: 24.h),
 
                   /// 2. Payment Summary Card
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: cardDark,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: borderDark),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildFeeRow(
-                          "Remaining Rental Fee",
-                          controller.rentalFee.value,
-                          Iconsax.receipt,
-                          textGrey,
-                        ),
-                        SizedBox(height: 16.h),
+                  Obx(
+                    () => Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: cardDark,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderDark),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildFeeRow(
+                            "Remaining Rental Fee",
+                            controller.rentalFee,
+                            Iconsax.receipt,
+                            textGrey,
+                          ),
+                          SizedBox(height: 16.h),
 
-                        _buildFeeRow(
-                          "Late Fee",
-                          controller.lateFee.value,
-                          Iconsax.clock,
-                          warningYellow,
-                        ),
-                        SizedBox(height: 16.h),
+                          _buildFeeRow(
+                            "Late Fee",
+                            controller.lateFee,
+                            Iconsax.clock,
+                            warningYellow,
+                          ),
+                          SizedBox(height: 16.h),
 
-                        _buildFeeRow(
-                          "Damage Fee",
-                          controller.damageFee.value,
-                          Iconsax.setting_2, // Or Tool icon
-                          warningYellow,
-                        ),
+                          _buildFeeRow(
+                            "Damage Fee",
+                            controller.damageFee,
+                            Iconsax.setting_2, // Or Tool icon
+                            warningYellow,
+                          ),
 
-                        SizedBox(height: 16.h),
-                        Divider(color: borderDark),
-                        SizedBox(height: 16.h),
+                          SizedBox(height: 16.h),
+                          Divider(color: borderDark),
+                          SizedBox(height: 16.h),
 
-                        // Total Row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Final Total",
-                              style: TextStyle(
-                                color: textWhite,
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
+                          // Total Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Final Total",
+                                style: TextStyle(
+                                  color: textWhite,
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "\$${controller.totalAmount.toStringAsFixed(2)}",
-                              style: TextStyle(
-                                color: textWhite,
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.bold,
+                              Text(
+                                "\$${controller.totalAmount.toStringAsFixed(2)}",
+                                style: TextStyle(
+                                  color: textWhite,
+                                  fontSize: 24.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
