@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CustomerModel {
   final String? id;
   final String firstName;
@@ -32,6 +34,23 @@ class CustomerModel {
       notes: json['notes'] ?? '',
       createdAt: json['created_at'],
       imageUrl: json['image_url'],
+    );
+  }
+
+  factory CustomerModel.fromSnapshot(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return CustomerModel(
+      id: doc.id,
+      firstName: data['first_name'] ?? '',
+      lastName: data['last_name'] ?? '',
+      phone: data['phone'] ?? '',
+      nic: data['nic'] ?? '',
+      email: data['email'] ?? '',
+      notes: data['notes'] ?? '',
+      createdAt: data['created_at'],
+      imageUrl: data['image_url'],
     );
   }
 

@@ -32,6 +32,11 @@ abstract class Routes {
   static const CREATE_RENTAL = _Paths.CREATE_RENTAL;
   static const SIGNATURE = _Paths.SIGNATURE;
   static const AGREEMENT_TEMPLATE = _Paths.AGREEMENT_TEMPLATE;
+  static const RENTALS = _Paths.RENTALS;
+  static const RENTAL_DETAIL = _Paths.RENTAL_DETAIL;
+  static const BOARD_INSPECTION = _Paths.BOARD_INSPECTION;
+  static const PAYMENTS = _Paths.PAYMENTS;
+  static const DAMAGE_REPORT = _Paths.DAMAGE_REPORT;
 }
 
 abstract class _Paths {
@@ -63,4 +68,9 @@ abstract class _Paths {
   static const CREATE_RENTAL = '/create-rental';
   static const SIGNATURE = '/signature';
   static const AGREEMENT_TEMPLATE = '/agreement-template';
+  static const RENTALS = '/rentals';
+  static const RENTAL_DETAIL = '/rental-detail';
+  static const BOARD_INSPECTION = '/board-inspection';
+  static const PAYMENTS = '/payments';
+  static const DAMAGE_REPORT = '/damage-report';
 }

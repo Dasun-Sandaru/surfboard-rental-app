@@ -76,6 +76,11 @@ class InventoryModel {
     );
   }
 
+  /// Firestore → Model
+  factory InventoryModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    return InventoryModel.fromMap(snapshot.data()!);
+  }
+
   /// Model → Firestore
   Map<String, dynamic> toMap() {
     return {

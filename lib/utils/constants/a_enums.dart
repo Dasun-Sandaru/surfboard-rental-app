@@ -10,64 +10,72 @@ enum InventoryFormMode { add, edit }
 
 enum DamageType { fin_damaged, board_cracked, leash_broken, lost }
 
-enum RentalStatus { active, completed, overdue }
+enum RentalStatus { active, completed, overdue, cancelled }
 
 enum RentType { hourly, daily }
 
-enum PaymentStatus { unpaid, partial, paid }
-
-extension EnumParser on Enum {
-  String get value => name;
+enum LedgerSide {
+  debit, // customer owes shop
+  credit, // shop owes customer
 }
 
-T enumFromString<T extends Enum>(List<T> values, String value, T fallback) {
-  return values.firstWhere((e) => e.name == value, orElse: () => fallback);
+enum PaymentCategory {
+  rental(LedgerSide.debit),
+  deposit(LedgerSide.debit),
+  lateFee(LedgerSide.debit),
+  damageFee(LedgerSide.debit),
+  partialPayment(LedgerSide.debit),
+  refund(LedgerSide.credit);
+
+  final LedgerSide side;
+  const PaymentCategory(this.side);
 }
 
-// Damage Type Helper with descriptions
-class DamageTypeHelper {
-  static const Map<String, DamageTypeData> damageTypes = {
-    'fin_damaged': DamageTypeData(
-      label: 'Broken Fin',
-      description: 'Fin box damage or snapped fin.',
-    ),
-    'board_cracked': DamageTypeData(
-      label: 'Major Ding',
-      description: 'Deep cracks affecting the core foam.',
-    ),
-    'leash_broken': DamageTypeData(
-      label: 'Snapped Leash',
-      description: 'Leash cord broken.',
-    ),
-    'lost': DamageTypeData(
-      label: 'Item Lost',
-      description: 'Item not returned.',
-    ),
-  };
+enum PaymentMethod { cash, card, online }
 
-  static String getLabel(DamageType type) {
-    return damageTypes[type.name]?.label ?? type.name;
-  }
+enum PaymentStatus { paid, unpaid, partial, refunded }
 
-  static String getDescription(DamageType type) {
-    return damageTypes[type.name]?.description ?? '';
-  }
+enum DamageStatus {
+  reported, // just reported
+  approved, // manager approved
+  charged, // payment created
+  resolved, // fully handled
+}
 
-  static List<DamageTypeData> getAll() {
-    return damageTypes.values.toList();
+/// Helper to parse enums safely
+T enumFromString<T>(Iterable<T> values, String? value, T defaultValue) {
+  if (value == null) {
+    return defaultValue;
   }
-
-  static DamageTypeData? getByLabel(String label) {
-    return damageTypes.values.firstWhere(
-      (item) => item.label == label,
-      orElse: () => const DamageTypeData(label: '', description: ''),
-    );
-  }
+  return values.firstWhere(
+    (e) => e.toString().split('.').last == value,
+    orElse: () => defaultValue,
+  );
 }
 
 class DamageTypeData {
   final String label;
   final String description;
-
   const DamageTypeData({required this.label, required this.description});
+}
+
+class DamageTypeHelper {
+  static const Map<String, DamageTypeData> damageTypes = {
+    'fin_damaged': DamageTypeData(
+      label: 'Fin Damaged',
+      description: 'Fin is broken or missing',
+    ),
+    'board_cracked': DamageTypeData(
+      label: 'Board Cracked',
+      description: 'Body of the board is cracked',
+    ),
+    'leash_broken': DamageTypeData(
+      label: 'Leash Broken',
+      description: 'Leash is snapped or missing',
+    ),
+    'lost': DamageTypeData(
+      label: 'Lost',
+      description: 'Board is lost completely',
+    ),
+  };
 }

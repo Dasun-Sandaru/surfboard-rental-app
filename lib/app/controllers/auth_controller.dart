@@ -54,7 +54,7 @@ class AuthController extends GetxController {
       final shopId = userModel.shopId;
 
       // Save shopId Locally
-      await _storage.saveData('shopId', shopId);
+      await _storage.saveData('shop_id', shopId);
 
       if (role == UserRole.admin) {
         Get.offAllNamed(Routes.ADMIN_HOME);

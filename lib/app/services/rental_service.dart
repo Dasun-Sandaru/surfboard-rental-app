@@ -87,4 +87,89 @@ class RentalService {
       rethrow;
     }
   }
+
+  // Stream rental by ID
+  Stream<RentalModel> streamRentalById(String shopId, String rentalId) {
+    final docRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+
+    return docRef.snapshots().map((doc) {
+      return RentalModel.fromSnapshot(doc);
+    });
+  }
+
+  Future<void> deleteRental(String shopId, String rentalId) async {
+    try {
+      log('Deleting rental: $rentalId', name: logName);
+
+      final docRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+
+      await docRef.delete();
+
+      log('Rental deleted: $rentalId', name: logName);
+    } catch (e) {
+      log('Error deleting rental: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> updateRental(String shopId, RentalModel rentalData) async {
+    try {
+      log('Updating rental: ${rentalData.id}', name: logName);
+
+      final docRef = _shopRef(shopId).collection('rentals').doc(rentalData.id);
+
+      await docRef.update(rentalData.toMap());
+
+      log('Rental updated: ${rentalData.id}', name: logName);
+    } catch (e) {
+      log('Error updating rental: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> finalizeReturn(
+    String shopId,
+    String rentalId,
+    String itemId,
+  ) async {
+    try {
+      log('Finalizing return for rental: $rentalId', name: logName);
+
+      final rentalRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+      final inventoryRef = _shopRef(shopId).collection('inventory').doc(itemId);
+
+      // Update rental status to 'completed'
+      await rentalRef.update({
+        'status': RentalStatus.completed.name,
+        'returnedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Update inventory item status to 'available'
+      await inventoryRef.update({'status': InventoryStatus.available.name});
+
+      log('Return finalized for rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error finalizing return: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> addDamageCharge({
+    required String shopId,
+    required String rentalId,
+    required double amount,
+  }) async {
+    try {
+      log(
+        'Adding damage charge of $amount to rental: $rentalId',
+        name: logName,
+      );
+      final rentalRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+      await rentalRef.update({'amountExpected': FieldValue.increment(amount)});
+      log('Damage charge added to rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error adding damage charge: $e', name: logName);
+      rethrow;
+    }
+  }
 }

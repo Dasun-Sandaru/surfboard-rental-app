@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../utils/constants/a_enums.dart';
 import 'security_deposit_model.dart';
 
+/// -----------------------------
+/// Rental Model (Cleaned & Consistent)
+/// -----------------------------
 class RentalModel {
   final String? id;
 
@@ -23,9 +26,9 @@ class RentalModel {
   final PaymentStatus paymentStatus;
 
   // Pricing snapshot
-  final double rate;
-  final double amountExpected;
-  final double amountPaid;
+  final double rate; // hourly or daily rate
+  final double amountExpected; // final rent amount
+  final double amountPaid; // calculated from payments
 
   // Security deposit
   final SecurityDepositModel securityDeposit;
@@ -33,9 +36,10 @@ class RentalModel {
   // Agreement
   final String? agreementLink;
 
+  // Meta
   final DateTime createdAt;
 
-  RentalModel({
+  const RentalModel({
     this.id,
     required this.shopId,
     required this.customerId,
@@ -55,18 +59,18 @@ class RentalModel {
     required this.createdAt,
   });
 
-  // -----------------------------
-  // From Firestore
-  // -----------------------------
+  /// -----------------------------
+  /// From Firestore
+  /// -----------------------------
   factory RentalModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
 
     return RentalModel(
       id: doc.id,
-      shopId: data['shopId'],
-      customerId: data['customerId'],
-      itemId: data['itemId'],
-      staffId: data['staffId'],
+      shopId: data['shopId'] as String,
+      customerId: data['customerId'] as String,
+      itemId: data['itemId'] as String,
+      staffId: data['staffId'] as String,
 
       startTime: (data['startTime'] as Timestamp).toDate(),
       expectedReturnTime: (data['expectedReturnTime'] as Timestamp).toDate(),
@@ -103,9 +107,9 @@ class RentalModel {
     );
   }
 
-  // -----------------------------
-  // To Firestore
-  // -----------------------------
+  /// -----------------------------
+  /// To Firestore
+  /// -----------------------------
   Map<String, dynamic> toMap() {
     return {
       'shopId': shopId,
@@ -119,9 +123,9 @@ class RentalModel {
           ? Timestamp.fromDate(actualReturnTime!)
           : null,
 
-      'status': status.value,
-      'rentType': rentType.value,
-      'paymentStatus': paymentStatus.value,
+      'status': status.name,
+      'rentType': rentType.name,
+      'paymentStatus': paymentStatus.name,
 
       'rate': rate,
       'amountExpected': amountExpected,
