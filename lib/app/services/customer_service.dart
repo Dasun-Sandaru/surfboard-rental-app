@@ -103,4 +103,53 @@ class CustomerService {
       rethrow;
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // GET CUSTOMER COUNT
+  // ---------------------------------------------------------------------------
+  Future<int> getCustomerCount(String shopId) async {
+    try {
+      log('Counting customers for shop: $shopId', name: logName);
+      final aggregateQuery = await _shopRef(
+        shopId,
+      ).collection('customers').count().get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      log('Error counting customers: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<QuerySnapshot> getCustomersPage({
+    required String shopId,
+    required int limit,
+    DocumentSnapshot? startAfter,
+    String? searchTerm,
+  }) async {
+    try {
+      log('Fetching customers page for shop: $shopId', name: logName);
+      Query query = _shopRef(shopId).collection('customers');
+
+      if (searchTerm != null && searchTerm.isNotEmpty) {
+        query = query
+            .where(
+              'name_lowercase',
+              isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
+            )
+            .where('name_lowercase', isLessThan: '${searchTerm.toLowerCase()}z')
+            .limit(20);
+      } else {
+        query = query.orderBy('created_at', descending: true).limit(limit);
+
+        if (startAfter != null) {
+          query = query.startAfterDocument(startAfter);
+        }
+      }
+
+      return await query.get();
+    } catch (e) {
+      log('Error fetching customers page: $e', name: logName);
+      rethrow;
+    }
+  }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:surfboard_rental_app/app/models/payment_model.dart';
@@ -10,9 +9,12 @@ import 'package:surfboard_rental_app/app/services/user_service.dart';
 
 import '../../../models/rental_model.dart';
 
+import 'package:surfboard_rental_app/app/services/payment_service.dart';
+
 class BoardInspectionController extends GetxController {
   final RentalService _rentalService = Get.find();
   final UserService _userService = Get.find();
+  final PaymentService _paymentService = PaymentService();
 
   // Controller Status
   final status = RxStatus.loading().obs;
@@ -22,6 +24,7 @@ class BoardInspectionController extends GetxController {
   final rental = Rx<RentalModel?>(null);
   Stream<RentalModel> rentalStream = Stream.empty();
   StreamSubscription? _rentalStreamSub;
+  StreamSubscription? _paymentStreamSub;
   final RxList<PaymentModel> paymentHistory = <PaymentModel>[].obs;
 
   // For the real-time countdown timer
@@ -30,13 +33,9 @@ class BoardInspectionController extends GetxController {
   final RxString timeRemaining = "00:00:00".obs;
   final Rx<Color> timeColor = Colors.white.obs;
 
-  // Firestore reference
-  late FirebaseFirestore _firestore;
-
   @override
   void onInit() {
     super.onInit();
-    _firestore = FirebaseFirestore.instance;
     rentalId = Get.arguments;
   }
 
@@ -81,25 +80,22 @@ class BoardInspectionController extends GetxController {
   void onClose() {
     _timer?.cancel();
     _rentalStreamSub?.cancel();
+    _paymentStreamSub?.cancel();
     super.onClose();
   }
 
   // --- Listener Methods ---
   void _setupPaymentListener() {
-    if (rental.value == null) return;
-    _firestore
-        .collection('shops')
-        .doc(rental.value!.shopId)
-        .collection('rentals')
-        .doc(rental.value!.id)
-        .collection('payments')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
+    final r = rental.value;
+    if (r == null || r.id == null) return;
+
+    // Cancel previous subscription if any
+    _paymentStreamSub?.cancel();
+
+    _paymentStreamSub = _paymentService
+        .paymentStream(r.shopId, r.id!)
         .listen(
-          (snapshot) {
-            final payments = snapshot.docs
-                .map((doc) => PaymentModel.fromSnapshot(doc))
-                .toList();
+          (payments) {
             paymentHistory.assignAll(payments);
           },
           onError: (e) {

@@ -24,7 +24,7 @@ class DamageReportModel {
   final DateTime reportedAt;
   final DateTime? resolvedAt;
 
-  DamageReportModel({
+  const DamageReportModel({
     this.id,
     required this.rentalId,
     required this.itemId,

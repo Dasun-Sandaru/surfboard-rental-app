@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+
 class DamageFeeModel {
   final String? id;
   final String itemId;
@@ -6,7 +9,7 @@ class DamageFeeModel {
   final bool activeStatus;
   final String damageType;
 
-  DamageFeeModel({
+  const DamageFeeModel({
     this.id,
     required this.itemId,
     required this.feeAmount,
@@ -32,27 +35,41 @@ class DamageFeeModel {
     );
   }
 
-  /// Create a DamageFeeModel from Firestore JSON
+  /// Create a DamageFeeModel from Firestore Snapshot
+  factory DamageFeeModel.fromSnapshot(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return DamageFeeModel(
+      id: doc.id,
+      itemId: (data[FirestoreFields.itemId] ?? 'ALL') as String,
+      feeAmount: ((data[FirestoreFields.feeAmount] ?? 0.0) as num).toDouble(),
+      description: (data[FirestoreFields.description] ?? '') as String,
+      activeStatus: (data[FirestoreFields.activeStatus] ?? true) as bool,
+      damageType: (data[FirestoreFields.damageType] ?? '') as String,
+    );
+  }
+
+  /// Create a DamageFeeModel from Firestore JSON (Legacy/Helper)
   factory DamageFeeModel.fromJson(Map<String, dynamic> json) {
     return DamageFeeModel(
-      id: json['id'] as String?,
-      itemId: (json['item_id'] ?? 'ALL') as String,
-      feeAmount: ((json['fee_amount'] ?? 0.0) as num).toDouble(),
-      description: (json['description'] ?? '') as String,
-      activeStatus: (json['active_status'] ?? true) as bool,
-      damageType: (json['damage_type'] ?? '') as String,
+      id: json[FirestoreFields.id] as String?,
+      itemId: (json[FirestoreFields.itemId] ?? 'ALL') as String,
+      feeAmount: ((json[FirestoreFields.feeAmount] ?? 0.0) as num).toDouble(),
+      description: (json[FirestoreFields.description] ?? '') as String,
+      activeStatus: (json[FirestoreFields.activeStatus] ?? true) as bool,
+      damageType: (json[FirestoreFields.damageType] ?? '') as String,
     );
   }
 
   /// Convert DamageFeeModel to Firestore Map
   Map<String, dynamic> toMap() {
     return {
-      if (id != null) 'id': id,
-      'item_id': itemId,
-      'fee_amount': feeAmount,
-      'description': description,
-      'active_status': activeStatus,
-      'damage_type': damageType,
+      FirestoreFields.itemId: itemId,
+      FirestoreFields.feeAmount: feeAmount,
+      FirestoreFields.description: description,
+      FirestoreFields.activeStatus: activeStatus,
+      FirestoreFields.damageType: damageType,
     };
   }
 

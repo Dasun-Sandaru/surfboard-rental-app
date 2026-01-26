@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import '../../utils/constants/a_enums.dart';
 
 class PaymentModel {
@@ -14,7 +15,7 @@ class PaymentModel {
   final DateTime timestamp;
   final String? note;
 
-  PaymentModel({
+  const PaymentModel({
     this.id,
     required this.rentalId,
     required this.amount,
@@ -26,29 +27,30 @@ class PaymentModel {
   });
 
   factory PaymentModel.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> doc) {
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return PaymentModel(
       id: doc.id,
-      rentalId: data['rentalId'],
-      amount: (data['amount'] as num).toDouble(),
-      category: PaymentCategory.values.byName(data['category']),
-      method: PaymentMethod.values.byName(data['method']),
-      handledBy: data['handledBy'],
-      timestamp: (data['timestamp'] as Timestamp).toDate(),
-      note: data['note'],
+      rentalId: data[FirestoreFields.rentalId],
+      amount: (data[FirestoreFields.amount] as num).toDouble(),
+      category: PaymentCategory.values.byName(data[FirestoreFields.category]),
+      method: PaymentMethod.values.byName(data[FirestoreFields.method]),
+      handledBy: data[FirestoreFields.handledBy],
+      timestamp: (data[FirestoreFields.timestamp] as Timestamp).toDate(),
+      note: data[FirestoreFields.note],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'rentalId': rentalId,
-      'amount': amount,
-      'category': category.name,
-      'method': method.name,
-      'handledBy': handledBy,
-      'timestamp': Timestamp.fromDate(timestamp),
-      'note': note,
+      FirestoreFields.rentalId: rentalId,
+      FirestoreFields.amount: amount,
+      FirestoreFields.category: category.name,
+      FirestoreFields.method: method.name,
+      FirestoreFields.handledBy: handledBy,
+      FirestoreFields.timestamp: Timestamp.fromDate(timestamp),
+      FirestoreFields.note: note,
     };
   }
 }

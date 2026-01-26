@@ -223,4 +223,22 @@ class InventoryService {
       rethrow;
     }
   }
+
+  Future<int> getInventoryCountByStatus(String shopId, String status) async {
+    try {
+      log(
+        'Counting inventory with status $status for shop: $shopId',
+        name: logName,
+      );
+      final aggregateQuery = await _shopRef(shopId)
+          .collection('inventory')
+          .where('status', isEqualTo: status)
+          .count()
+          .get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      log('Error counting inventory: $e', name: logName);
+      rethrow;
+    }
+  }
 }

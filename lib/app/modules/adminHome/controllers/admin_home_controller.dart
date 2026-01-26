@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
+import 'package:surfboard_rental_app/app/services/rental_service.dart';
+import 'package:surfboard_rental_app/app/services/inventory_service.dart';
+import 'package:surfboard_rental_app/app/services/customer_service.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 
@@ -21,104 +22,75 @@ class AdminHomeController extends GetxController {
   }
 
   // Dashboard Stats
-
   final activeRentals = 0.obs;
   final boardsAvailable = 0.obs;
-  final damagesPending = 0.obs;
+  final damagesPending =
+      0.obs; // This was tracking 'overdue' rentals in previous code
   final totalCustomers = 0.obs;
+  final isLoadingStats = false.obs;
 
-  // Firestore
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  String? shopId;
-
-  // Stream Subscriptions (to cancel later)
-  StreamSubscription? _rentalsSub;
-  StreamSubscription? _inventorySub;
-  StreamSubscription? _customersSub;
-  StreamSubscription? _damagesSub;
-
+  // Services
   final AuthService _authService = Get.find<AuthService>();
   final UserService _userService = Get.find<UserService>();
+  final RentalService _rentalService = RentalService();
+  final InventoryService _inventoryService = InventoryService();
+  final CustomerService _customerService = CustomerService();
+
+  String? shopId;
 
   @override
   void onInit() {
     super.onInit();
-    _setShopId();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _setShopId();
+    loadDashboardStats();
   }
 
   Future<void> _setShopId() async {
     shopId = await _userService.getShopId();
     log('shopId: $shopId');
-
-    _listenActiveRentals();
-    _listenInventory();
-    _listenCustomers();
-    _listenDamages();
   }
 
-  /// REAL-TIME LISTENERS
-  /// Active Rentals
-  void _listenActiveRentals() {
-    _rentalsSub = _firestore
-        .collection('shops')
-        .doc(shopId)
-        .collection('rentals')
-        .where('status', isEqualTo: RentalStatus.active.name)
-        .snapshots()
-        .listen((snapshot) {
-          activeRentals.value = snapshot.docs.length;
-        });
-  }
+  /// Load Dashboard Stats (Future based)
+  Future<void> loadDashboardStats() async {
+    if (shopId == null) return;
 
-  /// Boards Available
-  void _listenInventory() {
-    _inventorySub = _firestore
-        .collection('shops')
-        .doc(shopId)
-        .collection('inventory')
-        .where('status', isEqualTo: InventoryStatus.available.name)
-        .snapshots()
-        .listen((snapshot) {
-          boardsAvailable.value = snapshot.docs.length;
-        });
-  }
+    // Optional: Only show loading if it's the first load or explicit refresh
+    // isLoadingStats.value = true;
 
-  /// Total Customers
-  void _listenCustomers() {
-    _customersSub = _firestore
-        .collection('shops')
-        .doc(shopId)
-        .collection('customers')
-        .snapshots()
-        .listen((snapshot) {
-          totalCustomers.value = snapshot.docs.length;
-        });
-  }
+    try {
+      log('Loading dashboard stats...', name: 'AdminHomeController');
 
-  /// Damages Pending
-  /// Count damage reports where severity exists
-  void _listenDamages() {
-    _damagesSub = _firestore
-        .collection('shops')
-        .doc(shopId)
-        .collection('rentals')
-        .where('status', isEqualTo: RentalStatus.overdue.name)
-        .snapshots()
-        .listen((snapshot) {
-          damagesPending.value = snapshot.docs.length;
-        });
+      final results = await Future.wait([
+        _rentalService.getRentalCountByStatus(
+          shopId!,
+          RentalStatus.active.name,
+        ),
+        _inventoryService.getInventoryCountByStatus(
+          shopId!,
+          InventoryStatus.available.name,
+        ),
+        _customerService.getCustomerCount(shopId!),
+        _rentalService.getRentalCountByStatus(
+          shopId!,
+          RentalStatus.overdue.name,
+        ),
+      ]);
+
+      activeRentals.value = results[0];
+      boardsAvailable.value = results[1];
+      totalCustomers.value = results[2];
+      damagesPending.value = results[3];
+    } catch (e) {
+      log('Error loading dashboard stats: $e', name: 'AdminHomeController');
+    } finally {
+      isLoadingStats.value = false;
+    }
   }
 
   /// Sign out
   Future<void> signOut() async => await _authService.signOut();
-
-  @override
-  void onClose() {
-    _rentalsSub?.cancel();
-    _inventorySub?.cancel();
-    _customersSub?.cancel();
-    _damagesSub?.cancel();
-    super.onClose();
-  }
 }

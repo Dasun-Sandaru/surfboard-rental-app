@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 class DamagePhotoModel {
   final String? id;
@@ -8,7 +9,7 @@ class DamagePhotoModel {
   final String uploadedBy;
   final DateTime uploadedAt;
 
-  DamagePhotoModel({
+  const DamagePhotoModel({
     this.id,
     required this.damageId,
     required this.photoUrl,
@@ -17,24 +18,25 @@ class DamagePhotoModel {
   });
 
   factory DamagePhotoModel.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> doc) {
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
 
     return DamagePhotoModel(
       id: doc.id,
-      damageId: data['damageId'],
-      photoUrl: data['photoUrl'],
-      uploadedBy: data['uploadedBy'],
-      uploadedAt: (data['uploadedAt'] as Timestamp).toDate(),
+      damageId: data[FirestoreFields.damageId],
+      photoUrl: data[FirestoreFields.photoUrl],
+      uploadedBy: data[FirestoreFields.uploadedBy],
+      uploadedAt: (data[FirestoreFields.uploadedAt] as Timestamp).toDate(),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'damageId': damageId,
-      'photoUrl': photoUrl,
-      'uploadedBy': uploadedBy,
-      'uploadedAt': Timestamp.fromDate(uploadedAt),
+      FirestoreFields.damageId: damageId,
+      FirestoreFields.photoUrl: photoUrl,
+      FirestoreFields.uploadedBy: uploadedBy,
+      FirestoreFields.uploadedAt: Timestamp.fromDate(uploadedAt),
     };
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -330,7 +331,9 @@ class AgreementController extends GetxController {
     }
 
     final shopDoc = await _shopService.getShop(shopId);
-    final shopData = ShopModel.fromFirestore(shopDoc);
+    final shopData = ShopModel.fromSnapshot(
+      shopDoc as DocumentSnapshot<Map<String, dynamic>>,
+    );
 
     final rentalPrice = double.tryParse(rentalPriceController.text) ?? 0.0;
     final deposit = requireDeposit.value

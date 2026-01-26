@@ -172,4 +172,56 @@ class RentalService {
       rethrow;
     }
   }
+
+  Future<QuerySnapshot> getRentalsPage({
+    required String shopId,
+    required int limit,
+    DocumentSnapshot? startAfter,
+    String? searchTerm,
+  }) async {
+    try {
+      log('Fetching rentals page for shop: $shopId', name: logName);
+      Query query = _shopRef(shopId).collection('rentals');
+
+      if (searchTerm != null && searchTerm.isNotEmpty) {
+        query = query
+            .where(
+              'itemName_lowercase',
+              isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
+            )
+            .where(
+              'itemName_lowercase',
+              isLessThan: '${searchTerm.toLowerCase()}z',
+            )
+            .limit(limit);
+      } else {
+        query = query.orderBy('createdAt', descending: true).limit(limit);
+
+        if (startAfter != null) {
+          query = query.startAfterDocument(startAfter);
+        }
+      }
+
+      return await query.get();
+    } catch (e) {
+      log('Error fetching rentals page: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<int> getRentalCountByStatus(String shopId, String status) async {
+    try {
+      log(
+        'Counting rentals with status $status for shop: $shopId',
+        name: logName,
+      );
+      final aggregateQuery = await _shopRef(
+        shopId,
+      ).collection('rentals').where('status', isEqualTo: status).count().get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      log('Error counting rentals: $e', name: logName);
+      rethrow;
+    }
+  }
 }

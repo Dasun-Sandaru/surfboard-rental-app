@@ -8,14 +8,17 @@ import '../../../models/rental_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/user_service.dart';
 
+import 'package:surfboard_rental_app/app/services/rental_service.dart';
+
 class RentalsController extends GetxController {
   final PagingController<DocumentSnapshot?, RentalModel> pagingController =
       PagingController(firstPageKey: null);
 
   final TextEditingController searchTextController = TextEditingController();
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final RentalService _rentalService = RentalService();
   final UserService _userService = Get.find();
+
   String? shopId;
   static const int _limit = 15;
   Timer? _debounce;
@@ -55,33 +58,19 @@ class RentalsController extends GetxController {
       return;
     }
     try {
-      Query query =
-          _db.collection('shops').doc(shopId!).collection('rentals');
-
-      if (_currentSearchTerm.isNotEmpty) {
-        query = query
-            .where(
-              'itemName_lowercase',
-              isGreaterThanOrEqualTo: _currentSearchTerm.toLowerCase(),
-            )
-            .where(
-              'itemName_lowercase',
-              isLessThan: '${_currentSearchTerm.toLowerCase()}z',
-            )
-            .limit(20);
-      } else {
-        query = query.orderBy('createdAt', descending: true).limit(_limit);
-
-        if (pageKey != null) {
-          query = query.startAfterDocument(pageKey);
-        }
-      }
-
-      final snapshot = await query.get();
+      final snapshot = await _rentalService.getRentalsPage(
+        shopId: shopId!,
+        limit: _limit,
+        startAfter: pageKey,
+        searchTerm: _currentSearchTerm,
+      );
 
       final newItems = snapshot.docs
-          .map((doc) =>
-              RentalModel.fromSnapshot(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .map(
+            (doc) => RentalModel.fromSnapshot(
+              doc as DocumentSnapshot<Map<String, dynamic>>,
+            ),
+          )
           .toList();
 
       final isLastPage =

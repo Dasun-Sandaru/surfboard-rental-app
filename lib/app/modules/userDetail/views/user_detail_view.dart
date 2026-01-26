@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -330,7 +331,9 @@ class UserDetailView extends GetView<UserDetailController> {
             _buildInfoRow(
               Iconsax.calendar,
               "Joined",
-              controller.user.value!.createdAt.toString(),
+              controller.user.value!.createdAt != null
+                  ? DateFormat.yMMMd().format(controller.user.value!.createdAt!)
+                  : 'N/A',
             ),
           ],
         ),

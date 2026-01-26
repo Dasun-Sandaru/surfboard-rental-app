@@ -65,7 +65,7 @@ class AddEditCustomerController extends GetxController {
       notes: notesController.text.trim(),
       createdAt: isEditMode.value
           ? currentCustomer.value!.createdAt
-          : DateTime.now().toIso8601String(),
+          : DateTime.now(),
       imageUrl: isEditMode.value ? currentCustomer.value!.imageUrl : null,
     );
 

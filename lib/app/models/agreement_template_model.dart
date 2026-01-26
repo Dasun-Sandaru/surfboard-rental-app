@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+
 class AgreementTemplateModel {
   final String? id;
   final String shopId;
@@ -8,7 +11,7 @@ class AgreementTemplateModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  AgreementTemplateModel({
+  const AgreementTemplateModel({
     this.id,
     required this.shopId,
     required this.templateName,
@@ -20,32 +23,53 @@ class AgreementTemplateModel {
   });
 
   /// Create agreement template from Firestore document
+  factory AgreementTemplateModel.fromSnapshot(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data()!;
+    return AgreementTemplateModel(
+      id: doc.id,
+      shopId: data[FirestoreFields.shopId] ?? '',
+      templateName: data[FirestoreFields.templateName] ?? 'Default Template',
+      description: data[FirestoreFields.description],
+      sections: Map<String, String>.from(data[FirestoreFields.section] ?? {}),
+      isDefault: data[FirestoreFields.isDefault] ?? false,
+      createdAt: (data[FirestoreFields.createdAt] as Timestamp).toDate(),
+      updatedAt: (data[FirestoreFields.updatedAt] as Timestamp).toDate(),
+    );
+  }
+
+  /// Create agreement template from Firestore document (legacy/helper)
   factory AgreementTemplateModel.fromMap(
     Map<String, dynamic> data,
     String docId,
   ) {
     return AgreementTemplateModel(
       id: docId,
-      shopId: data['shop_id'] ?? '',
-      templateName: data['template_name'] ?? 'Default Template',
-      description: data['description'],
-      sections: Map<String, String>.from(data['sections'] ?? {}),
-      isDefault: data['is_default'] ?? false,
-      createdAt: (data['created_at'] as dynamic)?.toDate() ?? DateTime.now(),
-      updatedAt: (data['updated_at'] as dynamic)?.toDate() ?? DateTime.now(),
+      shopId: data[FirestoreFields.shopId] ?? '',
+      templateName: data[FirestoreFields.templateName] ?? 'Default Template',
+      description: data[FirestoreFields.description],
+      sections: Map<String, String>.from(data[FirestoreFields.section] ?? {}),
+      isDefault: data[FirestoreFields.isDefault] ?? false,
+      createdAt: data[FirestoreFields.createdAt] is Timestamp
+          ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
+          : DateTime.now(),
+      updatedAt: data[FirestoreFields.updatedAt] is Timestamp
+          ? (data[FirestoreFields.updatedAt] as Timestamp).toDate()
+          : DateTime.now(),
     );
   }
 
   /// Convert to Firestore document format
   Map<String, dynamic> toMap() {
     return {
-      'shop_id': shopId,
-      'template_name': templateName,
-      'description': description,
-      'sections': sections,
-      'is_default': isDefault,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
+      FirestoreFields.shopId: shopId,
+      FirestoreFields.templateName: templateName,
+      FirestoreFields.description: description,
+      FirestoreFields.section: sections,
+      FirestoreFields.isDefault: isDefault,
+      FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
+      FirestoreFields.updatedAt: Timestamp.fromDate(updatedAt),
     };
   }
 

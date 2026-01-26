@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -7,7 +6,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
-import '../../../models/inventory_model.dart';
 import '../controllers/item_details_controller.dart';
 
 class ItemDetailsView extends GetView<ItemDetailsController> {
@@ -63,9 +61,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             }
 
             if (ctrl.item.value == null) {
-              return const Center(
-                child: Text('Item not found'),
-              );
+              return const Center(child: Text('Item not found'));
             }
 
             final item = ctrl.item.value!;
@@ -106,31 +102,24 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                 _buildDetailRow("Type", item.type),
                 _buildDetailRow("Volume", '${item.volume}L'),
                 _buildDetailRow(
-                    "Size",
-                    "${item.sizeFeet}' ${item.sizeInches}\"",
-                  ),
+                  "Size",
+                  "${item.sizeFeet}' ${item.sizeInches}\"",
+                ),
 
-                  _buildDetailRow("Status", item.status.name.toUpperCase()),
-                  _buildDetailRow("Purchase Cost", '\$${item.purchaseCost}'),
-                  _buildDetailRow(
-                    "Rental Rate (hr)",
-                    '\$${item.rentalRateHour}',
-                  ),
-                  _buildDetailRow(
-                    "Rental Rate (day)",
-                    '\$${item.rentalRateDay}',
-                  ),
-                  _buildDetailRow("Damage Fee Rule", item.damageFeeRule),
-                  _buildDetailRow("Note", item.note),
-                  _buildDetailRow(
-                    "Created At",
-                    DateFormat.yMMMd().format(item.createdAt.toDate()),
-                    isLast: true,
-                  ),
-                ],
-              );
-            },
-          );
+                _buildDetailRow("Status", item.status.name.toUpperCase()),
+                _buildDetailRow("Purchase Cost", '\$${item.purchaseCost}'),
+                _buildDetailRow("Rental Rate (hr)", '\$${item.rentalRateHour}'),
+                _buildDetailRow("Rental Rate (day)", '\$${item.rentalRateDay}'),
+                _buildDetailRow("Damage Fee Rule", item.damageFeeRule),
+                _buildDetailRow("Note", item.note),
+                _buildDetailRow(
+                  "Created At",
+                  DateFormat.yMMMd().format(item.createdAt),
+                  isLast: true,
+                ),
+              ],
+            );
+          });
         },
       ),
       bottomNavigationBar: _buildBottomNav(controller),
