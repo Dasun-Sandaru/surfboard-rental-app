@@ -1,23 +1,34 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../models/payment_model.dart';
+import '../models/rental_model.dart'; // Import RentalModel for status checks
 
 class PaymentService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'PaymentService';
 
-  CollectionReference _paymentRef(String shopId, String rentalId) {
+  // Helper to get Rental Doc Ref
+  DocumentReference _rentalRef(String shopId, String rentalId) {
     return _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
-        .doc(rentalId)
-        .collection('payments');
+        .collection(FirestoreCollections.rentals)
+        .doc(rentalId);
   }
 
-  // ---------------- ADD PAYMENT ----------------
+  // Helper to get Payment Colection Ref
+  CollectionReference _paymentCollectionRef(String shopId, String rentalId) {
+    return _rentalRef(
+      shopId,
+      rentalId,
+    ).collection(FirestoreCollections.payments);
+  }
+
+  // ---------------- ADD PAYMENT (TRANSACTION) ----------------
   Future<void> addPayment({
     required String shopId,
     required String rentalId,
@@ -25,21 +36,63 @@ class PaymentService {
     required double amount,
     String? handledBy,
     PaymentMethod method = PaymentMethod.cash,
+    String? note,
   }) async {
     try {
-      final docRef = _paymentRef(shopId, rentalId).doc();
+      final rentalDocRef = _rentalRef(shopId, rentalId);
+      final paymentDocRef = _paymentCollectionRef(shopId, rentalId).doc();
 
       final payment = PaymentModel(
-        id: docRef.id,
+        id: paymentDocRef.id,
         rentalId: rentalId,
         amount: amount,
         category: category,
         method: method,
-        handledBy: handledBy!,
+        handledBy: handledBy ?? 'System',
         timestamp: DateTime.now(),
+        note: note,
       );
 
-      await docRef.set(payment.toMap());
+      await _db.runTransaction((transaction) async {
+        // 1. Read Rental Document
+        final rentalSnap = await transaction.get(rentalDocRef);
+        if (!rentalSnap.exists) {
+          throw Exception("Rental not found!");
+        }
+
+        // 2. Calculate New Totals
+        final currentAmountPaid =
+            (rentalSnap.data()
+                    as Map<String, dynamic>)[FirestoreFields.amountPaid]
+                as num? ??
+            0.0;
+        final amountExpected =
+            (rentalSnap.data()
+                    as Map<String, dynamic>)[FirestoreFields.amountExpected]
+                as num? ??
+            0.0;
+
+        final newAmountPaid = currentAmountPaid + amount;
+
+        // 3. Determine New Status
+        PaymentStatus newStatus;
+        if (newAmountPaid >= amountExpected) {
+          newStatus = PaymentStatus.paid; // Or overpaid
+        } else if (newAmountPaid > 0) {
+          newStatus = PaymentStatus.partial;
+        } else {
+          newStatus = PaymentStatus.unpaid;
+        }
+
+        // 4. Write Payment
+        transaction.set(paymentDocRef, payment.toMap());
+
+        // 5. Update Rental
+        transaction.update(rentalDocRef, {
+          FirestoreFields.amountPaid: newAmountPaid,
+          FirestoreFields.paymentStatus: newStatus.name,
+        });
+      });
 
       log("Payment added: ${category.name} | $amount", name: logName);
     } catch (e) {
@@ -50,9 +103,10 @@ class PaymentService {
 
   // ---------------- STREAM PAYMENTS ----------------
   Stream<List<PaymentModel>> paymentStream(String shopId, String rentalId) {
-    return _paymentRef(shopId, rentalId).orderBy('timestamp').snapshots().map((
-      snapshot,
-    ) {
+    return _paymentCollectionRef(
+      shopId,
+      rentalId,
+    ).orderBy(FirestoreFields.timestamp).snapshots().map((snapshot) {
       log("Payments fetched: ${snapshot.docs.length}", name: logName);
       return snapshot.docs
           .map(
@@ -67,10 +121,10 @@ class PaymentService {
   // ---------------- ONE-TIME FETCH ----------------
   Future<List<PaymentModel>> getPayments(String shopId, String rentalId) async {
     try {
-      final snapshot = await _paymentRef(
+      final snapshot = await _paymentCollectionRef(
         shopId,
         rentalId,
-      ).orderBy('timestamp').get();
+      ).orderBy(FirestoreFields.timestamp).get();
 
       return snapshot.docs
           .map(
@@ -85,14 +139,70 @@ class PaymentService {
     }
   }
 
-  // ---------------- DELETE PAYMENT (ADMIN) ----------------
+  // ---------------- DELETE PAYMENT (TRANSACTION) ----------------
   Future<void> deletePayment({
     required String shopId,
     required String rentalId,
     required String paymentId,
   }) async {
     try {
-      await _paymentRef(shopId, rentalId).doc(paymentId).delete();
+      final rentalDocRef = _rentalRef(shopId, rentalId);
+      final paymentDocRef = _paymentCollectionRef(
+        shopId,
+        rentalId,
+      ).doc(paymentId);
+
+      await _db.runTransaction((transaction) async {
+        // 1. Read Payment Doc (to know amount to subtract)
+        final paymentSnap = await transaction.get(paymentDocRef);
+        if (!paymentSnap.exists) {
+          throw Exception("Payment not found!");
+        }
+        final amountToReverse =
+            (paymentSnap.data() as Map<String, dynamic>)[FirestoreFields.amount]
+                as num;
+
+        // 2. Read Rental Doc
+        final rentalSnap = await transaction.get(rentalDocRef);
+        if (!rentalSnap.exists) {
+          // If rental doesn't exist, just delete the payment? Rigid consistency says throw error.
+          throw Exception("Rental not found!");
+        }
+
+        // 3. Calculate New Totals
+        final currentAmountPaid =
+            (rentalSnap.data()
+                    as Map<String, dynamic>)[FirestoreFields.amountPaid]
+                as num? ??
+            0.0;
+        final amountExpected =
+            (rentalSnap.data()
+                    as Map<String, dynamic>)[FirestoreFields.amountExpected]
+                as num? ??
+            0.0;
+
+        final newAmountPaid = currentAmountPaid - amountToReverse;
+
+        // 4. Determine New Status
+        PaymentStatus newStatus;
+        if (newAmountPaid >= amountExpected) {
+          newStatus = PaymentStatus.paid;
+        } else if (newAmountPaid > 0) {
+          newStatus = PaymentStatus.partial;
+        } else {
+          newStatus = PaymentStatus.unpaid;
+        }
+
+        // 5. Delete Payment
+        transaction.delete(paymentDocRef);
+
+        // 6. Update Rental
+        transaction.update(rentalDocRef, {
+          FirestoreFields.amountPaid: newAmountPaid,
+          FirestoreFields.paymentStatus: newStatus.name,
+        });
+      });
+
       log("Payment deleted: $paymentId", name: logName);
     } catch (e) {
       log("Delete payment failed: $e", name: logName);

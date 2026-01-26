@@ -8,4 +8,5 @@ class FirestoreCollections {
   static const inventory = 'inventory';
   static const rentals = 'rentals';
   static const agreements = 'agreements';
+  static const payments = 'payments';
 }

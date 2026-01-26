@@ -22,6 +22,8 @@ class FirestoreFields {
   static const nic = 'nic';
   static const notes = 'notes';
   static const imageUrl = 'image_url';
+  static const rentalsCount = 'rentals_count';
+  static const lastRentalDate = 'last_rental_date';
 
   // Inventory
   static const type = 'type';

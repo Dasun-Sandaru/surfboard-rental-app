@@ -55,39 +55,75 @@ class RentalService {
     try {
       log('Creating new rental for shop: $shopId', name: logName);
 
-      // 1. Create the rental document to get an ID
-      final docRef = _shopRef(
+      // 1. Prepare Document References
+      final rentalRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.rentals).doc();
-      final rentalId = docRef.id;
+      final rentalId = rentalRef.id;
 
-      // 2. Upload the agreement PDF
+      final inventoryRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(rentalData.itemId);
+
+      final customerRef = _shopRef(shopId)
+          .collection(FirestoreCollections.customers)
+          .doc(
+            rentalData.customerId,
+          ); // Assumes rentalData has customerId property
+
+      // 2. Upload the agreement PDF (Outside Transaction)
+      // Uploading files is slow and should not be done inside a transaction
       final agreementLink = await _uploadAgreementPdf(
         shopId,
         rentalId,
         pdfData,
       );
 
-      // 3. Set the full rental data including the agreement link
-      await docRef.set({
-        ...rentalData.toMap(),
-        FirestoreFields.id: rentalId,
-        FirestoreFields.agreementLink: agreementLink,
-        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+      // 3. Run Transaction
+      await _db.runTransaction((transaction) async {
+        final inventorySnap = await transaction.get(inventoryRef);
+        final customerSnap = await transaction.get(customerRef);
+
+        if (!inventorySnap.exists) {
+          throw Exception("Inventory item does not exist!");
+        }
+        if (!customerSnap.exists) {
+          throw Exception("Customer does not exist!");
+        }
+
+        final currentStatus = inventorySnap.get(FirestoreFields.status);
+        if (currentStatus != InventoryStatus.available.name) {
+          throw Exception(
+            "Item is not available for rent! (Status: $currentStatus)",
+          );
+        }
+
+        // Write Rental Data
+        transaction.set(rentalRef, {
+          ...rentalData.toMap(),
+          FirestoreFields.id: rentalId,
+          FirestoreFields.agreementLink: agreementLink,
+          FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+        });
+
+        // Update Inventory Status
+        transaction.update(inventoryRef, {
+          FirestoreFields.status: InventoryStatus.rented.name,
+        });
+
+        // Update Customer Stats
+        transaction.update(customerRef, {
+          FirestoreFields.rentalsCount: FieldValue.increment(1),
+          FirestoreFields.lastRentalDate: FieldValue.serverTimestamp(),
+        });
       });
 
-      // 4. Update the inventory item status
-      await _db
-          .collection(FirestoreCollections.shops)
-          .doc(shopId)
-          .collection(FirestoreCollections.inventory)
-          .doc(rentalData.itemId)
-          .update({FirestoreFields.status: InventoryStatus.rented.name});
-
-      log('Rental created: $rentalId', name: logName);
+      log('Rental created successfully: $rentalId', name: logName);
       return rentalId;
     } catch (e) {
       log('Error creating rental: $e', name: logName);
+      // NOTE: If the transaction fails, the PDF is still uploaded.
+      // In a production app, you might want to delete the orphaned file here.
       rethrow;
     }
   }
@@ -152,18 +188,26 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.inventory).doc(itemId);
 
+      // Use Batch Write for atomicity
+      final batch = _db.batch();
+
       // Update rental status to 'completed'
-      await rentalRef.update({
+      batch.update(rentalRef, {
         FirestoreFields.status: RentalStatus.completed.name,
         FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
       });
 
       // Update inventory item status to 'available'
-      await inventoryRef.update({
+      batch.update(inventoryRef, {
         FirestoreFields.status: InventoryStatus.available.name,
       });
 
-      log('Return finalized for rental: $rentalId', name: logName);
+      await batch.commit();
+
+      log(
+        'Return finalized for rental: $rentalId (Batch Committed)',
+        name: logName,
+      );
     } catch (e) {
       log('Error finalizing return: $e', name: logName);
       rethrow;
