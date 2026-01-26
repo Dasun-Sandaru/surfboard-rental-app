@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../models/customer_model.dart';
 
@@ -9,7 +11,7 @@ class CustomerService {
   static const String logName = 'CustomerService';
 
   DocumentReference _shopRef(String shopId) {
-    return _db.collection('shops').doc(shopId);
+    return _db.collection(FirestoreCollections.shops).doc(shopId);
   }
 
   // ---------------------------------------------------------------------------
@@ -20,12 +22,14 @@ class CustomerService {
       log('Creating new customer for shop: $shopId', name: logName);
 
       final data = customerData.toMap();
-      final docRef = _shopRef(shopId).collection('customers').doc();
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc();
 
       await docRef.set({
         ...data,
-        'id': docRef.id,
-        'created_at': FieldValue.serverTimestamp(),
+        FirestoreFields.id: docRef.id,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       log('Customer created: ${docRef.id}', name: logName);
@@ -42,7 +46,9 @@ class CustomerService {
   Stream<QuerySnapshot> getCustomersStream(String shopId) {
     try {
       log('Getting customers stream for shop: $shopId', name: logName);
-      return _shopRef(shopId).collection('customers').snapshots();
+      return _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).snapshots();
     } catch (e) {
       log('Error creating customers stream: $e', name: logName);
       rethrow;
@@ -60,7 +66,7 @@ class CustomerService {
       log('Fetching customer: $customerId', name: logName);
       return await _shopRef(
         shopId,
-      ).collection('customers').doc(customerId).get();
+      ).collection(FirestoreCollections.customers).doc(customerId).get();
     } catch (e) {
       log('Error fetching customer: $e', name: logName);
       rethrow;
@@ -78,9 +84,11 @@ class CustomerService {
     try {
       log('Updating customer: $customerId', name: logName);
 
-      await _shopRef(shopId).collection('customers').doc(customerId).update({
+      await _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc(customerId).update({
         ...data.toMap(),
-        'updated_at': FieldValue.serverTimestamp(),
+        FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       });
 
       log('Customer updated: $customerId', name: logName);
@@ -96,7 +104,9 @@ class CustomerService {
   Future<void> deleteCustomer(String shopId, String customerId) async {
     try {
       log('Deleting customer: $customerId', name: logName);
-      await _shopRef(shopId).collection('customers').doc(customerId).delete();
+      await _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc(customerId).delete();
       log('Customer deleted: $customerId', name: logName);
     } catch (e) {
       log('Error deleting customer: $e', name: logName);
@@ -112,7 +122,7 @@ class CustomerService {
       log('Counting customers for shop: $shopId', name: logName);
       final aggregateQuery = await _shopRef(
         shopId,
-      ).collection('customers').count().get();
+      ).collection(FirestoreCollections.customers).count().get();
       return aggregateQuery.count ?? 0;
     } catch (e) {
       log('Error counting customers: $e', name: logName);
@@ -128,18 +138,20 @@ class CustomerService {
   }) async {
     try {
       log('Fetching customers page for shop: $shopId', name: logName);
-      Query query = _shopRef(shopId).collection('customers');
+      Query query = _shopRef(shopId).collection(FirestoreCollections.customers);
 
       if (searchTerm != null && searchTerm.isNotEmpty) {
         query = query
             .where(
-              'name_lowercase',
+              'name_lowercase', // Needs optimization (TODO: add to FirestoreFields if used widely)
               isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
             )
             .where('name_lowercase', isLessThan: '${searchTerm.toLowerCase()}z')
             .limit(20);
       } else {
-        query = query.orderBy('created_at', descending: true).limit(limit);
+        query = query
+            .orderBy(FirestoreFields.createdAt, descending: true)
+            .limit(limit);
 
         if (startAfter != null) {
           query = query.startAfterDocument(startAfter);

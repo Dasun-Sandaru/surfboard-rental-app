@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 class DamageFeeService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -21,17 +23,17 @@ class DamageFeeService {
       );
 
       final snapshot = await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('inventory')
+          .collection(FirestoreCollections.inventory)
           .doc(itemId)
-          .collection('damage_fees')
-          .orderBy('created_at', descending: true)
+          .collection('damage_fees') // TODO: Constant for damage_fees?
+          .orderBy(FirestoreFields.createdAt, descending: true)
           .get();
 
       final damageRules = snapshot.docs.map((doc) {
         final data = doc.data();
-        data['id'] = doc.id;
+        data[FirestoreFields.id] = doc.id;
         return DamageFeeModel.fromJson(data);
       }).toList();
 
@@ -58,15 +60,15 @@ class DamageFeeService {
       );
 
       final docRef = await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('inventory')
+          .collection(FirestoreCollections.inventory)
           .doc(itemId)
           .collection('damage_fees')
           .add({
             ...damageRule.toMap(),
-            'created_at': FieldValue.serverTimestamp(),
-            'updated_at': FieldValue.serverTimestamp(),
+            FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+            FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
           });
 
       final addedRule = damageRule.copyWith(id: docRef.id);
@@ -94,15 +96,15 @@ class DamageFeeService {
       log('Updating damage rule: ${damageRule.id}', name: logName);
 
       await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('inventory')
+          .collection(FirestoreCollections.inventory)
           .doc(itemId)
           .collection('damage_fees')
           .doc(damageRule.id)
           .update({
             ...damageRule.toMap(),
-            'updated_at': FieldValue.serverTimestamp(),
+            FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
           });
 
       log('Updated damage rule: ${damageRule.id}', name: logName);
@@ -124,9 +126,9 @@ class DamageFeeService {
       log('Deleting damage rule: $ruleId', name: logName);
 
       await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('inventory')
+          .collection(FirestoreCollections.inventory)
           .doc(itemId)
           .collection('damage_fees')
           .doc(ruleId)
@@ -153,17 +155,17 @@ class DamageFeeService {
       );
 
       final query = _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('inventory')
+          .collection(FirestoreCollections.inventory)
           .doc(itemId)
           .collection('damage_fees')
-          .orderBy('created_at', descending: true);
+          .orderBy(FirestoreFields.createdAt, descending: true);
 
       return query.snapshots().map((snapshot) {
         final damageRules = snapshot.docs.map((doc) {
           final data = doc.data();
-          data['id'] = doc.id;
+          data[FirestoreFields.id] = doc.id;
           return DamageFeeModel.fromJson(data);
         }).toList();
         log('Streamed ${damageRules.length} damage rules', name: logName);

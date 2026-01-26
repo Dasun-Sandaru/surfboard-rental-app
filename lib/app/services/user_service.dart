@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../../utils/storage/app_storage.dart';
@@ -24,15 +26,12 @@ class UserService {
   Future<String?> getShopIdFromStorage() async {
     try {
       log('Getting shop ID from storage', name: logName);
-      return _storage.readData('shop_id') as String?;
+      return _storage.readData(FirestoreFields.shopId) as String?;
     } catch (e) {
       log('Error getting shop ID from storage: $e', name: logName);
       rethrow;
     }
   }
-
-
-  
 
   // ---------------------------------------------------------------------------
   // REGISTER ADMIN WITH SHOP
@@ -50,37 +49,37 @@ class UserService {
       log('Registering admin user with shop', name: logName);
       final batch = _db.batch();
 
-      final shopRef = _db.collection('shops').doc();
-      final userRef = _db.collection('users').doc(uid);
+      final shopRef = _db.collection(FirestoreCollections.shops).doc();
+      final userRef = _db.collection(FirestoreCollections.users).doc(uid);
       final memberRef = shopRef.collection('members').doc(uid);
 
       batch.set(userRef, {
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'is_active': true,
-        'verified': true,
-        'role': UserRole.admin.name,
-        'shop_id': shopRef.id,
-        'created_at': FieldValue.serverTimestamp(),
+        FirestoreFields.name: name,
+        FirestoreFields.email: email,
+        FirestoreFields.phone: phone,
+        FirestoreFields.isActive: true,
+        FirestoreFields.verified: true,
+        FirestoreFields.role: UserRole.admin.name,
+        FirestoreFields.shopId: shopRef.id,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       batch.set(shopRef, {
-        'name': shopName,
-        'location': shopLocation,
-        'contact_number': shopContactNumber,
-        'created_at': FieldValue.serverTimestamp(),
-        'owner_admin_uid': uid,
+        FirestoreFields.businessName: shopName,
+        FirestoreFields.location: shopLocation,
+        FirestoreFields.contactNumber: shopContactNumber,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+        FirestoreFields.ownerAdminUid: uid,
       });
 
       batch.set(memberRef, {
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'role': UserRole.admin.name,
-        'is_active': true,
-        'verified': true,
-        'created_at': FieldValue.serverTimestamp(),
+        FirestoreFields.name: name,
+        FirestoreFields.email: email,
+        FirestoreFields.phone: phone,
+        FirestoreFields.role: UserRole.admin.name,
+        FirestoreFields.isActive: true,
+        FirestoreFields.verified: true,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       await batch.commit();
@@ -105,32 +104,32 @@ class UserService {
       log('Registering staff user for shop: $shopId', name: logName);
       final batch = _db.batch();
 
-      final userRef = _db.collection('users').doc(uid);
+      final userRef = _db.collection(FirestoreCollections.users).doc(uid);
       final memberRef = _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
           .collection('members')
           .doc(uid);
 
       batch.set(userRef, {
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'role': UserRole.staff.name,
-        'shop_id': shopId,
-        'is_active': true,
-        'verified': false,
-        'created_at': FieldValue.serverTimestamp(),
+        FirestoreFields.name: name,
+        FirestoreFields.email: email,
+        FirestoreFields.phone: phone,
+        FirestoreFields.role: UserRole.staff.name,
+        FirestoreFields.shopId: shopId,
+        FirestoreFields.isActive: true,
+        FirestoreFields.verified: false,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       batch.set(memberRef, {
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'role': UserRole.staff.name,
-        'is_active': true,
-        'verified': false,
-        'created_at': FieldValue.serverTimestamp(),
+        FirestoreFields.name: name,
+        FirestoreFields.email: email,
+        FirestoreFields.phone: phone,
+        FirestoreFields.role: UserRole.staff.name,
+        FirestoreFields.isActive: true,
+        FirestoreFields.verified: false,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       await batch.commit();
@@ -147,7 +146,10 @@ class UserService {
   Future<UserModel?> getUser(String userId) async {
     try {
       log('Fetching user: $userId', name: logName);
-      final doc = await _db.collection('users').doc(userId).get();
+      final doc = await _db
+          .collection(FirestoreCollections.users)
+          .doc(userId)
+          .get();
       if (!doc.exists) return null;
 
       return UserModel.fromMap(doc.data()!, doc.id);
@@ -163,7 +165,10 @@ class UserService {
   Future<UserModel> getUserMembership(String userId) async {
     try {
       log('Fetching user membership: $userId', name: logName);
-      final doc = await _db.collection('users').doc(userId).get();
+      final doc = await _db
+          .collection(FirestoreCollections.users)
+          .doc(userId)
+          .get();
 
       if (!doc.exists) {
         throw Exception('User profile not found');
@@ -189,10 +194,10 @@ class UserService {
     try {
       log('Fetching shop ID for current user', name: logName);
       final doc = await _db
-          .collection('users')
+          .collection(FirestoreCollections.users)
           .doc(_auth.currentUser!.uid)
           .get();
-      return doc['shop_id'] as String;
+      return doc[FirestoreFields.shopId] as String;
     } catch (e) {
       log('Error fetching shop ID: $e', name: logName);
       rethrow;
@@ -205,10 +210,13 @@ class UserService {
   Future<bool> isUserActive(String userId) async {
     try {
       log('Checking if user is active: $userId', name: logName);
-      final doc = await _db.collection('users').doc(userId).get();
+      final doc = await _db
+          .collection(FirestoreCollections.users)
+          .doc(userId)
+          .get();
       if (!doc.exists) return false;
 
-      return doc['is_active'] == true;
+      return doc[FirestoreFields.isActive] == true;
     } catch (e) {
       log('Error checking user status: $e', name: logName);
       rethrow;
@@ -222,8 +230,8 @@ class UserService {
     try {
       log('Checking if user exists: $email', name: logName);
       final snap = await _db
-          .collection('users')
-          .where('email', isEqualTo: email)
+          .collection(FirestoreCollections.users)
+          .where(FirestoreFields.email, isEqualTo: email)
           .limit(1)
           .get();
 
@@ -245,10 +253,10 @@ class UserService {
     try {
       log('Updating user profile: $userId', name: logName);
       final data = <String, dynamic>{};
-      if (name != null) data['name'] = name;
-      if (phone != null) data['phone'] = phone;
+      if (name != null) data[FirestoreFields.name] = name;
+      if (phone != null) data[FirestoreFields.phone] = phone;
 
-      await _db.collection('users').doc(userId).update(data);
+      await _db.collection(FirestoreCollections.users).doc(userId).update(data);
       log('User profile updated: $userId', name: logName);
     } catch (e) {
       log('Error updating user profile: $e', name: logName);
@@ -269,14 +277,18 @@ class UserService {
       final batch = _db.batch();
 
       // Update global user profile
-      batch.update(_db.collection('users').doc(userId), {
-        'is_active': isActive,
+      batch.update(_db.collection(FirestoreCollections.users).doc(userId), {
+        FirestoreFields.isActive: isActive,
       });
 
       // Update minimal member info for real-time listing
       batch.update(
-        _db.collection('shops').doc(shopId).collection('members').doc(userId),
-        {'is_active': isActive},
+        _db
+            .collection(FirestoreCollections.shops)
+            .doc(shopId)
+            .collection('members')
+            .doc(userId),
+        {FirestoreFields.isActive: isActive},
       );
 
       await batch.commit();
@@ -303,12 +315,18 @@ class UserService {
       final batch = _db.batch();
 
       // Update global user profile
-      batch.update(_db.collection('users').doc(userId), {'verified': verified});
+      batch.update(_db.collection(FirestoreCollections.users).doc(userId), {
+        FirestoreFields.verified: verified,
+      });
 
       // Update minimal member info for real-time listing
       batch.update(
-        _db.collection('shops').doc(shopId).collection('members').doc(userId),
-        {'verified': verified},
+        _db
+            .collection(FirestoreCollections.shops)
+            .doc(shopId)
+            .collection('members')
+            .doc(userId),
+        {FirestoreFields.verified: verified},
       );
 
       await batch.commit();
@@ -329,7 +347,7 @@ class UserService {
     try {
       log('Removing user from shop: $shopId, userId: $userId', name: logName);
       await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
           .collection('members')
           .doc(userId)

@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/app/models/rental_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../utils/constants/a_enums.dart';
 
@@ -12,7 +14,7 @@ class RentalService {
   final supabase = Supabase.instance.client;
 
   DocumentReference _shopRef(String shopId) {
-    return _db.collection('shops').doc(shopId);
+    return _db.collection(FirestoreCollections.shops).doc(shopId);
   }
 
   Future<String> _uploadAgreementPdf(
@@ -54,7 +56,9 @@ class RentalService {
       log('Creating new rental for shop: $shopId', name: logName);
 
       // 1. Create the rental document to get an ID
-      final docRef = _shopRef(shopId).collection('rentals').doc();
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc();
       final rentalId = docRef.id;
 
       // 2. Upload the agreement PDF
@@ -67,18 +71,18 @@ class RentalService {
       // 3. Set the full rental data including the agreement link
       await docRef.set({
         ...rentalData.toMap(),
-        'id': rentalId,
-        'agreementLink': agreementLink,
-        'createdAt': FieldValue.serverTimestamp(),
+        FirestoreFields.id: rentalId,
+        FirestoreFields.agreementLink: agreementLink,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       // 4. Update the inventory item status
       await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('inventory')
+          .collection(FirestoreCollections.inventory)
           .doc(rentalData.itemId)
-          .update({'status': InventoryStatus.rented.name});
+          .update({FirestoreFields.status: InventoryStatus.rented.name});
 
       log('Rental created: $rentalId', name: logName);
       return rentalId;
@@ -90,7 +94,9 @@ class RentalService {
 
   // Stream rental by ID
   Stream<RentalModel> streamRentalById(String shopId, String rentalId) {
-    final docRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+    final docRef = _shopRef(
+      shopId,
+    ).collection(FirestoreCollections.rentals).doc(rentalId);
 
     return docRef.snapshots().map((doc) {
       return RentalModel.fromSnapshot(doc);
@@ -101,7 +107,9 @@ class RentalService {
     try {
       log('Deleting rental: $rentalId', name: logName);
 
-      final docRef = _shopRef(shopId).collection('rentals').doc(rentalId);
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
 
       await docRef.delete();
 
@@ -116,7 +124,9 @@ class RentalService {
     try {
       log('Updating rental: ${rentalData.id}', name: logName);
 
-      final docRef = _shopRef(shopId).collection('rentals').doc(rentalData.id);
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalData.id);
 
       await docRef.update(rentalData.toMap());
 
@@ -135,17 +145,23 @@ class RentalService {
     try {
       log('Finalizing return for rental: $rentalId', name: logName);
 
-      final rentalRef = _shopRef(shopId).collection('rentals').doc(rentalId);
-      final inventoryRef = _shopRef(shopId).collection('inventory').doc(itemId);
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+      final inventoryRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId);
 
       // Update rental status to 'completed'
       await rentalRef.update({
-        'status': RentalStatus.completed.name,
-        'returnedAt': FieldValue.serverTimestamp(),
+        FirestoreFields.status: RentalStatus.completed.name,
+        FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
       });
 
       // Update inventory item status to 'available'
-      await inventoryRef.update({'status': InventoryStatus.available.name});
+      await inventoryRef.update({
+        FirestoreFields.status: InventoryStatus.available.name,
+      });
 
       log('Return finalized for rental: $rentalId', name: logName);
     } catch (e) {
@@ -164,8 +180,12 @@ class RentalService {
         'Adding damage charge of $amount to rental: $rentalId',
         name: logName,
       );
-      final rentalRef = _shopRef(shopId).collection('rentals').doc(rentalId);
-      await rentalRef.update({'amountExpected': FieldValue.increment(amount)});
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+      await rentalRef.update({
+        FirestoreFields.amountExpected: FieldValue.increment(amount),
+      });
       log('Damage charge added to rental: $rentalId', name: logName);
     } catch (e) {
       log('Error adding damage charge: $e', name: logName);
@@ -181,12 +201,12 @@ class RentalService {
   }) async {
     try {
       log('Fetching rentals page for shop: $shopId', name: logName);
-      Query query = _shopRef(shopId).collection('rentals');
+      Query query = _shopRef(shopId).collection(FirestoreCollections.rentals);
 
       if (searchTerm != null && searchTerm.isNotEmpty) {
         query = query
             .where(
-              'itemName_lowercase',
+              'itemName_lowercase', // TODO: Add to fields if necessary
               isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
             )
             .where(
@@ -195,7 +215,9 @@ class RentalService {
             )
             .limit(limit);
       } else {
-        query = query.orderBy('createdAt', descending: true).limit(limit);
+        query = query
+            .orderBy(FirestoreFields.createdAt, descending: true)
+            .limit(limit);
 
         if (startAfter != null) {
           query = query.startAfterDocument(startAfter);
@@ -215,9 +237,11 @@ class RentalService {
         'Counting rentals with status $status for shop: $shopId',
         name: logName,
       );
-      final aggregateQuery = await _shopRef(
-        shopId,
-      ).collection('rentals').where('status', isEqualTo: status).count().get();
+      final aggregateQuery = await _shopRef(shopId)
+          .collection(FirestoreCollections.rentals)
+          .where(FirestoreFields.status, isEqualTo: status)
+          .count()
+          .get();
       return aggregateQuery.count ?? 0;
     } catch (e) {
       log('Error counting rentals: $e', name: logName);
