@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
 
 import '../../../models/agreement_template_model.dart';
@@ -66,8 +67,6 @@ class AgreementTemplateController extends GetxController {
     isEditing.value = true;
     _editedTemplate.value = template;
     templateNameController.text = template.templateName;
-    // Assuming 'content' is the key for the main section.
-    // This might need adjustment based on your data structure.
     contentController.text = template.sections['content'] ?? '';
     Get.to(() => const AddEditAgreementTemplateView());
   }
@@ -118,7 +117,10 @@ class AgreementTemplateController extends GetxController {
 
   void previewTemplate() {
     // 1. Create sample data
-    final customer = {"name": "John Doe", "email": "john.doe@example.com"};
+    final customer = {
+      FirestoreFields.name: "John Doe",
+      FirestoreFields.email: "john.doe@example.com",
+    };
     final rental = {
       "startDate": DateFormat('MMM dd, yyyy').format(DateTime.now()),
       "endDate": DateFormat(
@@ -131,8 +133,14 @@ class AgreementTemplateController extends GetxController {
     String content = contentController.text;
 
     // 3. Replace placeholders
-    content = content.replaceAll('{{customer.name}}', customer['name']!);
-    content = content.replaceAll('{{customer.email}}', customer['email']!);
+    content = content.replaceAll(
+      '{{customer.name}}',
+      customer[FirestoreFields.name]!,
+    );
+    content = content.replaceAll(
+      '{{customer.email}}',
+      customer[FirestoreFields.email]!,
+    );
     content = content.replaceAll('{{rental.startDate}}', rental['startDate']!);
     content = content.replaceAll('{{rental.endDate}}', rental['endDate']!);
     content = content.replaceAll('{{rental.totalCost}}', rental['totalCost']!);
@@ -141,10 +149,7 @@ class AgreementTemplateController extends GetxController {
     AppDialogs.defaultDialog(
       context: Get.context!,
       title: "Template Preview",
-      contentWidget: Text(
-        content,
-        style: const TextStyle(fontSize: 14),
-      ),
+      contentWidget: Text(content, style: const TextStyle(fontSize: 14)),
       confirmText: "Close",
       onConfirm: () => Get.back(),
     );

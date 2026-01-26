@@ -10,7 +10,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
-import '../../../models/user_model.dart';
+
 import '../controllers/user_detail_controller.dart';
 
 class UserDetailView extends GetView<UserDetailController> {

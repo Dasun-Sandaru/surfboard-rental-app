@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:surfboard_rental_app/app/services/auth_service.dart';
 import 'package:surfboard_rental_app/app/services/shop_service.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
@@ -27,7 +28,7 @@ class SettingsController extends GetxController {
       // Get current user's data
       final currentUser = _authService.currentUser;
       if (currentUser == null) throw 'User not logged in';
-      
+
       final userModel = await _userService.getUser(currentUser.uid);
       if (userModel == null) throw 'User data not found in Firestore';
 
@@ -46,16 +47,16 @@ class SettingsController extends GetxController {
       if (!shopDoc.exists) throw 'Shop data not found in Firestore';
       final shopData = shopDoc.data() as Map<String, dynamic>;
       shopProfile.value = {
-        "name": shopData['name'] ?? 'No Shop Name',
-        "location": shopData['location'] ?? 'No Location',
+        "name":
+            shopData[FirestoreFields.businessName] ??
+            'No Shop Name', // Using local key 'name' for profile Map
+        "location": shopData[FirestoreFields.location] ?? 'No Location',
         "id": shopDoc.id,
       };
-
     } catch (e) {
       AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
     }
   }
-
 
   // -- Inventory Configuration Data --
   // In a real app, these would come from Firebase
