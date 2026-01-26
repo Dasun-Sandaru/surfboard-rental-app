@@ -11,19 +11,11 @@ import '../controllers/damage_fee_controller.dart';
 class DamageFeeView extends GetView<DamageFeeController> {
   const DamageFeeView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-  final Color errorRed = const Color(0xFFEF4444);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -31,7 +23,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
         title: Text(
           "Damage Fee Rules",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -43,13 +35,13 @@ class DamageFeeView extends GetView<DamageFeeController> {
           Obx(() {
             if (controller.isLoading.value) {
               return Center(
-                child: CircularProgressIndicator(color: primaryBlue),
+                child: CircularProgressIndicator(color: colorScheme.primary),
               );
             }
 
             // Empty State
             if (controller.damageRules.isEmpty) {
-              return _buildEmptyList();
+              return _buildEmptyList(context);
             }
 
             // List Content
@@ -65,7 +57,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 separatorBuilder: (context, index) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
                   final rule = controller.damageRules[index];
-                  return _buildDamageRuleCard(rule, controller);
+                  return _buildDamageRuleCard(context, rule, controller);
                 },
               ),
             );
@@ -82,8 +74,8 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 child: ElevatedButton(
                   onPressed: () => controller.openAddEditDialog(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryBlue,
-                    foregroundColor: textWhite,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -114,20 +106,22 @@ class DamageFeeView extends GetView<DamageFeeController> {
   }
 
   Widget _buildDamageRuleCard(
+    BuildContext context,
     DamageFeeModel rule,
     DamageFeeController controller,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     final bool isActive = rule.activeStatus;
 
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isActive
-              ? borderDark.withOpacity(0.5)
-              : borderDark.withOpacity(0.2),
+              ? colorScheme.outline.withOpacity(0.5)
+              : colorScheme.outline.withOpacity(0.2),
         ),
       ),
       child: Row(
@@ -140,7 +134,9 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 Text(
                   rule.damageType,
                   style: TextStyle(
-                    color: isActive ? textWhite : textGrey,
+                    color: isActive
+                        ? colorScheme.onSurface
+                        : colorScheme.onSurfaceVariant,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -148,14 +144,17 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 SizedBox(height: 4.h),
                 Text(
                   "\$${rule.feeAmount.toStringAsFixed(2)}",
-                  style: TextStyle(color: textGrey, fontSize: 14.sp),
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 14.sp,
+                  ),
                 ),
                 if (rule.description.isNotEmpty) ...[
                   SizedBox(height: 4.h),
                   Text(
                     rule.description,
                     style: TextStyle(
-                      color: textGrey.withOpacity(0.6),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
                       fontSize: 12.sp,
                       fontStyle: FontStyle.italic,
                     ),
@@ -173,8 +172,8 @@ class DamageFeeView extends GetView<DamageFeeController> {
               // Edit Button
               _buildIconButton(
                 icon: Iconsax.edit,
-                color: textGrey,
-                bgColor: bgDark,
+                color: colorScheme.onSurfaceVariant,
+                bgColor: colorScheme.surface,
                 onTap: () => controller.openAddEditDialog(rule: rule),
               ),
 
@@ -183,8 +182,8 @@ class DamageFeeView extends GetView<DamageFeeController> {
               // Delete Button
               _buildIconButton(
                 icon: Iconsax.trash,
-                color: errorRed,
-                bgColor: errorRed.withOpacity(0.1),
+                color: colorScheme.error,
+                bgColor: colorScheme.error.withOpacity(0.1),
                 onTap: () => controller.deleteRule(rule.id!),
               ),
             ],
@@ -212,21 +211,32 @@ class DamageFeeView extends GetView<DamageFeeController> {
     );
   }
 
-  Widget _buildEmptyList() {
+  Widget _buildEmptyList(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Iconsax.warning_2, size: 64.w, color: textGrey),
+          Icon(
+            Iconsax.warning_2,
+            size: 64.w,
+            color: colorScheme.onSurfaceVariant,
+          ),
           SizedBox(height: 16.h),
           Text(
             "No damage fee rules found.",
-            style: TextStyle(color: textGrey, fontSize: 16.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 16.sp,
+            ),
           ),
           SizedBox(height: 8.h),
           Text(
             "Tap the button below to add a new rule.",
-            style: TextStyle(color: textGrey.withOpacity(0.7), fontSize: 14.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+              fontSize: 14.sp,
+            ),
           ),
         ],
       ),

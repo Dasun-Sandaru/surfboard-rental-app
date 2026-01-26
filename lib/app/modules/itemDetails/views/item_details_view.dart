@@ -6,27 +6,17 @@ import 'package:intl/intl.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/item_details_controller.dart';
 
 class ItemDetailsView extends GetView<ItemDetailsController> {
   const ItemDetailsView({super.key});
 
-  // -- Theme Colors --
-  static const Color bgDark = Color(0xFF101f22);
-  static const Color cardDark = Color(0xFF182c30);
-  static const Color primaryBlue = Color(0xFF4A90E2);
-  static const Color textWhite = Color(0xFFf0f4f4);
-  static const Color textGrey = Color(0xFF94a3b8);
-  static const Color borderDark = Color(0xFF334155);
-
-  // Status Colors
-  static const Color statusGreen = Color(0xFF28A745);
-  static const Color statusYellow = Color(0xFFEAB308);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -34,7 +24,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
         title: Text(
           "Item Details",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -45,7 +35,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             child: Text(
               "Edit",
               style: TextStyle(
-                color: primaryBlue,
+                color: colorScheme.primary,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -74,7 +64,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                   height: 200.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: cardDark,
+                    color: colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(16),
                     image: item.imageUrl.isNotEmpty && item.imageUrl != '000'
                         ? DecorationImage(
@@ -84,10 +74,12 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                         : null,
                   ),
                   child: item.imageUrl.isEmpty || item.imageUrl == '000'
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             "No Image",
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         )
                       : null,
@@ -95,24 +87,42 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
 
                 SizedBox(height: 16.h),
 
-                _buildDetailRow("Item ID", item.id),
-                _buildDetailRow("Name", item.name),
-                _buildDetailRow("Brand", item.brand),
-                _buildDetailRow("Color", item.color),
-                _buildDetailRow("Type", item.type),
-                _buildDetailRow("Volume", '${item.volume}L'),
+                _buildDetailRow(context, "Item ID", item.id),
+                _buildDetailRow(context, "Name", item.name),
+                _buildDetailRow(context, "Brand", item.brand),
+                _buildDetailRow(context, "Color", item.color),
+                _buildDetailRow(context, "Type", item.type),
+                _buildDetailRow(context, "Volume", '${item.volume}L'),
                 _buildDetailRow(
+                  context,
                   "Size",
                   "${item.sizeFeet}' ${item.sizeInches}\"",
                 ),
 
-                _buildDetailRow("Status", item.status.name.toUpperCase()),
-                _buildDetailRow("Purchase Cost", '\$${item.purchaseCost}'),
-                _buildDetailRow("Rental Rate (hr)", '\$${item.rentalRateHour}'),
-                _buildDetailRow("Rental Rate (day)", '\$${item.rentalRateDay}'),
-                _buildDetailRow("Damage Fee Rule", item.damageFeeRule),
-                _buildDetailRow("Note", item.note),
                 _buildDetailRow(
+                  context,
+                  "Status",
+                  item.status.name.toUpperCase(),
+                ),
+                _buildDetailRow(
+                  context,
+                  "Purchase Cost",
+                  '\$${item.purchaseCost}',
+                ),
+                _buildDetailRow(
+                  context,
+                  "Rental Rate (hr)",
+                  '\$${item.rentalRateHour}',
+                ),
+                _buildDetailRow(
+                  context,
+                  "Rental Rate (day)",
+                  '\$${item.rentalRateDay}',
+                ),
+                _buildDetailRow(context, "Damage Fee Rule", item.damageFeeRule),
+                _buildDetailRow(context, "Note", item.note),
+                _buildDetailRow(
+                  context,
                   "Created At",
                   DateFormat.yMMMd().format(item.createdAt),
                   isLast: true,
@@ -122,92 +132,107 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
           });
         },
       ),
-      bottomNavigationBar: _buildBottomNav(controller),
+      bottomNavigationBar: _buildBottomNav(context, controller),
     );
   }
 
-  Widget _buildBottomNav(ItemDetailsController controller) {
+  Widget _buildBottomNav(
+    BuildContext context,
+    ItemDetailsController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
+
     return Container(
       padding: EdgeInsets.all(ASizes.defaultPadding),
       decoration: BoxDecoration(
-        color: bgDark,
-        border: const Border(top: BorderSide(color: borderDark)),
+        color: colorScheme.surface,
+        border: Border(top: BorderSide(color: colorScheme.outline)),
       ),
-      child: Row(
-        children: [
-          // Mark as Repair Button
-          Expanded(
-            child: ElevatedButton(
-              onPressed: controller.markAsRepair,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: statusYellow,
-                foregroundColor: Colors.black87, // Dark text on yellow
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                elevation: 0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.setting_2, size: 20.w),
-                  SizedBox(width: 8.w),
-                  Text(
-                    "Mark as Repair",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+      child: SafeArea(
+        child: Row(
+          children: [
+            // Mark as Repair Button
+            Expanded(
+              child: ElevatedButton(
+                onPressed: controller.markAsRepair,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: statusColors?.warning ?? Colors.orange,
+                  foregroundColor: colorScheme
+                      .surface, // Dark text on yellow in light mode, maybe?
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                ],
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  elevation: 0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.setting_2, size: 20.w),
+                    SizedBox(width: 8.w),
+                    Text(
+                      "Mark as Repair",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
-          SizedBox(width: 12.w),
+            SizedBox(width: 12.w),
 
-          // View Damage Fees Button
-          Expanded(
-            child: TextButton(
-              onPressed: controller.viewDamageFees,
-              style: TextButton.styleFrom(
-                backgroundColor: primaryBlue.withOpacity(0.15),
-                foregroundColor: primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.receipt, size: 20.w),
-                  SizedBox(width: 8.w),
-                  Text(
-                    "View Damage Fees",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+            // View Damage Fees Button
+            Expanded(
+              child: TextButton(
+                onPressed: controller.viewDamageFees,
+                style: TextButton.styleFrom(
+                  backgroundColor: colorScheme.primary.withOpacity(0.15),
+                  foregroundColor: colorScheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                ],
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.receipt, size: 20.w),
+                    SizedBox(width: 8.w),
+                    Text(
+                      "View Damage Fees",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isLast = false}) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value, {
+    bool isLast = false,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.symmetric(vertical: 14.h),
       decoration: BoxDecoration(
         border: Border(
-          top: const BorderSide(color: borderDark),
+          top: BorderSide(color: colorScheme.outline),
           bottom: isLast
-              ? const BorderSide(color: borderDark)
+              ? BorderSide(color: colorScheme.outline)
               : BorderSide.none,
         ),
       ),
@@ -217,7 +242,10 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             flex: 4,
             child: Text(
               label,
-              style: TextStyle(color: textGrey, fontSize: 14.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14.sp,
+              ),
             ),
           ),
           Expanded(
@@ -225,7 +253,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             child: Text(
               value,
               style: TextStyle(
-                color: textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
               ),

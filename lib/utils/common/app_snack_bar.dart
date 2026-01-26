@@ -1,9 +1,15 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
 
 class AppSnackBar {
   static const String _logName = 'AppSnackBar';
+
+  static StatusColors? get _statusColors {
+    if (Get.context == null) return null;
+    return Theme.of(Get.context!).extension<StatusColors>();
+  }
 
   // Success Snackbar
   static void success({
@@ -13,17 +19,18 @@ class AppSnackBar {
     void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] $message', name: _logName);
+    final color = _statusColors?.success ?? Colors.green;
     Get.snackbar(
       title,
       message,
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green,
-      borderColor: Colors.green,
+      backgroundColor: color.withOpacity(0.1),
+      colorText: color,
+      borderColor: color,
       borderWidth: 1,
       duration: duration,
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
-      icon: const Icon(Icons.check_circle, color: Colors.green),
+      icon: Icon(Icons.check_circle, color: color),
       onTap: onTap,
     );
   }
@@ -36,17 +43,18 @@ class AppSnackBar {
     void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] ERROR: $message', name: _logName);
+    final color = _statusColors?.error ?? Colors.red;
     Get.snackbar(
       title,
       message,
-      backgroundColor: Colors.red.withOpacity(0.1),
-      colorText: Colors.red,
-      borderColor: Colors.red,
+      backgroundColor: color.withOpacity(0.1),
+      colorText: color,
+      borderColor: color,
       borderWidth: 1,
       duration: duration,
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
-      icon: const Icon(Icons.error_outline, color: Colors.red),
+      icon: Icon(Icons.error_outline, color: color),
       onTap: onTap,
     );
   }
@@ -59,17 +67,18 @@ class AppSnackBar {
     void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] WARNING: $message', name: _logName);
+    final color = _statusColors?.warning ?? Colors.orange;
     Get.snackbar(
       title,
       message,
-      backgroundColor: Colors.orange.withOpacity(0.1),
-      colorText: Colors.orange,
-      borderColor: Colors.orange,
+      backgroundColor: color.withOpacity(0.1),
+      colorText: color,
+      borderColor: color,
       borderWidth: 1,
       duration: duration,
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
-      icon: const Icon(Icons.warning_amber, color: Colors.orange),
+      icon: Icon(Icons.warning_amber, color: color),
       onTap: onTap,
     );
   }
@@ -82,17 +91,18 @@ class AppSnackBar {
     void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] $message', name: _logName);
+    final color = _statusColors?.info ?? Colors.blue;
     Get.snackbar(
       title,
       message,
-      backgroundColor: Colors.blue.withOpacity(0.1),
-      colorText: Colors.blue,
-      borderColor: Colors.blue,
+      backgroundColor: color.withOpacity(0.1),
+      colorText: color,
+      borderColor: color,
       borderWidth: 1,
       duration: duration,
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
-      icon: const Icon(Icons.info_outline, color: Colors.blue),
+      icon: Icon(Icons.info_outline, color: color),
       onTap: onTap,
     );
   }

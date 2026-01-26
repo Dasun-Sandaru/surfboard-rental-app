@@ -6,16 +6,11 @@ import '../controllers/splash_controller.dart';
 class SplashView extends GetView<SplashController> {
   const SplashView({super.key});
 
-  // -- Theme Colors (Matches Admin Dashboard) --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textSubtle = const Color(0xFF94a3b8);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       body: SizedBox(
         width: double.infinity,
         child: Column(
@@ -28,9 +23,13 @@ class SplashView extends GetView<SplashController> {
               padding: EdgeInsets.all(24.w),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryBlue.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
               ),
-              child: Icon(Icons.surfing, size: 80.sp, color: primaryBlue),
+              child: Icon(
+                Icons.surfing,
+                size: 80.sp,
+                color: colorScheme.primary,
+              ),
             ),
 
             SizedBox(height: 24.h),
@@ -39,7 +38,7 @@ class SplashView extends GetView<SplashController> {
             Text(
               "SURF RENTAL",
               style: TextStyle(
-                color: textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
@@ -51,7 +50,7 @@ class SplashView extends GetView<SplashController> {
             Text(
               "Manager App",
               style: TextStyle(
-                color: textSubtle,
+                color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
                 letterSpacing: 0.5,
               ),
@@ -65,7 +64,7 @@ class SplashView extends GetView<SplashController> {
               height: 24.w,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                color: primaryBlue,
+                color: colorScheme.primary,
               ),
             ),
 
@@ -75,7 +74,10 @@ class SplashView extends GetView<SplashController> {
             Obx(
               () => Text(
                 controller.updateStatus.value,
-                style: TextStyle(color: textSubtle, fontSize: 12.sp),
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 12.sp,
+                ),
               ),
             ),
 

@@ -8,25 +8,18 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../../../../app/models/rental_model.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/rentals_controller.dart';
 
 class RentalsView extends GetView<RentalsController> {
   const RentalsView({super.key});
 
-  // -- Theme Colors --
-  static const Color bgDark = Color(0xFF101f22);
-  static const Color cardDark = Color(0xFF182c30);
-  static const Color primaryBlue = Color(0xFF4A90E2);
-  static const Color textWhite = Color(0xFFf0f4f4);
-  static const Color textGrey = Color(0xFF94a3b8);
-  static const Color borderDark = Color(0xFF334155);
-  static const Color successGreen = Color(0xFF34C759);
-  static const Color errorRed = Color(0xFFEF4444);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -34,7 +27,7 @@ class RentalsView extends GetView<RentalsController> {
         title: Text(
           "Active Rentals",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -42,7 +35,7 @@ class RentalsView extends GetView<RentalsController> {
         actions: [
           IconButton(
             onPressed: controller.refreshRentals,
-            icon: Icon(Iconsax.refresh, color: textWhite),
+            icon: Icon(Iconsax.refresh, color: colorScheme.onSurface),
           ),
           SizedBox(width: 8.w),
         ],
@@ -57,17 +50,19 @@ class RentalsView extends GetView<RentalsController> {
             ),
             child: TextFormField(
               controller: controller.searchTextController,
-              style: TextStyle(color: textWhite),
+              style: TextStyle(color: colorScheme.onSurface),
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Iconsax.search_normal,
                   size: 20.w,
-                  color: textGrey,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 hintText: 'Search by Customer or Item...',
-                hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                ),
                 filled: true,
-                fillColor: cardDark,
+                fillColor: colorScheme.surfaceContainer,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -85,10 +80,12 @@ class RentalsView extends GetView<RentalsController> {
               builderDelegate: PagedChildBuilderDelegate<RentalModel>(
                 itemBuilder: (context, rental, index) => Padding(
                   padding: EdgeInsets.only(bottom: 12.h),
-                  child: _buildRentalCard(rental, controller),
+                  child: _buildRentalCard(context, rental, controller),
                 ),
-                noItemsFoundIndicatorBuilder: (context) => _buildEmptyState(),
-                firstPageErrorIndicatorBuilder: (context) => _buildErrorState(),
+                noItemsFoundIndicatorBuilder: (context) =>
+                    _buildEmptyState(context),
+                firstPageErrorIndicatorBuilder: (context) =>
+                    _buildErrorState(context),
               ),
             ),
           ),
@@ -101,7 +98,13 @@ class RentalsView extends GetView<RentalsController> {
   // WIDGET BUILDERS
   // ===========================================================================
 
-  Widget _buildRentalCard(RentalModel rental, RentalsController controller) {
+  Widget _buildRentalCard(
+    BuildContext context,
+    RentalModel rental,
+    RentalsController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
     final bool isOverdue = rental.expectedReturnTime.isBefore(DateTime.now());
 
     return InkWell(
@@ -110,10 +113,12 @@ class RentalsView extends GetView<RentalsController> {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isOverdue ? errorRed.withOpacity(0.3) : Colors.transparent,
+            color: isOverdue
+                ? colorScheme.error.withOpacity(0.3)
+                : Colors.transparent,
           ),
         ),
         child: Row(
@@ -124,10 +129,14 @@ class RentalsView extends GetView<RentalsController> {
               height: 48.w,
               width: 48.w,
               decoration: BoxDecoration(
-                color: bgDark,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(Icons.surfing, color: textWhite, size: 24.w),
+              child: Icon(
+                Icons.surfing,
+                color: colorScheme.onSurface,
+                size: 24.w,
+              ),
             ),
 
             SizedBox(width: 16.w),
@@ -140,7 +149,7 @@ class RentalsView extends GetView<RentalsController> {
                   Text(
                     rental.id ?? 'N/A',
                     style: TextStyle(
-                      color: textWhite,
+                      color: colorScheme.onSurface,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -148,15 +157,21 @@ class RentalsView extends GetView<RentalsController> {
                   SizedBox(height: 4.h),
                   Text(
                     rental.itemId,
-                    style: TextStyle(color: textGrey, fontSize: 14.sp),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 14.sp,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTimeBadge("Start: ${rental.startTime}"),
+                      _buildTimeBadge(context, "Start: ${rental.startTime}"),
                       SizedBox(width: 8.w),
-                      _buildTimeBadge("Due: ${rental.expectedReturnTime}"),
+                      _buildTimeBadge(
+                        context,
+                        "Due: ${rental.expectedReturnTime}",
+                      ),
                     ],
                   ),
                 ],
@@ -176,13 +191,13 @@ class RentalsView extends GetView<RentalsController> {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: errorRed.withOpacity(0.2),
+                      color: colorScheme.error.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "Overdue",
                       style: TextStyle(
-                        color: errorRed,
+                        color: colorScheme.error,
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -193,11 +208,12 @@ class RentalsView extends GetView<RentalsController> {
                     height: 12.w,
                     width: 12.w,
                     decoration: BoxDecoration(
-                      color: successGreen,
+                      color: statusColors?.success ?? Colors.green,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: successGreen.withOpacity(0.4),
+                          color: (statusColors?.success ?? Colors.green)
+                              .withOpacity(0.4),
                           blurRadius: 6,
                           spreadRadius: 2,
                         ),
@@ -212,52 +228,67 @@ class RentalsView extends GetView<RentalsController> {
     );
   }
 
-  Widget _buildTimeBadge(String text) {
+  Widget _buildTimeBadge(BuildContext context, String text) {
     return Text(
       text,
-      style: TextStyle(color: textGrey.withOpacity(0.7), fontSize: 12.sp),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+        fontSize: 12.sp,
+      ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: EdgeInsets.all(24.w),
-            decoration: BoxDecoration(color: cardDark, shape: BoxShape.circle),
-            child: Icon(Iconsax.box, size: 40.w, color: textGrey),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Iconsax.box,
+              size: 40.w,
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
           SizedBox(height: 16.h),
           Text(
             "No Active Rentals",
             style: TextStyle(
-              color: textWhite,
+              color: colorScheme.onSurface,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             "All boards have been returned.",
-            style: TextStyle(color: textGrey, fontSize: 14.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 14.sp,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Iconsax.warning_2, size: 40.w, color: errorRed),
+          Icon(Iconsax.warning_2, size: 40.w, color: colorScheme.error),
           SizedBox(height: 16.h),
           Text(
             "Something went wrong!",
             style: TextStyle(
-              color: textWhite,
+              color: colorScheme.onSurface,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -265,12 +296,18 @@ class RentalsView extends GetView<RentalsController> {
           Text(
             "We couldn't load the rentals. Please try again.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: textGrey, fontSize: 14.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 14.sp,
+            ),
           ),
           SizedBox(height: 24.h),
           ElevatedButton(
             onPressed: () => controller.pagingController.refresh(),
-            style: ElevatedButton.styleFrom(backgroundColor: primaryBlue),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+            ),
             child: const Text("Retry"),
           ),
         ],

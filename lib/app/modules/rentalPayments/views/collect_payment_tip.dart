@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../controllers/rental_payment_controller.dart';
 import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 
 class CollectPaymentTip extends StatelessWidget {
   final RentalPaymentController controller;
@@ -13,6 +14,8 @@ class CollectPaymentTip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
     // Use Scaffold backgroundColor for overlay effect
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.8),
@@ -22,9 +25,9 @@ class CollectPaymentTip extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 24.w),
           padding: EdgeInsets.all(24.w),
           decoration: BoxDecoration(
-            color: const Color(0xFF182c30),
+            color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFF334155)),
+            border: Border.all(color: colorScheme.outline),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.5),
@@ -40,13 +43,13 @@ class CollectPaymentTip extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2).withOpacity(0.1),
+                  color: colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Iconsax.receipt,
                   size: 32.w,
-                  color: const Color(0xFF4A90E2),
+                  color: colorScheme.primary,
                 ),
               ),
               SizedBox(height: 16.h),
@@ -55,7 +58,7 @@ class CollectPaymentTip extends StatelessWidget {
               Text(
                 "Collect Payment",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: colorScheme.onSurface,
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
                 ),
@@ -65,7 +68,7 @@ class CollectPaymentTip extends StatelessWidget {
                 "Final settlement breakdown",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: const Color(0xFF94a3b8),
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 14.sp,
                 ),
               ),
@@ -76,31 +79,35 @@ class CollectPaymentTip extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF101f22),
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   children: [
                     _buildDetailRow(
+                      context,
                       "Rental Fee",
                       "\$${controller.rentalFee.toStringAsFixed(2)}",
                     ),
                     SizedBox(height: 8.h),
                     _buildDetailRow(
+                      context,
                       "Late Fee",
                       "\$${controller.lateFee.toStringAsFixed(2)}",
-                      color: const Color(0xFFFFC107),
+                      color: statusColors?.warning,
                     ),
                     SizedBox(height: 8.h),
                     _buildDetailRow(
+                      context,
                       "Damage Fee",
                       "\$${controller.damageFee.toStringAsFixed(2)}",
-                      color: const Color(0xFFFFC107),
+                      color: statusColors?.error ?? Colors.red,
                     ),
                     SizedBox(height: 12.h),
-                    Divider(color: const Color(0xFF334155)),
+                    Divider(color: colorScheme.outline),
                     SizedBox(height: 12.h),
                     _buildDetailRow(
+                      context,
                       "Total Due",
                       "\$${controller.totalAmount.toStringAsFixed(2)}",
                       isTotal: true,
@@ -115,10 +122,14 @@ class CollectPaymentTip extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFC107).withOpacity(0.1),
+                  color: (statusColors?.warning ?? Colors.orange).withOpacity(
+                    0.1,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFFFC107).withOpacity(0.3),
+                    color: (statusColors?.warning ?? Colors.orange).withOpacity(
+                      0.3,
+                    ),
                   ),
                 ),
                 child: Row(
@@ -126,7 +137,7 @@ class CollectPaymentTip extends StatelessWidget {
                   children: [
                     Icon(
                       Iconsax.info_circle,
-                      color: const Color(0xFFFFC107),
+                      color: statusColors?.warning,
                       size: 20.w,
                     ),
                     SizedBox(width: 12.w),
@@ -134,7 +145,7 @@ class CollectPaymentTip extends StatelessWidget {
                       child: RichText(
                         text: TextSpan(
                           style: TextStyle(
-                            color: const Color(0xFFf0f4f4),
+                            color: colorScheme.onSurface,
                             fontSize: 13.sp,
                             height: 1.4,
                           ),
@@ -154,9 +165,9 @@ class CollectPaymentTip extends StatelessWidget {
                             TextSpan(
                               text:
                                   "\$${(controller.totalAmount - (controller.rental.value?.securityDeposit.amount ?? 0)).toStringAsFixed(2)}",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4A90E2),
+                                color: colorScheme.primary,
                               ),
                             ),
                             const TextSpan(text: " from the customer."),
@@ -177,7 +188,7 @@ class CollectPaymentTip extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF334155)),
+                        side: BorderSide(color: colorScheme.outline),
                         padding: EdgeInsets.symmetric(vertical: 14.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -186,7 +197,7 @@ class CollectPaymentTip extends StatelessWidget {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                          color: const Color(0xFF94a3b8),
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -202,7 +213,8 @@ class CollectPaymentTip extends StatelessWidget {
                         _processPayment();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4A90E2),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: EdgeInsets.symmetric(vertical: 14.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -214,7 +226,6 @@ class CollectPaymentTip extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -229,18 +240,22 @@ class CollectPaymentTip extends StatelessWidget {
   }
 
   Widget _buildDetailRow(
+    BuildContext context,
     String label,
     String value, {
     bool isTotal = false,
     Color? color,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: isTotal ? Colors.white : const Color(0xFF94a3b8),
+            color: isTotal
+                ? colorScheme.onSurface
+                : colorScheme.onSurfaceVariant,
             fontSize: isTotal ? 16.sp : 14.sp,
             fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -248,7 +263,9 @@ class CollectPaymentTip extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            color: color ?? (isTotal ? const Color(0xFF4A90E2) : Colors.white),
+            color:
+                color ??
+                (isTotal ? colorScheme.primary : colorScheme.onSurface),
             fontSize: isTotal ? 20.sp : 14.sp,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
           ),

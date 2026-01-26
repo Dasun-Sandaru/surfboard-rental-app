@@ -7,23 +7,22 @@ import '../controllers/onboard_controller.dart';
 class OnBoardingNextButtonWidget extends GetView<OnboardController> {
   const OnBoardingNextButtonWidget({super.key});
 
-  final Color bgDark = const Color(0xFF101f22);
-  final Color textWhite = const Color(0xFFf0f4f4);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
       width: 50.w,
       height: 50.w,
       child: ElevatedButton(
         onPressed: () => controller.nextPage(),
         style: ElevatedButton.styleFrom(
-          backgroundColor: textWhite,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           shape: const CircleBorder(),
           padding: EdgeInsets.zero,
           elevation: 2,
         ),
-        child: Icon(Iconsax.arrow_right_3, size: 24.w, color: bgDark),
+        child: Icon(Iconsax.arrow_right_3, size: 24.w),
       ),
     );
   }

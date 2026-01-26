@@ -10,21 +10,13 @@ import '../controllers/damage_report_controller.dart';
 class DamageReportView extends StatelessWidget {
   const DamageReportView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-  final Color errorRed = const Color(0xFFEF4444);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DamageReportController());
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -32,7 +24,7 @@ class DamageReportView extends StatelessWidget {
         title: Text(
           "Damage Report",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -47,7 +39,7 @@ class DamageReportView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// 1. Damage Details Section
-                  _buildSectionTitle("Damage Details"),
+                  _buildSectionTitle(context, "Damage Details"),
                   SizedBox(height: 12.h),
 
                   Obx(
@@ -64,10 +56,12 @@ class DamageReportView extends StatelessWidget {
                           margin: EdgeInsets.only(bottom: 12.h),
                           padding: EdgeInsets.all(12.w),
                           decoration: BoxDecoration(
-                            color: cardDark,
+                            color: colorScheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isSelected ? primaryBlue : borderDark,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.outline,
                             ),
                           ),
                           child: Column(
@@ -86,7 +80,7 @@ class DamageReportView extends StatelessWidget {
                                         Text(
                                           name,
                                           style: TextStyle(
-                                            color: textWhite,
+                                            color: colorScheme.onSurface,
                                             fontSize: 16.sp,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -97,7 +91,8 @@ class DamageReportView extends StatelessWidget {
                                           Text(
                                             description,
                                             style: TextStyle(
-                                              color: textGrey,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                               fontSize: 12.sp,
                                             ),
                                           ),
@@ -111,12 +106,12 @@ class DamageReportView extends StatelessWidget {
                                         controller.toggleDamage(fee.id!, val);
                                       }
                                     },
-                                    activeColor: primaryBlue,
+                                    activeColor: colorScheme.primary,
                                   ),
                                 ],
                               ),
                               // Price Row
-                              Divider(color: borderDark),
+                              Divider(color: colorScheme.outline),
                               SizedBox(height: 8.h),
                               Row(
                                 mainAxisAlignment:
@@ -125,14 +120,14 @@ class DamageReportView extends StatelessWidget {
                                   Text(
                                     "Replacement Cost:",
                                     style: TextStyle(
-                                      color: textGrey,
+                                      color: colorScheme.onSurfaceVariant,
                                       fontSize: 14.sp,
                                     ),
                                   ),
                                   Text(
                                     "\$${feeAmount.toStringAsFixed(2)}",
                                     style: TextStyle(
-                                      color: textWhite,
+                                      color: colorScheme.onSurface,
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -148,7 +143,7 @@ class DamageReportView extends StatelessWidget {
                                 Text(
                                   "Photos (Max 3)",
                                   style: TextStyle(
-                                    color: textGrey,
+                                    color: colorScheme.onSurfaceVariant,
                                     fontSize: 12.sp,
                                   ),
                                 ),
@@ -177,11 +172,11 @@ class DamageReportView extends StatelessWidget {
                                             child: Container(
                                               width: 80.h,
                                               decoration: BoxDecoration(
-                                                color: bgDark,
+                                                color: colorScheme.surface,
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                                 border: Border.all(
-                                                  color: borderDark,
+                                                  color: colorScheme.outline,
                                                   style: BorderStyle.solid,
                                                 ),
                                               ),
@@ -191,13 +186,15 @@ class DamageReportView extends StatelessWidget {
                                                 children: [
                                                   Icon(
                                                     Iconsax.camera,
-                                                    color: textGrey,
+                                                    color: colorScheme
+                                                        .onSurfaceVariant,
                                                     size: 20.w,
                                                   ),
                                                   Text(
                                                     "Add",
                                                     style: TextStyle(
-                                                      color: textGrey,
+                                                      color: colorScheme
+                                                          .onSurfaceVariant,
                                                       fontSize: 10.sp,
                                                     ),
                                                   ),
@@ -236,9 +233,9 @@ class DamageReportView extends StatelessWidget {
                                                 child: Container(
                                                   padding: EdgeInsets.all(2.w),
                                                   decoration: BoxDecoration(
-                                                    color: errorRed,
+                                                    color: colorScheme.error,
                                                     shape: BoxShape.circle,
-                                                    boxShadow: [
+                                                    boxShadow: const [
                                                       BoxShadow(
                                                         color: Colors.black26,
                                                         blurRadius: 4,
@@ -247,7 +244,7 @@ class DamageReportView extends StatelessWidget {
                                                   ),
                                                   child: Icon(
                                                     Icons.close,
-                                                    color: Colors.white,
+                                                    color: colorScheme.onError,
                                                     size: 12.w,
                                                   ),
                                                 ),
@@ -267,7 +264,7 @@ class DamageReportView extends StatelessWidget {
                                 Text(
                                   "Notes",
                                   style: TextStyle(
-                                    color: textGrey,
+                                    color: colorScheme.onSurfaceVariant,
                                     fontSize: 12.sp,
                                   ),
                                 ),
@@ -275,28 +272,35 @@ class DamageReportView extends StatelessWidget {
                                 TextFormField(
                                   controller: controller.damageNotes[fee.id],
                                   maxLines: 2,
-                                  style: TextStyle(color: textWhite),
+                                  style: TextStyle(
+                                    color: colorScheme.onSurface,
+                                  ),
                                   decoration: InputDecoration(
                                     hintText:
                                         "Describe the damage details here...",
                                     hintStyle: TextStyle(
-                                      color: textGrey.withOpacity(0.5),
+                                      color: colorScheme.onSurfaceVariant
+                                          .withOpacity(0.5),
                                       fontSize: 12.sp,
                                     ),
                                     filled: true,
-                                    fillColor: bgDark,
+                                    fillColor: colorScheme.surface,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: borderDark),
+                                      borderSide: BorderSide(
+                                        color: colorScheme.outline,
+                                      ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: borderDark),
+                                      borderSide: BorderSide(
+                                        color: colorScheme.outline,
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       borderSide: BorderSide(
-                                        color: primaryBlue,
+                                        color: colorScheme.primary,
                                       ),
                                     ),
                                     contentPadding: EdgeInsets.all(12.w),
@@ -320,9 +324,9 @@ class DamageReportView extends StatelessWidget {
                     return Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0f3a3f),
+                        color: colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: primaryBlue),
+                        border: Border.all(color: colorScheme.primary),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -330,7 +334,7 @@ class DamageReportView extends StatelessWidget {
                           Text(
                             "Total Damage Fees:",
                             style: TextStyle(
-                              color: textWhite,
+                              color: colorScheme.onSurface,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -338,7 +342,7 @@ class DamageReportView extends StatelessWidget {
                           Text(
                             "\$${controller.totalFee.toStringAsFixed(2)}",
                             style: TextStyle(
-                              color: primaryBlue,
+                              color: colorScheme.primary,
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
                             ),
@@ -358,8 +362,8 @@ class DamageReportView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(ASizes.defaultPadding),
             decoration: BoxDecoration(
-              color: bgDark,
-              border: Border(top: BorderSide(color: borderDark)),
+              color: colorScheme.surface,
+              border: Border(top: BorderSide(color: colorScheme.outline)),
             ),
             child: SizedBox(
               width: double.infinity,
@@ -367,7 +371,8 @@ class DamageReportView extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: controller.saveReport,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -378,7 +383,6 @@ class DamageReportView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: textWhite,
                   ),
                 ),
               ),
@@ -393,11 +397,11 @@ class DamageReportView extends StatelessWidget {
   // WIDGET BUILDERS
   // ===========================================================================
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
       style: TextStyle(
-        color: textWhite,
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: 18.sp,
         fontWeight: FontWeight.bold,
       ),

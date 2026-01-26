@@ -10,29 +10,26 @@ import '../controllers/settings_controller.dart';
 class InventoryConfigView extends StatelessWidget {
   const InventoryConfigView({super.key});
 
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SettingsController>();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: bgDark,
+        backgroundColor: colorScheme.surface,
         appBar: AAppBar(
           showbackArrow: true,
           centerTitle: true,
-          title: Text("Inventory Config", style: TextStyle(color: textWhite, fontSize: 18.sp)),
+          title: Text(
+            "Inventory Config",
+            style: TextStyle(color: colorScheme.onSurface, fontSize: 18.sp),
+          ),
           bottom: TabBar(
-            indicatorColor: primaryBlue,
-            labelColor: primaryBlue,
-            unselectedLabelColor: textGrey,
+            indicatorColor: colorScheme.primary,
+            labelColor: colorScheme.primary,
+            unselectedLabelColor: colorScheme.onSurfaceVariant,
             tabs: const [
               Tab(text: "Brands"),
               Tab(text: "Board Types"),
@@ -43,62 +40,79 @@ class InventoryConfigView extends StatelessWidget {
           children: [
             /// 1. Brands Tab
             _buildListManager(
+              context,
               items: controller.brands,
               onAdd: () => controller.addItem("Brand", controller.brands),
-              onRemove: (item) => controller.removeItem(item, controller.brands),
+              onRemove: (item) =>
+                  controller.removeItem(item, controller.brands),
             ),
 
             /// 2. Board Types Tab
-            _buildListManager(
-              items: controller.boardTypes,
-            ),
+            _buildListManager(context, items: controller.boardTypes),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildListManager({
+  Widget _buildListManager(
+    BuildContext context, {
     required RxList<dynamic> items,
     VoidCallback? onAdd,
     Function(dynamic)? onRemove,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Stack(
       children: [
-        Obx(() => ListView.separated(
-          padding: EdgeInsets.all(ASizes.defaultPadding),
-          itemCount: items.length,
-          separatorBuilder: (c, i) => SizedBox(height: 12.h),
-          itemBuilder: (context, index) {
-            final item = items[index];
-            final title = item is String ? item : (item as SurfBoardType).name;
-            return Container(
-              decoration: BoxDecoration(
-                color: cardDark,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: borderDark),
-              ),
-              child: ListTile(
-                title: Text(title, style: TextStyle(color: textWhite, fontWeight: FontWeight.w500)),
-                trailing: onRemove != null ? IconButton(
-                  icon: Icon(Iconsax.trash, color: Colors.redAccent, size: 20.w),
-                  onPressed: () => onRemove(item),
-                ) : null,
-              ),
-            );
-          },
-        )),
-        
-        if (onAdd != null)
-        Positioned(
-          bottom: 24.h,
-          right: 24.w,
-          child: FloatingActionButton(
-            onPressed: onAdd,
-            backgroundColor: primaryBlue,
-            child: const Icon(Iconsax.add, color: Colors.white),
+        Obx(
+          () => ListView.separated(
+            padding: EdgeInsets.all(ASizes.defaultPadding),
+            itemCount: items.length,
+            separatorBuilder: (c, i) => SizedBox(height: 12.h),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final title = item is String
+                  ? item
+                  : (item as SurfBoardType).name;
+              return Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: colorScheme.outline),
+                ),
+                child: ListTile(
+                  title: Text(
+                    title,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  trailing: onRemove != null
+                      ? IconButton(
+                          icon: Icon(
+                            Iconsax.trash,
+                            color: colorScheme.error,
+                            size: 20.w,
+                          ),
+                          onPressed: () => onRemove(item),
+                        )
+                      : null,
+                ),
+              );
+            },
           ),
-        )
+        ),
+        if (onAdd != null)
+          Positioned(
+            bottom: 24.h,
+            right: 24.w,
+            child: FloatingActionButton(
+              onPressed: onAdd,
+              backgroundColor: colorScheme.primary,
+              child: Icon(Iconsax.add, color: colorScheme.onPrimary),
+            ),
+          ),
       ],
     );
   }

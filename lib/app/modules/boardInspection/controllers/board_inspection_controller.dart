@@ -8,6 +8,7 @@ import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
 import '../../../models/rental_model.dart';
 
 import 'package:surfboard_rental_app/app/services/payment_service.dart';
@@ -164,15 +165,18 @@ class BoardInspectionController extends GetxController {
     final dueTime = rental.value!.expectedReturnTime;
     final difference = dueTime.difference(now);
 
+    final colorScheme = Get.theme.colorScheme;
+    final statusColors = Get.theme.extension<StatusColors>();
+
     if (difference.isNegative) {
       // Overdue
       timeLabel.value = "Overdue";
-      timeColor.value = const Color(0xFFEF4444); // errorRed
+      timeColor.value = colorScheme.error;
       timeRemaining.value = _formatDuration(difference.abs());
     } else {
       // Time Remaining
       timeLabel.value = "Time Remaining";
-      timeColor.value = const Color(0xFF34C759); // successGreen
+      timeColor.value = statusColors?.success ?? Colors.green;
       timeRemaining.value = _formatDuration(difference);
     }
   }
@@ -189,28 +193,31 @@ class BoardInspectionController extends GetxController {
   void _showSettlementDialog({required double damageFee}) {
     double finalTotal = balanceDue + damageFee;
     String actionText = finalTotal > 0 ? "Collect Payment" : "Refund Customer";
+    final colorScheme = Get.theme.colorScheme;
+    final statusColors = Get.theme.extension<StatusColors>();
 
     Get.defaultDialog(
       title: "Settlement Required",
-      backgroundColor: const Color(0xFF182c30),
-      titleStyle: const TextStyle(color: Colors.white),
+      backgroundColor: colorScheme.surfaceContainer,
+      titleStyle: TextStyle(color: colorScheme.onSurface),
       content: Column(
         children: [
           _summaryRow("Outstanding Rent", balanceDue),
           if (damageFee > 0) _summaryRow("Damage Fee", damageFee),
-          const Divider(color: Colors.grey),
+          Divider(color: colorScheme.outline),
           _summaryRow("Net Payable", finalTotal, isBold: true),
         ],
       ),
       textConfirm: actionText,
-      confirmTextColor: Colors.white,
+      confirmTextColor: colorScheme.onPrimary,
       buttonColor: finalTotal > 0
-          ? const Color(0xFF4A90E2)
-          : const Color(0xFFF59E0B),
+          ? colorScheme.primary
+          : (statusColors?.warning ?? Colors.orange),
       onConfirm: () {
         _finalizeReturn(damageFee: damageFee, finalPayment: finalTotal);
       },
       textCancel: "Cancel",
+      cancelTextColor: colorScheme.primary,
     );
   }
 

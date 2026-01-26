@@ -33,13 +33,10 @@ class AAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<PopupMenuEntry<dynamic>>? popupMenuItems;
   final void Function(dynamic)? onPopupMenuSelected;
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color cardDark = const Color(0xFF182c30);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       // Add padding to avoid elements touching the screen edges too closely
       padding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -50,18 +47,28 @@ class AAppBar extends StatelessWidget implements PreferredSizeWidget {
         elevation: 0,
         scrolledUnderElevation:
             0, // Prevents color change on scroll (Material 3)
-        backgroundColor: backgroundColor ?? bgDark,
+        backgroundColor: backgroundColor ?? colorScheme.surface,
         surfaceTintColor: Colors.transparent, // Removes tint
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+
         // -- 1. Leading Icon Logic --
         leading: showbackArrow
             ? IconButton(
                 onPressed: () => Get.back(),
-                icon: Icon(Iconsax.arrow_left, size: 24.w, color: textWhite),
+                icon: Icon(
+                  Iconsax.arrow_left,
+                  size: 24.w,
+                  color: colorScheme.onSurface,
+                ),
               )
             : leadingIcon != null
             ? IconButton(
                 onPressed: leadingOnPressed,
-                icon: Icon(leadingIcon, size: 24.w, color: textWhite),
+                icon: Icon(
+                  leadingIcon,
+                  size: 24.w,
+                  color: colorScheme.onSurface,
+                ),
               )
             : null,
 
@@ -74,23 +81,20 @@ class AAppBar extends StatelessWidget implements PreferredSizeWidget {
 
           if (popupMenuItems != null)
             Theme(
-              // Override theme to make Popup Menu Dark
+              // Override theme for Popup Menu
               data: Theme.of(context).copyWith(
-                cardColor: cardDark,
-                iconTheme: IconThemeData(color: textWhite),
+                colorScheme: colorScheme.copyWith(
+                  surface: colorScheme.surfaceContainer,
+                  onSurface: colorScheme.onSurface,
+                ),
               ),
               child: PopupMenuButton(
-                icon: Icon(Iconsax.more, color: textWhite),
+                icon: Icon(Iconsax.more, color: colorScheme.onSurface),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 onSelected: onPopupMenuSelected,
                 itemBuilder: (context) => popupMenuItems!,
-                // Style the text inside the popup
-                // textStyle: TextStyle(
-                //   color: textWhite,
-                //   fontWeight: FontWeight.w500,
-                // ),
               ),
             ),
         ],

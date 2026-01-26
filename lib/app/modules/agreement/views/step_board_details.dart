@@ -9,8 +9,7 @@ class StepBoardDetails extends GetView<AgreementController> {
 
   @override
   Widget build(BuildContext context) {
-    final Color textWhite = const Color(0xFFf0f4f4);
-    final Color textGrey = const Color(0xFF94a3b8);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: EdgeInsets.all(20.w),
@@ -20,7 +19,7 @@ class StepBoardDetails extends GetView<AgreementController> {
           Text(
             "What are they renting?",
             style: TextStyle(
-              color: textWhite,
+              color: colorScheme.onSurface,
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -28,7 +27,10 @@ class StepBoardDetails extends GetView<AgreementController> {
           SizedBox(height: 8.h),
           Text(
             "Select the board and accessories.",
-            style: TextStyle(color: textGrey, fontSize: 16.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 16.sp,
+            ),
           ),
 
           SizedBox(height: 32.h),
@@ -37,6 +39,7 @@ class StepBoardDetails extends GetView<AgreementController> {
           // In real app use your Inventory List here
           Obx(
             () => _buildSelectionCard(
+              context,
               "Selected Board",
               Iconsax.box,
               controller.board?.name ?? "No board selected",
@@ -44,46 +47,28 @@ class StepBoardDetails extends GetView<AgreementController> {
           ),
 
           SizedBox(height: 24.h),
-
-          // Text("Accessories", style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.bold)),
-          // SizedBox(height: 12.h),
-          // Wrap(
-          //   spacing: 12.w,
-          //   runSpacing: 12.h,
-          //   children: ["Leash", "Fins", "Wax", "Board Bag"].map((item) {
-          //     return Obx(() {
-          //       final isSelected = controller.selectedAccessories.contains(item);
-          //       return ChoiceChip(
-          //         label: Text(item),
-          //         selected: isSelected,
-          //         onSelected: (selected) {
-          //           if(selected) controller.selectedAccessories.add(item);
-          //           else controller.selectedAccessories.remove(item);
-          //         },
-          //         selectedColor: const Color(0xFF4A90E2),
-          //         backgroundColor: const Color(0xFF182c30),
-          //         labelStyle: TextStyle(color: isSelected ? Colors.white : textGrey),
-          //         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-          //       );
-          //     });
-          //   }).toList(),
-          // )
         ],
       ),
     );
   }
 
-  Widget _buildSelectionCard(String title, IconData icon, String value) {
+  Widget _buildSelectionCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String value,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF182c30),
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF4A90E2)),
+          Icon(icon, color: colorScheme.primary),
           SizedBox(width: 16.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,14 +76,14 @@ class StepBoardDetails extends GetView<AgreementController> {
               Text(
                 title,
                 style: TextStyle(
-                  color: const Color(0xFF94a3b8),
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 12.sp,
                 ),
               ),
               Text(
                 value,
                 style: TextStyle(
-                  color: const Color(0xFFf0f4f4),
+                  color: colorScheme.onSurface,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                 ),
@@ -106,7 +91,7 @@ class StepBoardDetails extends GetView<AgreementController> {
             ],
           ),
           const Spacer(),
-          Icon(Iconsax.arrow_down_1, color: const Color(0xFF94a3b8)),
+          Icon(Iconsax.arrow_down_1, color: colorScheme.onSurfaceVariant),
         ],
       ),
     );

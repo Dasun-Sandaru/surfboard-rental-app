@@ -11,13 +11,11 @@ import '../widgets/onboarding_widget.dart';
 class OnboardView extends GetView<OnboardController> {
   const OnboardView({super.key});
 
-  // Theme Colors
-  final Color bgDark = const Color(0xFF101f22);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           /// Horizontal Scrollable Pages

@@ -5,27 +5,22 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
 
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/rental_payment_controller.dart';
 
 class RentalPaymentView extends StatelessWidget {
   const RentalPaymentView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-  final Color warningYellow = const Color(0xFFFFC107);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(RentalPaymentController());
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -33,7 +28,7 @@ class RentalPaymentView extends StatelessWidget {
         title: Text(
           "Payment Summary",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -51,9 +46,9 @@ class RentalPaymentView extends StatelessWidget {
                     () => Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: cardDark,
+                        color: colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: borderDark),
+                        border: Border.all(color: colorScheme.outline),
                       ),
                       child: Row(
                         children: [
@@ -66,7 +61,10 @@ class RentalPaymentView extends StatelessWidget {
                               // Fallback handled by using a default icon over it or just plain color
                             },
                             child: controller.customerImage.isEmpty
-                                ? Icon(Iconsax.user, color: textWhite)
+                                ? Icon(
+                                    Iconsax.user,
+                                    color: colorScheme.onSurface,
+                                  )
                                 : null,
                           ),
                           SizedBox(width: 16.w),
@@ -76,7 +74,7 @@ class RentalPaymentView extends StatelessWidget {
                               Text(
                                 controller.customerName,
                                 style: TextStyle(
-                                  color: textWhite,
+                                  color: colorScheme.onSurface,
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -85,7 +83,7 @@ class RentalPaymentView extends StatelessWidget {
                               Text(
                                 "Rental #${controller.rentalId}",
                                 style: TextStyle(
-                                  color: textGrey,
+                                  color: colorScheme.onSurfaceVariant,
                                   fontSize: 14.sp,
                                 ),
                               ),
@@ -103,37 +101,40 @@ class RentalPaymentView extends StatelessWidget {
                     () => Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: cardDark,
+                        color: colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: borderDark),
+                        border: Border.all(color: colorScheme.outline),
                       ),
                       child: Column(
                         children: [
                           _buildFeeRow(
+                            context,
                             "Remaining Rental Fee",
                             controller.rentalFee,
                             Iconsax.receipt,
-                            textGrey,
+                            colorScheme.onSurfaceVariant,
                           ),
                           SizedBox(height: 16.h),
 
                           _buildFeeRow(
+                            context,
                             "Late Fee",
                             controller.lateFee,
                             Iconsax.clock,
-                            warningYellow,
+                            statusColors?.warning ?? Colors.orange,
                           ),
                           SizedBox(height: 16.h),
 
                           _buildFeeRow(
+                            context,
                             "Damage Fee",
                             controller.damageFee,
                             Iconsax.setting_2, // Or Tool icon
-                            warningYellow,
+                            statusColors?.warning ?? Colors.orange,
                           ),
 
                           SizedBox(height: 16.h),
-                          Divider(color: borderDark),
+                          Divider(color: colorScheme.outline),
                           SizedBox(height: 16.h),
 
                           // Total Row
@@ -143,7 +144,7 @@ class RentalPaymentView extends StatelessWidget {
                               Text(
                                 "Final Total",
                                 style: TextStyle(
-                                  color: textWhite,
+                                  color: colorScheme.onSurface,
                                   fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -151,7 +152,7 @@ class RentalPaymentView extends StatelessWidget {
                               Text(
                                 "\$${controller.totalAmount.toStringAsFixed(2)}",
                                 style: TextStyle(
-                                  color: textWhite,
+                                  color: colorScheme.onSurface,
                                   fontSize: 24.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -171,7 +172,7 @@ class RentalPaymentView extends StatelessWidget {
                     child: Text(
                       "Payment History",
                       style: TextStyle(
-                        color: textWhite,
+                        color: colorScheme.onSurface,
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -188,13 +189,13 @@ class RentalPaymentView extends StatelessWidget {
                             Icon(
                               Iconsax.receipt,
                               size: 48.w,
-                              color: borderDark,
+                              color: colorScheme.outline,
                             ),
                             SizedBox(height: 12.h),
                             Text(
                               "No payments recorded yet",
                               style: TextStyle(
-                                color: textGrey,
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 14.sp,
                               ),
                             ),
@@ -212,13 +213,15 @@ class RentalPaymentView extends StatelessWidget {
                         final payment = controller.payments[index];
                         final isRefund =
                             payment.category == PaymentCategory.refund;
+                        final successColor =
+                            statusColors?.success ?? Colors.green;
 
                         return Container(
                           padding: EdgeInsets.all(12.w),
                           decoration: BoxDecoration(
-                            color: cardDark,
+                            color: colorScheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: borderDark),
+                            border: Border.all(color: colorScheme.outline),
                           ),
                           child: Row(
                             children: [
@@ -226,15 +229,17 @@ class RentalPaymentView extends StatelessWidget {
                                 padding: EdgeInsets.all(10.w),
                                 decoration: BoxDecoration(
                                   color: isRefund
-                                      ? Colors.green.withOpacity(0.1)
-                                      : primaryBlue.withOpacity(0.1),
+                                      ? successColor.withOpacity(0.1)
+                                      : colorScheme.primary.withOpacity(0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   isRefund
                                       ? Iconsax.money_send
                                       : Iconsax.money_recive,
-                                  color: isRefund ? Colors.green : primaryBlue,
+                                  color: isRefund
+                                      ? successColor
+                                      : colorScheme.primary,
                                   size: 20.w,
                                 ),
                               ),
@@ -247,7 +252,7 @@ class RentalPaymentView extends StatelessWidget {
                                       payment.category.name.capitalizeFirst ??
                                           payment.category.name,
                                       style: TextStyle(
-                                        color: textWhite,
+                                        color: colorScheme.onSurface,
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -256,7 +261,7 @@ class RentalPaymentView extends StatelessWidget {
                                     Text(
                                       "${payment.method.name.capitalizeFirst} • ${payment.timestamp.toString().substring(0, 10)}",
                                       style: TextStyle(
-                                        color: textGrey,
+                                        color: colorScheme.onSurfaceVariant,
                                         fontSize: 12.sp,
                                       ),
                                     ),
@@ -270,8 +275,8 @@ class RentalPaymentView extends StatelessWidget {
                                     "${isRefund ? '-' : '+'}\$${payment.amount.toStringAsFixed(2)}",
                                     style: TextStyle(
                                       color: isRefund
-                                          ? Colors.green
-                                          : textWhite,
+                                          ? successColor
+                                          : colorScheme.onSurface,
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -281,7 +286,7 @@ class RentalPaymentView extends StatelessWidget {
                                     Text(
                                       payment.note!,
                                       style: TextStyle(
-                                        color: textGrey,
+                                        color: colorScheme.onSurfaceVariant,
                                         fontSize: 10.sp,
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -304,8 +309,8 @@ class RentalPaymentView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(ASizes.defaultPadding),
             decoration: BoxDecoration(
-              color: bgDark,
-              border: Border(top: BorderSide(color: borderDark)),
+              color: colorScheme.surface,
+              border: Border(top: BorderSide(color: colorScheme.outline)),
             ),
             child: SizedBox(
               width: double.infinity,
@@ -313,7 +318,8 @@ class RentalPaymentView extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: controller.collectPayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -324,7 +330,6 @@ class RentalPaymentView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: textWhite,
                   ),
                 ),
               ),
@@ -340,11 +345,13 @@ class RentalPaymentView extends StatelessWidget {
   // ===========================================================================
 
   Widget _buildFeeRow(
+    BuildContext context,
     String label,
     double amount,
     IconData icon,
     Color iconColor,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     // Hide row if amount is 0 to keep UI clean
     if (amount <= 0) return const SizedBox.shrink();
 
@@ -357,14 +364,17 @@ class RentalPaymentView extends StatelessWidget {
             SizedBox(width: 12.w),
             Text(
               label,
-              style: TextStyle(color: textGrey, fontSize: 14.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14.sp,
+              ),
             ),
           ],
         ),
         Text(
           "\$${amount.toStringAsFixed(2)}",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 14.sp,
             fontWeight: FontWeight.w500,
           ),

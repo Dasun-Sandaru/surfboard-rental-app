@@ -12,26 +12,24 @@ import '../controllers/customer_list_controller.dart';
 class CustomerListView extends GetView<CustomerListController> {
   const CustomerListView({super.key});
 
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: bgDark,
-        title: Text('Customers', style: TextStyle(color: textWhite)),
+        backgroundColor: colorScheme.surface,
+        title: Text(
+          'Customers',
+          style: TextStyle(color: colorScheme.onSurface),
+        ),
         centerTitle: true,
         elevation: 0,
-        iconTheme: IconThemeData(color: textWhite),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         actions: [
           IconButton(
             onPressed: () => controller.addCustomer(),
-            icon: Icon(Iconsax.user_add, color: textWhite),
+            icon: Icon(Iconsax.user_add, color: colorScheme.onSurface),
           ),
         ],
       ),
@@ -41,7 +39,7 @@ class CustomerListView extends GetView<CustomerListController> {
             /// 1. Header & Search
             Container(
               padding: EdgeInsets.all(ASizes.defaultPadding),
-              color: bgDark,
+              color: colorScheme.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -49,13 +47,16 @@ class CustomerListView extends GetView<CustomerListController> {
                   TextField(
                     controller: controller.searchController,
                     onChanged: controller.onSearchChanged,
-                    style: TextStyle(color: textWhite),
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: "Search name...",
-                      hintStyle: TextStyle(color: textGrey),
-                      prefixIcon: Icon(Iconsax.search_normal, color: textGrey),
+                      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(
+                        Iconsax.search_normal,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       filled: true,
-                      fillColor: cardDark,
+                      fillColor: colorScheme.surfaceContainer,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -71,7 +72,7 @@ class CustomerListView extends GetView<CustomerListController> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: controller.refreshCustomers,
-                color: const Color(0xFF4A90E2),
+                color: colorScheme.primary,
                 child: PagedListView<dynamic, CustomerModel>.separated(
                   pagingController: controller.pagingController,
                   padding: EdgeInsets.symmetric(
@@ -80,16 +81,20 @@ class CustomerListView extends GetView<CustomerListController> {
                   separatorBuilder: (context, index) => SizedBox(height: 12.h),
                   builderDelegate: PagedChildBuilderDelegate<CustomerModel>(
                     itemBuilder: (context, customer, index) =>
-                        _buildCustomerCard(customer),
+                        _buildCustomerCard(context, customer),
 
                     // -- Loading Indicators --
                     firstPageProgressIndicatorBuilder: (_) => Center(
-                      child: CircularProgressIndicator(color: primaryBlue),
+                      child: CircularProgressIndicator(
+                        color: colorScheme.primary,
+                      ),
                     ),
                     newPageProgressIndicatorBuilder: (_) => Center(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: CircularProgressIndicator(color: primaryBlue),
+                        child: CircularProgressIndicator(
+                          color: colorScheme.primary,
+                        ),
                       ),
                     ),
 
@@ -98,11 +103,17 @@ class CustomerListView extends GetView<CustomerListController> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Iconsax.people, size: 48.w, color: textGrey),
+                          Icon(
+                            Iconsax.people,
+                            size: 48.w,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                           SizedBox(height: 8.h),
                           Text(
                             "No customers found",
-                            style: TextStyle(color: textGrey),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
@@ -117,7 +128,8 @@ class CustomerListView extends GetView<CustomerListController> {
     );
   }
 
-  Widget _buildCustomerCard(CustomerModel customer) {
+  Widget _buildCustomerCard(BuildContext context, CustomerModel customer) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
@@ -130,16 +142,16 @@ class CustomerListView extends GetView<CustomerListController> {
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: const Color(0xFF4A90E2).withOpacity(0.2),
+              backgroundColor: colorScheme.primary.withOpacity(0.2),
               child: Text(
                 customer.firstName.isNotEmpty ? customer.firstName[0] : "C",
-                style: TextStyle(color: textWhite),
+                style: TextStyle(color: colorScheme.primary),
               ),
             ),
             SizedBox(width: 16.w),
@@ -149,13 +161,16 @@ class CustomerListView extends GetView<CustomerListController> {
                 Text(
                   "${customer.firstName} ${customer.lastName}",
                   style: TextStyle(
-                    color: textWhite,
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   customer.phone,
-                  style: TextStyle(color: textGrey, fontSize: 12.sp),
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12.sp,
+                  ),
                 ),
               ],
             ),

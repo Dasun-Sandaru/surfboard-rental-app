@@ -5,40 +5,48 @@ import 'package:iconsax/iconsax.dart';
 import 'package:signature/signature.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/signature_pad_controller.dart';
 
 class SignaturePadView extends StatelessWidget {
   const SignaturePadView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color paperWhite = const Color(0xFFF5F5F5); // Slightly off-white for the pad
-  final Color errorRed = const Color(0xFFEF4444);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(SignaturePadController());
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
+    final paperWhite = statusColors?.paperWhite ?? Colors.white;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
-        leadingIcon: Iconsax.close_circle, // "Close" icon instead of back for modals
+        leadingIcon:
+            Iconsax.close_circle, // "Close" icon instead of back for modals
         centerTitle: true,
         title: Text(
           "Customer Signature",
-          style: TextStyle(color: textWhite, fontSize: 18.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           // Clear Button
           TextButton.icon(
             onPressed: controller.clearSignature,
-            icon: Icon(Iconsax.eraser, size: 18.w, color: errorRed),
-            label: Text("Clear", style: TextStyle(color: errorRed, fontWeight: FontWeight.bold)),
+            icon: Icon(Iconsax.eraser, size: 18.w, color: colorScheme.error),
+            label: Text(
+              "Clear",
+              style: TextStyle(
+                color: colorScheme.error,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           SizedBox(width: 8.w),
         ],
@@ -46,17 +54,20 @@ class SignaturePadView extends StatelessWidget {
       body: Column(
         children: [
           SizedBox(height: 16.h),
-          
+
           // -- Instructions --
           Padding(
             padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
             child: Text(
               "Please sign within the box below to accept the rental agreement.",
-              style: TextStyle(color: textGrey, fontSize: 14.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14.sp,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
-          
+
           SizedBox(height: 16.h),
 
           // -- Signature Pad --
@@ -71,7 +82,7 @@ class SignaturePadView extends StatelessWidget {
                     color: Colors.black.withOpacity(0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
               child: ClipRRect(
@@ -92,22 +103,32 @@ class SignaturePadView extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               height: 54.h,
-              child: Obx(() => ElevatedButton(
-                onPressed: controller.isEmpty.value ? null : controller.saveSignature,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  disabledBackgroundColor: primaryBlue.withOpacity(0.3),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-                child: Text(
-                  "Confirm Signature",
-                  style: TextStyle(
-                    color: controller.isEmpty.value ? textGrey : textWhite,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+              child: Obx(
+                () => ElevatedButton(
+                  onPressed: controller.isEmpty.value
+                      ? null
+                      : controller.saveSignature,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    disabledBackgroundColor: colorScheme.primary.withOpacity(
+                      0.3,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    "Confirm Signature",
+                    style: TextStyle(
+                      color: controller.isEmpty.value
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onPrimary,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              )),
+              ),
             ),
           ),
         ],

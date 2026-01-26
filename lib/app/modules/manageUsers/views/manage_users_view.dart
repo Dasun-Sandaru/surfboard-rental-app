@@ -7,24 +7,17 @@ import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/user_model.dart';
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
 import '../controllers/manage_users_controller.dart';
 
 class ManageUsersView extends GetView<ManageUsersController> {
   const ManageUsersView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-  final Color successGreen = const Color(0xFF34C759);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -32,7 +25,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
         title: Text(
           'User Management',
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
           ),
@@ -40,11 +33,11 @@ class ManageUsersView extends GetView<ManageUsersController> {
         actions: [
           TextButton.icon(
             onPressed: controller.addUser,
-            icon: Icon(Iconsax.add, color: primaryBlue, size: 20.w),
+            icon: Icon(Iconsax.add, color: colorScheme.primary, size: 20.w),
             label: Text(
               "Add",
               style: TextStyle(
-                color: primaryBlue,
+                color: colorScheme.primary,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -62,17 +55,19 @@ class ManageUsersView extends GetView<ManageUsersController> {
             /// Search Bar
             TextFormField(
               controller: controller.searchTextController,
-              style: TextStyle(color: textWhite),
+              style: TextStyle(color: colorScheme.onSurface),
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Iconsax.search_normal,
                   size: 20.w,
-                  color: textGrey,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 hintText: 'Search by name or email',
-                hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                ),
                 filled: true,
-                fillColor: cardDark,
+                fillColor: colorScheme.surfaceContainer,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -87,23 +82,26 @@ class ManageUsersView extends GetView<ManageUsersController> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: cardDark,
+                  color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderDark.withOpacity(0.5)),
+                  border: Border.all(
+                    color: colorScheme.outline.withOpacity(0.5),
+                  ),
                 ),
-
                 child: Obx(() {
                   if (controller.users.isEmpty) {
-                    return _buildEmptyList();
+                    return _buildEmptyList(context);
                   }
                   return ListView.separated(
                     itemCount: controller.users.length,
                     padding: EdgeInsets.zero,
-                    separatorBuilder: (context, index) =>
-                        Divider(color: borderDark.withOpacity(0.5), height: 1),
+                    separatorBuilder: (context, index) => Divider(
+                      color: colorScheme.outline.withOpacity(0.5),
+                      height: 1,
+                    ),
                     itemBuilder: (context, index) {
                       final user = controller.users[index];
-                      return _buildUserListItem(user);
+                      return _buildUserListItem(context, user);
                     },
                   );
                 }),
@@ -118,7 +116,8 @@ class ManageUsersView extends GetView<ManageUsersController> {
 
   // HELPER WIDGETS
 
-  Widget _buildEmptyList() {
+  Widget _buildEmptyList(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -126,19 +125,26 @@ class ManageUsersView extends GetView<ManageUsersController> {
           Icon(
             Iconsax.user_search,
             size: 60.w,
-            color: textGrey.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
           ),
           SizedBox(height: 16.h),
           Text(
             'No users found',
-            style: TextStyle(color: textGrey, fontSize: 16.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 16.sp,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildUserListItem(UserModel user) {
+  Widget _buildUserListItem(BuildContext context, UserModel user) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
+    final successColor = statusColors?.success ?? Colors.green;
+
     final bool isAdmin = user.role == UserRole.admin;
     final bool isActive = user.isActive;
 
@@ -180,7 +186,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   Text(
                     user.name ?? 'Unknown',
                     style: TextStyle(
-                      color: textWhite,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w600,
                       fontSize: 16.sp,
                     ),
@@ -188,7 +194,10 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   SizedBox(height: 4.h),
                   Text(
                     user.email ?? 'No email',
-                    style: TextStyle(color: textGrey, fontSize: 13.sp),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 13.sp,
+                    ),
                   ),
                   SizedBox(height: 8.h),
 
@@ -203,14 +212,16 @@ class ManageUsersView extends GetView<ManageUsersController> {
                         ),
                         decoration: BoxDecoration(
                           color: isAdmin
-                              ? primaryBlue.withOpacity(0.2)
-                              : textGrey.withOpacity(0.2),
+                              ? colorScheme.primary.withOpacity(0.2)
+                              : colorScheme.onSurfaceVariant.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           user.role.name.capitalizeFirst ?? 'Staff',
                           style: TextStyle(
-                            color: isAdmin ? primaryBlue : textGrey,
+                            color: isAdmin
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
                             fontSize: 10.sp,
                             fontWeight: FontWeight.bold,
                           ),
@@ -227,13 +238,13 @@ class ManageUsersView extends GetView<ManageUsersController> {
                             vertical: 2.h,
                           ),
                           decoration: BoxDecoration(
-                            color: successGreen.withOpacity(0.2),
+                            color: successColor.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             'Verified',
                             style: TextStyle(
-                              color: successGreen,
+                              color: successColor,
                               fontSize: 10.sp,
                               fontWeight: FontWeight.bold,
                             ),
@@ -249,7 +260,9 @@ class ManageUsersView extends GetView<ManageUsersController> {
                             height: 6.w,
                             width: 6.w,
                             decoration: BoxDecoration(
-                              color: isActive ? successGreen : textGrey,
+                              color: isActive
+                                  ? successColor
+                                  : colorScheme.outline,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -257,7 +270,9 @@ class ManageUsersView extends GetView<ManageUsersController> {
                           Text(
                             user.isActive ? 'Active' : 'Inactive',
                             style: TextStyle(
-                              color: isActive ? successGreen : textGrey,
+                              color: isActive
+                                  ? successColor
+                                  : colorScheme.outline,
                               fontSize: 11.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -271,7 +286,11 @@ class ManageUsersView extends GetView<ManageUsersController> {
             ),
 
             /// Arrow Icon
-            Icon(Iconsax.arrow_right_3, color: textGrey, size: 20.w),
+            Icon(
+              Iconsax.arrow_right_3,
+              color: colorScheme.onSurfaceVariant,
+              size: 20.w,
+            ),
           ],
         ),
       ),
