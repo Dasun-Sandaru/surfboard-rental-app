@@ -82,4 +82,12 @@ class FirestoreFields {
   static const contactNumber = 'contact_number';
   static const shopCode = 'shop_code';
   static const ownerAdminUid = 'owner_admin_uid';
+
+  // Activity Log
+  static const activityType = 'activity_type';
+  static const actorId = 'actor_id';
+  static const actorName = 'actor_name';
+  static const entityId = 'entity_id';
+  static const entityType = 'entity_type';
+  static const metadata = 'metadata';
 }

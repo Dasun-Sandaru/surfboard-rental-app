@@ -9,4 +9,5 @@ class FirestoreCollections {
   static const rentals = 'rentals';
   static const agreements = 'agreements';
   static const payments = 'payments';
+  static const activityLogs = 'activity_logs';
 }

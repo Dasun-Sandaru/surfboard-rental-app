@@ -1,14 +1,16 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 import '../models/customer_model.dart';
 
 class CustomerService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'CustomerService';
+  final ActivityLogService _activityLogService = ActivityLogService();
 
   DocumentReference _shopRef(String shopId) {
     return _db.collection(FirestoreCollections.shops).doc(shopId);
@@ -26,10 +28,23 @@ class CustomerService {
         shopId,
       ).collection(FirestoreCollections.customers).doc();
 
-      await docRef.set({
-        ...data,
-        FirestoreFields.id: docRef.id,
-        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+      // Using transaction for atomicity with log
+      await _db.runTransaction((transaction) async {
+        transaction.set(docRef, {
+          ...data,
+          FirestoreFields.id: docRef.id,
+          FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+        });
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_customer,
+          description:
+              "Added customer ${customerData.firstName} ${customerData.lastName}",
+          entityId: docRef.id,
+          entityType: 'Customer',
+          transaction: transaction,
+        );
       });
 
       log('Customer created: ${docRef.id}', name: logName);
@@ -104,9 +119,25 @@ class CustomerService {
   Future<void> deleteCustomer(String shopId, String customerId) async {
     try {
       log('Deleting customer: $customerId', name: logName);
-      await _shopRef(
+
+      final docRef = _shopRef(
         shopId,
-      ).collection(FirestoreCollections.customers).doc(customerId).delete();
+      ).collection(FirestoreCollections.customers).doc(customerId);
+
+      // Using transaction for atomicity with log
+      await _db.runTransaction((transaction) async {
+        transaction.delete(docRef);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.undefined, // or delete_customer if enum exists
+          description: "Deleted customer $customerId",
+          entityId: customerId,
+          entityType: 'Customer',
+          transaction: transaction,
+        );
+      });
+
       log('Customer deleted: $customerId', name: logName);
     } catch (e) {
       log('Error deleting customer: $e', name: logName);

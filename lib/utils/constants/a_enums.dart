@@ -42,6 +42,20 @@ enum DamageStatus {
   resolved, // fully handled
 }
 
+enum ActivityType {
+  create_rental,
+  return_rental,
+  add_payment,
+  delete_payment,
+  add_customer,
+  update_inventory,
+  add_inventory,
+  delete_inventory,
+  login,
+  logout,
+  undefined,
+}
+
 /// Helper to parse enums safely
 T enumFromString<T>(Iterable<T> values, String? value, T defaultValue) {
   if (value == null) {

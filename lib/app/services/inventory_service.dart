@@ -1,11 +1,14 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 class InventoryService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'InventoryService';
+  final ActivityLogService _activityLogService = ActivityLogService();
 
   DocumentReference _shopRef(String shopId) {
     return _db.collection(FirestoreCollections.shops).doc(shopId);
@@ -132,6 +135,7 @@ class InventoryService {
       final docRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.inventory).doc();
+
       final itemData = {
         ...data,
         FirestoreFields.id: docRef.id,
@@ -139,7 +143,19 @@ class InventoryService {
         FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       };
 
-      await docRef.set(itemData);
+      await _db.runTransaction((transaction) async {
+        transaction.set(docRef, itemData);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_inventory,
+          description:
+              "Added inventory item: ${data[FirestoreFields.name] ?? 'Unknown'}",
+          entityId: docRef.id,
+          entityType: 'Inventory',
+          transaction: transaction,
+        );
+      });
 
       log('Inventory item created: ${docRef.id}', name: logName);
       return docRef.id;
@@ -165,10 +181,22 @@ class InventoryService {
         FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       };
 
-      await _shopRef(shopId)
-          .collection(FirestoreCollections.inventory)
-          .doc(itemId)
-          .update(updateData);
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+
+      await _db.runTransaction((transaction) async {
+        transaction.update(docRef, updateData);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.update_inventory,
+          description: "Updated inventory item details: $itemId",
+          entityId: itemId,
+          entityType: 'Inventory',
+          transaction: transaction,
+        );
+      });
 
       log('Inventory item updated: $itemId', name: logName);
     } catch (e) {
@@ -187,9 +215,22 @@ class InventoryService {
     try {
       log('Deleting inventory item: $itemId', name: logName);
 
-      await _shopRef(
+      final docRef = _shopRef(
         shopId,
-      ).collection(FirestoreCollections.inventory).doc(itemId).delete();
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+
+      await _db.runTransaction((transaction) async {
+        transaction.delete(docRef);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.delete_inventory,
+          description: "Deleted inventory item: $itemId",
+          entityId: itemId,
+          entityType: 'Inventory',
+          transaction: transaction,
+        );
+      });
 
       log('Inventory item deleted: $itemId', name: logName);
     } catch (e) {
@@ -209,11 +250,25 @@ class InventoryService {
     try {
       log('Updating inventory status for $itemId to $status', name: logName);
 
-      await _shopRef(
+      final docRef = _shopRef(
         shopId,
-      ).collection(FirestoreCollections.inventory).doc(itemId).update({
-        FirestoreFields.status: status,
-        FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+
+      await _db.runTransaction((transaction) async {
+        transaction.update(docRef, {
+          FirestoreFields.status: status,
+          FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
+        });
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.update_inventory,
+          description: "Updated inventory status to $status",
+          entityId: itemId,
+          entityType: 'Inventory',
+          metadata: {'status': status},
+          transaction: transaction,
+        );
       });
 
       log('Inventory status updated: $itemId', name: logName);

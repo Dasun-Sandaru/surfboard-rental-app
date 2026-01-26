@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../models/payment_model.dart';
@@ -10,6 +11,7 @@ import '../models/rental_model.dart'; // Import RentalModel for status checks
 class PaymentService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'PaymentService';
+  final ActivityLogService _activityLogService = ActivityLogService();
 
   // Helper to get Rental Doc Ref
   DocumentReference _rentalRef(String shopId, String rentalId) {
@@ -92,6 +94,21 @@ class PaymentService {
           FirestoreFields.amountPaid: newAmountPaid,
           FirestoreFields.paymentStatus: newStatus.name,
         });
+
+        // 6. Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_payment,
+          description: "Added payment of $amount for rental $rentalId",
+          entityId: paymentDocRef.id,
+          entityType: 'Payment',
+          metadata: {
+            'rentalId': rentalId,
+            'amount': amount,
+            'category': category.name,
+          },
+          transaction: transaction,
+        );
       });
 
       log("Payment added: ${category.name} | $amount", name: logName);
@@ -201,6 +218,17 @@ class PaymentService {
           FirestoreFields.amountPaid: newAmountPaid,
           FirestoreFields.paymentStatus: newStatus.name,
         });
+
+        // 7. Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.delete_payment,
+          description: "Deleted payment $paymentId ($amountToReverse)",
+          entityId: paymentId,
+          entityType: 'Payment',
+          metadata: {'rentalId': rentalId, 'amountReversed': amountToReverse},
+          transaction: transaction,
+        );
       });
 
       log("Payment deleted: $paymentId", name: logName);

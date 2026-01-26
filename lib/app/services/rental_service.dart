@@ -5,6 +5,7 @@ import 'package:surfboard_rental_app/app/models/rental_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
 
 import '../../utils/constants/a_enums.dart';
 
@@ -12,6 +13,7 @@ class RentalService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'RentalService';
   final supabase = Supabase.instance.client;
+  final ActivityLogService _activityLogService = ActivityLogService();
 
   DocumentReference _shopRef(String shopId) {
     return _db.collection(FirestoreCollections.shops).doc(shopId);
@@ -116,6 +118,20 @@ class RentalService {
           FirestoreFields.rentalsCount: FieldValue.increment(1),
           FirestoreFields.lastRentalDate: FieldValue.serverTimestamp(),
         });
+
+        // Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.create_rental,
+          description: "Created rental for ${rentalData.customerId}",
+          entityId: rentalId,
+          entityType: 'Rental',
+          metadata: {
+            'amountExpected': rentalData.amountExpected,
+            'items': rentalData.itemId,
+          },
+          transaction: transaction,
+        );
       });
 
       log('Rental created successfully: $rentalId', name: logName);
@@ -188,24 +204,36 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.inventory).doc(itemId);
 
-      // Use Batch Write for atomicity
-      final batch = _db.batch();
+      // Moved from Batch to Transaction to support Logging within the same atomic operation
+      await _db.runTransaction((transaction) async {
+        // Optional: Check if already returned?
+        // final rentalSnap = await transaction.get(rentalRef);
 
-      // Update rental status to 'completed'
-      batch.update(rentalRef, {
-        FirestoreFields.status: RentalStatus.completed.name,
-        FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+        // Update rental status to 'completed'
+        transaction.update(rentalRef, {
+          FirestoreFields.status: RentalStatus.completed.name,
+          FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+        });
+
+        // Update inventory item status to 'available'
+        transaction.update(inventoryRef, {
+          FirestoreFields.status: InventoryStatus.available.name,
+        });
+
+        // Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.return_rental,
+          description: "Returned rental $rentalId",
+          entityId: rentalId,
+          entityType: 'Rental',
+          metadata: {'itemId': itemId},
+          transaction: transaction,
+        );
       });
-
-      // Update inventory item status to 'available'
-      batch.update(inventoryRef, {
-        FirestoreFields.status: InventoryStatus.available.name,
-      });
-
-      await batch.commit();
 
       log(
-        'Return finalized for rental: $rentalId (Batch Committed)',
+        'Return finalized for rental: $rentalId (Transaction Committed)',
         name: logName,
       );
     } catch (e) {
