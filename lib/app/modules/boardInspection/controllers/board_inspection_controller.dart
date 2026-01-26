@@ -6,6 +6,7 @@ import 'package:surfboard_rental_app/app/models/payment_model.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../models/rental_model.dart';
 
@@ -51,7 +52,7 @@ class BoardInspectionController extends GetxController {
 
     if (shopId == null) {
       status.value = RxStatus.error('Could not retrieve shop ID.');
-      Get.snackbar('Error', 'Could not retrieve shop ID.');
+      AppSnackBar.error(title: 'Error', message: 'Could not retrieve shop ID.');
       return;
     }
 
@@ -65,7 +66,10 @@ class BoardInspectionController extends GetxController {
       },
       onError: (error) {
         status.value = RxStatus.error(error.toString());
-        Get.snackbar('Error', 'Failed to load rental data.');
+        AppSnackBar.error(
+          title: 'Error',
+          message: 'Failed to load rental data.',
+        );
       },
     );
 
@@ -216,11 +220,9 @@ class BoardInspectionController extends GetxController {
   }) {
     Get.back(); // Close dialog
     Get.back(); // Close screen
-    Get.snackbar(
-      "Return Complete",
-      "Rental closed. ${finalPayment != 0 ? 'Payment recorded.' : ''}",
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green,
+    AppSnackBar.success(
+      title: "Return Complete",
+      message: "Rental closed. ${finalPayment != 0 ? 'Payment recorded.' : ''}",
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import 'package:get/get.dart';
 import '../../../models/payment_model.dart';
 import '../../../models/rental_model.dart';
@@ -81,7 +82,7 @@ class RentalPaymentController extends GetxController {
 
   Future<void> collectPayment() async {
     if (totalBalance <= 0) {
-      Get.snackbar("Info", "No balance to collect.");
+      AppSnackBar.info(title: "Info", message: "No balance to collect.");
       return;
     }
 

@@ -2,21 +2,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import '../../../models/damage_fee_model.dart';
 import '../../../models/damage_report_model.dart';
 import '../../../models/damage_photo_model.dart';
-import '../../../models/payment_model.dart';
 import '../../../../utils/constants/a_enums.dart';
 
 import '../../../services/damage_fee_service.dart';
 import '../../../services/damage_report_service.dart';
-import '../../../services/rental_service.dart';
 import '../../../services/user_service.dart';
 
 class DamageReportController extends GetxController {
   final DamageFeeService _damageFeeService = DamageFeeService();
   final DamageReportService _damageReportService = DamageReportService();
-  final RentalService _rentalService = RentalService();
   final UserService _userService = Get.find<UserService>();
 
   // -- State --
@@ -89,14 +87,15 @@ class DamageReportController extends GetxController {
         }
       });
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load damage fees: $e');
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Failed to load damage fees: $e',
+      );
     }
   }
 
-  // -- Actions --
-
-  void toggleDamage(String feeId, bool isSelected) {
-    selectedDamageFees[feeId] = isSelected;
+  void toggleDamage(String feeId, bool value) {
+    selectedDamageFees[feeId] = value;
   }
 
   double get totalFee {
@@ -112,22 +111,28 @@ class DamageReportController extends GetxController {
   Future<void> pickPhoto(String feeId) async {
     final currentPhotos = damagePhotos[feeId] ?? [];
     if (currentPhotos.length >= 3) {
-      Get.snackbar(
-        "Limit Reached",
-        "Maximum 3 photos per damage type.",
-        backgroundColor: Colors.amber.withOpacity(0.1),
-        colorText: Colors.amber,
+      AppSnackBar.warning(
+        title: "Limit Reached",
+        message: "Maximum 3 photos per damage type.",
       );
       return;
     }
 
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      if (!damagePhotos.containsKey(feeId)) {
-        damagePhotos[feeId] = [];
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70,
+      );
+
+      if (image != null) {
+        if (!damagePhotos.containsKey(feeId)) {
+          damagePhotos[feeId] = [];
+        }
+        damagePhotos[feeId]!.add(File(image.path));
+        damagePhotos.refresh();
       }
-      damagePhotos[feeId]!.add(File(image.path));
-      damagePhotos.refresh();
+    } catch (e) {
+      AppSnackBar.error(title: 'Error', message: 'Failed to pick image: $e');
     }
   }
 
@@ -139,127 +144,78 @@ class DamageReportController extends GetxController {
   }
 
   Future<void> saveReport() async {
-    // 1. Filter selected damage types
     final selectedFees = availableDamageFees
         .where((fee) => selectedDamageFees[fee.id] == true)
         .toList();
 
     if (selectedFees.isEmpty) {
-      Get.snackbar(
-        "Missing Info",
-        "Please select at least one damage type",
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
+      AppSnackBar.error(
+        title: "Missing Info",
+        message: "Please select at least one damage type",
       );
       return;
     }
 
-    isSaving.value = true;
-    // Show loading overlay
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
-
     try {
+      isSaving.value = true;
       final shopId = await _userService.getShopIdFromStorage();
-      final userId = _userService.currentUser!.uid;
-
       if (shopId == null || rentalId == null || itemId == null) {
-        throw Exception("Missing context data (shopId, rentalId, or itemId)");
+        throw 'Missing shop, rental or item information';
       }
 
-      // 2. Iterate and save each damage report
       for (var fee in selectedFees) {
-        if (fee.id == null) continue;
+        final note = damageNotes[fee.id]?.text;
 
-        // Create Report Document
-        final reportModel = DamageReportModel(
+        final report = DamageReportModel(
           rentalId: rentalId!,
           itemId: itemId!,
-          damageType: fee.damageType, // Now a String in model
-          note: damageNotes[fee.id]?.text,
+          damageType: fee.damageType,
+          note: note,
           status: DamageStatus.reported,
           estimatedCost: fee.feeAmount,
-          reportedBy: userId,
+          reportedBy: _userService.currentUser?.uid ?? 'Unknown',
           reportedAt: DateTime.now(),
         );
 
-        final damageId = await _damageReportService.createDamageReport(
+        final reportId = await _damageReportService.createDamageReport(
           shopId: shopId,
           rentalId: rentalId!,
-          report: reportModel,
+          report: report,
         );
 
-        // 3. Upload Photos for this damage (Supabase)
+        // Upload photos if any
         final photos = damagePhotos[fee.id] ?? [];
-        for (var file in photos) {
-          final timestamp = DateTime.now().millisecondsSinceEpoch;
-          final filename = "photo_${timestamp}.jpg";
-          // Path: rentalId/damageId/filename (Supabase bucket root relative)
-          final storagePath = "$rentalId/$damageId/$filename";
+        for (var photoFile in photos) {
+          final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+          final path =
+              'shops/$shopId/rentals/$rentalId/damages/$reportId/$fileName';
 
-          final photoUrl = await _damageReportService.uploadPhotoSupabase(
-            file: file,
-            path: storagePath,
-          );
-
-          final photoModel = DamagePhotoModel(
-            damageId: damageId,
-            photoUrl: photoUrl,
-            uploadedBy: userId,
-            uploadedAt: DateTime.now(),
+          final photoUrl = await _damageReportService.uploadPhoto(
+            file: photoFile,
+            path: path,
           );
 
           await _damageReportService.addDamagePhoto(
             shopId: shopId,
             rentalId: rentalId!,
-            damageId: damageId,
-            photo: photoModel,
+            damageId: reportId,
+            photo: DamagePhotoModel(
+              damageId: reportId,
+              photoUrl: photoUrl,
+              uploadedBy: _userService.currentUser?.uid ?? 'Unknown',
+              uploadedAt: DateTime.now(),
+            ),
           );
         }
-
-        // 4. Create Payment Record (Charge)
-        final paymentModel = PaymentModel(
-          rentalId: rentalId!,
-          amount: fee.feeAmount,
-          category: PaymentCategory.damageFee,
-          method: PaymentMethod.cash, // Defaulting to cash for charge record
-          handledBy: userId,
-          timestamp: DateTime.now(),
-          note: "Damage Fee: ${fee.damageType}",
-        );
-
-        await _damageReportService.createPayment(
-          shopId: shopId,
-          rentalId: rentalId!,
-          payment: paymentModel,
-        );
-
-        // 5. Update Rental Ledger (Amount Expected)
-        await _rentalService.addDamageCharge(
-          shopId: shopId,
-          rentalId: rentalId!,
-          amount: fee.feeAmount,
-        );
       }
 
-      // Close loading dialog
-      Get.back();
-
-      // Return to Inspection Screen with success result
       Get.back(result: {'success': true, 'totalFee': totalFee});
-      Get.snackbar("Success", "Damage reports saved successfully");
-    } catch (e) {
-      // Close loading dialog
-      if (Get.isDialogOpen == true) Get.back();
-
-      Get.snackbar(
-        "Error",
-        "Failed to save reports: $e",
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
+      AppSnackBar.success(
+        title: "Success",
+        message: "Damage reports saved successfully",
       );
+    } catch (e) {
+      AppSnackBar.error(title: "Error", message: "Failed to save reports: $e");
     } finally {
       isSaving.value = false;
     }

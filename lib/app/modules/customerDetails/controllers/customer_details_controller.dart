@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import 'package:surfboard_rental_app/app/models/customer_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -63,13 +64,13 @@ class CustomerDetailsController extends GetxController {
   void makeCall() async {
     final Uri launchUri = Uri(scheme: 'tel', path: customer.value.phone);
     if (await canLaunchUrl(launchUri)) {
-      await launchUri;
+      await launchUrl(launchUri); // Corrected to launchUrl
     } else {
-      Get.snackbar("Error", "Could not launch dialer");
+      AppSnackBar.error(title: "Error", message: "Could not launch dialer");
     }
   }
 
   void sendEmail() {
-    Get.snackbar("Action", "Opening Email App...");
+    AppSnackBar.info(title: "Action", message: "Opening Email App...");
   }
 }

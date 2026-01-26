@@ -10,6 +10,7 @@ class AppSnackBar {
     required String title,
     required String message,
     Duration duration = const Duration(seconds: 2),
+    void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] $message', name: _logName);
     Get.snackbar(
@@ -23,6 +24,7 @@ class AppSnackBar {
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
       icon: const Icon(Icons.check_circle, color: Colors.green),
+      onTap: onTap,
     );
   }
 
@@ -31,6 +33,7 @@ class AppSnackBar {
     required String title,
     required String message,
     Duration duration = const Duration(seconds: 3),
+    void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] ERROR: $message', name: _logName);
     Get.snackbar(
@@ -44,6 +47,7 @@ class AppSnackBar {
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
       icon: const Icon(Icons.error_outline, color: Colors.red),
+      onTap: onTap,
     );
   }
 
@@ -52,6 +56,7 @@ class AppSnackBar {
     required String title,
     required String message,
     Duration duration = const Duration(seconds: 2),
+    void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] WARNING: $message', name: _logName);
     Get.snackbar(
@@ -65,6 +70,7 @@ class AppSnackBar {
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
       icon: const Icon(Icons.warning_amber, color: Colors.orange),
+      onTap: onTap,
     );
   }
 
@@ -73,6 +79,7 @@ class AppSnackBar {
     required String title,
     required String message,
     Duration duration = const Duration(seconds: 2),
+    void Function(GetSnackBar)? onTap,
   }) {
     log('[$title] $message', name: _logName);
     Get.snackbar(
@@ -86,6 +93,7 @@ class AppSnackBar {
       margin: const EdgeInsets.all(16),
       snackPosition: SnackPosition.BOTTOM,
       icon: const Icon(Icons.info_outline, color: Colors.blue),
+      onTap: onTap,
     );
   }
 }

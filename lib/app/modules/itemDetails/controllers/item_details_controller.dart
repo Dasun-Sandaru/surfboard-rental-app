@@ -180,7 +180,7 @@ class ItemDetailsController extends GetxController {
   }
 
   void viewDamageFees() {
-    // Get.snackbar("Action", "View Damage Fees Clicked $itemId");
+    // AppSnackBar.info(title: "Action", message: "View Damage Fees Clicked $itemId");
     Get.toNamed(Routes.DAMAGE_FEE, arguments: itemId);
   }
 }

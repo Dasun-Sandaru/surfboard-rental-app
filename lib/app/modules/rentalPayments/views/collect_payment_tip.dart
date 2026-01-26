@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -280,14 +281,12 @@ class CollectPaymentTip extends StatelessWidget {
       Get.back(); // Close Payment Screen
       Get.back(); // Close Inspection Screen
 
-      Get.snackbar(
-        "Success",
-        "Payment collected & Rental Closed",
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
+      AppSnackBar.success(
+        title: "Success",
+        message: "Payment collected & Rental Closed",
       );
     } catch (e) {
-      Get.snackbar("Error", "Payment failed: $e");
+      AppSnackBar.error(title: "Error", message: "Payment failed: $e");
     }
   }
 }

@@ -220,7 +220,10 @@ class AgreementController extends GetxController {
         }
       });
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load damage fees: $e');
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Failed to load damage fees: $e',
+      );
     }
   }
 
@@ -361,13 +364,13 @@ class AgreementController extends GetxController {
         onLayout: (PdfPageFormat format) async => generatedPdfData.value!,
       );
     } else {
-      Get.snackbar('Error', 'PDF not generated yet.');
+      AppSnackBar.error(title: 'Error', message: 'PDF not generated yet.');
     }
   }
 
   Future<void> createRental() async {
     if (generatedPdfData.value == null) {
-      Get.snackbar("Error", "Please generate the agreement first.");
+      AppSnackBar.error(title: "Error", message: "Please generate the agreement first.");
       return;
     }
 
@@ -384,7 +387,7 @@ class AgreementController extends GetxController {
           customerId == null ||
           board == null ||
           rentalData == null) {
-        Get.snackbar("Error", "Missing required data to create rental.");
+        AppSnackBar.error(title: "Error", message: "Missing required data to create rental.");
         return;
       }
 
@@ -437,10 +440,10 @@ class AgreementController extends GetxController {
         generatedPdfData.value!,
       );
 
-      Get.snackbar("Success", "Rental created successfully with ID: $rentalId");
+      AppSnackBar.success(title: "Success", message: "Rental created successfully with ID: $rentalId");
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
-      Get.snackbar("Error", "Failed to create rental: $e");
+      AppSnackBar.error(title: "Error", message: "Failed to create rental: $e");
     } finally {
       isCreatingRental.value = false;
     }

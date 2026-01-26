@@ -68,16 +68,17 @@ class DamageFeeController extends GetxController {
       isLoading.value = true;
 
       // Bind the stream
-      damageRules.bindStream(_damageFeeService.streamDamageRules(
-        shopId: shopId!,
-        itemId: itemId,
-      ));
+      damageRules.bindStream(
+        _damageFeeService.streamDamageRules(shopId: shopId!, itemId: itemId),
+      );
 
       // Listen for the first data event to stop the loader
       ever(damageRules, (_) => isLoading.value = false);
     } catch (e) {
-      log('Error setting up damage rules stream: $e',
-          name: 'DamageFeeController');
+      log(
+        'Error setting up damage rules stream: $e',
+        name: 'DamageFeeController',
+      );
       AppSnackBar.error(
         title: 'Error',
         message: 'Failed to load damage rules: $e',
@@ -112,8 +113,10 @@ class DamageFeeController extends GetxController {
         itemId: itemId,
         damageRule: damageRule,
       );
-      log('Added damage rule: ${damageRule.damageType}',
-          name: 'DamageFeeController');
+      log(
+        'Added damage rule: ${damageRule.damageType}',
+        name: 'DamageFeeController',
+      );
       return true;
     } catch (e) {
       log('Error adding rule: $e', name: 'DamageFeeController');
@@ -138,8 +141,7 @@ class DamageFeeController extends GetxController {
         itemId: itemId,
         damageRule: damageRule,
       );
-      log('Updated damage rule: ${damageRule.id}',
-          name: 'DamageFeeController');
+      log('Updated damage rule: ${damageRule.id}', name: 'DamageFeeController');
       return true;
     } catch (e) {
       log('Error updating rule: $e', name: 'DamageFeeController');
@@ -253,11 +255,9 @@ class DamageFeeController extends GetxController {
             // Validate
             if (selectedDamageType.value.isEmpty ||
                 feeController.text.isEmpty) {
-              Get.snackbar(
-                "Error",
-                "Please select damage type and fee amount",
-                backgroundColor: Colors.red.withOpacity(0.1),
-                colorText: Colors.red,
+              AppSnackBar.error(
+                title: "Error",
+                message: "Please select damage type and fee amount",
               );
               return;
             }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../models/agreement_template_model.dart';
 import '../../../services/agreement_template_service.dart';
@@ -43,12 +44,9 @@ class AgreementTemplateController extends GetxController {
       final fetchedTemplates = await _templateService.getShopTemplates(shopId!);
       templates.assignAll(fetchedTemplates);
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to fetch templates.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to fetch templates.",
       );
     } finally {
       isLoading.value = false;
@@ -94,20 +92,14 @@ class AgreementTemplateController extends GetxController {
         }
         await fetchTemplates(); // Refresh the list
         Get.back(); // Go back to the list view
-        Get.snackbar(
-          "Success",
-          "Template saved successfully!",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        AppSnackBar.success(
+          title: "Success",
+          message: "Template saved successfully!",
         );
       } catch (e) {
-        Get.snackbar(
-          "Error",
-          "Failed to save template.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        AppSnackBar.error(
+          title: "Error",
+          message: "Failed to save template.",
         );
       } finally {
         isLoading.value = false;
