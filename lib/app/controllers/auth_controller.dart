@@ -29,6 +29,8 @@ class AuthController extends GetxController {
     ever(firebaseUser, _handleAuthChanged);
   }
 
+  final Rx<UserRole?> currentUserRole = Rx<UserRole?>(null);
+
   /// CENTRAL AUTH ROUTING
   Future<void> _handleAuthChanged(User? user) async {
     _userSub?.cancel();
@@ -51,6 +53,7 @@ class AuthController extends GetxController {
       final userModel = await _userService.getUserMembership(user.uid);
 
       final role = userModel.role;
+      currentUserRole.value = role;
       final shopId = userModel.shopId;
 
       // Save shopId Locally

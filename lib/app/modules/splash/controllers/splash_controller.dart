@@ -18,9 +18,15 @@ class SplashController extends GetxController {
 
   Future<void> _startApp() async {
     await checkAppUpdate();
-    _handleOnboarding();
-  }
 
+    // OnboardingMiddleware will handle redirection if needed.
+    // AuthMiddleware will handle Auth state.
+
+    Future.delayed(const Duration(seconds: 2), () {
+      Get.delete<SplashController>();
+      Get.put(AuthController(), permanent: true);
+    });
+  }
 
   /// APP UPDATE
   Future<void> checkAppUpdate() async {
@@ -42,20 +48,5 @@ class SplashController extends GetxController {
     } catch (e) {
       AppLogger.error('Update check failed: $e');
     }
-  }
-
-  /// ONBOARDING
-  void _handleOnboarding() {
-    final isOnboardingShown = _storage.readData('onboarding_shown') ?? false;
-
-    if (!isOnboardingShown) {
-      Get.offAllNamed(Routes.ONBOARD);
-      return;
-    }
-
-    /// AuthController WILL HANDLE AUTH STATE
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.put(AuthController(), permanent: true);
-    });
   }
 }

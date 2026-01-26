@@ -1,5 +1,10 @@
 import 'package:get/get.dart';
 
+import '../../utils/constants/a_enums.dart';
+import '../middleware/auth_middleware.dart';
+import '../middleware/maintenance_middleware.dart';
+import '../middleware/onboarding_middleware.dart';
+import '../middleware/role_middleware.dart';
 import '../modules/addEditCustomer/bindings/add_edit_customer_binding.dart';
 import '../modules/addEditCustomer/views/add_edit_customer_view.dart';
 import '../modules/addInventory/bindings/add_inventory_binding.dart';
@@ -36,6 +41,8 @@ import '../modules/itemDetails/bindings/item_details_binding.dart';
 import '../modules/itemDetails/views/item_details_view.dart';
 import '../modules/manageUsers/bindings/manage_users_binding.dart';
 import '../modules/manageUsers/views/manage_users_view.dart';
+import '../modules/maintenance/bindings/maintenance_binding.dart';
+import '../modules/maintenance/views/maintenance_view.dart';
 import '../modules/newRental/bindings/new_rental_binding.dart';
 import '../modules/newRental/views/new_rental_view.dart';
 import '../modules/onboard/bindings/onboard_binding.dart';
@@ -67,6 +74,8 @@ import '../modules/userDetail/views/user_detail_view.dart';
 
 part 'app_routes.dart';
 
+// Middlewares
+
 class AppPages {
   AppPages._();
 
@@ -77,6 +86,7 @@ class AppPages {
       name: _Paths.SPLASH,
       page: () => const SplashView(),
       binding: SplashBinding(),
+      middlewares: [MaintenanceMiddleware()],
     ),
     GetPage(
       name: _Paths.ONBOARD,
@@ -97,6 +107,7 @@ class AppPages {
       name: _Paths.SIGN_IN,
       page: () => const SignInView(),
       binding: SignInBinding(),
+      middlewares: [MaintenanceMiddleware(), OnboardingMiddleware()],
     ),
     GetPage(
       name: _Paths.SIGN_UP,
@@ -107,11 +118,23 @@ class AppPages {
       name: _Paths.ADMIN_HOME,
       page: () => const AdminHomeView(),
       binding: AdminHomeBinding(),
+      middlewares: [
+        MaintenanceMiddleware(),
+        OnboardingMiddleware(),
+        AuthMiddleware(),
+        RoleMiddleware(allowedRoles: [UserRole.admin]),
+      ],
     ),
     GetPage(
       name: _Paths.STAFF_HOME,
       page: () => const StaffHomeView(),
       binding: StaffHomeBinding(),
+      middlewares: [
+        MaintenanceMiddleware(),
+        OnboardingMiddleware(),
+        AuthMiddleware(),
+        RoleMiddleware(allowedRoles: [UserRole.staff, UserRole.admin]),
+      ],
     ),
     GetPage(
       name: _Paths.VERIFY_EMAIL,
@@ -228,6 +251,11 @@ class AppPages {
       name: _Paths.DAMAGE_REPORT,
       page: () => const DamageReportView(),
       binding: DamageReportBinding(),
+    ),
+    GetPage(
+      name: _Paths.MAINTENANCE,
+      page: () => const MaintenanceView(),
+      binding: MaintenanceBinding(),
     ),
   ];
 }
