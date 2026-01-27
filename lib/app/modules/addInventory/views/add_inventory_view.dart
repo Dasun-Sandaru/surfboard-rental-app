@@ -350,7 +350,7 @@ class AddInventoryView extends StatelessWidget {
       controller: controller.surfboardTypeController,
       hintText: 'Select board type',
       items: SurfBoardType.values,
-      headerBuilder: (context, selectedItem, _) {
+      headerBuilder: (context, selectedItem, enabled) {
         return Text(
           selectedItem.name,
           style: TextStyle(color: colorScheme.onSurface, fontSize: 16.sp),
@@ -393,13 +393,18 @@ class AddInventoryView extends StatelessWidget {
       decoration: CustomDropdownDecoration(
         closedFillColor: colorScheme.surfaceContainer,
         expandedFillColor: colorScheme.surfaceContainer,
-        closedBorder: BoxBorder.all(color: colorScheme.outline),
-        expandedBorder: BoxBorder.all(color: colorScheme.primary),
+        closedBorder: Border.all(color: colorScheme.outline),
+        expandedBorder: Border.all(color: colorScheme.primary),
+        closedBorderRadius: BorderRadius.circular(12),
+        expandedBorderRadius: BorderRadius.circular(12),
+        listItemDecoration: ListItemDecoration(
+          selectedColor: colorScheme.primaryContainer,
+        ),
         hintStyle: TextStyle(
           color: colorScheme.onSurfaceVariant.withOpacity(0.5),
           fontSize: 16.sp,
         ),
-        closedErrorBorder: BoxBorder.all(color: colorScheme.error),
+        closedErrorBorder: Border.all(color: colorScheme.error),
         errorStyle: TextStyle(color: colorScheme.error, fontSize: 14.sp),
         closedSuffixIcon: Icon(
           Iconsax.arrow_down_2,

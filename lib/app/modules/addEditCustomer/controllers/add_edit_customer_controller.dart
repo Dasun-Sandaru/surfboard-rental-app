@@ -53,7 +53,10 @@ class AddEditCustomerController extends GetxController {
     if (!formKey.currentState!.validate()) return;
 
     if (shopId == null) {
-      AppSnackBar.error(title: 'Error', message: 'Shop ID not found. Please restart the app.');
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Shop ID not found. Please restart the app.',
+      );
       return;
     }
 
@@ -94,8 +97,6 @@ class AddEditCustomerController extends GetxController {
       // Clear fields
       clearForm();
     }
-
-    Get.back(); // Return to previous screen
   }
 
   /// Clear fields

@@ -279,6 +279,23 @@ class DamageFeeController extends GetxController {
                     damageType: typeController.text,
                   );
 
+            // Check for duplicates when adding a new rule
+            if (!isEdit) {
+              final isDuplicate = damageRules.any(
+                (existing) =>
+                    existing.damageType.toLowerCase() ==
+                    damageRule.damageType.toLowerCase(),
+              );
+              if (isDuplicate) {
+                AppSnackBar.warning(
+                  title: 'Duplicate Rule',
+                  message:
+                      'A damage rule for "${damageRule.damageType}" already exists.',
+                );
+                return;
+              }
+            }
+
             bool success = false;
             if (isEdit) {
               success = await _updateRule(damageRule);

@@ -125,7 +125,7 @@ class SignInView extends GetView<SignInController> {
           _buildLabel(context, 'Email Address'.tr),
           SizedBox(height: 8.h),
           TextFormField(
-            controller: controller.emailController,
+            controller: controller.signInEmailController,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(color: colorScheme.onSurface),
@@ -144,7 +144,7 @@ class SignInView extends GetView<SignInController> {
           SizedBox(height: 8.h),
           Obx(
             () => TextFormField(
-              controller: controller.passwordController,
+              controller: controller.signInPasswordController,
               textInputAction: TextInputAction.done,
               obscureText: controller.isObscure.value,
               style: TextStyle(color: colorScheme.onSurface),

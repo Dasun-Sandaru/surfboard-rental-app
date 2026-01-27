@@ -32,13 +32,6 @@ class RentalsView extends GetView<RentalsController> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: controller.refreshRentals,
-            icon: Icon(Iconsax.refresh, color: colorScheme.onSurface),
-          ),
-          SizedBox(width: 8.w),
-        ],
       ),
       body: Column(
         children: [
@@ -146,29 +139,20 @@ class RentalsView extends GetView<RentalsController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () =>
-                        controller.goToCustomerDetails(rental.customerId),
-                    child: Text(
-                      rental.cachedCustomerName ?? rental.customerId,
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
+                  Text(
+                    rental.cachedCustomerName ?? rental.customerId,
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 4.h),
-                  GestureDetector(
-                    onTap: () => controller.goToItemDetails(rental.itemId),
-                    child: Text(
-                      rental.cachedItemName ?? rental.itemId,
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontSize: 14.sp,
-                        decoration: TextDecoration.underline,
-                      ),
+                  Text(
+                    rental.cachedItemName ?? rental.itemId,
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 14.sp,
                     ),
                   ),
                   SizedBox(height: 8.h),

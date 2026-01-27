@@ -49,22 +49,21 @@ class InventoryListView extends StatelessWidget {
               if (controller.items.isEmpty) {
                 return Padding(
                   padding: EdgeInsets.all(16.w),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        // decoration: BoxDecoration(
-                        //   color: cardDark,
-                        //   borderRadius: BorderRadius.circular(16),
-                        // ),
-                        child: const Center(
-                          child: Text(
-                            'No inventory found',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Iconsax.add,
+                          size: 48.w,
+                          color: colorScheme.onSurfaceVariant,
                         ),
-                      ),
-                    ],
+                        Text(
+                          'No inventory found',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }

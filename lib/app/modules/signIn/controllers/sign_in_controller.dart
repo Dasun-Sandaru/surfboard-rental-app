@@ -11,8 +11,8 @@ import '../../../services/user_service.dart';
 class SignInController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final signInEmailController = TextEditingController();
+  final signInPasswordController = TextEditingController();
 
   final isLoading = false.obs;
   final isObscure = true.obs;
@@ -29,8 +29,8 @@ class SignInController extends GetxController {
 
       /// FIREBASE AUTH
       await _authService.signIn(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: signInEmailController.text.trim(),
+        password: signInPasswordController.text.trim(),
       );
 
       /// GET SHOP ID + ROLE
@@ -88,8 +88,8 @@ class SignInController extends GetxController {
 
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
+    signInEmailController.dispose();
+    signInPasswordController.dispose();
     super.onClose();
   }
 }

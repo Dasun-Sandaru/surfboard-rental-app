@@ -50,30 +50,35 @@ class InventoryModel {
   /// Firestore → Model
   factory InventoryModel.fromMap(Map<String, dynamic> data) {
     return InventoryModel(
-      id: data[FirestoreFields.id] as String,
-      imageUrl: data[FirestoreFields.imageUrl] as String,
-      name: data[FirestoreFields.name] as String,
-      type: data[FirestoreFields.type] as String,
-      brand: data[FirestoreFields.brand] as String,
+      id: data[FirestoreFields.id] as String? ?? '',
+      imageUrl: data[FirestoreFields.imageUrl] as String? ?? '',
+      name: data[FirestoreFields.name] as String? ?? '',
+      type: data[FirestoreFields.type] as String? ?? '',
+      brand: data[FirestoreFields.brand] as String? ?? '',
 
-      sizeFeet: (data[FirestoreFields.sizeFeet] as num).toInt(),
-      sizeInches: (data[FirestoreFields.sizeInches] as num).toInt(),
-      sizeTotalInches: (data[FirestoreFields.sizeTotalInches] as num).toInt(),
+      sizeFeet: (data[FirestoreFields.sizeFeet] as num?)?.toInt() ?? 0,
+      sizeInches: (data[FirestoreFields.sizeInches] as num?)?.toInt() ?? 0,
+      sizeTotalInches:
+          (data[FirestoreFields.sizeTotalInches] as num?)?.toInt() ?? 0,
 
-      volume: (data[FirestoreFields.volume] as num).toInt(),
-      color: data[FirestoreFields.color] as String,
-      purchaseCost: (data[FirestoreFields.purchaseCost] as num).toInt(),
-      damageFeeRule: data[FirestoreFields.damageFeeRule] as String,
-      rentalRateHour: (data[FirestoreFields.rentalRateHour] as num).toInt(),
-      rentalRateDay: (data[FirestoreFields.rentalRateDay] as num).toInt(),
-      note: data[FirestoreFields.note] as String,
+      volume: (data[FirestoreFields.volume] as num?)?.toInt() ?? 0,
+      color: data[FirestoreFields.color] as String? ?? '',
+      purchaseCost: (data[FirestoreFields.purchaseCost] as num?)?.toInt() ?? 0,
+      damageFeeRule: data[FirestoreFields.damageFeeRule] as String? ?? '',
+      rentalRateHour:
+          (data[FirestoreFields.rentalRateHour] as num?)?.toInt() ?? 0,
+      rentalRateDay:
+          (data[FirestoreFields.rentalRateDay] as num?)?.toInt() ?? 0,
+      note: data[FirestoreFields.note] as String? ?? '',
 
       status: InventoryStatus.values.firstWhere(
         (e) => e.name == data[FirestoreFields.status],
         orElse: () => InventoryStatus.available,
       ),
 
-      createdAt: (data[FirestoreFields.createdAt] as Timestamp).toDate(),
+      createdAt: data[FirestoreFields.createdAt] != null
+          ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
+          : DateTime.now(),
     );
   }
 

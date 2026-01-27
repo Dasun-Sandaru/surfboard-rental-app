@@ -286,21 +286,32 @@ class CollectPaymentTip extends StatelessWidget {
         method: PaymentMethod.cash,
       );
 
-      // 2. Finalize Return (update inventory etc)
+      // 2. Determine inventory status based on damage
+      // If there are damage fees, mark the board as damaged
+      final bool hasDamage = controller.damageFee > 0;
+      final InventoryStatus inventoryStatus = hasDamage
+          ? InventoryStatus.mark_as_damaged
+          : InventoryStatus.available;
+
+      // 3. Finalize Return (update rental to completed and inventory status)
       if (controller.rental.value?.itemId != null) {
         await controller.rentalService.finalizeReturn(
           shopId: controller.shopId,
           rentalId: controller.rentalId,
           itemId: controller.rental.value!.itemId,
+          status: RentalStatus.completed,
+          inventoryStatus: inventoryStatus,
         );
       }
 
       Get.back(); // Close Payment Screen
-      Get.back(); // Close Inspection Screen
+      Get.back(); // Close Rental Payment Screen
 
       AppSnackBar.success(
         title: "Success",
-        message: "Payment collected & Rental Closed",
+        message: hasDamage
+            ? "Payment collected. Board marked as damaged."
+            : "Payment collected & Rental Closed",
       );
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Payment failed: $e");

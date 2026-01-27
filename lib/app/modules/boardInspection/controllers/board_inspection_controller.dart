@@ -240,7 +240,7 @@ class BoardInspectionController extends GetxController {
   Future<void> _finalizeReturn({
     required double damageFee,
     required double finalPayment,
-    RentalStatus status = RentalStatus.completed,
+    RentalStatus status = RentalStatus.item_returned,
   }) async {
     try {
       final String? shopId = await _userService.getShopIdFromStorage();

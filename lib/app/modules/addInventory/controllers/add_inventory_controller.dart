@@ -176,8 +176,8 @@ class AddInventoryController extends GetxController {
         FirestoreFields.volume: int.tryParse(volumeController.text) ?? 0,
         FirestoreFields.color: colorController.text,
         FirestoreFields.purchaseCost: int.tryParse(costController.text) ?? 0,
-        FirestoreFields.damageFeeRule:
-            'rule', // Consider if this should be constant or field
+        // Consider if this should be constant or field
+        FirestoreFields.damageFeeRule: 'rule',
         FirestoreFields.rentalRateHour:
             int.tryParse(rentalRateController.text) ?? 0,
         FirestoreFields.rentalRateDay:

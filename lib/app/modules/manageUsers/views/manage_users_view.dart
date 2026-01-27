@@ -30,21 +30,21 @@ class ManageUsersView extends GetView<ManageUsersController> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          TextButton.icon(
-            onPressed: controller.addUser,
-            icon: Icon(Iconsax.add, color: colorScheme.primary, size: 20.w),
-            label: Text(
-              "Add",
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          SizedBox(width: 8.w),
-        ],
+        // actions: [
+        //   TextButton.icon(
+        //     onPressed: controller.addUser,
+        //     icon: Icon(Iconsax.add, color: colorScheme.primary, size: 20.w),
+        //     label: Text(
+        //       "Add",
+        //       style: TextStyle(
+        //         color: colorScheme.primary,
+        //         fontSize: 14.sp,
+        //         fontWeight: FontWeight.w600,
+        //       ),
+        //     ),
+        //   ),
+        //   SizedBox(width: 8.w),
+        // ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),

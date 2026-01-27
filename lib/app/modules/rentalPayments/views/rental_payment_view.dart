@@ -71,16 +71,12 @@ class RentalPaymentView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: controller.goToCustomerDetails,
-                                child: Text(
-                                  controller.customerName,
-                                  style: TextStyle(
-                                    color: colorScheme.primary,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                  ),
+                              Text(
+                                controller.customerName,
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               SizedBox(height: 4.h),
@@ -310,35 +306,40 @@ class RentalPaymentView extends StatelessWidget {
           ),
 
           /// 3. Bottom Action Button
-          Container(
-            padding: EdgeInsets.all(ASizes.defaultPadding),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              border: Border(top: BorderSide(color: colorScheme.outline)),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54.h,
-              child: ElevatedButton(
-                onPressed: controller.collectPayment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+          Obx(() {
+            if (controller.rental.value?.status != RentalStatus.item_returned) {
+              return const SizedBox.shrink();
+            }
+            return Container(
+              padding: EdgeInsets.all(ASizes.defaultPadding),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                border: Border(top: BorderSide(color: colorScheme.outline)),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 54.h,
+                child: ElevatedButton(
+                  onPressed: controller.collectPayment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 4,
                   ),
-                  elevation: 4,
-                ),
-                child: Text(
-                  "Collect Payment",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    "Collect Payment",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

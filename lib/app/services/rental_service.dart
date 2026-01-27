@@ -194,6 +194,7 @@ class RentalService {
     required String rentalId,
     required String itemId,
     RentalStatus status = RentalStatus.completed,
+    InventoryStatus inventoryStatus = InventoryStatus.available,
     String? overdueTime,
   }) async {
     try {
@@ -218,9 +219,9 @@ class RentalService {
           if (overdueTime != null) FirestoreFields.overdueTime: overdueTime,
         });
 
-        // Update inventory item status to 'available'
+        // Update inventory item status based on damage
         transaction.update(inventoryRef, {
-          FirestoreFields.status: InventoryStatus.available.name,
+          FirestoreFields.status: inventoryStatus.name,
         });
 
         // Log Activity
@@ -230,7 +231,7 @@ class RentalService {
           description: "Returned rental $rentalId",
           entityId: rentalId,
           entityType: 'Rental',
-          metadata: {'itemId': itemId},
+          metadata: {'itemId': itemId, 'inventoryStatus': inventoryStatus.name},
           transaction: transaction,
         );
       });

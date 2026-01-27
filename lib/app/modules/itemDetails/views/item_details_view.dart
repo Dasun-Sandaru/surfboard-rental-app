@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/item_details_controller.dart';
@@ -143,80 +144,86 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
     final colorScheme = Theme.of(context).colorScheme;
     final statusColors = Theme.of(context).extension<StatusColors>();
 
-    return Container(
-      padding: EdgeInsets.all(ASizes.defaultPadding),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(top: BorderSide(color: colorScheme.outline)),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            // Mark as Repair Button
-            Expanded(
-              child: ElevatedButton(
-                onPressed: controller.markAsRepair,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: statusColors?.warning ?? Colors.orange,
-                  foregroundColor: colorScheme
-                      .surface, // Dark text on yellow in light mode, maybe?
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  elevation: 0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Iconsax.setting_2, size: 20.w),
-                    SizedBox(width: 8.w),
-                    Text(
-                      "Mark as Repair",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+    return Obx(() {
+      final item = controller.item.value;
+      if (item == null) {
+        return const SizedBox.shrink();
+      }
 
-            SizedBox(width: 12.w),
-
-            // View Damage Fees Button
-            Expanded(
-              child: TextButton(
-                onPressed: controller.viewDamageFees,
-                style: TextButton.styleFrom(
-                  backgroundColor: colorScheme.primary.withOpacity(0.15),
-                  foregroundColor: colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Iconsax.receipt, size: 20.w),
-                    SizedBox(width: 8.w),
-                    Text(
-                      "View Damage Fees",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+      return Container(
+        padding: EdgeInsets.all(ASizes.defaultPadding),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(top: BorderSide(color: colorScheme.outline)),
         ),
-      ),
-    );
+        child: SafeArea(
+          child: Row(
+            children: [
+              // Mark as Repair Button
+              if (item.status == InventoryStatus.mark_as_damaged) ...[
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: controller.markAsRepair,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: statusColors?.warning ?? Colors.orange,
+                      foregroundColor: colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Iconsax.setting_2, size: 20.w),
+                        SizedBox(width: 8.w),
+                        Text(
+                          "Mark as Repair",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+              ],
+              // View Damage Fees Button
+              Expanded(
+                child: TextButton(
+                  onPressed: controller.viewDamageFees,
+                  style: TextButton.styleFrom(
+                    backgroundColor: colorScheme.primary.withOpacity(0.15),
+                    foregroundColor: colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Iconsax.receipt, size: 20.w),
+                      SizedBox(width: 8.w),
+                      Text(
+                        "View Damage Fees",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildDetailRow(
