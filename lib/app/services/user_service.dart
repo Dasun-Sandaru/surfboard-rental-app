@@ -8,6 +8,7 @@ import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import '../../utils/constants/a_enums.dart';
 import '../../utils/storage/app_storage.dart';
 import '../models/user_model.dart';
+import 'agreement_template_service.dart';
 
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -84,6 +85,22 @@ class UserService {
 
       await batch.commit();
       log('Admin registered successfully', name: logName);
+
+      // Create Default Agreement Template for the new shop
+      try {
+        final templateService = AgreementTemplateService();
+        await templateService.createDefaultTemplate(shopRef.id);
+        log(
+          'Default agreement template created for shop: ${shopRef.id}',
+          name: logName,
+        );
+      } catch (e) {
+        log(
+          'Error creating default template during registration: $e',
+          name: logName,
+        );
+        // We don't rethrow here because the main registration was successful
+      }
     } catch (e) {
       log('Error registering admin: $e', name: logName);
       rethrow;
