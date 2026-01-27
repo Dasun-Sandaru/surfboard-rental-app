@@ -27,7 +27,7 @@ class AgreementTemplateService {
       final templateRef = _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.agreements)
+          .collection(FirestoreCollections.agreementTemplates)
           .doc();
 
       final template = AgreementTemplateModel(
@@ -58,7 +58,7 @@ class AgreementTemplateService {
       final snapshot = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.agreements)
+          .collection(FirestoreCollections.agreementTemplates)
           .orderBy(FirestoreFields.createdAt, descending: true)
           .get();
 
@@ -85,7 +85,7 @@ class AgreementTemplateService {
       final doc = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.agreements)
+          .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .get();
 
@@ -109,7 +109,7 @@ class AgreementTemplateService {
       final snapshot = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.agreements)
+          .collection(FirestoreCollections.agreementTemplates)
           .where(FirestoreFields.isDefault, isEqualTo: true)
           .limit(1)
           .get();
@@ -161,7 +161,7 @@ class AgreementTemplateService {
       await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.agreements)
+          .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .update(updates);
 
@@ -183,7 +183,7 @@ class AgreementTemplateService {
       await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.agreements)
+          .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .delete();
 
@@ -214,7 +214,7 @@ class AgreementTemplateService {
             _db
                 .collection(FirestoreCollections.shops)
                 .doc(shopId)
-                .collection(FirestoreCollections.agreements)
+                .collection(FirestoreCollections.agreementTemplates)
                 .doc(template.id),
             {FirestoreFields.isDefault: false},
           );
@@ -226,7 +226,7 @@ class AgreementTemplateService {
         _db
             .collection(FirestoreCollections.shops)
             .doc(shopId)
-            .collection(FirestoreCollections.agreements)
+            .collection(FirestoreCollections.agreementTemplates)
             .doc(templateId),
         {
           FirestoreFields.isDefault: true,

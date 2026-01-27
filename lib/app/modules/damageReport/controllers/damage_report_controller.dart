@@ -190,7 +190,7 @@ class DamageReportController extends GetxController {
           final path =
               'shops/$shopId/rentals/$rentalId/damages/$reportId/$fileName';
 
-          final photoUrl = await _damageReportService.uploadPhoto(
+          final photoUrl = await _damageReportService.uploadPhotoSupabase(
             file: photoFile,
             path: path,
           );
@@ -208,6 +208,12 @@ class DamageReportController extends GetxController {
           );
         }
       }
+
+      await _damageReportService.updateRentalStatus(
+        shopId: shopId,
+        rentalId: rentalId!,
+        status: RentalStatus.mark_as_damaged,
+      );
 
       Get.back(result: {'success': true, 'totalFee': totalFee});
       AppSnackBar.success(

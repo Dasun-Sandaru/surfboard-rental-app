@@ -7,7 +7,7 @@ class FirestoreCollections {
   static const customers = 'customers';
   static const inventory = 'inventory';
   static const rentals = 'rentals';
-  static const agreements = 'agreements';
+  static const agreementTemplates = 'agreement_templates';
   static const payments = 'payments';
   static const activityLogs = 'activity_logs';
 }

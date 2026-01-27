@@ -370,7 +370,10 @@ class AgreementController extends GetxController {
 
   Future<void> createRental() async {
     if (generatedPdfData.value == null) {
-      AppSnackBar.error(title: "Error", message: "Please generate the agreement first.");
+      AppSnackBar.error(
+        title: "Error",
+        message: "Please generate the agreement first.",
+      );
       return;
     }
 
@@ -387,7 +390,10 @@ class AgreementController extends GetxController {
           customerId == null ||
           board == null ||
           rentalData == null) {
-        AppSnackBar.error(title: "Error", message: "Missing required data to create rental.");
+        AppSnackBar.error(
+          title: "Error",
+          message: "Missing required data to create rental.",
+        );
         return;
       }
 
@@ -440,8 +446,11 @@ class AgreementController extends GetxController {
         generatedPdfData.value!,
       );
 
-      AppSnackBar.success(title: "Success", message: "Rental created successfully with ID: $rentalId");
-      Get.offAllNamed(Routes.HOME);
+      AppSnackBar.success(
+        title: "Success",
+        message: "Rental created successfully with ID: $rentalId",
+      );
+      Get.offAllNamed(Routes.ADMIN_HOME);
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to create rental: $e");
     } finally {

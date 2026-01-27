@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../services/agreement_template_service.dart';
 import '../controllers/agreement_controller.dart';
 import 'step_board_details.dart';
 import 'step_damage_fees.dart';

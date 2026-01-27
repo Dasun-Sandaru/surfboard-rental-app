@@ -202,4 +202,21 @@ class DamageReportService {
               .toList(),
         );
   }
+
+  // -----------------------------
+  // Update Rental Status
+  // -----------------------------
+  Future<void> updateRentalStatus({
+    required String shopId,
+    required String rentalId,
+    required RentalStatus status,
+  }) async {
+    final ref = _db
+        .collection('shops')
+        .doc(shopId)
+        .collection('rentals')
+        .doc(rentalId);
+
+    await ref.update({'status': status.name});
+  }
 }

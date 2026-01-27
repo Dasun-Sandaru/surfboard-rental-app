@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../routes/app_pages.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/board_inspection_controller.dart';
@@ -209,35 +210,37 @@ class BoardInspectionView extends StatelessWidget {
                 child: Row(
                   children: [
                     // Report Damage Button
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 54.h,
-                        child: ElevatedButton(
-                          onPressed: controller.reportDamage,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorScheme.surfaceContainer,
-                            foregroundColor:
-                                statusColors?.warning ?? Colors.orange,
-                            side: BorderSide(
-                              color: statusColors?.warning ?? Colors.orange,
+                    if (controller.rental.value?.status !=
+                        RentalStatus.mark_as_damaged) ...[
+                      Expanded(
+                        child: SizedBox(
+                          height: 54.h,
+                          child: ElevatedButton(
+                            onPressed: controller.reportDamage,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.surfaceContainer,
+                              foregroundColor:
+                                  statusColors?.warning ?? Colors.orange,
+                              side: BorderSide(
+                                color: statusColors?.warning ?? Colors.orange,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 0,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            "Report Damage",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
+                            child: Text(
+                              "Report Damage",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 12.h),
+                      SizedBox(width: 12.w),
+                    ],
                     // No Damage Button
                     Expanded(
                       child: SizedBox(
