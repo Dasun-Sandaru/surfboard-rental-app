@@ -9,6 +9,7 @@ import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/rental_model.dart';
 
 import 'package:surfboard_rental_app/app/services/payment_service.dart';
@@ -132,23 +133,38 @@ class BoardInspectionController extends GetxController {
   double get balanceDue =>
       (rental.value?.amountExpected ?? 0) - (rental.value?.amountPaid ?? 0);
 
-  String get staffName => rental.value?.staffId ?? '';
+  String get staffName =>
+      rental.value?.cachedStaffName ?? rental.value?.staffId ?? '';
 
-  String get customerName => rental.value?.customerId ?? '';
+  String get customerName =>
+      rental.value?.cachedCustomerName ?? rental.value?.customerId ?? '';
 
-  String get boardName => rental.value?.itemId ?? '';
+  String get boardName =>
+      rental.value?.cachedItemName ?? rental.value?.itemId ?? '';
 
   double get totalPaymentsMade =>
       paymentHistory.fold(0.0, (sum, payment) => sum + payment.amount);
 
   // --- Actions ---
-  void reportNoDamage() {
-    // Logic: If balance is 0, just close. If balance exists, show Payment Dialog.
-    if (balanceDue.abs() > 0.01) {
-      _showSettlementDialog(damageFee: 0);
-    } else {
-      _finalizeReturn(damageFee: 0, finalPayment: 0);
-    }
+  Future<void> reportNoDamage() async {
+    // Save overdue time in rental document using timeRemaining
+    // Logic: If balance is 0, just close (item_returned/completed).
+    // If balance exists, show Payment Dialog.
+    // if (balanceDue.abs() > 0.01) {
+    //   _showSettlementDialog(damageFee: 0);
+    // } else {
+    await _finalizeReturn(
+      damageFee: 0,
+      finalPayment: 0,
+      status: RentalStatus.item_returned,
+    );
+
+    // Navigate to Rental Payment
+    Get.offAllNamed(
+      Routes.PAYMENTS,
+      arguments: {'rentalId': rental.value!.id, 'shopId': rental.value!.shopId},
+    );
+    // }
   }
 
   void reportDamage() {
@@ -221,16 +237,42 @@ class BoardInspectionController extends GetxController {
     );
   }
 
-  void _finalizeReturn({
+  Future<void> _finalizeReturn({
     required double damageFee,
     required double finalPayment,
-  }) {
-    Get.back(); // Close dialog
-    Get.back(); // Close screen
-    AppSnackBar.success(
-      title: "Return Complete",
-      message: "Rental closed. ${finalPayment != 0 ? 'Payment recorded.' : ''}",
-    );
+    RentalStatus status = RentalStatus.completed,
+  }) async {
+    try {
+      final String? shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null || rental.value == null) return;
+
+      // Only save overdue time if it's actually overdue
+      String? overdueString;
+      if (timeLabel.value == "Overdue") {
+        overdueString = timeRemaining.value;
+      }
+
+      await _rentalService.finalizeReturn(
+        shopId: shopId,
+        rentalId: rentalId,
+        itemId: rental.value!.itemId,
+        status: status,
+        overdueTime: overdueString,
+      );
+
+      Get.back(); // Close dialog
+      Get.back(); // Close screen
+      AppSnackBar.success(
+        title: "Return Complete",
+        message:
+            "Rental closed. ${finalPayment != 0 ? 'Payment recorded.' : ''}",
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to finalize return: $e",
+      );
+    }
   }
 
   Widget _summaryRow(String label, double amount, {bool isBold = false}) {

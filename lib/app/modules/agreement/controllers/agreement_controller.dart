@@ -397,6 +397,10 @@ class AgreementController extends GetxController {
         return;
       }
 
+      // Fetch Staff Name for caching
+      final staffUser = await _userService.getUser(userId);
+      final staffName = staffUser?.name ?? 'Staff';
+
       final startDateTime = DateTime(
         rentalData.startDate.year,
         rentalData.startDate.month,
@@ -422,7 +426,6 @@ class AgreementController extends GetxController {
         expectedReturnTime: dueDateTime,
         actualReturnTime: null,
         status: RentalStatus.active,
-
         rentType: initRentalModel.value!.rentType,
         paymentStatus: PaymentStatus.unpaid,
         rate: double.tryParse(rentalPriceController.text) ?? 0.0,
@@ -437,6 +440,10 @@ class AgreementController extends GetxController {
           refunded: 0.0,
         ),
         agreementLink: null,
+        overdueTime: null,
+        cachedCustomerName: "${customer!.firstName} ${customer!.lastName}",
+        cachedItemName: board!.name,
+        cachedStaffName: staffName,
         createdAt: DateTime.now(),
       );
 

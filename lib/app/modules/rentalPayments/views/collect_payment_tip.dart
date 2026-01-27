@@ -289,9 +289,9 @@ class CollectPaymentTip extends StatelessWidget {
       // 2. Finalize Return (update inventory etc)
       if (controller.rental.value?.itemId != null) {
         await controller.rentalService.finalizeReturn(
-          controller.shopId,
-          controller.rentalId,
-          controller.rental.value!.itemId,
+          shopId: controller.shopId,
+          rentalId: controller.rentalId,
+          itemId: controller.rental.value!.itemId,
         );
       }
 

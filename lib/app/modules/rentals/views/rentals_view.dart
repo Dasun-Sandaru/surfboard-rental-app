@@ -146,20 +146,29 @@ class RentalsView extends GetView<RentalsController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    rental.id ?? 'N/A',
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () =>
+                        controller.goToCustomerDetails(rental.customerId),
+                    child: Text(
+                      rental.cachedCustomerName ?? rental.customerId,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    rental.itemId,
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 14.sp,
+                  GestureDetector(
+                    onTap: () => controller.goToItemDetails(rental.itemId),
+                    child: Text(
+                      rental.cachedItemName ?? rental.itemId,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 14.sp,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                   SizedBox(height: 8.h),

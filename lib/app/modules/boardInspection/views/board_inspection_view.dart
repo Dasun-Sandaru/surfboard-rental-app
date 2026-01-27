@@ -128,6 +128,8 @@ class BoardInspectionView extends StatelessWidget {
                             context,
                             "Customer",
                             controller.customerName,
+                            onTap: controller.goToCustomerDetails,
+                            valueColor: colorScheme.primary,
                           ),
                         ),
                         Obx(
@@ -135,6 +137,8 @@ class BoardInspectionView extends StatelessWidget {
                             context,
                             "Item",
                             controller.boardName,
+                            onTap: controller.goToItemDetails,
+                            valueColor: colorScheme.primary,
                           ),
                         ),
                         _buildDetailRow(
@@ -166,7 +170,6 @@ class BoardInspectionView extends StatelessWidget {
                       arguments: {
                         'rentalId': rental.id,
                         'shopId': rental.shopId,
-                        'damageFee': 50.0, // Simulated fee
                       },
                       children: [
                         Column(
@@ -381,6 +384,7 @@ class BoardInspectionView extends StatelessWidget {
     String value, {
     bool isLast = false,
     Color? valueColor,
+    VoidCallback? onTap,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
@@ -407,14 +411,18 @@ class BoardInspectionView extends StatelessWidget {
           ),
           Expanded(
             flex: 6,
-            child: Text(
-              value,
-              style: TextStyle(
-                color: valueColor ?? colorScheme.onSurface,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
+            child: InkWell(
+              onTap: onTap,
+              child: Text(
+                value,
+                style: TextStyle(
+                  color: valueColor ?? colorScheme.onSurface,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  decoration: onTap != null ? TextDecoration.underline : null,
+                ),
+                textAlign: TextAlign.right,
               ),
-              textAlign: TextAlign.right,
             ),
           ),
         ],

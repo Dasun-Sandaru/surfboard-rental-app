@@ -71,12 +71,16 @@ class RentalPaymentView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                controller.customerName,
-                                style: TextStyle(
-                                  color: colorScheme.onSurface,
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
+                              GestureDetector(
+                                onTap: controller.goToCustomerDetails,
+                                child: Text(
+                                  controller.customerName,
+                                  style: TextStyle(
+                                    color: colorScheme.primary,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 4.h),

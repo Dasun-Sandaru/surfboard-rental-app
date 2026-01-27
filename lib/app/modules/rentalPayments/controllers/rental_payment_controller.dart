@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import 'package:get/get.dart';
 import '../../../models/payment_model.dart';
 import '../../../models/rental_model.dart';
 import '../../../../utils/constants/a_enums.dart';
+import '../../../routes/app_pages.dart';
 import '../../../services/payment_service.dart';
 import '../../../services/rental_service.dart';
 import '../../../services/user_service.dart';
@@ -23,7 +23,10 @@ class RentalPaymentController extends GetxController {
   String shopId = "";
 
   // -- Getters for View --
-  String get customerName => rental.value?.customerId ?? "Customer";
+  String get customerName =>
+      rental.value?.cachedCustomerName ??
+      rental.value?.customerId ??
+      "Customer";
 
   double get damageFeeValue => payments
       .where((p) => p.category == PaymentCategory.damageFee)
@@ -87,5 +90,12 @@ class RentalPaymentController extends GetxController {
     }
 
     Get.to(CollectPaymentTip(controller: this));
+  }
+
+  void goToCustomerDetails() {
+    final customerId = rental.value?.customerId;
+    if (customerId != null) {
+      Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customerId);
+    }
   }
 }

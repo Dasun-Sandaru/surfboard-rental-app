@@ -36,6 +36,10 @@ class RentalModel {
 
   // Agreement
   final String? agreementLink;
+  final String? overdueTime;
+  final String? cachedCustomerName;
+  final String? cachedItemName;
+  final String? cachedStaffName;
 
   // Meta
   final DateTime createdAt;
@@ -57,6 +61,10 @@ class RentalModel {
     required this.amountPaid,
     required this.securityDeposit,
     this.agreementLink,
+    this.overdueTime,
+    this.cachedCustomerName,
+    this.cachedItemName,
+    this.cachedStaffName,
     required this.createdAt,
   });
 
@@ -107,6 +115,10 @@ class RentalModel {
       ),
 
       agreementLink: data[FirestoreFields.agreementLink],
+      overdueTime: data[FirestoreFields.overdueTime],
+      cachedCustomerName: data[FirestoreFields.cachedCustomerName],
+      cachedItemName: data[FirestoreFields.cachedItemName],
+      cachedStaffName: data[FirestoreFields.cachedStaffName],
       createdAt: (data[FirestoreFields.createdAt] as Timestamp).toDate(),
     );
   }
@@ -140,6 +152,10 @@ class RentalModel {
       FirestoreFields.securityDeposit: securityDeposit.toMap(),
 
       FirestoreFields.agreementLink: agreementLink,
+      FirestoreFields.overdueTime: overdueTime,
+      FirestoreFields.cachedCustomerName: cachedCustomerName,
+      FirestoreFields.cachedItemName: cachedItemName,
+      FirestoreFields.cachedStaffName: cachedStaffName,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
     };
   }

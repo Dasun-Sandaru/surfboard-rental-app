@@ -189,11 +189,13 @@ class RentalService {
     }
   }
 
-  Future<void> finalizeReturn(
-    String shopId,
-    String rentalId,
-    String itemId,
-  ) async {
+  Future<void> finalizeReturn({
+    required String shopId,
+    required String rentalId,
+    required String itemId,
+    RentalStatus status = RentalStatus.completed,
+    String? overdueTime,
+  }) async {
     try {
       log('Finalizing return for rental: $rentalId', name: logName);
 
@@ -209,10 +211,11 @@ class RentalService {
         // Optional: Check if already returned?
         // final rentalSnap = await transaction.get(rentalRef);
 
-        // Update rental status to 'completed'
+        // Update rental status
         transaction.update(rentalRef, {
-          FirestoreFields.status: RentalStatus.completed.name,
+          FirestoreFields.status: status.name,
           FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+          if (overdueTime != null) FirestoreFields.overdueTime: overdueTime,
         });
 
         // Update inventory item status to 'available'
@@ -261,6 +264,38 @@ class RentalService {
       log('Damage charge added to rental: $rentalId', name: logName);
     } catch (e) {
       log('Error adding damage charge: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> updateRentalStatus({
+    required String shopId,
+    required String rentalId,
+    required RentalStatus status,
+  }) async {
+    try {
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+      await docRef.update({FirestoreFields.status: status.name});
+    } catch (e) {
+      log('Error updating rental status: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> updateInventoryStatus({
+    required String shopId,
+    required String itemId,
+    required InventoryStatus status,
+  }) async {
+    try {
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+      await docRef.update({FirestoreFields.status: status.name});
+    } catch (e) {
+      log('Error updating inventory status: $e', name: logName);
       rethrow;
     }
   }
