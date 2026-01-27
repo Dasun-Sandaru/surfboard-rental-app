@@ -233,6 +233,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         'icon': Iconsax.document_text,
       },
       {'title': 'Settings', 'sub': 'App config', 'icon': Iconsax.setting_2},
+      {'title': 'Seed Data', 'sub': 'DEBUG: Add samples', 'icon': Iconsax.data},
     ];
 
     return GridView.builder(
@@ -264,6 +265,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 break;
               case 6:
                 Get.toNamed(Routes.SETTINGS);
+                break;
+              case 7:
+                controller.seedSampleData();
                 break;
             }
           },

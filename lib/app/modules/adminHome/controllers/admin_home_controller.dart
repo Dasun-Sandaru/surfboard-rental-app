@@ -6,6 +6,8 @@ import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/inventory_service.dart';
 import 'package:surfboard_rental_app/app/services/customer_service.dart';
+import 'package:surfboard_rental_app/app/services/sample_data_service.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 
@@ -93,4 +95,28 @@ class AdminHomeController extends GetxController {
 
   /// Sign out
   Future<void> signOut() async => await _authService.signOut();
+
+  /// Seed Sample Data
+  Future<void> seedSampleData() async {
+    if (shopId == null) return;
+    final adminUid = _userService.currentUser?.uid;
+    if (adminUid == null) return;
+
+    try {
+      AppSnackBar.info(
+        title: "Seeding...",
+        message: "Populating sample data...",
+      );
+      final sampleService = SampleDataService();
+      await sampleService.seedData(shopId!, adminUid);
+
+      await loadDashboardStats();
+      AppSnackBar.success(
+        title: "Success",
+        message: "Sample data populated successfully!",
+      );
+    } catch (e) {
+      AppSnackBar.error(title: "Error", message: "Failed to seed data: $e");
+    }
+  }
 }
