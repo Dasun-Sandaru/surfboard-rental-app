@@ -143,7 +143,7 @@ class RentalQrCodeDialog extends StatelessWidget {
                 border: Border.all(color: colorScheme.outline),
               ),
               child: QrImageView(
-                data: rental.id ?? 'unknown',
+                data: 'RENT:${rental.id ?? 'unknown'}',
                 version: QrVersions.auto,
                 size: 180.w,
                 backgroundColor: Colors.white,

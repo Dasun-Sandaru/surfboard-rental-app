@@ -115,7 +115,7 @@ class UserQrCodeDialog extends StatelessWidget {
                 border: Border.all(color: colorScheme.outline),
               ),
               child: QrImageView(
-                data: user.uid,
+                data: 'USER:${user.uid}',
                 version: QrVersions.auto,
                 size: 180.w,
                 backgroundColor: Colors.white,

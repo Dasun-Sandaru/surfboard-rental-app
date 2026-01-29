@@ -107,7 +107,7 @@ class InventoryQrCodeDialog extends StatelessWidget {
                 border: Border.all(color: colorScheme.outline),
               ),
               child: QrImageView(
-                data: item.id,
+                data: 'ITEM:${item.id}',
                 version: QrVersions.auto,
                 size: 180.w,
                 backgroundColor: Colors.white,
