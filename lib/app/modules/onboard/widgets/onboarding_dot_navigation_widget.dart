@@ -7,18 +7,16 @@ import '../controllers/onboard_controller.dart';
 class OnBoardingDotNavigationWidget extends GetView<OnboardController> {
   const OnBoardingDotNavigationWidget({super.key});
 
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color inactiveGrey = const Color(0xFF4A5C6A);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SmoothPageIndicator(
       controller: controller.pageController,
       count: 3,
       onDotClicked: controller.dotNavigationClick,
       effect: ExpandingDotsEffect(
-        activeDotColor: textWhite,
-        dotColor: inactiveGrey,
+        activeDotColor: colorScheme.primary,
+        dotColor: colorScheme.outlineVariant,
         dotHeight: 6.h,
         dotWidth: 8.w,
         expansionFactor: 3,

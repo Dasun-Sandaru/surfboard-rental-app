@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+
 import '../../../models/customer_model.dart';
 import '../../../services/customer_service.dart';
 import '../../../services/user_service.dart';
@@ -51,7 +53,10 @@ class AddEditCustomerController extends GetxController {
     if (!formKey.currentState!.validate()) return;
 
     if (shopId == null) {
-      Get.snackbar('Error', 'Shop ID not found. Please restart the app.');
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Shop ID not found. Please restart the app.',
+      );
       return;
     }
 
@@ -65,7 +70,7 @@ class AddEditCustomerController extends GetxController {
       notes: notesController.text.trim(),
       createdAt: isEditMode.value
           ? currentCustomer.value!.createdAt
-          : DateTime.now().toIso8601String(),
+          : DateTime.now(),
       imageUrl: isEditMode.value ? currentCustomer.value!.imageUrl : null,
     );
 
@@ -78,26 +83,20 @@ class AddEditCustomerController extends GetxController {
         currentCustomer.value!.id!,
         customer,
       );
-      Get.snackbar(
-        'Customer Updated',
-        'Customer has been updated successfully.',
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
+      AppSnackBar.success(
+        title: 'Customer Updated',
+        message: 'Customer has been updated successfully.',
       );
     } else {
       // Add new customer
       _customerService.addCustomer(shopId!, customer);
-      Get.snackbar(
-        'Customer Added',
-        'Customer has been added successfully.',
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
+      AppSnackBar.success(
+        title: 'Customer Added',
+        message: 'Customer has been added successfully.',
       );
       // Clear fields
       clearForm();
     }
-
-    Get.back(); // Return to previous screen
   }
 
   /// Clear fields

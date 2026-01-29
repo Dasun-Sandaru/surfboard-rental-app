@@ -13,20 +13,13 @@ import '../controllers/add_inventory_controller.dart';
 class AddInventoryView extends StatelessWidget {
   const AddInventoryView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AddInventoryController());
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: false,
         leadingIcon: Icons.close,
@@ -37,7 +30,7 @@ class AddInventoryView extends StatelessWidget {
               ? "Edit Board"
               : "Add Board",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -54,23 +47,24 @@ class AddInventoryView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// Name
-                    _buildLabel('Board Name'),
+                    _buildLabel(context, 'Board Name'),
                     SizedBox(height: 8.h),
-                    _buildBoardName(controller),
+                    _buildBoardName(context, controller),
 
                     SizedBox(height: 20.h),
 
                     /// 3. Type
-                    _buildLabel('Surfboard Type'),
+                    _buildLabel(context, 'Surfboard Type'),
                     SizedBox(height: 8.h),
-                    _buildTypeDropdown(controller),
+                    _buildTypeDropdown(context, controller),
 
                     SizedBox(height: 20.h),
 
                     /// 1. Brand (Dropdown)
-                    _buildLabel('Brand'),
+                    _buildLabel(context, 'Brand'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.brandController,
                       hintText: "e.g., Surfline",
                       icon: Icons.storefront,
@@ -81,13 +75,14 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// 2. Size (Split Inputs)
-                    _buildLabel('Size'),
+                    _buildLabel(context, 'Size'),
                     SizedBox(height: 8.h),
                     Row(
                       children: [
                         // Feet Input
                         Expanded(
                           child: _buildTextField(
+                            context,
                             controller: controller.sizeFeetController,
                             hintText: "6 ft",
                             validator: (v) =>
@@ -101,6 +96,7 @@ class AddInventoryView extends StatelessWidget {
                         // Inches Input
                         Expanded(
                           child: _buildTextField(
+                            context,
                             controller: controller.sizeInchesController,
                             hintText: "2 in",
                             validator: (v) =>
@@ -116,9 +112,10 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// Volume
-                    _buildLabel('Volume'),
+                    _buildLabel(context, 'Volume'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.volumeController,
                       validator: (v) => AValidator.validateNumber(v, 'Volume'),
                       icon: Icons.water_drop,
@@ -130,13 +127,13 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// 4. Color
-                    _buildLabel('Color'),
+                    _buildLabel(context, 'Color'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.colorController,
                       icon: Icons.color_lens,
                       validator: (v) => AValidator.validateText(v, 'Color'),
-
                       hintText: "e.g., Blue with stripes",
                       textAction: TextInputAction.next,
                     ),
@@ -144,9 +141,10 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// 5. Purchase Cost
-                    _buildLabel('Purchase Cost'),
+                    _buildLabel(context, 'Purchase Cost'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.costController,
                       hintText: "0.00",
                       icon: Icons.attach_money,
@@ -160,9 +158,10 @@ class AddInventoryView extends StatelessWidget {
 
                     /// rental rate hour
                     SizedBox(height: 20.h),
-                    _buildLabel('Rental Rate (Hourly)'),
+                    _buildLabel(context, 'Rental Rate (Hourly)'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.rentalRateController,
                       hintText: "0.00",
                       icon: Icons.attach_money,
@@ -177,9 +176,10 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// rental rate day
-                    _buildLabel('Rental Rate (Daily)'),
+                    _buildLabel(context, 'Rental Rate (Daily)'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.rentalRateDayController,
                       hintText: "0.00",
                       icon: Icons.attach_money,
@@ -194,9 +194,10 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// Notes
-                    _buildLabel('Notes'),
+                    _buildLabel(context, 'Notes'),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.notesController,
                       icon: Icons.note,
                       hintText: "Additional details about the board",
@@ -217,28 +218,30 @@ class AddInventoryView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(ASizes.defaultPadding),
             decoration: BoxDecoration(
-              color: bgDark,
-              border: Border(top: BorderSide(color: borderDark)),
+              color: colorScheme.surface,
+              border: Border(top: BorderSide(color: colorScheme.outline)),
             ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54.h,
-              child: ElevatedButton(
-                onPressed: controller.saveItem,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+            child: SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                height: 54.h,
+                child: ElevatedButton(
+                  onPressed: controller.saveItem,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                ),
-                child: Text(
-                  controller.mode == InventoryFormMode.edit
-                      ? "Update Board Details"
-                      : "Add Board Details",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: textWhite,
+                  child: Text(
+                    controller.mode == InventoryFormMode.edit
+                        ? "Update Board Details"
+                        : "Add Board Details",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -253,18 +256,19 @@ class AddInventoryView extends StatelessWidget {
   // WIDGET BUILDERS
   // ===========================================================================
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(BuildContext context, String text) {
     return Text(
       text,
       style: TextStyle(
-        color: textWhite,
+        color: Theme.of(context).colorScheme.onSurface,
         fontWeight: FontWeight.w600,
         fontSize: 14.sp,
       ),
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
@@ -273,27 +277,30 @@ class AddInventoryView extends StatelessWidget {
     RxBool? isObscure,
     String? Function(String?)? validator,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     InputDecoration decoration = InputDecoration(
-      prefixIcon: Icon(icon, size: 20.w, color: textGrey),
+      prefixIcon: Icon(icon, size: 20.w, color: colorScheme.onSurfaceVariant),
       hintText: hintText,
-      hintStyle: TextStyle(color: textGrey.withValues(alpha: 0.5)),
+      hintStyle: TextStyle(
+        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+      ),
       filled: true,
-      fillColor: cardDark,
+      fillColor: colorScheme.surfaceContainer,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: borderDark),
+        borderSide: BorderSide(color: colorScheme.outline),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: borderDark),
+        borderSide: BorderSide(color: colorScheme.outline),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryBlue),
+        borderSide: BorderSide(color: colorScheme.primary),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.redAccent),
+        borderSide: BorderSide(color: colorScheme.error),
       ),
       contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
     );
@@ -306,13 +313,13 @@ class AddInventoryView extends StatelessWidget {
           keyboardType: inputType,
           obscureText: isObscure.value,
           validator: validator,
-          style: TextStyle(color: textWhite),
+          style: TextStyle(color: colorScheme.onSurface),
           decoration: decoration.copyWith(
             suffixIcon: IconButton(
               icon: Icon(
                 isObscure.value ? Iconsax.eye_slash : Iconsax.eye,
                 size: 20.w,
-                color: textGrey,
+                color: colorScheme.onSurfaceVariant,
               ),
               onPressed: () {
                 isObscure.value = !isObscure.value;
@@ -328,35 +335,46 @@ class AddInventoryView extends StatelessWidget {
         keyboardType: inputType,
         obscureText: false,
         validator: validator,
-        style: TextStyle(color: textWhite),
+        style: TextStyle(color: colorScheme.onSurface),
         decoration: decoration,
       );
     }
   }
 
-  Widget _buildTypeDropdown(AddInventoryController controller) {
+  Widget _buildTypeDropdown(
+    BuildContext context,
+    AddInventoryController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return CustomDropdown<SurfBoardType>(
       controller: controller.surfboardTypeController,
       hintText: 'Select board type',
       items: SurfBoardType.values,
-      headerBuilder: (context, selectedItem, _) {
+      headerBuilder: (context, selectedItem, enabled) {
         return Text(
           selectedItem.name,
-          style: TextStyle(color: textWhite, fontSize: 16.sp),
+          style: TextStyle(color: colorScheme.onSurface, fontSize: 16.sp),
         );
       },
       listItemBuilder: (context, item, isSelected, onItemSelect) {
         return Material(
-          color: isSelected ? primaryBlue.withOpacity(0.2) : cardDark,
+          color: isSelected
+              ? colorScheme.primaryContainer
+              : colorScheme.surface,
           child: InkWell(
             onTap: onItemSelect,
-            splashColor: primaryBlue.withOpacity(0.1),
-            child: Text(
-              item.name,
-              style: TextStyle(
-                color: isSelected ? primaryBlue : textWhite,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 16.sp,
+            splashColor: colorScheme.primary.withOpacity(0.1),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Text(
+                item.name,
+                style: TextStyle(
+                  color: isSelected
+                      ? colorScheme.onPrimaryContainer
+                      : colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 16.sp,
+                ),
               ),
             ),
           ),
@@ -373,39 +391,55 @@ class AddInventoryView extends StatelessWidget {
         return null;
       },
       decoration: CustomDropdownDecoration(
-        closedFillColor: cardDark,
-        expandedFillColor: cardDark,
-        closedBorder: BoxBorder.all(color: borderDark),
-        expandedBorder: BoxBorder.all(color: primaryBlue),
-        hintStyle: TextStyle(color: textGrey.withOpacity(0.5), fontSize: 16.sp),
-        closedErrorBorder: BoxBorder.all(color: Colors.redAccent),
-        errorStyle: TextStyle(color: Colors.redAccent, fontSize: 14.sp),
+        closedFillColor: colorScheme.surfaceContainer,
+        expandedFillColor: colorScheme.surfaceContainer,
+        closedBorder: Border.all(color: colorScheme.outline),
+        expandedBorder: Border.all(color: colorScheme.primary),
+        closedBorderRadius: BorderRadius.circular(12),
+        expandedBorderRadius: BorderRadius.circular(12),
+        listItemDecoration: ListItemDecoration(
+          selectedColor: colorScheme.primaryContainer,
+        ),
+        hintStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          fontSize: 16.sp,
+        ),
+        closedErrorBorder: Border.all(color: colorScheme.error),
+        errorStyle: TextStyle(color: colorScheme.error, fontSize: 14.sp),
         closedSuffixIcon: Icon(
           Iconsax.arrow_down_2,
           size: 20.w,
-          color: textGrey,
+          color: colorScheme.onSurfaceVariant,
         ),
         expandedSuffixIcon: Icon(
           Iconsax.arrow_up_2,
           size: 20.w,
-          color: primaryBlue,
+          color: colorScheme.primary,
         ),
       ),
     );
   }
 
-  Widget _buildBoardName(AddInventoryController controller) {
+  Widget _buildBoardName(
+    BuildContext context,
+    AddInventoryController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderDark),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Obx(
         () => Text(
           controller.boardName.value,
-          style: TextStyle(color: textGrey, fontSize: 14.sp),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 14.sp,
+          ),
         ),
       ),
     );

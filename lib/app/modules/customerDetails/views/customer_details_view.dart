@@ -3,27 +3,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import 'package:surfboard_rental_app/app/models/customer_model.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/customer_details_controller.dart';
 
 class CustomerDetailsView extends GetView<CustomerDetailsController> {
   const CustomerDetailsView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-  final Color successGreen = const Color(0xFF34C759);
-  final Color warningOrange = const Color(0xFFF59E0B);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -31,7 +24,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         title: Text(
           "Customer Profile",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -42,7 +35,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
             child: Text(
               "Edit",
               style: TextStyle(
-                color: primaryBlue,
+                color: colorScheme.primary,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -51,31 +44,40 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
           SizedBox(width: 8.w),
         ],
       ),
-      body: Obx(
-        () => SingleChildScrollView(
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final customer = controller.customer.value;
+        if (customer == null) {
+          return const Center(child: Text('Customer not found'));
+        }
+
+        return SingleChildScrollView(
           padding: EdgeInsets.all(ASizes.defaultPadding),
           child: Column(
             children: [
               /// 1. Profile Header & Actions
-              _buildProfileHeader(controller),
+              _buildProfileHeader(context, controller, customer),
 
               SizedBox(height: 24.h),
 
               /// 2. Personal Info Card
-              _buildInfoCard(controller),
+              _buildInfoCard(context, customer),
 
               SizedBox(height: 24.h),
 
               /// 3. History Section
-              _buildSectionHeader("Rental History"),
+              _buildSectionHeader(context, "Rental History"),
               SizedBox(height: 12.h),
-              _buildHistoryList(controller),
+              _buildHistoryList(context, controller),
 
               SizedBox(height: 40.h),
             ],
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -83,7 +85,12 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
   // WIDGET BUILDERS
   // ===========================================================================
 
-  Widget _buildProfileHeader(CustomerDetailsController controller) {
+  Widget _buildProfileHeader(
+    BuildContext context,
+    CustomerDetailsController controller,
+    CustomerModel customer,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         // Avatar
@@ -91,24 +98,22 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
           padding: EdgeInsets.all(4.w),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: primaryBlue, width: 2),
+            border: Border.all(color: colorScheme.primary, width: 2),
           ),
           child: CircleAvatar(
             radius: 40.w,
-            backgroundColor: cardDark,
+            backgroundColor: colorScheme.surfaceContainer,
             backgroundImage:
-                controller.customer.value.imageUrl != null &&
-                    controller.customer.value.imageUrl!.isNotEmpty
-                ? NetworkImage(controller.customer.value.imageUrl!)
+                customer.imageUrl != null && customer.imageUrl!.isNotEmpty
+                ? NetworkImage(customer.imageUrl!)
                 : null,
-            child:
-                controller.customer.value.imageUrl == null ||
-                    controller.customer.value.imageUrl!.isEmpty
+            child: customer.imageUrl == null || customer.imageUrl!.isEmpty
                 ? Text(
-                    controller.customer.value.firstName.isNotEmpty
-                        ? controller.customer.value.firstName[0]
-                        : 'C',
-                    style: TextStyle(color: textWhite, fontSize: 32.sp),
+                    customer.firstName.isNotEmpty ? customer.firstName[0] : 'C',
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 32.sp,
+                    ),
                   )
                 : null,
           ),
@@ -117,9 +122,9 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
 
         // Name
         Text(
-          "${controller.customer.value.firstName} ${controller.customer.value.lastName}",
+          "${customer.firstName} ${customer.lastName}",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 22.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -130,47 +135,67 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: cardDark,
+            color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: borderDark),
+            border: Border.all(color: colorScheme.outline),
           ),
-          child: Text("ID: ${controller.customer.value.id}"),
+          child: Text(
+            "ID: ${customer.id ?? 'N/A'}",
+            style: TextStyle(color: colorScheme.onSurfaceVariant),
+          ),
         ),
 
         SizedBox(height: 20.h),
 
-        // Action Buttons Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildActionButton(
-              icon: Iconsax.call,
-              label: "Call",
-              onTap: controller.makeCall,
-            ),
-            SizedBox(width: 16.w),
-            _buildActionButton(
-              icon: Iconsax.sms,
-              label: "Message",
-              onTap: controller.makeCall, // Reuse for now or add SMS logic
-            ),
-            SizedBox(width: 16.w),
-            _buildActionButton(
-              icon: Iconsax.direct,
-              label: "Email",
-              onTap: controller.sendEmail,
-            ),
-          ],
+        // Action Buttons Row (Scrollable to prevent overflow)
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(width: ASizes.defaultPadding),
+              _buildActionButton(
+                context,
+                icon: Iconsax.call,
+                label: "Call",
+                onTap: controller.makeCall,
+              ),
+              SizedBox(width: 16.w),
+              _buildActionButton(
+                context,
+                icon: Iconsax.sms,
+                label: "Message",
+                onTap: controller.makeCall,
+              ),
+              SizedBox(width: 16.w),
+              _buildActionButton(
+                context,
+                icon: Iconsax.direct,
+                label: "Email",
+                onTap: controller.sendEmail,
+              ),
+              SizedBox(width: 16.w),
+              _buildActionButton(
+                context,
+                icon: Iconsax.scan_barcode4,
+                label: "My QR",
+                onTap: controller.showQR,
+              ),
+              SizedBox(width: ASizes.defaultPadding),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildActionButton({
+  Widget _buildActionButton(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -178,17 +203,17 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         width: 80.w,
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: borderDark),
+          border: Border.all(color: colorScheme.outline),
         ),
         child: Column(
           children: [
-            Icon(icon, color: primaryBlue, size: 24.w),
+            Icon(icon, color: colorScheme.primary, size: 24.w),
             SizedBox(height: 6.h),
             Text(
               label,
-              style: TextStyle(color: textWhite, fontSize: 12.sp),
+              style: TextStyle(color: colorScheme.onSurface, fontSize: 12.sp),
             ),
           ],
         ),
@@ -196,37 +221,32 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
     );
   }
 
-  Widget _buildInfoCard(CustomerDetailsController controller) {
+  Widget _buildInfoCard(BuildContext context, CustomerModel customer) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderDark.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
       ),
       child: Column(
         children: [
+          _buildDetailRow(context, "Phone", customer.phone, Iconsax.call),
+          Divider(color: colorScheme.outline, height: 24.h),
+          _buildDetailRow(context, "Email", customer.email, Iconsax.sms),
+          Divider(color: colorScheme.outline, height: 24.h),
           _buildDetailRow(
-            "Phone",
-            controller.customer.value.phone,
-            Iconsax.call,
-          ),
-          Divider(color: borderDark, height: 24.h),
-          _buildDetailRow(
-            "Email",
-            controller.customer.value.email,
-            Iconsax.sms,
-          ),
-          Divider(color: borderDark, height: 24.h),
-          _buildDetailRow(
+            context,
             "NIC / Passport",
-            controller.customer.value.nic,
+            customer.nic,
             Iconsax.card,
           ),
-          Divider(color: borderDark, height: 24.h),
+          Divider(color: colorScheme.outline, height: 24.h),
           _buildDetailRow(
+            context,
             "Notes",
-            controller.customer.value.notes,
+            customer.notes,
             Iconsax.note,
             isMultiLine: true,
           ),
@@ -236,17 +256,19 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
   }
 
   Widget _buildDetailRow(
+    BuildContext context,
     String label,
     String value,
     IconData icon, {
     bool isMultiLine = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       crossAxisAlignment: isMultiLine
           ? CrossAxisAlignment.start
           : CrossAxisAlignment.center,
       children: [
-        Icon(icon, color: textGrey, size: 20.w),
+        Icon(icon, color: colorScheme.onSurfaceVariant, size: 20.w),
         SizedBox(width: 16.w),
         Expanded(
           child: Column(
@@ -254,13 +276,16 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
             children: [
               Text(
                 label,
-                style: TextStyle(color: textGrey, fontSize: 12.sp),
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 12.sp,
+                ),
               ),
               SizedBox(height: 2.h),
               Text(
                 value,
                 style: TextStyle(
-                  color: textWhite,
+                  color: colorScheme.onSurface,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   height: 1.4,
@@ -273,13 +298,13 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
         title,
         style: TextStyle(
-          color: textWhite,
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 18.sp,
           fontWeight: FontWeight.bold,
         ),
@@ -287,7 +312,13 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
     );
   }
 
-  Widget _buildHistoryList(CustomerDetailsController controller) {
+  Widget _buildHistoryList(
+    BuildContext context,
+    CustomerDetailsController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
+
     return Obx(
       () => ListView.separated(
         shrinkWrap: true,
@@ -297,14 +328,16 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         itemBuilder: (context, index) {
           final item = controller.history[index];
           final bool isLate = item['status'] == "Late Return";
-          final Color statusColor = isLate ? warningOrange : successGreen;
+          final Color statusColor = isLate
+              ? (statusColors?.warning ?? Colors.orange)
+              : (statusColors?.success ?? Colors.green);
 
           return Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: cardDark,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderDark),
+              border: Border.all(color: colorScheme.outline),
             ),
             child: Row(
               children: [
@@ -315,7 +348,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                     vertical: 8.h,
                   ),
                   decoration: BoxDecoration(
-                    color: bgDark,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -323,14 +356,17 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                       Text(
                         item['date'].split(' ')[0], // Day
                         style: TextStyle(
-                          color: textWhite,
+                          color: colorScheme.onSurface,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         item['date'].split(' ')[1], // Month
-                        style: TextStyle(color: textGrey, fontSize: 12.sp),
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
+                        ),
                       ),
                     ],
                   ),
@@ -345,7 +381,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                       Text(
                         item['items'],
                         style: TextStyle(
-                          color: textWhite,
+                          color: colorScheme.onSurface,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -355,11 +391,18 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                       SizedBox(height: 4.h),
                       Row(
                         children: [
-                          Icon(Iconsax.clock, size: 14.w, color: textGrey),
+                          Icon(
+                            Iconsax.clock,
+                            size: 14.w,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                           SizedBox(width: 4.w),
                           Text(
                             "${item['duration']} • ${item['cost']}",
-                            style: TextStyle(color: textGrey, fontSize: 12.sp),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 12.sp,
+                            ),
                           ),
                         ],
                       ),

@@ -9,6 +9,7 @@ class StepDamageFees extends GetView<AgreementController> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: ListView(
@@ -16,7 +17,7 @@ class StepDamageFees extends GetView<AgreementController> {
           Text(
             "Damage Policy",
             style: TextStyle(
-              color: Colors.white,
+              color: colorScheme.onSurface,
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -24,7 +25,10 @@ class StepDamageFees extends GetView<AgreementController> {
           SizedBox(height: 8.h),
           Text(
             "Select damage fees to include in the agreement. Replacement costs will be charged if items are damaged.",
-            style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 14.sp,
+            ),
           ),
           SizedBox(height: 24.h),
 
@@ -34,13 +38,16 @@ class StepDamageFees extends GetView<AgreementController> {
                 ? Container(
                     padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF182c30),
+                      color: colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: Text(
                         "No damage fees available for this item.",
-                        style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ),
                   )
@@ -53,12 +60,12 @@ class StepDamageFees extends GetView<AgreementController> {
                         margin: EdgeInsets.only(bottom: 12.h),
                         padding: EdgeInsets.all(12.w),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF182c30),
+                          color: colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFF4A90E2)
-                                : const Color(0xFF334155),
+                                ? colorScheme.primary
+                                : colorScheme.outline,
                           ),
                         ),
                         child: Column(
@@ -75,7 +82,7 @@ class StepDamageFees extends GetView<AgreementController> {
                                       Text(
                                         fee.damageType,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: colorScheme.onSurface,
                                           fontSize: 16.sp,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -86,7 +93,7 @@ class StepDamageFees extends GetView<AgreementController> {
                                         Text(
                                           fee.description,
                                           style: TextStyle(
-                                            color: Colors.grey,
+                                            color: colorScheme.onSurfaceVariant,
                                             fontSize: 12.sp,
                                           ),
                                         ),
@@ -98,12 +105,12 @@ class StepDamageFees extends GetView<AgreementController> {
                                   onChanged: (val) {
                                     controller.toggleDamageFee(fee.id!, val);
                                   },
-                                  activeColor: const Color(0xFF4A90E2),
+                                  activeColor: colorScheme.primary,
                                 ),
                               ],
                             ),
                             // Price Row
-                            Divider(color: const Color(0xFF334155)),
+                            Divider(color: colorScheme.outline),
                             SizedBox(height: 8.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,14 +118,14 @@ class StepDamageFees extends GetView<AgreementController> {
                                 Text(
                                   "Replacement Cost:",
                                   style: TextStyle(
-                                    color: Colors.grey,
+                                    color: colorScheme.onSurfaceVariant,
                                     fontSize: 14.sp,
                                   ),
                                 ),
                                 Text(
                                   "\$${fee.feeAmount.toStringAsFixed(2)}",
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: colorScheme.onSurface,
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -147,6 +154,11 @@ class StepDamageFees extends GetView<AgreementController> {
                             );
                           });
                         },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          elevation: 0,
+                        ),
                         child: Text("Add Damage Fees"),
                       ),
                     ],
@@ -161,9 +173,9 @@ class StepDamageFees extends GetView<AgreementController> {
             return Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: const Color(0xFF0f3a3f),
+                color: colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF4A90E2)),
+                border: Border.all(color: colorScheme.primary),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -171,7 +183,7 @@ class StepDamageFees extends GetView<AgreementController> {
                   Text(
                     "Total Damage Fees:",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onPrimaryContainer,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -179,7 +191,7 @@ class StepDamageFees extends GetView<AgreementController> {
                   Text(
                     "\$${total.toStringAsFixed(2)}",
                     style: TextStyle(
-                      color: const Color(0xFF4A90E2),
+                      color: colorScheme.primary,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),

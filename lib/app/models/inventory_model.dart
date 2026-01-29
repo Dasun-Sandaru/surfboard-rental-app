@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import '../../utils/constants/a_enums.dart';
 
 class InventoryModel {
@@ -21,9 +22,9 @@ class InventoryModel {
   final int rentalRateDay;
   final String note;
   final InventoryStatus status;
-  final Timestamp createdAt;
+  final DateTime createdAt;
 
-  InventoryModel({
+  const InventoryModel({
     required this.id,
     required this.imageUrl,
     required this.name,
@@ -49,61 +50,68 @@ class InventoryModel {
   /// Firestore → Model
   factory InventoryModel.fromMap(Map<String, dynamic> data) {
     return InventoryModel(
-      id: data['id'] as String,
-      imageUrl: data['image_url'] as String,
-      name: data['name'] as String,
-      type: data['type'] as String,
-      brand: data['brand'] as String,
+      id: data[FirestoreFields.id] as String? ?? '',
+      imageUrl: data[FirestoreFields.imageUrl] as String? ?? '',
+      name: data[FirestoreFields.name] as String? ?? '',
+      type: data[FirestoreFields.type] as String? ?? '',
+      brand: data[FirestoreFields.brand] as String? ?? '',
 
-      sizeFeet: (data['size_feet'] as num).toInt(),
-      sizeInches: (data['size_inches'] as num).toInt(),
-      sizeTotalInches: (data['size_total_inches'] as num).toInt(),
+      sizeFeet: (data[FirestoreFields.sizeFeet] as num?)?.toInt() ?? 0,
+      sizeInches: (data[FirestoreFields.sizeInches] as num?)?.toInt() ?? 0,
+      sizeTotalInches:
+          (data[FirestoreFields.sizeTotalInches] as num?)?.toInt() ?? 0,
 
-      volume: (data['volume'] as num).toInt(),
-      color: data['color'] as String,
-      purchaseCost: (data['purchase_cost'] as num).toInt(),
-      damageFeeRule: data['damage_fee_rule'] as String,
-      rentalRateHour: (data['rental_rate_hour'] as num).toInt(),
-      rentalRateDay: (data['rental_rate_day'] as num).toInt(),
-      note: data['note'] as String,
+      volume: (data[FirestoreFields.volume] as num?)?.toInt() ?? 0,
+      color: data[FirestoreFields.color] as String? ?? '',
+      purchaseCost: (data[FirestoreFields.purchaseCost] as num?)?.toInt() ?? 0,
+      damageFeeRule: data[FirestoreFields.damageFeeRule] as String? ?? '',
+      rentalRateHour:
+          (data[FirestoreFields.rentalRateHour] as num?)?.toInt() ?? 0,
+      rentalRateDay:
+          (data[FirestoreFields.rentalRateDay] as num?)?.toInt() ?? 0,
+      note: data[FirestoreFields.note] as String? ?? '',
 
       status: InventoryStatus.values.firstWhere(
-        (e) => e.name == data['status'],
+        (e) => e.name == data[FirestoreFields.status],
         orElse: () => InventoryStatus.available,
       ),
 
-      createdAt: data['created_at'] as Timestamp,
+      createdAt: data[FirestoreFields.createdAt] != null
+          ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
+          : DateTime.now(),
     );
   }
 
   /// Firestore → Model
-  factory InventoryModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  factory InventoryModel.fromSnapshot(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+  ) {
     return InventoryModel.fromMap(snapshot.data()!);
   }
 
   /// Model → Firestore
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'image_url': imageUrl,
-      'name': name,
-      'type': type,
-      'brand': brand,
+      FirestoreFields.id: id,
+      FirestoreFields.imageUrl: imageUrl,
+      FirestoreFields.name: name,
+      FirestoreFields.type: type,
+      FirestoreFields.brand: brand,
 
-      'size_feet': sizeFeet,
-      'size_inches': sizeInches,
-      'size_total_inches': sizeTotalInches,
+      FirestoreFields.sizeFeet: sizeFeet,
+      FirestoreFields.sizeInches: sizeInches,
+      FirestoreFields.sizeTotalInches: sizeTotalInches,
 
-      'volume': volume,
-      'color': color,
-      'purchase_cost': purchaseCost,
-      'damage_fee_rule': damageFeeRule,
-      'rental_rate_hour': rentalRateHour,
-      'rental_rate_day': rentalRateDay,
-      'note': note,
+      FirestoreFields.volume: volume,
+      FirestoreFields.color: color,
+      FirestoreFields.purchaseCost: purchaseCost,
+      FirestoreFields.damageFeeRule: damageFeeRule,
+      FirestoreFields.rentalRateHour: rentalRateHour,
+      FirestoreFields.rentalRateDay: rentalRateDay,
+      FirestoreFields.note: note,
 
-      'status': status.name,
-      'created_at': createdAt,
+      FirestoreFields.status: status.name,
+      FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
     };
   }
 }

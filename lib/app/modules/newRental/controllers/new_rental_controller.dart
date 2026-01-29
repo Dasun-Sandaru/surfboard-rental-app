@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,11 +44,9 @@ class NewRentalController extends GetxController {
   void addItem() async {
     // Only allow one item
     if (selectedItems.isNotEmpty) {
-      Get.snackbar(
-        "Limit Reached",
-        "You can only select one item per rental",
-        backgroundColor: Colors.orange.withOpacity(0.2),
-        colorText: Colors.orange,
+      AppSnackBar.warning(
+        title: "Limit Reached",
+        message: "You can only select one item per rental",
       );
       return;
     }
@@ -63,7 +62,7 @@ class NewRentalController extends GetxController {
         selectedItems.add(result);
         calculateTotal();
       } else {
-        Get.snackbar("Info", "Item already added");
+        AppSnackBar.info(title: "Info", message: "Item already added");
       }
     }
   }
@@ -199,9 +198,9 @@ class NewRentalController extends GetxController {
       log('Estimated Total Rental: \$${estimatedTotal.value}');
     } catch (e, stackTrace) {
       log('Error in calculateTotal: $e', error: e, stackTrace: stackTrace);
-      Get.snackbar(
-        'Calculation Error',
-        'Could not calculate the total rental cost.',
+      AppSnackBar.error(
+        title: 'Calculation Error',
+        message: 'Could not calculate the total rental cost.',
       );
       estimatedTotal.value = 0.0;
     }
@@ -209,20 +208,16 @@ class NewRentalController extends GetxController {
 
   void proceedToAgreement() {
     if (selectedCustomer.value == null) {
-      Get.snackbar(
-        "Missing Info",
-        "Please select a customer",
-        backgroundColor: Colors.red.withOpacity(0.2),
-        colorText: Colors.red,
+      AppSnackBar.error(
+        title: "Missing Info",
+        message: "Please select a customer",
       );
       return;
     }
     if (selectedItems.isEmpty) {
-      Get.snackbar(
-        "Missing Info",
-        "Please add at least one item",
-        backgroundColor: Colors.red.withOpacity(0.2),
-        colorText: Colors.red,
+      AppSnackBar.error(
+        title: "Missing Info",
+        message: "Please add at least one item",
       );
       return;
     }

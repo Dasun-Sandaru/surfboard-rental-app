@@ -29,13 +29,11 @@ Future<void> main() async {
 
   if (supabaseUrl == null || supabaseAnonKey == null) {
     throw Exception(
-        'Supabase URL or Anon Key not found in .env file. Make sure you have a .env file with SUPABASE_URL and SUPABASE_ANON_KEY.');
+      'Supabase URL or Anon Key not found in .env file. Make sure you have a .env file with SUPABASE_URL and SUPABASE_ANON_KEY.',
+    );
   }
 
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
   Get.put(ThemeController(), permanent: true);
 
@@ -70,12 +68,10 @@ class MyApp extends StatelessWidget {
     String? lang = box.readData('lang');
     Locale initialLocale = lang != null ? Locale(lang) : const Locale('en');
     // Use MaterialTheme for app theme
-    final textTheme = Theme.of(context).textTheme;
-    final materialTheme = MaterialTheme(textTheme);
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: materialTheme.light(),
-      darkTheme: materialTheme.dark(),
+      theme: appLightTheme,
+      darkTheme: appDarkTheme,
       themeMode: ThemeController.to.themeMode.value,
       useInheritedMediaQuery: true,
       locale: initialLocale,
@@ -86,4 +82,4 @@ class MyApp extends StatelessWidget {
       translations: AppTranslations(),
     );
   }
-} 
+}

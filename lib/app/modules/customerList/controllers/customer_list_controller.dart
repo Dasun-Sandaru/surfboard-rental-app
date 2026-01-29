@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'dart:async';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';
@@ -58,9 +60,9 @@ class CustomerListController extends GetxController {
     }
     try {
       Query query = _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId!)
-          .collection('customers');
+          .collection(FirestoreCollections.customers);
 
       // A. APPLY SEARCH OR SORT
       if (_currentSearchTerm.isNotEmpty) {
@@ -68,7 +70,7 @@ class CustomerListController extends GetxController {
         // Note: Firestore search requires exact case handling or specific setup.
         query = query
             .where(
-              'name_lowercase',
+              'name_lowercase', // TODO: Add to fields if necessary
               isGreaterThanOrEqualTo: _currentSearchTerm.toLowerCase(),
             )
             .where(
@@ -78,7 +80,9 @@ class CustomerListController extends GetxController {
             .limit(20);
       } else {
         // Standard Mode: Chronological order
-        query = query.orderBy('created_at', descending: true).limit(_limit);
+        query = query
+            .orderBy(FirestoreFields.createdAt, descending: true)
+            .limit(_limit);
 
         if (pageKey != null) {
           query = query.startAfterDocument(pageKey);
@@ -89,7 +93,7 @@ class CustomerListController extends GetxController {
 
       final newItems = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
+        data[FirestoreFields.id] = doc.id;
         return CustomerModel.fromJson(data);
       }).toList();
 

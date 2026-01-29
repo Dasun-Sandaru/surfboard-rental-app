@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../models/user_model.dart';
 import '../../../services/user_service.dart';
 import '../../../../utils/common/app_snack_bar.dart';
+import '../widgets/user_qr_code_dialog.dart';
 
 class UserDetailController extends GetxController {
   static const String _logName = 'UserDetailController';
@@ -16,15 +17,36 @@ class UserDetailController extends GetxController {
   String shopId = '0000';
 
   @override
-  Future<void> onInit() async {
+  void onInit() {
     super.onInit();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
     try {
+      final args = Get.arguments;
+      if (args == null) return;
+
       shopId = await _userService.getShopIdFromStorage() ?? '0000';
 
-      if (Get.arguments is UserModel) {
-        user.value = Get.arguments as UserModel;
-        isActive.value = user.value?.isActive ?? false;
-        isVerified.value = user.value?.isVerified ?? false;
+      if (args is UserModel) {
+        user.value = args;
+      } else if (args is String) {
+        // Fetch user from database if only UID is passed
+        final fetchedUser = await _userService.getUser(args);
+        if (fetchedUser != null) {
+          user.value = fetchedUser;
+        } else {
+          AppSnackBar.error(title: 'Error', message: 'User not found');
+          Get.back();
+          return;
+        }
+      }
+
+      // Initialize reactive status variables
+      if (user.value != null) {
+        isActive.value = user.value!.isActive;
+        isVerified.value = user.value!.isVerified;
       }
     } catch (e) {
       AppSnackBar.error(title: 'Error', message: 'Failed to load user: $e');
@@ -91,5 +113,11 @@ class UserDetailController extends GetxController {
         Get.back(); // Go back to list
       },
     );
+  }
+
+  void showQR() {
+    if (user.value == null) return;
+
+    Get.dialog(UserQrCodeDialog(user: user.value!), barrierDismissible: true);
   }
 }

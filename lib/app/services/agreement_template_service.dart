@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/app/models/agreement_template_model.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 class AgreementTemplateService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -23,9 +25,9 @@ class AgreementTemplateService {
 
       final now = DateTime.now();
       final templateRef = _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('agreement_templates')
+          .collection(FirestoreCollections.agreementTemplates)
           .doc();
 
       final template = AgreementTemplateModel(
@@ -54,10 +56,10 @@ class AgreementTemplateService {
       log('Fetching templates for shop: $shopId', name: logName);
 
       final snapshot = await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('agreement_templates')
-          .orderBy('created_at', descending: true)
+          .collection(FirestoreCollections.agreementTemplates)
+          .orderBy(FirestoreFields.createdAt, descending: true)
           .get();
 
       final templates = snapshot.docs
@@ -81,9 +83,9 @@ class AgreementTemplateService {
       log('Fetching template: $templateId', name: logName);
 
       final doc = await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('agreement_templates')
+          .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .get();
 
@@ -105,10 +107,10 @@ class AgreementTemplateService {
       log('Fetching default template for shop: $shopId', name: logName);
 
       final snapshot = await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('agreement_templates')
-          .where('is_default', isEqualTo: true)
+          .collection(FirestoreCollections.agreementTemplates)
+          .where(FirestoreFields.isDefault, isEqualTo: true)
           .limit(1)
           .get();
 
@@ -139,17 +141,27 @@ class AgreementTemplateService {
     try {
       log('Updating template: $templateId', name: logName);
 
-      final updates = <String, dynamic>{'updated_at': DateTime.now()};
+      final updates = <String, dynamic>{
+        FirestoreFields.updatedAt: DateTime.now(),
+      };
 
-      if (templateName != null) updates['template_name'] = templateName;
-      if (description != null) updates['description'] = description;
-      if (sections != null) updates['sections'] = sections;
-      if (isDefault != null) updates['is_default'] = isDefault;
+      if (templateName != null) {
+        updates[FirestoreFields.templateName] = templateName;
+      }
+      if (description != null) {
+        updates[FirestoreFields.description] = description;
+      }
+      if (sections != null) {
+        updates[FirestoreFields.section] = sections;
+      }
+      if (isDefault != null) {
+        updates[FirestoreFields.isDefault] = isDefault;
+      }
 
       await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('agreement_templates')
+          .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .update(updates);
 
@@ -169,9 +181,9 @@ class AgreementTemplateService {
       log('Deleting template: $templateId', name: logName);
 
       await _db
-          .collection('shops')
+          .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection('agreement_templates')
+          .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .delete();
 
@@ -200,11 +212,11 @@ class AgreementTemplateService {
         if (template.id != null && template.isDefault) {
           batch.update(
             _db
-                .collection('shops')
+                .collection(FirestoreCollections.shops)
                 .doc(shopId)
-                .collection('agreement_templates')
+                .collection(FirestoreCollections.agreementTemplates)
                 .doc(template.id),
-            {'is_default': false},
+            {FirestoreFields.isDefault: false},
           );
         }
       }
@@ -212,11 +224,14 @@ class AgreementTemplateService {
       // Set the new default
       batch.update(
         _db
-            .collection('shops')
+            .collection(FirestoreCollections.shops)
             .doc(shopId)
-            .collection('agreement_templates')
+            .collection(FirestoreCollections.agreementTemplates)
             .doc(templateId),
-        {'is_default': true, 'updated_at': DateTime.now()},
+        {
+          FirestoreFields.isDefault: true,
+          FirestoreFields.updatedAt: DateTime.now(),
+        },
       );
 
       await batch.commit();

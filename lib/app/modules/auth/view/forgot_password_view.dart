@@ -11,23 +11,16 @@ import '../controllers/forgot_password_controller.dart';
 class ForgotPasswordView extends GetView<ForgotPasswordController> {
   const ForgotPasswordView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
-        title: Text('', style: TextStyle(color: textWhite)),
+        title: Text('', style: TextStyle(color: colorScheme.onSurface)),
       ),
       body: Padding(
         padding: EdgeInsets.all(ASizes.defaultPadding),
@@ -42,43 +35,50 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 "Forgot Password".tr,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: textWhite,
+                  color: colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 12.h),
               Text(
                 "Enter your email and we will send you a link to reset your password.",
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: textGrey, height: 1.5),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.5,
+                ),
               ),
               SizedBox(height: 32.h),
 
               /// Email Input
-              _buildLabel('Email Address'),
+              _buildLabel(context, 'Email Address'),
               SizedBox(height: 8.h),
               TextFormField(
                 controller: controller.emailController,
                 textInputAction: TextInputAction.done,
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: textWhite), // White text input
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Iconsax.sms, size: 20.w, color: textGrey),
+                  prefixIcon: Icon(
+                    Iconsax.sms,
+                    size: 20.w,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   hintText: 'hello@surfshop.com',
-                  hintStyle: TextStyle(color: textGrey.withValues(alpha: 0.5)),
+                  hintStyle: TextStyle(
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
                   filled: true,
-                  fillColor: cardDark,
+                  fillColor: colorScheme.surfaceContainer,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: borderDark),
+                    borderSide: BorderSide(color: colorScheme.outline),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: borderDark),
+                    borderSide: BorderSide(color: colorScheme.outline),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: primaryBlue),
+                    borderSide: BorderSide(color: colorScheme.primary),
                   ),
                   contentPadding: EdgeInsets.symmetric(
                     vertical: 16.h,
@@ -99,20 +99,19 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                   () => ElevatedButton(
                     onPressed: controller.resetPassword,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryBlue,
-                      foregroundColor: textWhite,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      elevation: 4,
-                      shadowColor: primaryBlue.withValues(alpha: 0.4),
+                      elevation: 0,
                     ),
                     child: controller.isLoading.value
                         ? SizedBox(
                             height: 24.h,
                             width: 24.w,
-                            child: const CircularProgressIndicator(
-                              color: Colors.white,
+                            child: CircularProgressIndicator(
+                              color: colorScheme.onPrimary,
                               strokeWidth: 2,
                             ),
                           )
@@ -138,7 +137,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                         child: OutlinedButton(
                           onPressed: controller.goToLogin,
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: borderDark),
+                            side: BorderSide(color: colorScheme.outline),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
@@ -147,7 +146,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                           child: Text(
                             "Back to Login",
                             style: TextStyle(
-                              color: textWhite,
+                              color: colorScheme.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: 16.sp,
                             ),
@@ -164,10 +163,13 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
   }
 
   /// Helper to build labels consistent with the theme
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(BuildContext context, String text) {
     return Text(
       text,
-      style: TextStyle(color: textWhite, fontWeight: FontWeight.w500),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 }

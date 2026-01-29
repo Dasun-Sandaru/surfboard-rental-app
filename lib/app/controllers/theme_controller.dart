@@ -5,6 +5,6 @@ class ThemeController extends GetxController {
   // Singleton Access
   static ThemeController get to => Get.find<ThemeController>();
 
-  final themeMode = ThemeMode.light.obs;
-  final themeData = ThemeData.light().obs;
-}   
+  final themeMode = ThemeMode.system.obs;
+  final themeData = ThemeData.dark().obs;
+}

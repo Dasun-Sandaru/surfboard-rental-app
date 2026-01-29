@@ -1,18 +1,23 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:surfboard_rental_app/app/models/payment_model.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/rental_model.dart';
+
+import 'package:surfboard_rental_app/app/services/payment_service.dart';
 
 class BoardInspectionController extends GetxController {
   final RentalService _rentalService = Get.find();
   final UserService _userService = Get.find();
+  final PaymentService _paymentService = PaymentService();
 
   // Controller Status
   final status = RxStatus.loading().obs;
@@ -22,6 +27,7 @@ class BoardInspectionController extends GetxController {
   final rental = Rx<RentalModel?>(null);
   Stream<RentalModel> rentalStream = Stream.empty();
   StreamSubscription? _rentalStreamSub;
+  StreamSubscription? _paymentStreamSub;
   final RxList<PaymentModel> paymentHistory = <PaymentModel>[].obs;
 
   // For the real-time countdown timer
@@ -30,13 +36,9 @@ class BoardInspectionController extends GetxController {
   final RxString timeRemaining = "00:00:00".obs;
   final Rx<Color> timeColor = Colors.white.obs;
 
-  // Firestore reference
-  late FirebaseFirestore _firestore;
-
   @override
   void onInit() {
     super.onInit();
-    _firestore = FirebaseFirestore.instance;
     rentalId = Get.arguments;
   }
 
@@ -52,7 +54,7 @@ class BoardInspectionController extends GetxController {
 
     if (shopId == null) {
       status.value = RxStatus.error('Could not retrieve shop ID.');
-      Get.snackbar('Error', 'Could not retrieve shop ID.');
+      AppSnackBar.error(title: 'Error', message: 'Could not retrieve shop ID.');
       return;
     }
 
@@ -66,7 +68,10 @@ class BoardInspectionController extends GetxController {
       },
       onError: (error) {
         status.value = RxStatus.error(error.toString());
-        Get.snackbar('Error', 'Failed to load rental data.');
+        AppSnackBar.error(
+          title: 'Error',
+          message: 'Failed to load rental data.',
+        );
       },
     );
 
@@ -81,25 +86,22 @@ class BoardInspectionController extends GetxController {
   void onClose() {
     _timer?.cancel();
     _rentalStreamSub?.cancel();
+    _paymentStreamSub?.cancel();
     super.onClose();
   }
 
   // --- Listener Methods ---
   void _setupPaymentListener() {
-    if (rental.value == null) return;
-    _firestore
-        .collection('shops')
-        .doc(rental.value!.shopId)
-        .collection('rentals')
-        .doc(rental.value!.id)
-        .collection('payments')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
+    final r = rental.value;
+    if (r == null || r.id == null) return;
+
+    // Cancel previous subscription if any
+    _paymentStreamSub?.cancel();
+
+    _paymentStreamSub = _paymentService
+        .paymentStream(r.shopId, r.id!)
         .listen(
-          (snapshot) {
-            final payments = snapshot.docs
-                .map((doc) => PaymentModel.fromSnapshot(doc))
-                .toList();
+          (payments) {
             paymentHistory.assignAll(payments);
           },
           onError: (e) {
@@ -131,23 +133,38 @@ class BoardInspectionController extends GetxController {
   double get balanceDue =>
       (rental.value?.amountExpected ?? 0) - (rental.value?.amountPaid ?? 0);
 
-  String get staffName => rental.value?.staffId ?? '';
+  String get staffName =>
+      rental.value?.cachedStaffName ?? rental.value?.staffId ?? '';
 
-  String get customerName => rental.value?.customerId ?? '';
+  String get customerName =>
+      rental.value?.cachedCustomerName ?? rental.value?.customerId ?? '';
 
-  String get boardName => rental.value?.itemId ?? '';
+  String get boardName =>
+      rental.value?.cachedItemName ?? rental.value?.itemId ?? '';
 
   double get totalPaymentsMade =>
       paymentHistory.fold(0.0, (sum, payment) => sum + payment.amount);
 
   // --- Actions ---
-  void reportNoDamage() {
-    // Logic: If balance is 0, just close. If balance exists, show Payment Dialog.
-    if (balanceDue.abs() > 0.01) {
-      _showSettlementDialog(damageFee: 0);
-    } else {
-      _finalizeReturn(damageFee: 0, finalPayment: 0);
-    }
+  Future<void> reportNoDamage() async {
+    // Save overdue time in rental document using timeRemaining
+    // Logic: If balance is 0, just close (item_returned/completed).
+    // If balance exists, show Payment Dialog.
+    // if (balanceDue.abs() > 0.01) {
+    //   _showSettlementDialog(damageFee: 0);
+    // } else {
+    await _finalizeReturn(
+      damageFee: 0,
+      finalPayment: 0,
+      status: RentalStatus.item_returned,
+    );
+
+    // Navigate to Rental Payment
+    Get.offAllNamed(
+      Routes.PAYMENTS,
+      arguments: {'rentalId': rental.value!.id, 'shopId': rental.value!.shopId},
+    );
+    // }
   }
 
   void reportDamage() {
@@ -164,15 +181,18 @@ class BoardInspectionController extends GetxController {
     final dueTime = rental.value!.expectedReturnTime;
     final difference = dueTime.difference(now);
 
+    final colorScheme = Get.theme.colorScheme;
+    final statusColors = Get.theme.extension<StatusColors>();
+
     if (difference.isNegative) {
       // Overdue
       timeLabel.value = "Overdue";
-      timeColor.value = const Color(0xFFEF4444); // errorRed
+      timeColor.value = colorScheme.error;
       timeRemaining.value = _formatDuration(difference.abs());
     } else {
       // Time Remaining
       timeLabel.value = "Time Remaining";
-      timeColor.value = const Color(0xFF34C759); // successGreen
+      timeColor.value = statusColors?.success ?? Colors.green;
       timeRemaining.value = _formatDuration(difference);
     }
   }
@@ -189,43 +209,70 @@ class BoardInspectionController extends GetxController {
   void _showSettlementDialog({required double damageFee}) {
     double finalTotal = balanceDue + damageFee;
     String actionText = finalTotal > 0 ? "Collect Payment" : "Refund Customer";
+    final colorScheme = Get.theme.colorScheme;
+    final statusColors = Get.theme.extension<StatusColors>();
 
     Get.defaultDialog(
       title: "Settlement Required",
-      backgroundColor: const Color(0xFF182c30),
-      titleStyle: const TextStyle(color: Colors.white),
+      backgroundColor: colorScheme.surfaceContainer,
+      titleStyle: TextStyle(color: colorScheme.onSurface),
       content: Column(
         children: [
           _summaryRow("Outstanding Rent", balanceDue),
           if (damageFee > 0) _summaryRow("Damage Fee", damageFee),
-          const Divider(color: Colors.grey),
+          Divider(color: colorScheme.outline),
           _summaryRow("Net Payable", finalTotal, isBold: true),
         ],
       ),
       textConfirm: actionText,
-      confirmTextColor: Colors.white,
+      confirmTextColor: colorScheme.onPrimary,
       buttonColor: finalTotal > 0
-          ? const Color(0xFF4A90E2)
-          : const Color(0xFFF59E0B),
+          ? colorScheme.primary
+          : (statusColors?.warning ?? Colors.orange),
       onConfirm: () {
         _finalizeReturn(damageFee: damageFee, finalPayment: finalTotal);
       },
       textCancel: "Cancel",
+      cancelTextColor: colorScheme.primary,
     );
   }
 
-  void _finalizeReturn({
+  Future<void> _finalizeReturn({
     required double damageFee,
     required double finalPayment,
-  }) {
-    Get.back(); // Close dialog
-    Get.back(); // Close screen
-    Get.snackbar(
-      "Return Complete",
-      "Rental closed. ${finalPayment != 0 ? 'Payment recorded.' : ''}",
-      backgroundColor: Colors.green.withOpacity(0.1),
-      colorText: Colors.green,
-    );
+    RentalStatus status = RentalStatus.item_returned,
+  }) async {
+    try {
+      final String? shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null || rental.value == null) return;
+
+      // Only save overdue time if it's actually overdue
+      String? overdueString;
+      if (timeLabel.value == "Overdue") {
+        overdueString = timeRemaining.value;
+      }
+
+      await _rentalService.finalizeReturn(
+        shopId: shopId,
+        rentalId: rentalId,
+        itemId: rental.value!.itemId,
+        status: status,
+        overdueTime: overdueString,
+      );
+
+      Get.back(); // Close dialog
+      Get.back(); // Close screen
+      AppSnackBar.success(
+        title: "Return Complete",
+        message:
+            "Rental closed. ${finalPayment != 0 ? 'Payment recorded.' : ''}",
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to finalize return: $e",
+      );
+    }
   }
 
   Widget _summaryRow(String label, double amount, {bool isBold = false}) {

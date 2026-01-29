@@ -7,6 +7,7 @@ import '../../../models/inventory_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/inventory_service.dart';
 import '../../../services/user_service.dart';
+import '../widgets/inventory_qr_code_dialog.dart';
 
 class ItemDetailsController extends GetxController {
   static const String _logName = 'ItemDetailsController';
@@ -180,7 +181,16 @@ class ItemDetailsController extends GetxController {
   }
 
   void viewDamageFees() {
-    // Get.snackbar("Action", "View Damage Fees Clicked $itemId");
+    // AppSnackBar.info(title: "Action", message: "View Damage Fees Clicked $itemId");
     Get.toNamed(Routes.DAMAGE_FEE, arguments: itemId);
+  }
+
+  void showQR() {
+    if (item.value == null) return;
+
+    Get.dialog(
+      InventoryQrCodeDialog(item: item.value!),
+      barrierDismissible: true,
+    );
   }
 }

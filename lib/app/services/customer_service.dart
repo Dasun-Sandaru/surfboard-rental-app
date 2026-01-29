@@ -1,15 +1,19 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 import '../models/customer_model.dart';
 
 class CustomerService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'CustomerService';
+  final ActivityLogService _activityLogService = ActivityLogService();
 
   DocumentReference _shopRef(String shopId) {
-    return _db.collection('shops').doc(shopId);
+    return _db.collection(FirestoreCollections.shops).doc(shopId);
   }
 
   // ---------------------------------------------------------------------------
@@ -20,12 +24,27 @@ class CustomerService {
       log('Creating new customer for shop: $shopId', name: logName);
 
       final data = customerData.toMap();
-      final docRef = _shopRef(shopId).collection('customers').doc();
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc();
 
-      await docRef.set({
-        ...data,
-        'id': docRef.id,
-        'created_at': FieldValue.serverTimestamp(),
+      // Using transaction for atomicity with log
+      await _db.runTransaction((transaction) async {
+        transaction.set(docRef, {
+          ...data,
+          FirestoreFields.id: docRef.id,
+          FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+        });
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_customer,
+          description:
+              "Added customer ${customerData.firstName} ${customerData.lastName}",
+          entityId: docRef.id,
+          entityType: 'Customer',
+          transaction: transaction,
+        );
       });
 
       log('Customer created: ${docRef.id}', name: logName);
@@ -42,7 +61,9 @@ class CustomerService {
   Stream<QuerySnapshot> getCustomersStream(String shopId) {
     try {
       log('Getting customers stream for shop: $shopId', name: logName);
-      return _shopRef(shopId).collection('customers').snapshots();
+      return _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).snapshots();
     } catch (e) {
       log('Error creating customers stream: $e', name: logName);
       rethrow;
@@ -60,7 +81,7 @@ class CustomerService {
       log('Fetching customer: $customerId', name: logName);
       return await _shopRef(
         shopId,
-      ).collection('customers').doc(customerId).get();
+      ).collection(FirestoreCollections.customers).doc(customerId).get();
     } catch (e) {
       log('Error fetching customer: $e', name: logName);
       rethrow;
@@ -78,9 +99,11 @@ class CustomerService {
     try {
       log('Updating customer: $customerId', name: logName);
 
-      await _shopRef(shopId).collection('customers').doc(customerId).update({
+      await _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc(customerId).update({
         ...data.toMap(),
-        'updated_at': FieldValue.serverTimestamp(),
+        FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       });
 
       log('Customer updated: $customerId', name: logName);
@@ -96,10 +119,79 @@ class CustomerService {
   Future<void> deleteCustomer(String shopId, String customerId) async {
     try {
       log('Deleting customer: $customerId', name: logName);
-      await _shopRef(shopId).collection('customers').doc(customerId).delete();
+
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc(customerId);
+
+      // Using transaction for atomicity with log
+      await _db.runTransaction((transaction) async {
+        transaction.delete(docRef);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.undefined, // or delete_customer if enum exists
+          description: "Deleted customer $customerId",
+          entityId: customerId,
+          entityType: 'Customer',
+          transaction: transaction,
+        );
+      });
+
       log('Customer deleted: $customerId', name: logName);
     } catch (e) {
       log('Error deleting customer: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // GET CUSTOMER COUNT
+  // ---------------------------------------------------------------------------
+  Future<int> getCustomerCount(String shopId) async {
+    try {
+      log('Counting customers for shop: $shopId', name: logName);
+      final aggregateQuery = await _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).count().get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      log('Error counting customers: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<QuerySnapshot> getCustomersPage({
+    required String shopId,
+    required int limit,
+    DocumentSnapshot? startAfter,
+    String? searchTerm,
+  }) async {
+    try {
+      log('Fetching customers page for shop: $shopId', name: logName);
+      Query query = _shopRef(shopId).collection(FirestoreCollections.customers);
+
+      if (searchTerm != null && searchTerm.isNotEmpty) {
+        query = query
+            .where(
+              'name_lowercase', // Needs optimization (TODO: add to FirestoreFields if used widely)
+              isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
+            )
+            .where('name_lowercase', isLessThan: '${searchTerm.toLowerCase()}z')
+            .limit(20);
+      } else {
+        query = query
+            .orderBy(FirestoreFields.createdAt, descending: true)
+            .limit(limit);
+
+        if (startAfter != null) {
+          query = query.startAfterDocument(startAfter);
+        }
+      }
+
+      return await query.get();
+    } catch (e) {
+      log('Error fetching customers page: $e', name: logName);
       rethrow;
     }
   }

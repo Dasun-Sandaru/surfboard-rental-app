@@ -1,32 +1,60 @@
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import 'package:surfboard_rental_app/app/models/customer_model.dart';
+import 'package:surfboard_rental_app/app/services/customer_service.dart';
+import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../routes/app_pages.dart'; // Add this package for calls/emails
+import '../../../routes/app_pages.dart';
+import '../widgets/customer_qr_code_dialog.dart';
 
 class CustomerDetailsController extends GetxController {
-  late final Rx<CustomerModel> customer;
+  final CustomerService _customerService = CustomerService();
+  final UserService _userService = Get.find();
+
+  final Rx<CustomerModel?> customer = Rx<CustomerModel?>(null);
+  final RxBool isLoading = true.obs;
+  String? shopId;
 
   @override
   void onInit() {
     super.onInit();
-    // Get customer from navigation arguments
-    final arg = Get.arguments;
-    if (arg is CustomerModel) {
-      customer = arg.obs;
-    } else {
-      // Create a default/placeholder customer if none provided
-      customer = CustomerModel(
-        id: "N/A",
-        firstName: "Unknown",
-        lastName: "Customer",
-        phone: "N/A",
-        nic: "N/A",
-        email: "N/A",
-        notes: "No data available",
-        imageUrl: null,
-        createdAt: null,
-      ).obs;
+    _loadCustomer();
+  }
+
+  Future<void> _loadCustomer() async {
+    try {
+      isLoading.value = true;
+      final args = Get.arguments;
+      if (args == null) {
+        throw Exception('No customer data provided');
+      }
+
+      shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null) {
+        throw Exception('Shop ID not found');
+      }
+
+      if (args is CustomerModel) {
+        // Full customer model passed
+        customer.value = args;
+      } else if (args is String) {
+        // Customer ID passed - fetch from Firestore
+        final doc = await _customerService.getCustomerOnce(shopId!, args);
+        if (!doc.exists) {
+          throw Exception('Customer not found');
+        }
+        customer.value = CustomerModel.fromJson(
+          doc.data() as Map<String, dynamic>,
+        );
+      } else {
+        throw Exception('Invalid argument type');
+      }
+    } catch (e) {
+      AppSnackBar.error(title: 'Error', message: 'Failed to load customer: $e');
+      Get.back();
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -56,20 +84,31 @@ class CustomerDetailsController extends GetxController {
   ].obs;
 
   void editCustomer() {
+    if (customer.value == null) return;
     // Navigate to Edit Screen with current data
     Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: customer.value);
   }
 
   void makeCall() async {
-    final Uri launchUri = Uri(scheme: 'tel', path: customer.value.phone);
+    if (customer.value == null) return;
+    final Uri launchUri = Uri(scheme: 'tel', path: customer.value!.phone);
     if (await canLaunchUrl(launchUri)) {
-      await launchUri;
+      await launchUrl(launchUri);
     } else {
-      Get.snackbar("Error", "Could not launch dialer");
+      AppSnackBar.error(title: "Error", message: "Could not launch dialer");
     }
   }
 
   void sendEmail() {
-    Get.snackbar("Action", "Opening Email App...");
+    AppSnackBar.info(title: "Action", message: "Opening Email App...");
+  }
+
+  void showQR() {
+    if (customer.value == null) return;
+
+    Get.dialog(
+      CustomerQrCodeDialog(customer: customer.value!),
+      barrierDismissible: true,
+    );
   }
 }

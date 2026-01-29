@@ -6,6 +6,8 @@ import '../models/damage_report_model.dart';
 import '../models/damage_photo_model.dart';
 import '../models/payment_model.dart';
 import '../../utils/constants/a_enums.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
 
 class DamageReportService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -20,11 +22,11 @@ class DamageReportService {
     required PaymentModel payment,
   }) async {
     final ref = _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('payments')
+        .collection(FirestoreCollections.payments)
         .doc();
 
     await ref.set(payment.toMap());
@@ -77,11 +79,11 @@ class DamageReportService {
     required DamageReportModel report,
   }) async {
     final ref = _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('damage_reports')
+        .collection(FirestoreCollections.damageReports)
         .doc();
 
     await ref.set(report.toMap());
@@ -98,13 +100,13 @@ class DamageReportService {
     required DamagePhotoModel photo,
   }) async {
     final ref = _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('damage_reports')
+        .collection(FirestoreCollections.damageReports)
         .doc(damageId)
-        .collection('photos')
+        .collection(FirestoreCollections.photos)
         .doc();
 
     await ref.set(photo.toMap());
@@ -120,16 +122,16 @@ class DamageReportService {
     required double estimatedCost,
   }) async {
     final ref = _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('damage_reports')
+        .collection(FirestoreCollections.damageReports)
         .doc(damageId);
 
     await ref.update({
-      'status': DamageStatus.approved.name,
-      'estimatedCost': estimatedCost,
+      FirestoreFields.status: DamageStatus.approved.name,
+      FirestoreFields.estimatedCost: estimatedCost,
     });
   }
 
@@ -143,17 +145,17 @@ class DamageReportService {
     required double finalCost,
   }) async {
     final ref = _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('damage_reports')
+        .collection(FirestoreCollections.damageReports)
         .doc(damageId);
 
     await ref.update({
-      'status': DamageStatus.resolved.name,
-      'finalCost': finalCost,
-      'resolvedAt': Timestamp.now(),
+      FirestoreFields.status: DamageStatus.resolved.name,
+      FirestoreFields.finalCost: finalCost,
+      FirestoreFields.resolvedAt: Timestamp.now(),
     });
   }
 
@@ -165,12 +167,12 @@ class DamageReportService {
     required String rentalId,
   }) {
     return _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('damage_reports')
-        .orderBy('reportedAt', descending: true)
+        .collection(FirestoreCollections.damageReports)
+        .orderBy(FirestoreFields.reportedAt, descending: true)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
@@ -188,18 +190,52 @@ class DamageReportService {
     required String damageId,
   }) {
     return _db
-        .collection('shops')
+        .collection(FirestoreCollections.shops)
         .doc(shopId)
-        .collection('rentals')
+        .collection(FirestoreCollections.rentals)
         .doc(rentalId)
-        .collection('damage_reports')
+        .collection(FirestoreCollections.damageReports)
         .doc(damageId)
-        .collection('photos')
+        .collection(FirestoreCollections.photos)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => DamagePhotoModel.fromSnapshot(doc))
               .toList(),
         );
+  }
+
+  // -----------------------------
+  // Update Rental Status
+  // -----------------------------
+  Future<void> updateRentalStatus({
+    required String shopId,
+    required String rentalId,
+    required RentalStatus status,
+  }) async {
+    final ref = _db
+        .collection(FirestoreCollections.shops)
+        .doc(shopId)
+        .collection(FirestoreCollections.rentals)
+        .doc(rentalId);
+
+    await ref.update({FirestoreFields.status: status.name});
+  }
+
+  // -----------------------------
+  // Update Inventory Status
+  // -----------------------------
+  Future<void> updateInventoryStatus({
+    required String shopId,
+    required String itemId,
+    required InventoryStatus status,
+  }) async {
+    final ref = _db
+        .collection(FirestoreCollections.shops)
+        .doc(shopId)
+        .collection(FirestoreCollections.inventory)
+        .doc(itemId);
+
+    await ref.update({FirestoreFields.status: status.name});
   }
 }

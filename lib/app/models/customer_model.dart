@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 class CustomerModel {
   final String? id;
@@ -8,10 +9,10 @@ class CustomerModel {
   final String nic;
   final String email;
   final String notes;
-  final String? createdAt;
+  final DateTime? createdAt;
   final String? imageUrl;
 
-  CustomerModel({
+  const CustomerModel({
     this.id,
     required this.firstName,
     required this.lastName,
@@ -25,15 +26,17 @@ class CustomerModel {
 
   factory CustomerModel.fromJson(Map<String, dynamic> json) {
     return CustomerModel(
-      id: json['id'],
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
-      phone: json['phone'] ?? '',
-      nic: json['nic'] ?? '',
-      email: json['email'] ?? '',
-      notes: json['notes'] ?? '',
-      createdAt: json['created_at'],
-      imageUrl: json['image_url'],
+      id: json[FirestoreFields.id],
+      firstName: json[FirestoreFields.firstName] ?? '',
+      lastName: json[FirestoreFields.lastName] ?? '',
+      phone: json[FirestoreFields.phone] ?? '',
+      nic: json[FirestoreFields.nic] ?? '',
+      email: json[FirestoreFields.email] ?? '',
+      notes: json[FirestoreFields.notes] ?? '',
+      createdAt: json[FirestoreFields.createdAt] is Timestamp
+          ? (json[FirestoreFields.createdAt] as Timestamp).toDate()
+          : null,
+      imageUrl: json[FirestoreFields.imageUrl],
     );
   }
 
@@ -43,28 +46,32 @@ class CustomerModel {
     final data = doc.data()!;
     return CustomerModel(
       id: doc.id,
-      firstName: data['first_name'] ?? '',
-      lastName: data['last_name'] ?? '',
-      phone: data['phone'] ?? '',
-      nic: data['nic'] ?? '',
-      email: data['email'] ?? '',
-      notes: data['notes'] ?? '',
-      createdAt: data['created_at'],
-      imageUrl: data['image_url'],
+      firstName: data[FirestoreFields.firstName] ?? '',
+      lastName: data[FirestoreFields.lastName] ?? '',
+      phone: data[FirestoreFields.phone] ?? '',
+      nic: data[FirestoreFields.nic] ?? '',
+      email: data[FirestoreFields.email] ?? '',
+      notes: data[FirestoreFields.notes] ?? '',
+      createdAt: data[FirestoreFields.createdAt] is Timestamp
+          ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
+          : null,
+      imageUrl: data[FirestoreFields.imageUrl],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'first_name': firstName,
-      'last_name': lastName,
-      'phone': phone,
-      'nic': nic,
-      'email': email,
-      'notes': notes,
-      'created_at': createdAt,
-      'image_url': imageUrl ?? '',
+      FirestoreFields.id: id,
+      FirestoreFields.firstName: firstName,
+      FirestoreFields.lastName: lastName,
+      FirestoreFields.phone: phone,
+      FirestoreFields.nic: nic,
+      FirestoreFields.email: email,
+      FirestoreFields.notes: notes,
+      FirestoreFields.createdAt: createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : null,
+      FirestoreFields.imageUrl: imageUrl ?? '',
     };
   }
 }

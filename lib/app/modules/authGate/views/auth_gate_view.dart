@@ -11,8 +11,9 @@ class AuthGateView extends GetView<AuthGateController> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: controller.bgDark,
+      backgroundColor: colorScheme.surface,
       body: Padding(
         padding: EdgeInsets.all(ASizes.defaultPadding),
         child: Column(
@@ -21,20 +22,22 @@ class AuthGateView extends GetView<AuthGateController> {
             const Spacer(),
 
             /// Status Icon with Glow Effect
-            Container(
-              padding: EdgeInsets.all(24.w),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: controller.mainColor.withOpacity(0.1), // Glow
-                border: Border.all(
-                  color: controller.mainColor.withOpacity(0.3),
-                  width: 2,
+            Obx(
+              () => Container(
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: controller.mainColor.value.withOpacity(0.1), // Glow
+                  border: Border.all(
+                    color: controller.mainColor.value.withOpacity(0.3),
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: Icon(
-                controller.mainIcon,
-                size: 64.w,
-                color: controller.mainColor,
+                child: Icon(
+                  controller.mainIcon,
+                  size: 64.w,
+                  color: controller.mainColor.value,
+                ),
               ),
             ),
 
@@ -44,7 +47,7 @@ class AuthGateView extends GetView<AuthGateController> {
             Text(
               controller.title,
               style: TextStyle(
-                color: controller.textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -57,7 +60,7 @@ class AuthGateView extends GetView<AuthGateController> {
             Text(
               controller.description,
               style: TextStyle(
-                color: controller.textGrey,
+                color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
                 height: 1.5,
               ),
@@ -75,14 +78,14 @@ class AuthGateView extends GetView<AuthGateController> {
                   onPressed: () {
                     // Open Email or Phone logic
                   },
-                  icon: Icon(Iconsax.message, color: controller.textWhite),
+                  icon: Icon(Iconsax.message, color: colorScheme.onPrimary),
                   label: const Text(
                     "Contact Administrator",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: controller.cardDark,
-                    foregroundColor: controller.textWhite,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -100,7 +103,7 @@ class AuthGateView extends GetView<AuthGateController> {
               child: OutlinedButton(
                 onPressed: () => controller.logout(),
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  side: BorderSide(color: colorScheme.outline),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -109,7 +112,7 @@ class AuthGateView extends GetView<AuthGateController> {
                 child: Text(
                   "Sign Out",
                   style: TextStyle(
-                    color: controller.textWhite,
+                    color: colorScheme.error,
                     fontWeight: FontWeight.w600,
                     fontSize: 16.sp,
                   ),

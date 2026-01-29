@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -219,7 +220,10 @@ class AgreementController extends GetxController {
         }
       });
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load damage fees: $e');
+      AppSnackBar.error(
+        title: 'Error',
+        message: 'Failed to load damage fees: $e',
+      );
     }
   }
 
@@ -330,7 +334,9 @@ class AgreementController extends GetxController {
     }
 
     final shopDoc = await _shopService.getShop(shopId);
-    final shopData = ShopModel.fromFirestore(shopDoc);
+    final shopData = ShopModel.fromSnapshot(
+      shopDoc as DocumentSnapshot<Map<String, dynamic>>,
+    );
 
     final rentalPrice = double.tryParse(rentalPriceController.text) ?? 0.0;
     final deposit = requireDeposit.value
@@ -358,13 +364,16 @@ class AgreementController extends GetxController {
         onLayout: (PdfPageFormat format) async => generatedPdfData.value!,
       );
     } else {
-      Get.snackbar('Error', 'PDF not generated yet.');
+      AppSnackBar.error(title: 'Error', message: 'PDF not generated yet.');
     }
   }
 
   Future<void> createRental() async {
     if (generatedPdfData.value == null) {
-      Get.snackbar("Error", "Please generate the agreement first.");
+      AppSnackBar.error(
+        title: "Error",
+        message: "Please generate the agreement first.",
+      );
       return;
     }
 
@@ -381,9 +390,16 @@ class AgreementController extends GetxController {
           customerId == null ||
           board == null ||
           rentalData == null) {
-        Get.snackbar("Error", "Missing required data to create rental.");
+        AppSnackBar.error(
+          title: "Error",
+          message: "Missing required data to create rental.",
+        );
         return;
       }
+
+      // Fetch Staff Name for caching
+      final staffUser = await _userService.getUser(userId);
+      final staffName = staffUser?.name ?? 'Staff';
 
       final startDateTime = DateTime(
         rentalData.startDate.year,
@@ -410,7 +426,6 @@ class AgreementController extends GetxController {
         expectedReturnTime: dueDateTime,
         actualReturnTime: null,
         status: RentalStatus.active,
-
         rentType: initRentalModel.value!.rentType,
         paymentStatus: PaymentStatus.unpaid,
         rate: double.tryParse(rentalPriceController.text) ?? 0.0,
@@ -425,6 +440,10 @@ class AgreementController extends GetxController {
           refunded: 0.0,
         ),
         agreementLink: null,
+        overdueTime: null,
+        cachedCustomerName: "${customer!.firstName} ${customer!.lastName}",
+        cachedItemName: board!.name,
+        cachedStaffName: staffName,
         createdAt: DateTime.now(),
       );
 
@@ -434,10 +453,13 @@ class AgreementController extends GetxController {
         generatedPdfData.value!,
       );
 
-      Get.snackbar("Success", "Rental created successfully with ID: $rentalId");
-      Get.offAllNamed(Routes.HOME);
+      AppSnackBar.success(
+        title: "Success",
+        message: "Rental created successfully with ID: $rentalId",
+      );
+      Get.offAllNamed(Routes.ADMIN_HOME);
     } catch (e) {
-      Get.snackbar("Error", "Failed to create rental: $e");
+      AppSnackBar.error(title: "Error", message: "Failed to create rental: $e");
     } finally {
       isCreatingRental.value = false;
     }

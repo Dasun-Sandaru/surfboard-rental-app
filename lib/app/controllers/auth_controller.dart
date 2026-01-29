@@ -41,7 +41,16 @@ class AuthController extends GetxController {
     }
 
     // Reload & Verify Email
-    await user.reload();
+    try {
+      await user.reload();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        _authService.signOut();
+        return;
+      }
+      rethrow;
+    }
+
     final isVerified = user.emailVerified;
 
     if (!isVerified) {

@@ -9,18 +9,11 @@ import '../controllers/sign_in_controller.dart';
 class SignInView extends GetView<SignInController> {
   const SignInView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22); // Main Background
-  final Color cardDark = const Color(0xFF182c30); // Input Fields
-  final Color primaryBlue = const Color(0xFF4A90E2); // Primary Action
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -38,15 +31,15 @@ class SignInView extends GetView<SignInController> {
                     'Welcome Back!',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: textWhite,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     "Log in to manage your surfboards rentals",
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: textGrey),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     textAlign: TextAlign.center,
                   ),
 
@@ -79,14 +72,15 @@ class SignInView extends GetView<SignInController> {
 
   /// Build Header
   Widget _buildHeader(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Stack(
       children: [
         Container(
           height: 220.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: cardDark,
-            image: DecorationImage(
+            color: colorScheme.surfaceContainer,
+            image: const DecorationImage(
               image: AssetImage("assets/login_header.jpg"),
               fit: BoxFit.cover,
               opacity: 0.5,
@@ -104,7 +98,10 @@ class SignInView extends GetView<SignInController> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.transparent, bgDark.withValues(alpha: 0.9)],
+              colors: [
+                Colors.transparent,
+                colorScheme.surface.withValues(alpha: 0.9),
+              ],
             ),
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(30),
@@ -112,45 +109,28 @@ class SignInView extends GetView<SignInController> {
             ),
           ),
         ),
-        // Positioned(
-        //   bottom: 20.h,
-        //   left: 20.w,
-        //   child: Container(
-        //     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-        //     decoration: BoxDecoration(
-        //       color: primaryBlue.withValues(alpha: 0.9),
-        //       borderRadius: BorderRadius.circular(8),
-        //     ),
-        //     child: Text(
-        //       "Ride the wave",
-        //       style: TextStyle(
-        //         color: textWhite,
-        //         fontWeight: FontWeight.w600,
-        //         fontSize: 12.sp,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
 
   /// Build Form
   Widget _buildForm(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Form(
       key: controller.formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Email
-          _buildLabel('Email Address'.tr),
+          _buildLabel(context, 'Email Address'.tr),
           SizedBox(height: 8.h),
           TextFormField(
-            controller: controller.emailController,
+            controller: controller.signInEmailController,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(color: textWhite),
+            style: TextStyle(color: colorScheme.onSurface),
             decoration: _inputDecoration(
+              context,
               hint: 'hello@surfshop.com',
               icon: Iconsax.sms,
             ),
@@ -160,16 +140,20 @@ class SignInView extends GetView<SignInController> {
           SizedBox(height: 20.h),
 
           /// Password
-          _buildLabel('Password'.tr),
+          _buildLabel(context, 'Password'.tr),
           SizedBox(height: 8.h),
           Obx(
             () => TextFormField(
-              controller: controller.passwordController,
+              controller: controller.signInPasswordController,
               textInputAction: TextInputAction.done,
               obscureText: controller.isObscure.value,
-              style: TextStyle(color: textWhite),
-              decoration: _inputDecoration(hint: '••••••••', icon: Iconsax.lock)
-                  .copyWith(
+              style: TextStyle(color: colorScheme.onSurface),
+              decoration:
+                  _inputDecoration(
+                    context,
+                    hint: '••••••••',
+                    icon: Iconsax.lock,
+                  ).copyWith(
                     suffixIcon: IconButton(
                       onPressed: () => controller.isObscure.toggle(),
                       icon: Icon(
@@ -177,7 +161,7 @@ class SignInView extends GetView<SignInController> {
                             ? Iconsax.eye_slash
                             : Iconsax.eye,
                         size: 20.w,
-                        color: textGrey,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -194,7 +178,7 @@ class SignInView extends GetView<SignInController> {
               child: Text(
                 'Forgot Password?',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: primaryBlue,
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -211,20 +195,20 @@ class SignInView extends GetView<SignInController> {
               () => ElevatedButton(
                 onPressed: () => controller.signIn(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  foregroundColor: textWhite,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                   elevation: 4,
-                  shadowColor: primaryBlue.withValues(alpha: 0.4),
+                  shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                 ),
                 child: controller.isLoading.value
                     ? SizedBox(
                         height: 24.h,
                         width: 24.h,
                         child: CircularProgressIndicator(
-                          color: textWhite,
+                          color: colorScheme.onPrimary,
                           strokeWidth: 2,
                         ),
                       )
@@ -244,67 +228,82 @@ class SignInView extends GetView<SignInController> {
   }
 
   /// Reusable Input Decoration for Dark Mode
-  InputDecoration _inputDecoration({
+  InputDecoration _inputDecoration(
+    BuildContext context, {
     required String hint,
     required IconData icon,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InputDecoration(
-      prefixIcon: Icon(icon, size: 20.w, color: textGrey),
+      prefixIcon: Icon(icon, size: 20.w, color: colorScheme.onSurfaceVariant),
       hintText: hint,
-      hintStyle: TextStyle(color: textGrey.withValues(alpha: 0.5)),
+      hintStyle: TextStyle(
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+      ),
       filled: true,
-      fillColor: cardDark, // Dark background for input
+      fillColor: colorScheme.surfaceContainer, // Dark background for input
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: borderDark),
+        borderSide: BorderSide(color: colorScheme.outline),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: borderDark),
+        borderSide: BorderSide(color: colorScheme.outline),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryBlue),
+        borderSide: BorderSide(color: colorScheme.primary),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.redAccent),
+        borderSide: BorderSide(color: colorScheme.error),
       ),
       contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(BuildContext context, String text) {
     return Text(
       text,
-      style: TextStyle(color: textWhite, fontWeight: FontWeight.w500),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 
   /// Separation with "Or"
   Widget _buildDivider(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Expanded(child: Divider(color: borderDark, thickness: 1)),
+        Expanded(child: Divider(color: colorScheme.outline, thickness: 1)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Text(
             "Or join us",
-            style: TextStyle(color: textGrey, fontSize: 12.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 12.sp,
+            ),
           ),
         ),
-        Expanded(child: Divider(color: borderDark, thickness: 1)),
+        Expanded(child: Divider(color: colorScheme.outline, thickness: 1)),
       ],
     );
   }
 
   /// Sign Up Section
   Widget _buildSignUpSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Text(
           "Don't have an account?",
-          style: TextStyle(color: textGrey, fontSize: 13.sp),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 13.sp,
+          ),
         ),
         SizedBox(height: 16.h),
 
@@ -313,9 +312,10 @@ class SignInView extends GetView<SignInController> {
             /// Staff Button
             Expanded(
               child: _buildOutlineButton(
+                context,
                 text: "As Staff",
                 icon: Iconsax.user,
-                color: textWhite,
+                color: colorScheme.onSurface,
                 onPressed: () => controller.goToSignUpStaff(),
               ),
             ),
@@ -325,9 +325,10 @@ class SignInView extends GetView<SignInController> {
             /// Shop Owner Button
             Expanded(
               child: _buildOutlineButton(
+                context,
                 text: "Setup Shop",
                 icon: Iconsax.shop,
-                color: primaryBlue,
+                color: colorScheme.primary,
                 isPrimary: true,
                 onPressed: () => controller.goToSignUpAdmin(),
               ),
@@ -339,19 +340,21 @@ class SignInView extends GetView<SignInController> {
   }
 
   /// Reusable Outline Button
-  Widget _buildOutlineButton({
+  Widget _buildOutlineButton(
+    BuildContext context, {
     required String text,
     required IconData icon,
     required Color color,
     required VoidCallback onPressed,
     bool isPrimary = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 14.h),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: BorderSide(color: isPrimary ? color : borderDark),
+        side: BorderSide(color: isPrimary ? color : colorScheme.outline),
         backgroundColor: isPrimary
             ? color.withValues(alpha: 0.1)
             : Colors.transparent,

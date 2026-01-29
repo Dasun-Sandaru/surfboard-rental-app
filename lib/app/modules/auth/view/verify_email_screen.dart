@@ -9,17 +9,11 @@ import '../controllers/verify_email_controller.dart';
 class VerifyEmailScreen extends GetView<VerifyEmailController> {
   const VerifyEmailScreen({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -37,9 +31,13 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: primaryBlue.withValues(alpha: 0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                 ),
-                child: Icon(Iconsax.verify, size: 80.w, color: primaryBlue),
+                child: Icon(
+                  Iconsax.verify,
+                  size: 80.w,
+                  color: colorScheme.primary,
+                ),
               ),
 
               SizedBox(height: 32.h),
@@ -47,7 +45,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
               Text(
                 'Verify your email address',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: textWhite,
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -55,9 +53,10 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
               SizedBox(height: 16.h),
               Text(
                 'We have sent a verification link to your email address. Please check your inbox and click the link to activate your account.',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: textGrey, height: 1.5),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.5,
+                ),
                 textAlign: TextAlign.center,
               ),
 
@@ -70,12 +69,12 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                 child: ElevatedButton(
                   onPressed: controller.goToLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryBlue,
-                    foregroundColor: textWhite,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    elevation: 4,
+                    elevation: 0,
                   ),
                   child: Text(
                     'Back to Login',
@@ -96,7 +95,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                 child: OutlinedButton(
                   onPressed: controller.resendVerificationEmail,
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: borderDark),
+                    side: BorderSide(color: colorScheme.outline),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -105,7 +104,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                   child: Text(
                     'Resend Email',
                     style: TextStyle(
-                      color: textWhite,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
                       fontSize: 16.sp,
                     ),
@@ -124,13 +123,18 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                       width: 24.w,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(primaryBlue),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          colorScheme.primary,
+                        ),
                       ),
                     ),
                     SizedBox(height: 12.h),
                     Text(
                       "Waiting for verification...",
-                      style: TextStyle(color: textGrey, fontSize: 12.sp),
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 12.sp,
+                      ),
                     ),
                   ],
                 ),

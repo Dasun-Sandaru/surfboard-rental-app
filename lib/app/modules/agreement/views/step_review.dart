@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
 import '../../../models/init_rental_model.dart';
 import '../../signature/views/signature_view.dart';
 import '../controllers/agreement_controller.dart';
@@ -10,30 +11,24 @@ import '../controllers/agreement_controller.dart';
 class StepReview extends GetView<AgreementController> {
   const StepReview({super.key});
 
-  // --- Theme Colors ---
-  static const Color cardDark = Color(0xFF182c30);
-  static const Color borderDark = Color(0xFF334155);
-  static const Color textWhite = Color(0xFFf0f4f4);
-  static const Color textGrey = Color(0xFF94a3b8);
-  static const Color primaryBlue = Color(0xFF4A90E2);
-  static const Color warningYellow = Color(0xFFF59E0B);
-  static const Color errorRed = Color(0xFFEF4444);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     // This Obx will wrap the main content to react to data model changes
     return Obx(() {
       final rentalData = controller.initRentalModel.value;
       if (rentalData == null) {
-        return const Center(
+        return Center(
           child: Text(
             "No rental data available.",
-            style: TextStyle(color: textGrey),
+            style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
         );
       }
 
       return SingleChildScrollView(
+        
         padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +36,7 @@ class StepReview extends GetView<AgreementController> {
             Text(
               "Review Agreement",
               style: TextStyle(
-                color: textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -49,20 +44,23 @@ class StepReview extends GetView<AgreementController> {
             SizedBox(height: 8.h),
             Text(
               "Review details and sign below.",
-              style: TextStyle(color: textGrey, fontSize: 16.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 16.sp,
+              ),
             ),
             SizedBox(height: 24.h),
-            _buildCustomerInfo(rentalData),
+            _buildCustomerInfo(context, rentalData),
             SizedBox(height: 16.h),
-            _buildRentalDetails(rentalData),
+            _buildRentalDetails(context, rentalData),
             SizedBox(height: 16.h),
-            _buildPricingDetails(),
+            _buildPricingDetails(context),
             SizedBox(height: 24.h),
-            _buildDamageFeeSection(),
+            _buildDamageFeeSection(context),
             SizedBox(height: 32.h),
-            _buildSignatureSection(),
+            _buildSignatureSection(context),
             SizedBox(height: 16.h),
-            _buildTermsCheckbox(),
+            _buildTermsCheckbox(context),
             SizedBox(height: 80.h), // Bottom padding
           ],
         ),
@@ -72,29 +70,40 @@ class StepReview extends GetView<AgreementController> {
 
   // --- Section Widgets ---
 
-  Widget _buildCustomerInfo(InitRentalModel rentalData) {
+  Widget _buildCustomerInfo(BuildContext context, InitRentalModel rentalData) {
     final customer = rentalData.customer;
-    return _buildSectionCard([
-      _buildSectionHeader("Renter Information"),
-      _buildSummaryRow("Name", "${customer.firstName} ${customer.lastName}"),
-      _buildSummaryRow("Email", customer.email),
-      if (customer.phone.isNotEmpty) _buildSummaryRow("Phone", customer.phone),
+    return _buildSectionCard(context, [
+      _buildSectionHeader(context, "Renter Information"),
+      _buildSummaryRow(
+        context,
+        "Name",
+        "${customer.firstName} ${customer.lastName}",
+      ),
+      _buildSummaryRow(context, "Email", customer.email),
+      if (customer.phone.isNotEmpty)
+        _buildSummaryRow(context, "Phone", customer.phone),
     ]);
   }
 
-  Widget _buildRentalDetails(InitRentalModel rentalData) {
+  Widget _buildRentalDetails(BuildContext context, InitRentalModel rentalData) {
     final board = rentalData.items.first;
-    return _buildSectionCard([
-      _buildSectionHeader("Rental Details"),
-      _buildSummaryRow("Item", "${board.brand} ${board.name}"),
-      _buildSummaryRow("Size", "${board.sizeFeet}' ${board.sizeInches}\""),
+    return _buildSectionCard(context, [
+      _buildSectionHeader(context, "Rental Details"),
+      _buildSummaryRow(context, "Item", "${board.brand} ${board.name}"),
+      _buildSummaryRow(
+        context,
+        "Size",
+        "${board.sizeFeet}' ${board.sizeInches}\"",
+      ),
       SizedBox(height: 8.h),
-      _buildSummaryRow("Start Time", rentalData.startDateTimeString),
-      _buildSummaryRow("Due Time", rentalData.dueDateTimeString),
+      _buildSummaryRow(context, "Start Time", rentalData.startDateTimeString),
+      _buildSummaryRow(context, "Due Time", rentalData.dueDateTimeString),
     ]);
   }
 
-  Widget _buildPricingDetails() {
+  Widget _buildPricingDetails(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
     final rentalPrice =
         double.tryParse(controller.rentalPriceController.text) ?? 0.0;
     final deposit = controller.requireDeposit.value
@@ -103,35 +112,41 @@ class StepReview extends GetView<AgreementController> {
     final totalDamageFees = controller.getTotalDamageFees();
     final grandTotal = rentalPrice + deposit;
 
-    return _buildSectionCard([
-      _buildSectionHeader("Pricing Summary"),
+    return _buildSectionCard(context, [
+      _buildSectionHeader(context, "Pricing Summary"),
       _buildSummaryRow(
+        context,
         "Rental Price",
         "\$${rentalPrice.toStringAsFixed(2)}",
-        valueColor: primaryBlue,
+        valueColor: colorScheme.primary,
       ),
       if (controller.requireDeposit.value)
         _buildSummaryRow(
+          context,
           "Security Deposit",
           "\$${deposit.toStringAsFixed(2)}",
-          valueColor: warningYellow,
+          valueColor: statusColors?.warning ?? Colors.orange,
         ),
       _buildSummaryRow(
+        context,
         "Max Damage Liability",
         "\$${totalDamageFees.toStringAsFixed(2)}",
-        valueColor: errorRed,
+        valueColor: statusColors?.error ?? Colors.red,
       ),
-      Divider(color: borderDark, height: 24.h),
+      Divider(color: colorScheme.outline, height: 24.h),
       _buildSummaryRow(
+        context,
         "Total Due Today",
         "\$${grandTotal.toStringAsFixed(2)}",
         isBold: true,
-        valueColor: textWhite,
+        valueColor: colorScheme.onSurface,
       ),
     ]);
   }
 
-  Widget _buildDamageFeeSection() {
+  Widget _buildDamageFeeSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
     final selectedFees = controller.getSelectedDamageFees();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,19 +154,20 @@ class StepReview extends GetView<AgreementController> {
         Text(
           "Damage Policy Agreement",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 12.h),
         _buildSectionCard(
+          context,
           selectedFees.isEmpty
               ? [
                   Text(
                     "No specific damage fees applied. General wear and tear is expected.",
                     style: TextStyle(
-                      color: textGrey,
+                      color: colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -159,9 +175,10 @@ class StepReview extends GetView<AgreementController> {
               : selectedFees
                     .map(
                       (fee) => _buildSummaryRow(
+                        context,
                         fee.damageType,
                         "\$${fee.feeAmount.toStringAsFixed(2)}",
-                        valueColor: errorRed,
+                        valueColor: statusColors?.error ?? Colors.red,
                       ),
                     )
                     .toList(),
@@ -170,14 +187,15 @@ class StepReview extends GetView<AgreementController> {
     );
   }
 
-  Widget _buildSignatureSection() {
+  Widget _buildSignatureSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "Customer Signature",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -198,7 +216,7 @@ class StepReview extends GetView<AgreementController> {
             height: 150.h,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFf0f4f4),
+              color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Obx(() {
@@ -211,7 +229,7 @@ class StepReview extends GetView<AgreementController> {
                   child: Text(
                     "Tap to Sign",
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -225,7 +243,8 @@ class StepReview extends GetView<AgreementController> {
     );
   }
 
-  Widget _buildTermsCheckbox() {
+  Widget _buildTermsCheckbox(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Checkbox(
@@ -233,14 +252,17 @@ class StepReview extends GetView<AgreementController> {
           onChanged: (v) {
             controller.isAgree.value = v ?? false;
           },
-          activeColor: primaryBlue,
-          checkColor: textWhite,
-          side: BorderSide(color: borderDark),
+          activeColor: colorScheme.primary,
+          checkColor: colorScheme.onPrimary,
+          side: BorderSide(color: colorScheme.outline),
         ),
         Expanded(
           child: Text(
             "I agree to the terms and conditions stated above.",
-            style: TextStyle(color: textGrey, fontSize: 12.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 12.sp,
+            ),
           ),
         ),
       ],
@@ -249,14 +271,15 @@ class StepReview extends GetView<AgreementController> {
 
   // --- Generic Helper Widgets ---
 
-  Widget _buildSectionCard(List<Widget> children) {
+  Widget _buildSectionCard(BuildContext context, List<Widget> children) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderDark),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,13 +288,14 @@ class StepReview extends GetView<AgreementController> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Text(
         title,
         style: TextStyle(
-          color: primaryBlue,
+          color: colorScheme.primary,
           fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
@@ -280,11 +304,13 @@ class StepReview extends GetView<AgreementController> {
   }
 
   Widget _buildSummaryRow(
+    BuildContext context,
     String label,
     String value, {
     Color? valueColor,
     bool isBold = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
@@ -292,12 +318,15 @@ class StepReview extends GetView<AgreementController> {
         children: [
           Text(
             label,
-            style: TextStyle(color: textGrey, fontSize: 14.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 14.sp,
+            ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: valueColor ?? textWhite,
+              color: valueColor ?? colorScheme.onSurface,
               fontSize: 16.sp,
               fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
             ),

@@ -12,20 +12,13 @@ import '../controllers/new_rental_controller.dart';
 class NewRentalView extends StatelessWidget {
   const NewRentalView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NewRentalController());
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -33,7 +26,7 @@ class NewRentalView extends StatelessWidget {
         title: Text(
           "New Rental",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -45,19 +38,20 @@ class NewRentalView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// 1. Customer Section
-            _buildSectionLabel("Customer"),
+            _buildSectionLabel(context, "Customer"),
             SizedBox(height: 8.h),
-            Obx(() => _buildCustomerSelector(controller)),
+            Obx(() => _buildCustomerSelector(context, controller)),
 
             SizedBox(height: 24.h),
 
             /// 2. Rental Dates
-            _buildSectionLabel("Rental Period"),
+            _buildSectionLabel(context, "Rental Period"),
             SizedBox(height: 8.h),
             Row(
               children: [
                 Expanded(
                   child: _buildDateTimeCard(
+                    context,
                     "Start Date & Time",
                     controller.startDate,
                     controller.startTime,
@@ -68,6 +62,7 @@ class NewRentalView extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: _buildDateTimeCard(
+                    context,
                     "Due Date & Time",
                     controller.dueDate,
                     controller.dueTime,
@@ -84,14 +79,18 @@ class NewRentalView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSectionLabel("Items"),
+                _buildSectionLabel(context, "Items"),
                 TextButton.icon(
                   onPressed: controller.addItem,
-                  icon: Icon(Iconsax.add, size: 18.w, color: primaryBlue),
+                  icon: Icon(
+                    Iconsax.add,
+                    size: 18.w,
+                    color: colorScheme.primary,
+                  ),
                   label: Text(
                     "Add Item",
                     style: TextStyle(
-                      color: primaryBlue,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -103,7 +102,7 @@ class NewRentalView extends StatelessWidget {
             // Items List
             Obx(() {
               if (controller.selectedItems.isEmpty) {
-                return _buildEmptyItemState(controller);
+                return _buildEmptyItemState(context, controller);
               }
               return ListView.separated(
                 shrinkWrap: true,
@@ -113,6 +112,7 @@ class NewRentalView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = controller.selectedItems[index];
                   return _buildSelectedItemCard(
+                    context,
                     controller,
                     item,
                     () => controller.removeItem(index),
@@ -130,8 +130,8 @@ class NewRentalView extends StatelessWidget {
       bottomNavigationBar: Container(
         padding: EdgeInsets.all(ASizes.defaultPadding),
         decoration: BoxDecoration(
-          color: bgDark,
-          border: Border(top: BorderSide(color: borderDark)),
+          color: colorScheme.surface,
+          border: Border(top: BorderSide(color: colorScheme.outline)),
         ),
         child: SafeArea(
           child: SizedBox(
@@ -139,7 +139,8 @@ class NewRentalView extends StatelessWidget {
             child: ElevatedButton(
               onPressed: controller.proceedToAgreement,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -153,7 +154,6 @@ class NewRentalView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
-                      color: textWhite,
                     ),
                   ),
                   SizedBox(width: 8.w),
@@ -171,7 +171,11 @@ class NewRentalView extends StatelessWidget {
   // WIDGET BUILDERS
   // ===========================================================================
 
-  Widget _buildRentTypeSelector(NewRentalController controller) {
+  Widget _buildRentTypeSelector(
+    BuildContext context,
+    NewRentalController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Obx(
       () => SizedBox(
         width: double.infinity,
@@ -194,10 +198,10 @@ class NewRentalView extends StatelessWidget {
             controller.calculateTotal();
           },
           style: SegmentedButton.styleFrom(
-            backgroundColor: cardDark,
-            foregroundColor: textGrey,
-            selectedForegroundColor: textWhite,
-            selectedBackgroundColor: primaryBlue,
+            backgroundColor: colorScheme.surface,
+            foregroundColor: colorScheme.onSurfaceVariant,
+            selectedForegroundColor: colorScheme.onPrimary,
+            selectedBackgroundColor: colorScheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -207,11 +211,11 @@ class NewRentalView extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionLabel(String text) {
+  Widget _buildSectionLabel(BuildContext context, String text) {
     return Text(
       text,
       style: TextStyle(
-        color: textWhite,
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: 16.sp,
         fontWeight: FontWeight.bold,
       ),
@@ -219,7 +223,11 @@ class NewRentalView extends StatelessWidget {
   }
 
   // -- Customer Selector --
-  Widget _buildCustomerSelector(NewRentalController controller) {
+  Widget _buildCustomerSelector(
+    BuildContext context,
+    NewRentalController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     final customer = controller.selectedCustomer.value;
     final bool isSelected = customer != null;
 
@@ -229,23 +237,22 @@ class NewRentalView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? primaryBlue : borderDark,
-            style: isSelected ? BorderStyle.solid : BorderStyle.solid,
+            color: isSelected ? colorScheme.primary : colorScheme.outline,
           ),
         ),
         child: isSelected
             ? Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: primaryBlue.withOpacity(0.2),
+                    backgroundColor: colorScheme.primary.withOpacity(0.2),
                     child: Text(
                       customer.firstName.isNotEmpty
                           ? customer.firstName[0]
                           : "C",
-                      style: TextStyle(color: primaryBlue),
+                      style: TextStyle(color: colorScheme.primary),
                     ),
                   ),
                   SizedBox(width: 16.w),
@@ -255,29 +262,39 @@ class NewRentalView extends StatelessWidget {
                       Text(
                         "${customer.firstName} ${customer.lastName}",
                         style: TextStyle(
-                          color: textWhite,
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                           fontSize: 16.sp,
                         ),
                       ),
                       Text(
                         customer.phone,
-                        style: TextStyle(color: textGrey, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  Icon(Iconsax.edit, color: textGrey, size: 20.w),
+                  Icon(
+                    Iconsax.edit,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 20.w,
+                  ),
                 ],
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Iconsax.user_add, color: textGrey),
+                  Icon(Iconsax.user_add, color: colorScheme.onSurfaceVariant),
                   SizedBox(width: 8.w),
                   Text(
                     "Select Customer",
-                    style: TextStyle(color: textGrey, fontSize: 16.sp),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 16.sp,
+                    ),
                   ),
                 ],
               ),
@@ -287,26 +304,31 @@ class NewRentalView extends StatelessWidget {
 
   // -- Date & Time Picker Card --
   Widget _buildDateTimeCard(
+    BuildContext context,
     String title,
     Rx<DateTime> dateObs,
     Rx<TimeOfDay> timeObs,
     VoidCallback onDateTap,
     VoidCallback onTimeTap,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Obx(
       () => Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: borderDark),
+          border: Border.all(color: colorScheme.outline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: TextStyle(color: textGrey, fontSize: 11.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 11.sp,
+              ),
             ),
             SizedBox(height: 8.h),
             // Date Row
@@ -316,7 +338,7 @@ class NewRentalView extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: bgDark,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -325,12 +347,16 @@ class NewRentalView extends StatelessWidget {
                     Text(
                       "${dateObs.value.day}/${dateObs.value.month}/${dateObs.value.year}",
                       style: TextStyle(
-                        color: textWhite,
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 13.sp,
                       ),
                     ),
-                    Icon(Iconsax.calendar_1, color: primaryBlue, size: 16.w),
+                    Icon(
+                      Iconsax.calendar_1,
+                      color: colorScheme.primary,
+                      size: 16.w,
+                    ),
                   ],
                 ),
               ),
@@ -343,7 +369,7 @@ class NewRentalView extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: bgDark,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -352,12 +378,12 @@ class NewRentalView extends StatelessWidget {
                     Text(
                       "${timeObs.value.hour.toString().padLeft(2, '0')}:${timeObs.value.minute.toString().padLeft(2, '0')}",
                       style: TextStyle(
-                        color: textWhite,
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 13.sp,
                       ),
                     ),
-                    Icon(Iconsax.clock, color: primaryBlue, size: 16.w),
+                    Icon(Iconsax.clock, color: colorScheme.primary, size: 16.w),
                   ],
                 ),
               ),
@@ -369,7 +395,11 @@ class NewRentalView extends StatelessWidget {
   }
 
   // -- Empty Item State --
-  Widget _buildEmptyItemState(NewRentalController controller) {
+  Widget _buildEmptyItemState(
+    BuildContext context,
+    NewRentalController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: controller.addItem,
       borderRadius: BorderRadius.circular(16),
@@ -377,19 +407,23 @@ class NewRentalView extends StatelessWidget {
         height: 100.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: bgDark,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: borderDark,
-            style: BorderStyle.solid,
-          ), // Dotted better if possible
+          border: Border.all(color: colorScheme.outline),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Iconsax.box_add, color: textGrey, size: 32.w),
+            Icon(
+              Iconsax.box_add,
+              color: colorScheme.onSurfaceVariant,
+              size: 32.w,
+            ),
             SizedBox(height: 8.h),
-            Text("No items added yet", style: TextStyle(color: textGrey)),
+            Text(
+              "No items added yet",
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
+            ),
           ],
         ),
       ),
@@ -398,13 +432,18 @@ class NewRentalView extends StatelessWidget {
 
   // -- Selected Item Card --
   Widget _buildSelectedItemCard(
-      NewRentalController controller, InventoryModel item, VoidCallback onRemove) {
+    BuildContext context,
+    NewRentalController controller,
+    InventoryModel item,
+    VoidCallback onRemove,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderDark),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Column(
         children: [
@@ -415,7 +454,7 @@ class NewRentalView extends StatelessWidget {
                 height: 50.w,
                 width: 50.w,
                 decoration: BoxDecoration(
-                  color: bgDark,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
                   image: item.imageUrl.isNotEmpty
                       ? DecorationImage(
@@ -425,7 +464,7 @@ class NewRentalView extends StatelessWidget {
                       : null,
                 ),
                 child: item.imageUrl.isEmpty
-                    ? Icon(Iconsax.image, color: textGrey)
+                    ? Icon(Iconsax.image, color: colorScheme.onSurfaceVariant)
                     : null,
               ),
 
@@ -439,7 +478,7 @@ class NewRentalView extends StatelessWidget {
                     Text(
                       item.name,
                       style: TextStyle(
-                        color: textWhite,
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 14.sp,
                       ),
@@ -448,7 +487,10 @@ class NewRentalView extends StatelessWidget {
                     ),
                     Text(
                       item.displaySize,
-                      style: TextStyle(color: textGrey, fontSize: 12.sp),
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 12.sp,
+                      ),
                     ),
                   ],
                 ),
@@ -457,13 +499,12 @@ class NewRentalView extends StatelessWidget {
               // Remove Button
               IconButton(
                 onPressed: onRemove,
-                icon:
-                    Icon(Iconsax.minus_cirlce, color: const Color(0xFFEF4444)),
+                icon: Icon(Iconsax.minus_cirlce, color: colorScheme.error),
               ),
             ],
           ),
           SizedBox(height: 12.h),
-          _buildRentTypeSelector(controller),
+          _buildRentTypeSelector(context, controller),
         ],
       ),
     );

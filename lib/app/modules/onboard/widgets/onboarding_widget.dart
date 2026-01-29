@@ -12,14 +12,11 @@ class OnBoardingWidget extends StatelessWidget {
 
   final String image, title, subtitle;
 
-  final Color bgDark = const Color(0xFF101f22);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      color: bgDark,
+      color: colorScheme.surface,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +40,7 @@ class OnBoardingWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.bold,
-                        color: textWhite,
+                        color: colorScheme.onSurface,
                         height: 1.2,
                       ),
                       textAlign: TextAlign.center,
@@ -53,7 +50,7 @@ class OnBoardingWidget extends StatelessWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: 14.sp,
-                        color: textGrey,
+                        color: colorScheme.onSurfaceVariant,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.center,

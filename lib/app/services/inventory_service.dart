@@ -1,12 +1,17 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 class InventoryService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String logName = 'InventoryService';
+  final ActivityLogService _activityLogService = ActivityLogService();
 
   DocumentReference _shopRef(String shopId) {
-    return _db.collection('shops').doc(shopId);
+    return _db.collection(FirestoreCollections.shops).doc(shopId);
   }
 
   // ---------------------------------------------------------------------------
@@ -25,15 +30,15 @@ class InventoryService {
     try {
       log('Fetching inventory page for shop: $shopId', name: logName);
 
-      Query query = _shopRef(shopId).collection('inventory');
+      Query query = _shopRef(shopId).collection(FirestoreCollections.inventory);
 
       // Apply filters
       if (types.isNotEmpty) {
-        query = query.where('type', whereIn: types);
+        query = query.where(FirestoreFields.type, whereIn: types);
       }
 
       if (statuses.isNotEmpty) {
-        query = query.where('status', whereIn: statuses);
+        query = query.where(FirestoreFields.status, whereIn: statuses);
       }
 
       // Size filter
@@ -41,18 +46,27 @@ class InventoryService {
         final sizeValue =
             int.tryParse(sizeFeet) ?? 0; // feet as integer for comparison
         if (isLessThan) {
-          query = query.where('size_feet', isLessThan: sizeValue);
+          query = query.where(FirestoreFields.sizeFeet, isLessThan: sizeValue);
         } else {
-          query = query.where('size_feet', isGreaterThanOrEqualTo: sizeValue);
+          query = query.where(
+            FirestoreFields.sizeFeet,
+            isGreaterThanOrEqualTo: sizeValue,
+          );
         }
       }
 
       if (sizeInches != null && sizeInches.isNotEmpty) {
         final sizeValue = int.tryParse(sizeInches) ?? 0;
         if (isLessThan) {
-          query = query.where('size_inches', isLessThan: sizeValue);
+          query = query.where(
+            FirestoreFields.sizeInches,
+            isLessThan: sizeValue,
+          );
         } else {
-          query = query.where('size_inches', isGreaterThanOrEqualTo: sizeValue);
+          query = query.where(
+            FirestoreFields.sizeInches,
+            isGreaterThanOrEqualTo: sizeValue,
+          );
         }
       }
 
@@ -81,7 +95,9 @@ class InventoryService {
   }) {
     try {
       log('Getting stream for item: $itemId', name: logName);
-      return _shopRef(shopId).collection('inventory').doc(itemId).snapshots();
+      return _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId).snapshots();
     } catch (e) {
       log('Error creating inventory item stream: $e', name: logName);
       rethrow;
@@ -97,7 +113,9 @@ class InventoryService {
   }) async {
     try {
       log('Fetching inventory item once: $itemId', name: logName);
-      return await _shopRef(shopId).collection('inventory').doc(itemId).get();
+      return await _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId).get();
     } catch (e) {
       log('Error fetching inventory item: $e', name: logName);
       rethrow;
@@ -114,15 +132,30 @@ class InventoryService {
     try {
       log('Creating new inventory item', name: logName);
 
-      final docRef = _shopRef(shopId).collection('inventory').doc();
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc();
+
       final itemData = {
         ...data,
-        'id': docRef.id,
-        'created_at': FieldValue.serverTimestamp(),
-        'updated_at': FieldValue.serverTimestamp(),
+        FirestoreFields.id: docRef.id,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+        FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       };
 
-      await docRef.set(itemData);
+      await _db.runTransaction((transaction) async {
+        transaction.set(docRef, itemData);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_inventory,
+          description:
+              "Added inventory item: ${data[FirestoreFields.name] ?? 'Unknown'}",
+          entityId: docRef.id,
+          entityType: 'Inventory',
+          transaction: transaction,
+        );
+      });
 
       log('Inventory item created: ${docRef.id}', name: logName);
       return docRef.id;
@@ -143,11 +176,27 @@ class InventoryService {
     try {
       log('Updating inventory item: $itemId', name: logName);
 
-      final updateData = {...data, 'updated_at': FieldValue.serverTimestamp()};
+      final updateData = {
+        ...data,
+        FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
+      };
 
-      await _shopRef(
+      final docRef = _shopRef(
         shopId,
-      ).collection('inventory').doc(itemId).update(updateData);
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+
+      await _db.runTransaction((transaction) async {
+        transaction.update(docRef, updateData);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.update_inventory,
+          description: "Updated inventory item details: $itemId",
+          entityId: itemId,
+          entityType: 'Inventory',
+          transaction: transaction,
+        );
+      });
 
       log('Inventory item updated: $itemId', name: logName);
     } catch (e) {
@@ -166,7 +215,22 @@ class InventoryService {
     try {
       log('Deleting inventory item: $itemId', name: logName);
 
-      await _shopRef(shopId).collection('inventory').doc(itemId).delete();
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+
+      await _db.runTransaction((transaction) async {
+        transaction.delete(docRef);
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.delete_inventory,
+          description: "Deleted inventory item: $itemId",
+          entityId: itemId,
+          entityType: 'Inventory',
+          transaction: transaction,
+        );
+      });
 
       log('Inventory item deleted: $itemId', name: logName);
     } catch (e) {
@@ -186,9 +250,25 @@ class InventoryService {
     try {
       log('Updating inventory status for $itemId to $status', name: logName);
 
-      await _shopRef(shopId).collection('inventory').doc(itemId).update({
-        'status': status,
-        'updated_at': FieldValue.serverTimestamp(),
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+
+      await _db.runTransaction((transaction) async {
+        transaction.update(docRef, {
+          FirestoreFields.status: status,
+          FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
+        });
+
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.update_inventory,
+          description: "Updated inventory status to $status",
+          entityId: itemId,
+          entityType: 'Inventory',
+          metadata: {'status': status},
+          transaction: transaction,
+        );
       });
 
       log('Inventory status updated: $itemId', name: logName);
@@ -209,17 +289,37 @@ class InventoryService {
     try {
       log('Adding damage fee to item: $itemId', name: logName);
 
-      final itemRef = _shopRef(shopId).collection('inventory').doc(itemId);
-      final feesCollection = itemRef.collection('damage_fees');
+      final itemRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.inventory).doc(itemId);
+      final feesCollection = itemRef.collection('damage_fees'); // Use constant?
 
       await feesCollection.add({
         ...feeData,
-        'created_at': FieldValue.serverTimestamp(),
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
 
       log('Damage fee added to item: $itemId', name: logName);
     } catch (e) {
       log('Error adding damage fee: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<int> getInventoryCountByStatus(String shopId, String status) async {
+    try {
+      log(
+        'Counting inventory with status $status for shop: $shopId',
+        name: logName,
+      );
+      final aggregateQuery = await _shopRef(shopId)
+          .collection(FirestoreCollections.inventory)
+          .where(FirestoreFields.status, isEqualTo: status)
+          .count()
+          .get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      log('Error counting inventory: $e', name: logName);
       rethrow;
     }
   }

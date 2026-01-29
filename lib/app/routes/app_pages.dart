@@ -69,6 +69,8 @@ import '../modules/staffHome/bindings/staff_home_binding.dart';
 import '../modules/staffHome/views/staff_home_view.dart';
 import '../modules/userDetail/bindings/user_detail_binding.dart';
 import '../modules/userDetail/views/user_detail_view.dart';
+import '../modules/qrScanner/bindings/qr_scanner_binding.dart';
+import '../modules/qrScanner/views/qr_scanner_view.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -256,6 +258,11 @@ class AppPages {
       name: _Paths.MAINTENANCE,
       page: () => const MaintenanceView(),
       binding: MaintenanceBinding(),
+    ),
+    GetPage(
+      name: _Paths.QR_SCANNER,
+      page: () => const QrScannerView(),
+      binding: QrScannerBinding(),
     ),
   ];
 }

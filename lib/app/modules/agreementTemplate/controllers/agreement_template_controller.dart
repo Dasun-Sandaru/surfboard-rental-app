@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../models/agreement_template_model.dart';
 import '../../../services/agreement_template_service.dart';
@@ -42,12 +44,9 @@ class AgreementTemplateController extends GetxController {
       final fetchedTemplates = await _templateService.getShopTemplates(shopId!);
       templates.assignAll(fetchedTemplates);
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to fetch templates.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to fetch templates.",
       );
     } finally {
       isLoading.value = false;
@@ -66,8 +65,6 @@ class AgreementTemplateController extends GetxController {
     isEditing.value = true;
     _editedTemplate.value = template;
     templateNameController.text = template.templateName;
-    // Assuming 'content' is the key for the main section.
-    // This might need adjustment based on your data structure.
     contentController.text = template.sections['content'] ?? '';
     Get.to(() => const AddEditAgreementTemplateView());
   }
@@ -95,20 +92,14 @@ class AgreementTemplateController extends GetxController {
         }
         await fetchTemplates(); // Refresh the list
         Get.back(); // Go back to the list view
-        Get.snackbar(
-          "Success",
-          "Template saved successfully!",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        AppSnackBar.success(
+          title: "Success",
+          message: "Template saved successfully!",
         );
       } catch (e) {
-        Get.snackbar(
-          "Error",
-          "Failed to save template.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        AppSnackBar.error(
+          title: "Error",
+          message: "Failed to save template.",
         );
       } finally {
         isLoading.value = false;
@@ -118,7 +109,10 @@ class AgreementTemplateController extends GetxController {
 
   void previewTemplate() {
     // 1. Create sample data
-    final customer = {"name": "John Doe", "email": "john.doe@example.com"};
+    final customer = {
+      FirestoreFields.name: "John Doe",
+      FirestoreFields.email: "john.doe@example.com",
+    };
     final rental = {
       "startDate": DateFormat('MMM dd, yyyy').format(DateTime.now()),
       "endDate": DateFormat(
@@ -131,8 +125,14 @@ class AgreementTemplateController extends GetxController {
     String content = contentController.text;
 
     // 3. Replace placeholders
-    content = content.replaceAll('{{customer.name}}', customer['name']!);
-    content = content.replaceAll('{{customer.email}}', customer['email']!);
+    content = content.replaceAll(
+      '{{customer.name}}',
+      customer[FirestoreFields.name]!,
+    );
+    content = content.replaceAll(
+      '{{customer.email}}',
+      customer[FirestoreFields.email]!,
+    );
     content = content.replaceAll('{{rental.startDate}}', rental['startDate']!);
     content = content.replaceAll('{{rental.endDate}}', rental['endDate']!);
     content = content.replaceAll('{{rental.totalCost}}', rental['totalCost']!);
@@ -141,10 +141,7 @@ class AgreementTemplateController extends GetxController {
     AppDialogs.defaultDialog(
       context: Get.context!,
       title: "Template Preview",
-      contentWidget: Text(
-        content,
-        style: const TextStyle(fontSize: 14),
-      ),
+      contentWidget: Text(content, style: const TextStyle(fontSize: 14)),
       confirmText: "Close",
       onConfirm: () => Get.back(),
     );

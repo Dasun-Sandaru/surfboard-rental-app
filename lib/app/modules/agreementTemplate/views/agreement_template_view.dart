@@ -12,25 +12,18 @@ import '../controllers/agreement_template_controller.dart';
 class AgreementTemplateListView extends StatelessWidget {
   const AgreementTemplateListView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AgreementTemplateController());
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: controller.addDefaultTemplate,
-        backgroundColor: primaryBlue,
-        child: Icon(Iconsax.add, color: textWhite, size: 28.w),
+        backgroundColor: colorScheme.primary,
+        child: Icon(Iconsax.add, color: colorScheme.onPrimary, size: 28.w),
       ),
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -38,7 +31,7 @@ class AgreementTemplateListView extends StatelessWidget {
         title: Text(
           "Agreement Templates",
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -46,7 +39,7 @@ class AgreementTemplateListView extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: controller.addTemplate,
-            icon: Icon(Iconsax.add, color: primaryBlue, size: 28.w),
+            icon: Icon(Iconsax.add, color: colorScheme.primary, size: 28.w),
           ),
           SizedBox(width: 8.w),
         ],
@@ -59,20 +52,22 @@ class AgreementTemplateListView extends StatelessWidget {
               horizontal: ASizes.defaultPadding,
               vertical: 12.h,
             ),
-            color: bgDark, // Match background
+            color: colorScheme.surface, // Match background
             child: TextFormField(
               controller: controller.searchTextController,
-              style: TextStyle(color: textWhite),
+              style: TextStyle(color: colorScheme.onSurface),
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Iconsax.search_normal,
                   size: 20.w,
-                  color: textGrey,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 hintText: 'Search templates',
-                hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                ),
                 filled: true,
-                fillColor: cardDark,
+                fillColor: colorScheme.surfaceContainer,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -86,51 +81,60 @@ class AgreementTemplateListView extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(ASizes.defaultPadding),
-              child: Obx(
-                () {
-                  if (controller.isLoading.value) {
-                    return Center(
-                        child: CircularProgressIndicator(color: primaryBlue));
-                  }
-
-                  if (controller.templates.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Iconsax.document_text_1,
-                              size: 60, color: textGrey),
-                          SizedBox(height: 16.h),
-                          Text(
-                            'No Templates Found',
-                            style: TextStyle(color: textWhite, fontSize: 16.sp),
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            'Add a new template to get started.',
-                            style: TextStyle(color: textGrey, fontSize: 14.sp),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.separated(
-                    padding: EdgeInsets
-                        .zero, // Padding handled inside tiles or header
-                    itemCount: controller.templates.length,
-                    separatorBuilder: (context, index) => Divider(
-                      color: borderDark.withOpacity(0.3),
-                      height: 1,
-                      thickness: 1,
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
                     ),
-                    itemBuilder: (context, index) {
-                      final template = controller.templates[index];
-                      return _buildTemplateTile(template, controller);
-                    },
                   );
-                },
-              ),
+                }
+
+                if (controller.templates.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Iconsax.document_text_1,
+                          size: 60,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'No Templates Found',
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          'Add a new template to get started.',
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: EdgeInsets.zero,
+                  itemCount: controller.templates.length,
+                  separatorBuilder: (context, index) => Divider(
+                    color: colorScheme.outline.withOpacity(0.3),
+                    height: 1,
+                    thickness: 1,
+                  ),
+                  itemBuilder: (context, index) {
+                    final template = controller.templates[index];
+                    return _buildTemplateTile(context, template, controller);
+                  },
+                );
+              }),
             ),
           ),
         ],
@@ -143,17 +147,23 @@ class AgreementTemplateListView extends StatelessWidget {
   // ===========================================================================
 
   Widget _buildTemplateTile(
+    BuildContext context,
     AgreementTemplateModel template,
     AgreementTemplateController controller,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () => controller.editTemplate(template),
       child: Container(
-        color: cardDark, // Specific card color requested
         padding: EdgeInsets.symmetric(
           horizontal: ASizes.defaultPadding,
           vertical: 16.h,
         ),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: EdgeInsets.only(bottom: 8.h),
         child: Row(
           children: [
             /// Icon
@@ -161,12 +171,12 @@ class AgreementTemplateListView extends StatelessWidget {
               height: 48.w,
               width: 48.w,
               decoration: BoxDecoration(
-                color: primaryBlue.withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Iconsax.document_text,
-                color: primaryBlue,
+                color: colorScheme.primary,
                 size: 24.w,
               ),
             ),
@@ -181,7 +191,7 @@ class AgreementTemplateListView extends StatelessWidget {
                   Text(
                     template.templateName,
                     style: TextStyle(
-                      color: textWhite,
+                      color: colorScheme.onSurface,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -191,7 +201,10 @@ class AgreementTemplateListView extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     "Last Updated: ${DateFormat.yMMMd().format(template.updatedAt)}",
-                    style: TextStyle(color: textGrey, fontSize: 13.sp),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 13.sp,
+                    ),
                   ),
                 ],
               ),
@@ -199,24 +212,11 @@ class AgreementTemplateListView extends StatelessWidget {
 
             SizedBox(width: 12.w),
 
-            /// Edit Button
-            Container(
-              height: 36.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: bgDark,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  "Edit",
-                  style: TextStyle(
-                    color: textWhite,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+            /// Edit Icon
+            Icon(
+              Iconsax.arrow_right_3,
+              color: colorScheme.onSurfaceVariant,
+              size: 20.w,
             ),
           ],
         ),

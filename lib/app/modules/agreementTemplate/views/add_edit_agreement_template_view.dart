@@ -9,22 +9,15 @@ import '../controllers/agreement_template_controller.dart';
 class AddEditAgreementTemplateView extends StatelessWidget {
   const AddEditAgreementTemplateView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AgreementTemplateController>();
+    final colorScheme = Theme.of(context).colorScheme;
     final isEditing = controller.isEditing.value;
     final title = isEditing ? "Edit Template" : "Add New Template";
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -32,7 +25,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
         title: Text(
           title,
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -49,22 +42,33 @@ class AddEditAgreementTemplateView extends StatelessWidget {
               Text(
                 "Template Name",
                 style: TextStyle(
-                    color: textWhite,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600),
+                  color: colorScheme.onSurface,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               SizedBox(height: 8.h),
               TextFormField(
                 controller: controller.templateNameController,
-                style: TextStyle(color: textWhite),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Enter template name',
-                  hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
+                  hintStyle: TextStyle(
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  ),
                   filled: true,
-                  fillColor: cardDark,
+                  fillColor: colorScheme.surfaceContainer,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary),
                   ),
                 ),
                 validator: (value) {
@@ -80,23 +84,34 @@ class AddEditAgreementTemplateView extends StatelessWidget {
               Text(
                 "Template Content",
                 style: TextStyle(
-                    color: textWhite,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600),
+                  color: colorScheme.onSurface,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               SizedBox(height: 8.h),
               TextFormField(
                 controller: controller.contentController,
-                style: TextStyle(color: textWhite),
+                style: TextStyle(color: colorScheme.onSurface),
                 maxLines: 10,
                 decoration: InputDecoration(
                   hintText: 'Enter template content',
-                  hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
+                  hintStyle: TextStyle(
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  ),
                   filled: true,
-                  fillColor: cardDark,
+                  fillColor: colorScheme.surfaceContainer,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary),
                   ),
                 ),
                 validator: (value) {
@@ -112,7 +127,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                 child: Text(
                   "Use placeholders to automatically insert rental information. For example: {{customer.name}}, {{rental.startDate}}, {{rental.totalCost}}.",
                   style: TextStyle(
-                    color: textGrey,
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 12.sp,
                   ),
                 ),
@@ -126,7 +141,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: controller.previewTemplate,
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: primaryBlue),
+                        side: BorderSide(color: colorScheme.primary),
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -135,7 +150,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                       child: Text(
                         "Preview",
                         style: TextStyle(
-                          color: primaryBlue,
+                          color: colorScheme.primary,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -147,16 +162,17 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: controller.saveTemplate,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 0,
                       ),
                       child: Text(
                         "Save Template",
                         style: TextStyle(
-                          color: textWhite,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),

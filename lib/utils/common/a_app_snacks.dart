@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 void appSnackBarM(String message) {
   ScaffoldMessenger.of(Get.context!).showSnackBar(
@@ -11,14 +12,13 @@ void appSnackBarM(String message) {
 }
 
 void appSnackBarTM(String title, String message) {
-  Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM);
+  AppSnackBar.info(title: title, message: message);
 }
 
 void appRoutineSnackBar(String title, String message, {String? routeName}) {
-  Get.snackbar(
-    title,
-    message,
-    snackPosition: SnackPosition.BOTTOM,
+  AppSnackBar.info(
+    title: title,
+    message: message,
     duration: const Duration(seconds: 3),
     onTap: (snack) {
       if (routeName != null) {

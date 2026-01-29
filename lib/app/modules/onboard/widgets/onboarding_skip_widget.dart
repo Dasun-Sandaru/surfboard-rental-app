@@ -6,10 +6,9 @@ import '../controllers/onboard_controller.dart';
 class OnBoardingSkipWidget extends GetView<OnboardController> {
   const OnBoardingSkipWidget({super.key});
 
-  final Color textSubtle = const Color(0xFF94a3b8);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextButton(
       onPressed: () => controller.skipPage(),
       style: TextButton.styleFrom(
@@ -22,7 +21,7 @@ class OnBoardingSkipWidget extends GetView<OnboardController> {
       child: Text(
         'Skip',
         style: TextStyle(
-          color: textSubtle,
+          color: colorScheme.onSurfaceVariant,
           fontSize: 14.sp,
           fontWeight: FontWeight.w500,
         ),

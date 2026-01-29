@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../services/agreement_template_service.dart';
 import '../controllers/agreement_controller.dart';
 import 'step_board_details.dart';
 import 'step_damage_fees.dart';
@@ -15,16 +16,13 @@ import 'step_review.dart';
 class AgreementWizardView extends StatelessWidget {
   const AgreementWizardView({super.key});
 
-  final Color bgDark = const Color(0xFF101f22);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AgreementController());
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingOnPressed: controller.previousStep, // Back goes to previous step
@@ -32,7 +30,7 @@ class AgreementWizardView extends StatelessWidget {
         title: Obx(
           () => Text(
             "Step ${controller.currentStep.value + 1} of 4",
-            style: TextStyle(color: textWhite, fontSize: 16.sp),
+            style: TextStyle(color: colorScheme.onSurface, fontSize: 16.sp),
           ),
         ),
         actions: [
@@ -42,7 +40,7 @@ class AgreementWizardView extends StatelessWidget {
             },
             icon: Text(
               "Previous",
-              style: TextStyle(color: textWhite, fontSize: 14.sp),
+              style: TextStyle(color: colorScheme.primary, fontSize: 14.sp),
             ),
           ),
         ],
@@ -53,8 +51,8 @@ class AgreementWizardView extends StatelessWidget {
           Obx(
             () => LinearProgressIndicator(
               value: (controller.currentStep.value + 1) / 4,
-              backgroundColor: bgDark,
-              color: primaryBlue,
+              backgroundColor: colorScheme.surfaceContainer,
+              color: colorScheme.primary,
               minHeight: 6.h,
             ),
           ),
@@ -84,10 +82,12 @@ class AgreementWizardView extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: controller.nextStep,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryBlue,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
+                      elevation: 0,
                     ),
                     child: Obx(
                       () => Text(
@@ -95,7 +95,6 @@ class AgreementWizardView extends StatelessWidget {
                             ? "Generate Agreement"
                             : "Continue",
                         style: TextStyle(
-                          color: textWhite,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -115,7 +114,7 @@ class AgreementWizardView extends StatelessWidget {
                         child: OutlinedButton(
                           onPressed: controller.showGeneratedPdf,
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: primaryBlue),
+                            side: BorderSide(color: colorScheme.primary),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
@@ -123,7 +122,7 @@ class AgreementWizardView extends StatelessWidget {
                           child: Text(
                             "View Agreement",
                             style: TextStyle(
-                              color: primaryBlue,
+                              color: colorScheme.primary,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                             ),
@@ -138,21 +137,22 @@ class AgreementWizardView extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: controller.createRental,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryBlue,
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
+                            elevation: 0,
                           ),
                           child: Obx(() {
                             if (controller.isCreatingRental.value) {
-                              return const CircularProgressIndicator(
-                                color: Colors.white,
+                              return CircularProgressIndicator(
+                                color: colorScheme.onPrimary,
                               );
                             }
                             return Text(
                               "Create Rental",
                               style: TextStyle(
-                                color: textWhite,
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                               ),

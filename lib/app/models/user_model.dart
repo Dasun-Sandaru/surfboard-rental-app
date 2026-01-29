@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import '../../utils/constants/a_enums.dart';
 
 class UserModel {
@@ -11,11 +11,11 @@ class UserModel {
   final bool isVerified;
   final String? phone;
   final String? shopId;
-  final Timestamp? createdAt;
-  final Timestamp? updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final bool emailVerified;
 
-  UserModel({
+  const UserModel({
     required this.uid,
     this.email,
     this.name,
@@ -31,7 +31,7 @@ class UserModel {
 
   /// Create UserModel from Firestore map
   factory UserModel.fromMap(Map<String, dynamic> data, String documentId) {
-    final roleString = data['role'] as String? ?? 'staff';
+    final roleString = data[FirestoreFields.role] as String? ?? 'staff';
     final role = UserRole.values.firstWhere(
       (e) => e.name == roleString,
       orElse: () => UserRole.staff,
@@ -39,41 +39,46 @@ class UserModel {
 
     return UserModel(
       uid: documentId,
-      email: data['email'] as String?,
-      name: data['name'] as String?,
+      email: data[FirestoreFields.email] as String?,
+      name: data[FirestoreFields.name] as String?,
       role: role,
-      isActive: data['is_active'] as bool? ?? true,
-      isVerified: data['verified'] as bool? ?? false,
-      phone: data['phone'] as String?,
-      shopId: data['shop_id'] as String?,
-      createdAt: data['created_at'] as Timestamp?,
-      updatedAt: data['updated_at'] as Timestamp?,
-      emailVerified: data['email_verified'] as bool? ?? false,
+      isActive: data[FirestoreFields.isActive] as bool? ?? true,
+      isVerified: data[FirestoreFields.verified] as bool? ?? false,
+      phone: data[FirestoreFields.phone] as String?,
+      shopId: data[FirestoreFields.shopId] as String?,
+      createdAt: data[FirestoreFields.createdAt] is Timestamp
+          ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
+          : null,
+      updatedAt: data[FirestoreFields.updatedAt] is Timestamp
+          ? (data[FirestoreFields.updatedAt] as Timestamp).toDate()
+          : null,
+      emailVerified: data[FirestoreFields.emailVerified] as bool? ?? false,
     );
   }
 
-
-
   /// Create UserModel from Firestore snapshot
-  
-  factory UserModel.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     return UserModel.fromMap(data, doc.id);
   }
+
   /// Convert UserModel to map for Firestore
   Map<String, dynamic> toMap() {
     return {
-      'email': email,
-      'name': name,
-      'role': role.name,
-      'is_active': isActive,
-      'verified': isVerified,
-      'phone': phone,
-      'shop_id': shopId,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-      'email_verified': emailVerified,
+      FirestoreFields.email: email,
+      FirestoreFields.name: name,
+      FirestoreFields.role: role.name,
+      FirestoreFields.isActive: isActive,
+      FirestoreFields.verified: isVerified,
+      FirestoreFields.phone: phone,
+      FirestoreFields.shopId: shopId,
+      FirestoreFields.createdAt: createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : null,
+      FirestoreFields.updatedAt: updatedAt != null
+          ? Timestamp.fromDate(updatedAt!)
+          : null,
+      FirestoreFields.emailVerified: emailVerified,
     };
   }
 
@@ -87,8 +92,8 @@ class UserModel {
     bool? isVerified,
     String? phone,
     String? shopId,
-    Timestamp? createdAt,
-    Timestamp? updatedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     bool? emailVerified,
   }) {
     return UserModel(

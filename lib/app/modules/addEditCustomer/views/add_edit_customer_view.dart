@@ -11,18 +11,12 @@ import '../controllers/add_edit_customer_controller.dart';
 class AddEditCustomerView extends GetView<AddEditCustomerController> {
   const AddEditCustomerView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
@@ -31,26 +25,12 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
           () => Text(
             controller.isEditMode.value ? "Edit Customer" : "Add Customer",
             style: TextStyle(
-              color: textWhite,
+              color: colorScheme.onSurface,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        // actions: [
-        //   TextButton(
-        //     onPressed: controller.saveCustomer,
-        //     child: Text(
-        //       "Save",
-        //       style: TextStyle(
-        //         color: primaryBlue,
-        //         fontSize: 16.sp,
-        //         fontWeight: FontWeight.bold,
-        //       ),
-        //     ),
-        //   ),
-        //   SizedBox(width: 8.w),
-        // ],
       ),
       body: Column(
         children: [
@@ -63,7 +43,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// 1. Name Section
-                    _buildSectionHeader("Personal Information"),
+                    _buildSectionHeader(context, "Personal Information"),
                     SizedBox(height: 16.h),
 
                     Row(
@@ -72,9 +52,10 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel("First Name"),
+                              _buildLabel(context, "First Name"),
                               SizedBox(height: 8.h),
                               _buildTextField(
+                                context,
                                 controller: controller.firstNameController,
                                 hintText: "John",
                                 icon: Iconsax.user,
@@ -89,9 +70,10 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel("Last Name"),
+                              _buildLabel(context, "Last Name"),
                               SizedBox(height: 8.h),
                               _buildTextField(
+                                context,
                                 controller: controller.lastNameController,
                                 hintText: "Doe",
                                 icon: Iconsax.user,
@@ -107,12 +89,13 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                     SizedBox(height: 20.h),
 
                     /// 2. Contact Section
-                    _buildSectionHeader("Contact Details"),
+                    _buildSectionHeader(context, "Contact Details"),
                     SizedBox(height: 16.h),
 
-                    _buildLabel("Phone Number"),
+                    _buildLabel(context, "Phone Number"),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.phoneController,
                       hintText: "(808) 555-0123",
                       icon: Iconsax.call,
@@ -122,9 +105,10 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
 
                     SizedBox(height: 20.h),
 
-                    _buildLabel("Email Address"),
+                    _buildLabel(context, "Email Address"),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.emailController,
                       hintText: "john.doe@example.com",
                       icon: Iconsax.sms,
@@ -135,12 +119,13 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                     SizedBox(height: 20.h),
 
                     /// 3. Identification
-                    _buildSectionHeader("Identification"),
+                    _buildSectionHeader(context, "Identification"),
                     SizedBox(height: 16.h),
 
-                    _buildLabel("NIC / Passport Number"),
+                    _buildLabel(context, "NIC / Passport Number"),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.nicController,
                       hintText: "N123456789",
                       icon: Iconsax.card,
@@ -151,12 +136,13 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                     SizedBox(height: 20.h),
 
                     /// 4. Notes
-                    _buildSectionHeader("Additional Info"),
+                    _buildSectionHeader(context, "Additional Info"),
                     SizedBox(height: 16.h),
 
-                    _buildLabel("Notes"),
+                    _buildLabel(context, "Notes"),
                     SizedBox(height: 8.h),
                     _buildTextField(
+                      context,
                       controller: controller.notesController,
                       hintText: "Add customer preferences or notes...",
                       icon: Iconsax.note,
@@ -176,30 +162,32 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
           Container(
             padding: EdgeInsets.all(ASizes.defaultPadding),
             decoration: BoxDecoration(
-              color: bgDark,
-              border: Border(top: BorderSide(color: borderDark)),
+              color: colorScheme.surface,
+              border: Border(top: BorderSide(color: colorScheme.outline)),
             ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54.h,
-              child: ElevatedButton(
-                onPressed: controller.saveCustomer,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+            child: SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                height: 54.h,
+                child: ElevatedButton(
+                  onPressed: controller.saveCustomer,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 0,
                   ),
-                  elevation: 4,
-                ),
-                child: Obx(
-                  () => Text(
-                    controller.isEditMode.value
-                        ? "Update Customer"
-                        : "Save Customer",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: textWhite,
+                  child: Obx(
+                    () => Text(
+                      controller.isEditMode.value
+                          ? "Update Customer"
+                          : "Save Customer",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -215,38 +203,39 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
   // HELPER WIDGETS
   // ===========================================================================
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
           style: TextStyle(
-            color: textGrey,
+            color: colorScheme.onSurfaceVariant,
             fontSize: 12.sp,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
-            // uppercase: true,
           ),
         ),
         SizedBox(height: 4.h),
-        Divider(color: borderDark),
+        Divider(color: colorScheme.outline),
       ],
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(BuildContext context, String text) {
     return Text(
       text,
       style: TextStyle(
-        color: textWhite,
+        color: Theme.of(context).colorScheme.onSurface,
         fontWeight: FontWeight.w600,
         fontSize: 14.sp,
       ),
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
@@ -255,34 +244,39 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
     int maxLines = 1,
     TextInputAction textAction = TextInputAction.next,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: controller,
       keyboardType: inputType,
       textInputAction: textAction,
       maxLines: maxLines,
-      style: TextStyle(color: textWhite),
+      style: TextStyle(color: colorScheme.onSurface),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: textGrey.withOpacity(0.5)),
+        hintStyle:
+            TextStyle(color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
         filled: true,
-        fillColor: cardDark,
-        prefixIcon: Icon(icon, color: textGrey, size: 20.w),
-        // Align icon to top if textarea
+        fillColor: colorScheme.surfaceContainer,
+        prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20.w),
         prefixIconConstraints: maxLines > 1
             ? BoxConstraints(minWidth: 48.w, minHeight: 48.w, maxHeight: 48.w)
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: borderDark),
+          borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: borderDark),
+          borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primaryBlue),
+          borderSide: BorderSide(color: colorScheme.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.error),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),

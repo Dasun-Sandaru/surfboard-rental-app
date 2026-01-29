@@ -38,6 +38,7 @@ abstract class Routes {
   static const PAYMENTS = _Paths.PAYMENTS;
   static const DAMAGE_REPORT = _Paths.DAMAGE_REPORT;
   static const MAINTENANCE = _Paths.MAINTENANCE;
+  static const QR_SCANNER = _Paths.QR_SCANNER;
 }
 
 abstract class _Paths {
@@ -75,4 +76,5 @@ abstract class _Paths {
   static const PAYMENTS = '/payments';
   static const DAMAGE_REPORT = '/damage-report';
   static const MAINTENANCE = '/maintenance';
+  static const QR_SCANNER = '/qr-scanner';
 }

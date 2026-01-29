@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:signature/signature.dart';
@@ -40,11 +41,9 @@ class SignaturePadController extends GetxController {
       if (data != null) {
         // Return the image data to the previous screen (Agreement Wizard)
         Get.back(result: data);
-        Get.snackbar(
-          "Success",
-          "Signature saved successfully",
-          backgroundColor: Colors.green.withOpacity(0.1),
-          colorText: Colors.green,
+        AppSnackBar.success(
+          title: "Success",
+          message: "Signature saved successfully",
         );
       }
     }

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +10,9 @@ import 'package:iconsax/iconsax.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
+
+import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+
 import '../../../models/user_model.dart';
 import '../controllers/user_detail_controller.dart';
 
@@ -16,123 +20,125 @@ class UserDetailView extends GetView<UserDetailController> {
   const UserDetailView({super.key});
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
           "Staff Details",
-          style: TextStyle(color: textWhite, fontSize: 18.sp),
+          style: TextStyle(color: colorScheme.onSurface, fontSize: 18.sp),
         ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {},
-        //     icon: Icon(Iconsax.edit, color: textWhite),
-        //   ),
-        // ],
+        actions: [
+          IconButton(
+            onPressed: controller.showQR,
+            icon: Icon(Iconsax.scan_barcode, color: colorScheme.onSurface),
+            tooltip: 'Show QR Code',
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(ASizes.defaultPadding),
-        child: Column(
-          children: [
-            /// Profile Header
-            Obx(() => _buildProfileHeader(controller)),
+      body: Obx(() {
+        final userData = controller.user.value;
+        if (userData == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-            SizedBox(height: 24.h),
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(ASizes.defaultPadding),
+          child: Column(
+            children: [
+              /// Profile Header
+              _buildProfileHeader(context, userData),
 
-            /// Management Control (Active/Verify)
-            _buildManagementControlCard(controller),
+              SizedBox(height: 24.h),
 
-            SizedBox(height: 24.h),
+              /// Management Control (Active/Verify)
+              _buildManagementControlCard(context, controller, userData),
 
-            /// Contact Info
-            _buildSectionTitle("Contact Information"),
-            SizedBox(height: 12.h),
-            _buildContactInfoCard(controller),
+              SizedBox(height: 24.h),
 
-            SizedBox(height: 24.h),
+              /// Contact Info
+              _buildSectionTitle(context, "Contact Information"),
+              SizedBox(height: 12.h),
+              _buildContactInfoCard(context, userData),
 
-            /// Performance Stats
-            _buildSectionTitle("Performance"),
-            SizedBox(height: 12.h),
-            _buildPerformanceRow(),
+              SizedBox(height: 24.h),
 
-            SizedBox(height: 24.h),
+              /// Performance Stats
+              _buildSectionTitle(context, "Performance"),
+              SizedBox(height: 12.h),
+              _buildPerformanceRow(context),
 
-            /// History
-            _buildSectionTitle("Recent Activity"),
-            SizedBox(height: 12.h),
-            _buildHistoryList(),
+              SizedBox(height: 24.h),
 
-            SizedBox(height: 40.h),
+              /// History
+              _buildSectionTitle(context, "Recent Activity"),
+              SizedBox(height: 12.h),
+              _buildHistoryList(context),
 
-            /// Delete Button
-            Opacity(
-              opacity: controller.user.value?.role == UserRole.admin
-                  ? 0.5
-                  : 1.0,
-              child: SizedBox(
-                width: double.infinity,
-                height: 54.h,
-                child: OutlinedButton(
-                  onPressed: controller.user.value?.role == UserRole.admin
-                      ? null
-                      : controller.deleteUser,
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: borderDark),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              SizedBox(height: 40.h),
+
+              /// Delete Button
+              Opacity(
+                opacity: userData.role == UserRole.admin ? 0.5 : 1.0,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54.h,
+                  child: OutlinedButton(
+                    onPressed: userData.role == UserRole.admin
+                        ? null
+                        : controller.deleteUser,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: colorScheme.outline),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                  ),
-                  child: Text(
-                    "Delete User",
-                    style: TextStyle(
-                      color: errorRed,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16.sp,
+                    child: Text(
+                      "Delete User",
+                      style: TextStyle(
+                        color: colorScheme.error,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16.sp,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 20.h),
-          ],
-        ),
-      ),
+              SizedBox(height: 20.h),
+            ],
+          ),
+        );
+      }),
     );
   }
 
   // WIDGET BUILDERS
-  Widget _buildProfileHeader(UserDetailController controller) {
-    log("Building profile header for user: ${controller.user.value?.name}");
+  Widget _buildProfileHeader(BuildContext context, UserModel user) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final name = user.name ?? 'Unknown';
     return Column(
       children: [
         CircleAvatar(
           radius: 40.w,
-          backgroundColor: primaryBlue.withOpacity(0.2),
+          backgroundColor: colorScheme.primary.withOpacity(0.2),
           child: Text(
-            (controller.user.value?.name != null &&
-                    controller.user.value!.name!.toString().isNotEmpty)
-                ? controller.user.value!.name!
-                      .toString()
-                      .substring(0, 1)
-                      .toUpperCase()
-                : '',
+            name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?',
             style: TextStyle(
               fontSize: 32.sp,
               fontWeight: FontWeight.bold,
-              color: primaryBlue,
+              color: colorScheme.primary,
             ),
           ),
         ),
         SizedBox(height: 12.h),
         Text(
-          controller.user.value?.name?.toString() ?? 'N/A',
+          name,
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 22.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -141,14 +147,14 @@ class UserDetailView extends GetView<UserDetailController> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: primaryBlue.withOpacity(0.1),
+            color: colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: primaryBlue.withOpacity(0.3)),
+            border: Border.all(color: colorScheme.primary.withOpacity(0.3)),
           ),
           child: Text(
-            controller.user.value?.role.name.toUpperCase() ?? 'N/A',
+            user.role.name.toUpperCase(),
             style: TextStyle(
-              color: primaryBlue,
+              color: colorScheme.primary,
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
@@ -160,194 +166,208 @@ class UserDetailView extends GetView<UserDetailController> {
   }
 
   /// THE REQUESTED COMPONENT: Active/Deactivate & Verify
-  Widget _buildManagementControlCard(UserDetailController controller) {
+  Widget _buildManagementControlCard(
+    BuildContext context,
+    UserDetailController controller,
+    UserModel user,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
+    final successColor = statusColors?.success ?? Colors.green;
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderDark),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Column(
         children: [
           // Account Status
-          Obx(
-            () => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Iconsax.shield_tick, color: textGrey, size: 20.w),
-                    SizedBox(width: 12.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Account Status",
-                          style: TextStyle(
-                            color: textWhite,
-                            fontWeight: FontWeight.w600,
-                          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Iconsax.shield_tick,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 20.w,
+                  ),
+                  SizedBox(width: 12.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Account Status",
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
                         ),
-                        Text(
-                          controller.isActive.value
-                              ? "User can access app"
-                              : "Access denied",
-                          style: TextStyle(color: textGrey, fontSize: 12.sp),
+                      ),
+                      Text(
+                        controller.isActive.value
+                            ? "User can access app"
+                            : "Access denied",
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Switch(
-                  value: controller.isActive.value,
-                  activeColor: successGreen,
-                  inactiveTrackColor: bgDark,
-                  onChanged: controller.user.value!.role == UserRole.admin
-                      ? null
-                      : controller.toggleActiveStatus,
-                ),
-              ],
-            ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Switch(
+                value: controller.isActive.value,
+                activeColor: successColor,
+                inactiveTrackColor: colorScheme.surface,
+                onChanged: user.role == UserRole.admin
+                    ? null
+                    : controller.toggleActiveStatus,
+              ),
+            ],
           ),
 
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
-            child: Divider(color: borderDark),
+            child: Divider(color: colorScheme.outline),
           ),
 
           // Verification
-          Obx(
-            () => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Iconsax.verify, color: textGrey, size: 20.w),
-                    SizedBox(width: 12.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Iconsax.verify,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 20.w,
+                  ),
+                  SizedBox(width: 12.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Verification",
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        controller.isVerified.value
+                            ? "Identity confirmed"
+                            : "Pending verification",
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Custom Verify Button
+              Opacity(
+                opacity: user.role == UserRole.admin ? 0.5 : 1.0,
+                child: InkWell(
+                  onTap: user.role == UserRole.admin
+                      ? null
+                      : controller.toggleVerification,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: controller.isVerified.value
+                          ? successColor.withOpacity(0.1)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: controller.isVerified.value
+                            ? successColor
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    child: Row(
                       children: [
                         Text(
-                          "Verification",
+                          controller.isVerified.value ? "Verified" : "Approve",
                           style: TextStyle(
-                            color: textWhite,
-                            fontWeight: FontWeight.w600,
+                            color: controller.isVerified.value
+                                ? successColor
+                                : colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.sp,
                           ),
                         ),
-                        Text(
-                          controller.isVerified.value
-                              ? "Identity confirmed"
-                              : "Pending verification",
-                          style: TextStyle(color: textGrey, fontSize: 12.sp),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                // Custom Verify Button
-                Opacity(
-                  opacity: controller.user.value!.role == UserRole.admin
-                      ? 0.5
-                      : 1.0,
-                  child: InkWell(
-                    onTap: controller.user.value!.role == UserRole.admin
-                        ? null
-                        : controller.toggleVerification,
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 6.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: controller.isVerified.value
-                            ? successGreen.withOpacity(0.1)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: controller.isVerified.value
-                              ? successGreen
-                              : textGrey,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            controller.isVerified.value
-                                ? "Verified"
-                                : "Approve",
-                            style: TextStyle(
-                              color: controller.isVerified.value
-                                  ? successGreen
-                                  : textGrey,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                          if (controller.isVerified.value) ...[
-                            SizedBox(width: 4.w),
-                            Icon(Icons.check, size: 14.w, color: successGreen),
-                          ],
+                        if (controller.isVerified.value) ...[
+                          SizedBox(width: 4.w),
+                          Icon(Icons.check, size: 14.w, color: successColor),
                         ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContactInfoCard(UserDetailController controller) {
+  Widget _buildContactInfoCard(BuildContext context, UserModel user) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderDark.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
       ),
-      child: Obx(
-        () => Column(
-          children: [
-            _buildInfoRow(
-              Iconsax.sms,
-              "Email",
-              controller.user.value!.email.toString(),
-            ),
-            SizedBox(height: 16.h),
-            _buildInfoRow(
-              Iconsax.call,
-              "Phone",
-              controller.user.value!.phone.toString(),
-            ),
-            SizedBox(height: 16.h),
-            _buildInfoRow(
-              Iconsax.calendar,
-              "Joined",
-              controller.user.value!.createdAt.toString(),
-            ),
-          ],
-        ),
+      child: Column(
+        children: [
+          _buildInfoRow(context, Iconsax.sms, "Email", user.email ?? 'N/A'),
+          SizedBox(height: 16.h),
+          _buildInfoRow(context, Iconsax.call, "Phone", user.phone ?? 'N/A'),
+          SizedBox(height: 16.h),
+          _buildInfoRow(
+            context,
+            Iconsax.calendar,
+            "Joined",
+            user.createdAt != null
+                ? DateFormat.yMMMd().format(user.createdAt!)
+                : 'N/A',
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
-            color: bgDark,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: textGrey, size: 18.w),
+          child: Icon(icon, color: colorScheme.onSurfaceVariant, size: 18.w),
         ),
         SizedBox(width: 16.w),
         Column(
@@ -355,11 +375,17 @@ class UserDetailView extends GetView<UserDetailController> {
           children: [
             Text(
               label,
-              style: TextStyle(color: textGrey, fontSize: 12.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 12.sp,
+              ),
             ),
             Text(
               value,
-              style: TextStyle(color: textWhite, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -367,47 +393,62 @@ class UserDetailView extends GetView<UserDetailController> {
     );
   }
 
-  Widget _buildPerformanceRow() {
+  Widget _buildPerformanceRow(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _buildStatCard("Rentals", "142", Iconsax.receipt)),
+        Expanded(
+          child: _buildStatCard(context, "Rentals", "142", Iconsax.receipt),
+        ),
         SizedBox(width: 12.w),
-        Expanded(child: _buildStatCard("Revenue", "\$4.2k", Iconsax.money)),
+        Expanded(
+          child: _buildStatCard(context, "Revenue", "\$4.2k", Iconsax.money),
+        ),
       ],
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: cardDark,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderDark.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: primaryBlue, size: 24.w),
+          Icon(icon, color: colorScheme.primary, size: 24.w),
           SizedBox(height: 12.h),
           Text(
             value,
             style: TextStyle(
-              color: textWhite,
+              color: colorScheme.onSurface,
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             label,
-            style: TextStyle(color: textGrey, fontSize: 12.sp),
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 12.sp,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHistoryList() {
+  Widget _buildHistoryList(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<StatusColors>();
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -416,23 +457,30 @@ class UserDetailView extends GetView<UserDetailController> {
         return Container(
           margin: EdgeInsets.only(bottom: 12.h),
           decoration: BoxDecoration(
-            color: cardDark,
+            color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
-            leading: Icon(Iconsax.activity, color: textGrey, size: 20.w),
+            leading: Icon(
+              Iconsax.activity,
+              color: colorScheme.onSurfaceVariant,
+              size: 20.w,
+            ),
             title: Text(
               "Processed Rental #284$index",
-              style: TextStyle(color: textWhite, fontSize: 14.sp),
+              style: TextStyle(color: colorScheme.onSurface, fontSize: 14.sp),
             ),
             subtitle: Text(
               "2 hours ago",
-              style: TextStyle(color: textGrey, fontSize: 12.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 12.sp,
+              ),
             ),
             trailing: Text(
               "+ \$45",
               style: TextStyle(
-                color: successGreen,
+                color: statusColors?.success ?? Colors.green,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -442,13 +490,14 @@ class UserDetailView extends GetView<UserDetailController> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
         title,
         style: TextStyle(
-          color: textWhite,
+          color: colorScheme.onSurface,
           fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
@@ -456,13 +505,3 @@ class UserDetailView extends GetView<UserDetailController> {
     );
   }
 }
-
-// -- Theme Colors --
-final Color bgDark = const Color(0xFF101f22);
-final Color cardDark = const Color(0xFF182c30);
-final Color primaryBlue = const Color(0xFF4A90E2);
-final Color textWhite = const Color(0xFFf0f4f4);
-final Color textGrey = const Color(0xFF94a3b8);
-final Color borderDark = const Color(0xFF334155);
-final Color successGreen = const Color(0xFF34C759);
-final Color errorRed = const Color(0xFFEF4444);

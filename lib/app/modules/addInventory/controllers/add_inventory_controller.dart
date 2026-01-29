@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -101,18 +102,20 @@ class AddInventoryController extends GetxController {
 
       final data = doc.data() as Map<String, dynamic>;
 
-      sizeFeetController.text = data['size_feet'].toString();
-      sizeInchesController.text = data['size_inches'].toString();
-      brandController.text = data['brand'];
-      volumeController.text = data['volume'].toString();
-      colorController.text = data['color'];
-      costController.text = data['purchase_cost'].toString();
-      rentalRateController.text = data['rental_rate_hour'].toString();
-      rentalRateDayController.text = data['rental_rate_day'].toString();
-      notesController.text = data['note'];
+      sizeFeetController.text = data[FirestoreFields.sizeFeet].toString();
+      sizeInchesController.text = data[FirestoreFields.sizeInches].toString();
+      brandController.text = data[FirestoreFields.brand];
+      volumeController.text = data[FirestoreFields.volume].toString();
+      colorController.text = data[FirestoreFields.color];
+      costController.text = data[FirestoreFields.purchaseCost].toString();
+      rentalRateController.text = data[FirestoreFields.rentalRateHour]
+          .toString();
+      rentalRateDayController.text = data[FirestoreFields.rentalRateDay]
+          .toString();
+      notesController.text = data[FirestoreFields.note];
 
       final type = SurfBoardType.values.firstWhereOrNull(
-        (e) => e.name == data['type'],
+        (e) => e.name == data[FirestoreFields.type],
       );
       surfboardTypeController.value = type;
 
@@ -164,20 +167,23 @@ class AddInventoryController extends GetxController {
       final totalInches = (feet * 12) + inches;
 
       final data = {
-        'name': boardName.value,
-        'type': surfboardTypeController.value?.name,
-        'brand': brandController.text,
-        'size_feet': feet,
-        'size_inches': inches,
-        'size_total_inches': totalInches,
-        'volume': int.tryParse(volumeController.text) ?? 0,
-        'color': colorController.text,
-        'purchase_cost': int.tryParse(costController.text) ?? 0,
-        'damage_fee_rule': 'rule',
-        'rental_rate_hour': int.tryParse(rentalRateController.text) ?? 0,
-        'rental_rate_day': int.tryParse(rentalRateDayController.text) ?? 0,
-        'note': notesController.text,
-        'status': 'available',
+        FirestoreFields.name: boardName.value,
+        FirestoreFields.type: surfboardTypeController.value?.name,
+        FirestoreFields.brand: brandController.text,
+        FirestoreFields.sizeFeet: feet,
+        FirestoreFields.sizeInches: inches,
+        FirestoreFields.sizeTotalInches: totalInches,
+        FirestoreFields.volume: int.tryParse(volumeController.text) ?? 0,
+        FirestoreFields.color: colorController.text,
+        FirestoreFields.purchaseCost: int.tryParse(costController.text) ?? 0,
+        // Consider if this should be constant or field
+        FirestoreFields.damageFeeRule: 'rule',
+        FirestoreFields.rentalRateHour:
+            int.tryParse(rentalRateController.text) ?? 0,
+        FirestoreFields.rentalRateDay:
+            int.tryParse(rentalRateDayController.text) ?? 0,
+        FirestoreFields.note: notesController.text,
+        FirestoreFields.status: InventoryStatus.available.name,
       };
 
       if (mode == InventoryFormMode.edit && itemId != null) {

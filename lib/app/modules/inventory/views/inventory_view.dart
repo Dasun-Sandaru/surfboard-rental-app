@@ -14,29 +14,21 @@ import '../controllers/inventory_controller.dart';
 class InventoryListView extends StatelessWidget {
   const InventoryListView({super.key});
 
-  // -- Theme Colors --
-  final Color bgDark = const Color(0xFF101f22);
-  final Color cardDark = const Color(0xFF182c30);
-  final Color primaryBlue = const Color(0xFF4A90E2);
-  final Color textWhite = const Color(0xFFf0f4f4);
-  final Color textGrey = const Color(0xFF94a3b8);
-  final Color chipDark = const Color(0xFF2a3b42);
-  final Color borderDark = const Color(0xFF334155);
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(InventoryController());
     final isSelectionMode = Get.arguments?['selectMode'] ?? false;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: colorScheme.surface,
       appBar: AAppBar(
         showbackArrow: true,
         centerTitle: true,
         title: Text(
           isSelectionMode ? 'Select Board' : 'Inventory',
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.w700,
           ),
@@ -57,22 +49,21 @@ class InventoryListView extends StatelessWidget {
               if (controller.items.isEmpty) {
                 return Padding(
                   padding: EdgeInsets.all(16.w),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        // decoration: BoxDecoration(
-                        //   color: cardDark,
-                        //   borderRadius: BorderRadius.circular(16),
-                        // ),
-                        child: const Center(
-                          child: Text(
-                            'No inventory found',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Iconsax.add,
+                          size: 48.w,
+                          color: colorScheme.onSurfaceVariant,
                         ),
-                      ),
-                    ],
+                        Text(
+                          'No inventory found',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
@@ -102,6 +93,7 @@ class InventoryListView extends StatelessWidget {
                   }
 
                   return _buildInventoryCard(
+                    context,
                     controller.items[index],
                     controller,
                   );
@@ -113,14 +105,14 @@ class InventoryListView extends StatelessWidget {
       ),
       floatingActionButton: !isSelectionMode
           ? FloatingActionButton(
-              backgroundColor: primaryBlue,
+              backgroundColor: colorScheme.primary,
               onPressed: () {
                 Get.toNamed(
                   Routes.ADD_INVENTORY,
                   arguments: {'mode': InventoryFormMode.add},
                 );
               },
-              child: Icon(Iconsax.add, color: textWhite),
+              child: Icon(Iconsax.add, color: colorScheme.onPrimary),
             )
           : null,
     );
@@ -183,9 +175,12 @@ class InventoryListView extends StatelessWidget {
     IconData icon,
     bool isActive,
   ) {
-    final bgColor = isActive ? primaryBlue.withOpacity(0.2) : chipDark;
-    final textColor = isActive ? primaryBlue : textWhite;
-    final borderColor = isActive ? primaryBlue : Colors.transparent;
+    final colorScheme = Theme.of(context).colorScheme;
+    final bgColor = isActive
+        ? colorScheme.primary.withOpacity(0.2)
+        : colorScheme.secondaryContainer;
+    final textColor = isActive ? colorScheme.primary : colorScheme.onSurface;
+    final borderColor = isActive ? colorScheme.primary : Colors.transparent;
 
     return InkWell(
       onTap: () => _showFilterBottomSheet(context, controller, label),
@@ -223,11 +218,12 @@ class InventoryListView extends StatelessWidget {
     InventoryController controller,
     String type,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.all(24.w),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: Column(
@@ -239,7 +235,7 @@ class InventoryListView extends StatelessWidget {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: textGrey.withOpacity(0.3),
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -252,23 +248,27 @@ class InventoryListView extends StatelessWidget {
                 Text(
                   "Filter by $type",
                   style: TextStyle(
-                    color: textWhite,
+                    color: colorScheme.onSurface,
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 TextButton(
                   onPressed: controller.resetFilters,
-                  child: Text("Reset", style: TextStyle(color: textGrey)),
+                  child: Text(
+                    "Reset",
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
                 ),
               ],
             ),
 
             SizedBox(height: 16.h),
 
-            if (type == 'Type') _buildTypeFilterOptions(controller),
-            if (type == 'Status') _buildStatusFilterOptions(controller),
-            if (type == 'Size') _buildSizeFilterOptions(controller),
+            if (type == 'Type') _buildTypeFilterOptions(context, controller),
+            if (type == 'Status')
+              _buildStatusFilterOptions(context, controller),
+            if (type == 'Size') _buildSizeFilterOptions(context, controller),
 
             SizedBox(height: 32.h),
 
@@ -291,7 +291,10 @@ class InventoryListView extends StatelessWidget {
   // FILTER OPTIONS
   // ===========================================================================
 
-  Widget _buildTypeFilterOptions(InventoryController controller) {
+  Widget _buildTypeFilterOptions(
+    BuildContext context,
+    InventoryController controller,
+  ) {
     return Wrap(
       spacing: 12.w,
       runSpacing: 12.h,
@@ -308,7 +311,10 @@ class InventoryListView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusFilterOptions(InventoryController controller) {
+  Widget _buildStatusFilterOptions(
+    BuildContext context,
+    InventoryController controller,
+  ) {
     return Wrap(
       spacing: 12.w,
       runSpacing: 12.h,
@@ -325,7 +331,11 @@ class InventoryListView extends StatelessWidget {
     );
   }
 
-  Widget _buildSizeFilterOptions(InventoryController controller) {
+  Widget _buildSizeFilterOptions(
+    BuildContext context,
+    InventoryController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Form(
       key: controller.sizeFormKey, // optional but recommended
       child: Row(
@@ -336,7 +346,7 @@ class InventoryListView extends StatelessWidget {
             flex: 2,
             child: Text(
               "Surfboard Size",
-              style: TextStyle(color: textWhite, fontSize: 14.sp),
+              style: TextStyle(color: colorScheme.onSurface, fontSize: 14.sp),
             ),
           ),
 
@@ -351,14 +361,14 @@ class InventoryListView extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: primaryBlue.withOpacity(0.15),
+                  color: colorScheme.primary.withOpacity(0.15),
                 ),
                 child: Icon(
                   controller.isLessThan.value
                       ? Icons
                             .chevron_left_rounded // <
                       : Icons.chevron_right_rounded, // >
-                  color: primaryBlue,
+                  color: colorScheme.primary,
                   size: 22,
                 ),
               ),
@@ -378,7 +388,7 @@ class InventoryListView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
-              style: TextStyle(color: textWhite),
+              style: TextStyle(color: colorScheme.onSurface),
               validator: (v) => AValidator.validateSurfboardFeet(v),
             ),
           ),
@@ -396,7 +406,7 @@ class InventoryListView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
-              style: TextStyle(color: textWhite),
+              style: TextStyle(color: colorScheme.onSurface),
               validator: (v) => AValidator.validateSurfboardInches(v),
             ),
           ),
@@ -409,11 +419,12 @@ class InventoryListView extends StatelessWidget {
   // INVENTORY CARD
   // ===========================================================================
   Widget _buildInventoryCard(
+    BuildContext context,
     InventoryModel item,
     InventoryController controller,
   ) {
     final isSelectionMode = Get.arguments?['selectMode'] ?? false;
-    // final status = controller.getStatusDetails(item.status);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       onTap: () {
@@ -426,12 +437,12 @@ class InventoryListView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: cardDark,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
-            Container(width: 80.w, height: 80.w, color: bgDark),
+            Container(width: 80.w, height: 80.w, color: colorScheme.surface),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
@@ -440,7 +451,7 @@ class InventoryListView extends StatelessWidget {
                   Text(
                     item.name,
                     style: TextStyle(
-                      color: textWhite,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16.sp,
                     ),
@@ -448,16 +459,26 @@ class InventoryListView extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     item.status.name.toUpperCase(),
-                    style: TextStyle(color: textGrey, fontSize: 12.sp),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 12.sp,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Row(
                     children: [
-                      Icon(Iconsax.size, size: 16.sp, color: textGrey),
+                      Icon(
+                        Iconsax.size,
+                        size: 16.sp,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       SizedBox(width: 4.w),
                       Text(
                         '"${item.sizeFeet} ${item.sizeInches} ${item.sizeTotalInches}"',
-                        style: TextStyle(color: textGrey, fontSize: 12.sp),
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
+                        ),
                       ),
                     ],
                   ),

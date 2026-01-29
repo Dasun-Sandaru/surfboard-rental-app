@@ -11,11 +11,7 @@ class StepPricing extends GetView<AgreementController> {
   @override
   Widget build(BuildContext context) {
     // Theme colors
-    final Color cardDark = const Color(0xFF182c30);
-    final Color borderDark = const Color(0xFF334155);
-    final Color textWhite = const Color(0xFFf0f4f4);
-    final Color textGrey = const Color(0xFF94a3b8);
-    final Color primaryBlue = const Color(0xFF4A90E2);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
       child: Padding(
@@ -26,7 +22,7 @@ class StepPricing extends GetView<AgreementController> {
             Text(
               "Rental Details",
               style: TextStyle(
-                color: textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -34,7 +30,10 @@ class StepPricing extends GetView<AgreementController> {
             SizedBox(height: 8.h),
             Text(
               "Set the duration and total price.",
-              style: TextStyle(color: textGrey, fontSize: 16.sp),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 16.sp,
+              ),
             ),
 
             SizedBox(height: 32.h),
@@ -43,7 +42,7 @@ class StepPricing extends GetView<AgreementController> {
             Text(
               "Duration",
               style: TextStyle(
-                color: textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -56,19 +55,16 @@ class StepPricing extends GetView<AgreementController> {
               if (rentalData == null) {
                 return Text(
                   "No duration data",
-                  style: TextStyle(color: textGrey),
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
                 );
               }
-
-              final hours = rentalData.rentalDurationHours;
-              final days = rentalData.rentalDurationDays;
 
               return Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
-                  color: cardDark,
+                  color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: borderDark),
+                  border: Border.all(color: colorScheme.outline),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +78,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "Start",
                               style: TextStyle(
-                                color: textGrey,
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
                               ),
                             ),
@@ -90,7 +86,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               rentalData.startDateTimeString,
                               style: TextStyle(
-                                color: textWhite,
+                                color: colorScheme.onSurface,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -99,7 +95,7 @@ class StepPricing extends GetView<AgreementController> {
                         ),
                         Icon(
                           Iconsax.arrow_right,
-                          color: primaryBlue,
+                          color: colorScheme.primary,
                           size: 20.w,
                         ),
                         Column(
@@ -108,7 +104,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "Due",
                               style: TextStyle(
-                                color: textGrey,
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
                               ),
                             ),
@@ -116,7 +112,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               rentalData.dueDateTimeString,
                               style: TextStyle(
-                                color: textWhite,
+                                color: colorScheme.onSurface,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -125,20 +121,20 @@ class StepPricing extends GetView<AgreementController> {
                         ),
                       ],
                     ),
-                    Divider(color: borderDark, height: 24.h),
+                    Divider(color: colorScheme.outline, height: 24.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           controller.formattedDuration,
                           style: TextStyle(
-                            color: primaryBlue,
+                            color: colorScheme.primary,
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               );
@@ -150,7 +146,7 @@ class StepPricing extends GetView<AgreementController> {
             Text(
               "Rental Price",
               style: TextStyle(
-                color: textWhite,
+                color: colorScheme.onSurface,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -162,21 +158,21 @@ class StepPricing extends GetView<AgreementController> {
               if (rentalData == null || rentalData.items.isEmpty) {
                 return Text(
                   "No rental data",
-                  style: TextStyle(color: textGrey),
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
                 );
               }
 
               final item = rentalData.items.first;
-              final suggestedPriceString =
-                  controller.suggestedPrice.toStringAsFixed(2);
+              final suggestedPriceString = controller.suggestedPrice
+                  .toStringAsFixed(2);
               controller.rentalPriceController.text = suggestedPriceString;
 
               return Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
-                  color: cardDark,
+                  color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: borderDark),
+                  border: Border.all(color: colorScheme.outline),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +187,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "Hourly Rate",
                               style: TextStyle(
-                                color: textGrey,
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
                               ),
                             ),
@@ -199,7 +195,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "\$${item.rentalRateHour}",
                               style: TextStyle(
-                                color: textWhite,
+                                color: colorScheme.onSurface,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -212,7 +208,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "Daily Rate",
                               style: TextStyle(
-                                color: textGrey,
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
                               ),
                             ),
@@ -220,7 +216,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "\$${item.rentalRateDay}",
                               style: TextStyle(
-                                color: textWhite,
+                                color: colorScheme.onSurface,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -233,7 +229,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               "Duration",
                               style: TextStyle(
-                                color: textGrey,
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
                               ),
                             ),
@@ -241,7 +237,7 @@ class StepPricing extends GetView<AgreementController> {
                             Text(
                               controller.formattedDuration,
                               style: TextStyle(
-                                color: primaryBlue,
+                                color: colorScheme.primary,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -250,12 +246,12 @@ class StepPricing extends GetView<AgreementController> {
                         ),
                       ],
                     ),
-                    Divider(color: borderDark, height: 24.h),
+                    Divider(color: colorScheme.outline, height: 24.h),
                     // Suggested Price
                     Container(
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
-                        color: primaryBlue.withOpacity(0.1),
+                        color: colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -267,7 +263,7 @@ class StepPricing extends GetView<AgreementController> {
                               Text(
                                 "Suggested Price",
                                 style: TextStyle(
-                                  color: textGrey,
+                                  color: colorScheme.onSurfaceVariant,
                                   fontSize: 12.sp,
                                 ),
                               ),
@@ -275,7 +271,7 @@ class StepPricing extends GetView<AgreementController> {
                               Text(
                                 "\$$suggestedPriceString",
                                 style: TextStyle(
-                                  color: primaryBlue,
+                                  color: colorScheme.primary,
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -288,17 +284,16 @@ class StepPricing extends GetView<AgreementController> {
                                   suggestedPriceString;
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryBlue,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              elevation: 0,
                             ),
                             child: Text(
                               "Use",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                              ),
+                              style: TextStyle(fontSize: 12.sp),
                             ),
                           ),
                         ],
@@ -313,12 +308,10 @@ class StepPricing extends GetView<AgreementController> {
 
             // Total Rental Price Input
             _buildMoneyInput(
+              context: context,
               label: "Total Rental Price",
               controller: controller.rentalPriceController,
               icon: Iconsax.money_tick,
-              cardDark: cardDark,
-              borderDark: borderDark,
-              textWhite: textWhite,
             ),
 
             SizedBox(height: 32.h),
@@ -327,9 +320,9 @@ class StepPricing extends GetView<AgreementController> {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: cardDark,
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: borderDark),
+                border: Border.all(color: colorScheme.outline),
               ),
               child: Column(
                 children: [
@@ -339,17 +332,20 @@ class StepPricing extends GetView<AgreementController> {
                       title: Text(
                         "Require Security Deposit",
                         style: TextStyle(
-                          color: textWhite,
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(
                         "Hold an ID or Cash",
-                        style: TextStyle(color: textGrey, fontSize: 12.sp),
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
+                        ),
                       ),
                       value: controller.requireDeposit.value,
                       onChanged: (val) => controller.requireDeposit.value = val,
-                      activeColor: primaryBlue,
+                      activeColor: colorScheme.primary,
                     ),
                   ),
 
@@ -358,17 +354,13 @@ class StepPricing extends GetView<AgreementController> {
                     if (controller.requireDeposit.value) {
                       return Column(
                         children: [
-                          Divider(color: borderDark),
+                          Divider(color: colorScheme.outline),
                           SizedBox(height: 12.h),
                           _buildMoneyInput(
+                            context: context,
                             label: "Deposit Amount",
                             controller: controller.depositController,
                             icon: Iconsax.lock,
-                            cardDark: const Color(
-                              0xFF101f22,
-                            ), // Slightly darker for inner input
-                            borderDark: borderDark,
-                            textWhite: textWhite,
                           ),
                         ],
                       );
@@ -384,82 +376,52 @@ class StepPricing extends GetView<AgreementController> {
     );
   }
 
-  Widget _buildDurationOption(String label, AgreementController controller) {
-    return Expanded(
-      child: Obx(() {
-        final isSelected = controller.rentalDuration.value == label;
-        return InkWell(
-          onTap: () => controller.rentalDuration.value = label,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color(0xFF4A90E2)
-                  : const Color(0xFF182c30),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected
-                    ? const Color(0xFF4A90E2)
-                    : const Color(0xFF334155),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : const Color(0xFF94a3b8),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
   Widget _buildMoneyInput({
+    required BuildContext context,
     required String label,
     required TextEditingController controller,
     required IconData icon,
-    required Color cardDark,
-    required Color borderDark,
-    required Color textWhite,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 14.sp,
+          ),
         ),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           style: TextStyle(
-            color: textWhite,
+            color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.grey),
+            prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant),
             prefixText: "\$ ",
-            prefixStyle: TextStyle(color: textWhite, fontSize: 18.sp),
+            prefixStyle: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 18.sp,
+            ),
             filled: true,
-            fillColor: cardDark,
+            fillColor: colorScheme.surfaceContainer,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: borderDark),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: borderDark),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF4A90E2)),
+              borderSide: BorderSide(color: colorScheme.primary),
             ),
             contentPadding: EdgeInsets.symmetric(
               vertical: 16.h,

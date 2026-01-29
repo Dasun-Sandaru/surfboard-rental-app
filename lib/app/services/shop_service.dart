@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 class ShopService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -9,7 +11,7 @@ class ShopService {
   static const String logName = 'ShopService';
 
   DocumentReference _shopRef(String shopId) {
-    return _db.collection('shops').doc(shopId);
+    return _db.collection(FirestoreCollections.shops).doc(shopId);
   }
 
   // ---------------------------------------------------------------------------
@@ -23,17 +25,17 @@ class ShopService {
     try {
       log('Creating new shop: $shopName', name: logName);
       final uid = _auth.currentUser!.uid;
-      final shopRef = _db.collection('shops').doc();
+      final shopRef = _db.collection(FirestoreCollections.shops).doc();
 
       final batch = _db.batch();
 
       batch.set(shopRef, {
-        'name': shopName,
-        'location': location,
-        'contact_number': contactNumber,
-        'created_date': FieldValue.serverTimestamp(),
-        'owner_admin_uid': uid,
-        'shop_code': _generateShopCode(),
+        FirestoreFields.businessName: shopName,
+        FirestoreFields.location: location,
+        FirestoreFields.contactNumber: contactNumber,
+        FirestoreFields.createdAt: FieldValue.serverTimestamp(),
+        FirestoreFields.ownerAdminUid: uid,
+        FirestoreFields.shopCode: _generateShopCode(),
       });
 
       await batch.commit();
@@ -53,7 +55,7 @@ class ShopService {
       log('Fetching shop details once for: $shopId', name: logName);
       return _shopRef(shopId).get();
     } catch (e) {
-      log('Error fetching shop details: $e', name:logName);
+      log('Error fetching shop details: $e', name: logName);
       rethrow;
     }
   }
@@ -64,7 +66,9 @@ class ShopService {
   Stream<QuerySnapshot> getShopMembers(String shopId) {
     try {
       log('Getting shop members stream for: $shopId', name: logName);
-      return _shopRef(shopId).collection('members').snapshots();
+      return _shopRef(
+        shopId,
+      ).collection('members').snapshots(); // Constant for 'members' ??
     } catch (e) {
       log('Error creating shop members stream: $e', name: logName);
       rethrow;
@@ -95,8 +99,8 @@ class ShopService {
     try {
       log('Adding member to shop: $shopId, userId: $userId', name: logName);
       await _shopRef(shopId).collection('members').doc(userId).set({
-        'role': role,
-        'added_at': FieldValue.serverTimestamp(),
+        FirestoreFields.role: role,
+        'added_at': FieldValue.serverTimestamp(), 
       });
       log('Member added to shop: $userId', name: logName);
     } catch (e) {

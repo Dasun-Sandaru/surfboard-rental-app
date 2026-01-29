@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../utils/constants/a_enums.dart';
 import 'security_deposit_model.dart';
@@ -35,6 +36,10 @@ class RentalModel {
 
   // Agreement
   final String? agreementLink;
+  final String? overdueTime;
+  final String? cachedCustomerName;
+  final String? cachedItemName;
+  final String? cachedStaffName;
 
   // Meta
   final DateTime createdAt;
@@ -56,6 +61,10 @@ class RentalModel {
     required this.amountPaid,
     required this.securityDeposit,
     this.agreementLink,
+    this.overdueTime,
+    this.cachedCustomerName,
+    this.cachedItemName,
+    this.cachedStaffName,
     required this.createdAt,
   });
 
@@ -67,43 +76,50 @@ class RentalModel {
 
     return RentalModel(
       id: doc.id,
-      shopId: data['shopId'] as String,
-      customerId: data['customerId'] as String,
-      itemId: data['itemId'] as String,
-      staffId: data['staffId'] as String,
+      shopId: data[FirestoreFields.shopId] as String,
+      customerId: data[FirestoreFields.customerId] as String,
+      itemId: data[FirestoreFields.itemId] as String,
+      staffId: data[FirestoreFields.staffId] as String,
 
-      startTime: (data['startTime'] as Timestamp).toDate(),
-      expectedReturnTime: (data['expectedReturnTime'] as Timestamp).toDate(),
-      actualReturnTime: data['actualReturnTime'] != null
-          ? (data['actualReturnTime'] as Timestamp).toDate()
+      startTime: (data[FirestoreFields.startTime] as Timestamp).toDate(),
+      expectedReturnTime:
+          (data[FirestoreFields.expectedReturnTime] as Timestamp).toDate(),
+      actualReturnTime: data[FirestoreFields.actualReturnTime] != null
+          ? (data[FirestoreFields.actualReturnTime] as Timestamp).toDate()
           : null,
 
       status: enumFromString(
         RentalStatus.values,
-        data['status'],
+        data[FirestoreFields.status],
         RentalStatus.active,
       ),
 
       rentType: enumFromString(
         RentType.values,
-        data['rentType'],
+        data[FirestoreFields.rentType],
         RentType.hourly,
       ),
 
       paymentStatus: enumFromString(
         PaymentStatus.values,
-        data['paymentStatus'],
+        data[FirestoreFields.paymentStatus],
         PaymentStatus.unpaid,
       ),
 
-      rate: (data['rate'] as num).toDouble(),
-      amountExpected: (data['amountExpected'] as num).toDouble(),
-      amountPaid: (data['amountPaid'] as num).toDouble(),
+      rate: (data[FirestoreFields.rate] as num).toDouble(),
+      amountExpected: (data[FirestoreFields.amountExpected] as num).toDouble(),
+      amountPaid: (data[FirestoreFields.amountPaid] as num).toDouble(),
 
-      securityDeposit: SecurityDepositModel.fromMap(data['securityDeposit']),
+      securityDeposit: SecurityDepositModel.fromMap(
+        data[FirestoreFields.securityDeposit],
+      ),
 
-      agreementLink: data['agreementLink'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      agreementLink: data[FirestoreFields.agreementLink],
+      overdueTime: data[FirestoreFields.overdueTime],
+      cachedCustomerName: data[FirestoreFields.cachedCustomerName],
+      cachedItemName: data[FirestoreFields.cachedItemName],
+      cachedStaffName: data[FirestoreFields.cachedStaffName],
+      createdAt: (data[FirestoreFields.createdAt] as Timestamp).toDate(),
     );
   }
 
@@ -112,29 +128,35 @@ class RentalModel {
   /// -----------------------------
   Map<String, dynamic> toMap() {
     return {
-      'shopId': shopId,
-      'customerId': customerId,
-      'itemId': itemId,
-      'staffId': staffId,
+      FirestoreFields.shopId: shopId,
+      FirestoreFields.customerId: customerId,
+      FirestoreFields.itemId: itemId,
+      FirestoreFields.staffId: staffId,
 
-      'startTime': Timestamp.fromDate(startTime),
-      'expectedReturnTime': Timestamp.fromDate(expectedReturnTime),
-      'actualReturnTime': actualReturnTime != null
+      FirestoreFields.startTime: Timestamp.fromDate(startTime),
+      FirestoreFields.expectedReturnTime: Timestamp.fromDate(
+        expectedReturnTime,
+      ),
+      FirestoreFields.actualReturnTime: actualReturnTime != null
           ? Timestamp.fromDate(actualReturnTime!)
           : null,
 
-      'status': status.name,
-      'rentType': rentType.name,
-      'paymentStatus': paymentStatus.name,
+      FirestoreFields.status: status.name,
+      FirestoreFields.rentType: rentType.name,
+      FirestoreFields.paymentStatus: paymentStatus.name,
 
-      'rate': rate,
-      'amountExpected': amountExpected,
-      'amountPaid': amountPaid,
+      FirestoreFields.rate: rate,
+      FirestoreFields.amountExpected: amountExpected,
+      FirestoreFields.amountPaid: amountPaid,
 
-      'securityDeposit': securityDeposit.toMap(),
+      FirestoreFields.securityDeposit: securityDeposit.toMap(),
 
-      'agreementLink': agreementLink,
-      'createdAt': Timestamp.fromDate(createdAt),
+      FirestoreFields.agreementLink: agreementLink,
+      FirestoreFields.overdueTime: overdueTime,
+      FirestoreFields.cachedCustomerName: cachedCustomerName,
+      FirestoreFields.cachedItemName: cachedItemName,
+      FirestoreFields.cachedStaffName: cachedStaffName,
+      FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
     };
   }
 }
