@@ -7,6 +7,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../../../../app/models/rental_model.dart';
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/rentals_controller.dart';
@@ -177,7 +178,7 @@ class RentalsView extends GetView<RentalsController> {
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                if (isOverdue)
+                if (isOverdue && rental.status == RentalStatus.active)
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 8.w,
@@ -196,7 +197,7 @@ class RentalsView extends GetView<RentalsController> {
                       ),
                     ),
                   )
-                else
+                else if (rental.status == RentalStatus.completed)
                   Container(
                     height: 12.w,
                     width: 12.w,
@@ -211,6 +212,111 @@ class RentalsView extends GetView<RentalsController> {
                           spreadRadius: 2,
                         ),
                       ],
+                    ),
+                    child: Text(
+                      "Completed",
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else if (rental.status == RentalStatus.mark_as_damaged)
+                  Container(
+                    height: 12.w,
+                    width: 12.w,
+                    decoration: BoxDecoration(
+                      color: colorScheme.error,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.error.withOpacity(0.4),
+                          blurRadius: 6,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      "Mark as Damaged",
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else if (rental.status == RentalStatus.item_returned)
+                  Container(
+                    height: 12.w,
+                    width: 12.w,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.4),
+                          blurRadius: 6,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      "Item Returned",
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else if (rental.status == RentalStatus.active)
+                  Container(
+                    height: 12.w,
+                    width: 12.w,
+                    decoration: BoxDecoration(
+                      color: statusColors?.warning ?? Colors.orange,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: (statusColors?.warning ?? Colors.orange)
+                              .withOpacity(0.4),
+                          blurRadius: 6,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      "Active",
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    height: 12.w,
+                    width: 12.w,
+                    decoration: BoxDecoration(
+                      color: colorScheme.onSurfaceVariant,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+                          blurRadius: 6,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      "Cancelled",
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
               ],

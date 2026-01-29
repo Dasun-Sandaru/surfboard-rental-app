@@ -290,7 +290,7 @@ class CollectPaymentTip extends StatelessWidget {
       // If there are damage fees, mark the board as damaged
       final bool hasDamage = controller.damageFee > 0;
       final InventoryStatus inventoryStatus = hasDamage
-          ? InventoryStatus.mark_as_damaged
+          ? InventoryStatus.damaged
           : InventoryStatus.available;
 
       // 3. Finalize Return (update rental to completed and inventory status)

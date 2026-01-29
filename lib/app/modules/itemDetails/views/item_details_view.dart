@@ -160,7 +160,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
           child: Row(
             children: [
               // Mark as Repair Button
-              if (item.status == InventoryStatus.mark_as_damaged) ...[
+              if (item.status == InventoryStatus.damaged) ...[
                 Expanded(
                   child: ElevatedButton(
                     onPressed: controller.markAsRepair,

@@ -243,6 +243,13 @@ class DamageReportController extends GetxController {
         status: RentalStatus.mark_as_damaged,
       );
 
+      // Update inventory status to damaged immediately
+      await _damageReportService.updateInventoryStatus(
+        shopId: shopId,
+        itemId: itemId!,
+        status: InventoryStatus.damaged,
+      );
+
       Get.back(result: {'success': true, 'totalFee': totalFee});
       AppSnackBar.success(
         title: "Success",

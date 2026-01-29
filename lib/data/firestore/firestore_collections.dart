@@ -10,4 +10,6 @@ class FirestoreCollections {
   static const agreementTemplates = 'agreement_templates';
   static const payments = 'payments';
   static const activityLogs = 'activity_logs';
+  static const damageReports = 'damage_reports';
+  static const photos = 'photos';
 }

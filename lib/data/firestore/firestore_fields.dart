@@ -67,13 +67,18 @@ class FirestoreFields {
   static const handledBy = 'handledBy';
   static const timestamp = 'timestamp';
 
-  // Damage Fee
+  // Damage Fee & Damage Report
   static const feeAmount = 'fee_amount';
   static const description = 'description';
   static const activeStatus = 'active_status';
   static const damageType = 'damage_type';
   static const damageId = 'damageId';
   static const photoUrl = 'photoUrl';
+  static const reportedAt = 'reportedAt';
+  static const reportedBy = 'reportedBy';
+  static const estimatedCost = 'estimatedCost';
+  static const finalCost = 'finalCost';
+  static const resolvedAt = 'resolvedAt';
 
   // Agreement Template
   static const templateName = 'template_name';

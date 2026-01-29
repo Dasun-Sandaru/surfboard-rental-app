@@ -4,13 +4,20 @@ enum UserRole { admin, staff, customer }
 
 enum SurfBoardType { shortboard, longboard, fish, consultant }
 
-enum InventoryStatus { available, rented, repair, retired , mark_as_damaged }
+enum InventoryStatus { available, rented, repair, retired, damaged }
 
 enum InventoryFormMode { add, edit }
 
 enum DamageType { fin_damaged, board_cracked, leash_broken, lost }
 
-enum RentalStatus { active, completed, overdue, cancelled , mark_as_damaged , item_returned }
+enum RentalStatus {
+  active,
+  completed,
+  overdue,
+  cancelled,
+  mark_as_damaged,
+  item_returned,
+}
 
 enum RentType { hourly, daily }
 
