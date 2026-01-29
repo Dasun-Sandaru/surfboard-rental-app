@@ -51,13 +51,18 @@ enum DamageStatus {
 
 enum ActivityType {
   create_rental,
+  start_rental,
   return_rental,
   add_payment,
   delete_payment,
   add_customer,
+  update_customer,
   update_inventory,
   add_inventory,
   delete_inventory,
+  report_damage,
+  create_user,
+  update_user,
   login,
   logout,
   undefined,

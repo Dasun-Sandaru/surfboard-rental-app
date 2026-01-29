@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 
+import '../../alerts/views/alerts_view.dart';
 import '../controllers/admin_home_controller.dart';
 
 class AdminHomeView extends GetView<AdminHomeController> {
@@ -88,24 +89,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
 
   /// Tab 2: Alerts
   Widget _buildAlertsContent(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Iconsax.notification5,
-            size: 64.sp,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            "No new alerts",
-            style: TextStyle(color: colorScheme.onSurface, fontSize: 18.sp),
-          ),
-        ],
-      ),
-    );
+    return const AlertsView();
   }
 
   Widget _buildTopBar(BuildContext context) {
