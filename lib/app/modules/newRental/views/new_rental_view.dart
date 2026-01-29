@@ -40,7 +40,34 @@ class NewRentalView extends StatelessWidget {
             /// 1. Customer Section
             _buildSectionLabel(context, "Customer"),
             SizedBox(height: 8.h),
-            Obx(() => _buildCustomerSelector(context, controller)),
+            Row(
+              children: [
+                Expanded(
+                  child: Obx(() => _buildCustomerSelector(context, controller)),
+                ),
+                SizedBox(width: 12.w),
+                InkWell(
+                  onTap: controller.scanCustomer,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    height: 60.w,
+                    width: 60.w,
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: colorScheme.outline),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Iconsax.scan,
+                        size: 28.w,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
             SizedBox(height: 24.h),
 
@@ -80,20 +107,34 @@ class NewRentalView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildSectionLabel(context, "Items"),
-                TextButton.icon(
-                  onPressed: controller.addItem,
-                  icon: Icon(
-                    Iconsax.add,
-                    size: 18.w,
-                    color: colorScheme.primary,
-                  ),
-                  label: Text(
-                    "Add Item",
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: controller.addItem,
+                      icon: Icon(
+                        Iconsax.add,
+                        size: 18.w,
+                        color: colorScheme.primary,
+                      ),
+                      label: Text(
+                        "Add Item",
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+
+                    IconButton(
+                      onPressed: controller.scanItem,
+                      icon: Icon(
+                        Iconsax.scan_barcode,
+                        size: 20.w,
+                        color: colorScheme.primary,
+                      ),
+                      tooltip: "Scan Item Code",
+                    ),
+                  ],
                 ),
               ],
             ),
