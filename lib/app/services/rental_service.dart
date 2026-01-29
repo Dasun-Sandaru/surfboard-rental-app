@@ -155,6 +155,21 @@ class RentalService {
     });
   }
 
+  // Get rental once (for QR scanner and one-time fetches)
+  Future<DocumentSnapshot> getRentalOnce(String shopId, String rentalId) async {
+    try {
+      log('Fetching rental once: $rentalId', name: logName);
+      final docRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      return await docRef.get();
+    } catch (e) {
+      log('Error fetching rental: $e', name: logName);
+      rethrow;
+    }
+  }
+
   Future<void> deleteRental(String shopId, String rentalId) async {
     try {
       log('Deleting rental: $rentalId', name: logName);

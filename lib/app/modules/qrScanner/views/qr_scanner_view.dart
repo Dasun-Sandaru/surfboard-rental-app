@@ -14,7 +14,7 @@ class QrScannerView extends GetView<QrScannerController> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           // Scanner View
