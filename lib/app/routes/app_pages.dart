@@ -71,6 +71,8 @@ import '../modules/userDetail/bindings/user_detail_binding.dart';
 import '../modules/userDetail/views/user_detail_view.dart';
 import '../modules/qrScanner/bindings/qr_scanner_binding.dart';
 import '../modules/qrScanner/views/qr_scanner_view.dart';
+import '../modules/rentalHistory/bindings/rental_history_binding.dart';
+import '../modules/rentalHistory/views/rental_history_view.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -263,6 +265,11 @@ class AppPages {
       name: _Paths.QR_SCANNER,
       page: () => const QrScannerView(),
       binding: QrScannerBinding(),
+    ),
+    GetPage(
+      name: _Paths.RENTAL_HISTORY,
+      page: () => const RentalHistoryView(),
+      binding: RentalHistoryBinding(),
     ),
   ];
 }
