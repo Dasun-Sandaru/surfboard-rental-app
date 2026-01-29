@@ -119,7 +119,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         // Profile Pic
         InkWell(
           onTap: () {
-            controller.signOut();
+            Get.toNamed(Routes.QR_SCANNER);
           },
           child: Container(
             height: 40.w,
@@ -130,7 +130,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
               border: Border.all(color: colorScheme.outline),
             ),
             child: Icon(
-              Iconsax.user,
+              Iconsax.scan_barcode,
               color: colorScheme.onSurface,
               size: 20.sp,
             ),
