@@ -6,6 +6,7 @@ import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../routes/app_pages.dart';
+import '../widgets/customer_qr_code_dialog.dart';
 
 class CustomerDetailsController extends GetxController {
   final CustomerService _customerService = CustomerService();
@@ -100,5 +101,14 @@ class CustomerDetailsController extends GetxController {
 
   void sendEmail() {
     AppSnackBar.info(title: "Action", message: "Opening Email App...");
+  }
+
+  void showQR() {
+    if (customer.value == null) return;
+
+    Get.dialog(
+      CustomerQrCodeDialog(customer: customer.value!),
+      barrierDismissible: true,
+    );
   }
 }

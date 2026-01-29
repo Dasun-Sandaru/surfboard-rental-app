@@ -31,6 +31,11 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
           ),
         ),
         actions: [
+          IconButton(
+            onPressed: controller.showQR,
+            icon: Icon(Iconsax.scan_barcode, color: colorScheme.onSurface),
+            tooltip: 'Show QR Code',
+          ),
           TextButton(
             onPressed: controller.editItem,
             child: Text(

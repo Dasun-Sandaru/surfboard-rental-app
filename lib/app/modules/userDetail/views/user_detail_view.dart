@@ -31,6 +31,13 @@ class UserDetailView extends GetView<UserDetailController> {
           "Staff Details",
           style: TextStyle(color: colorScheme.onSurface, fontSize: 18.sp),
         ),
+        actions: [
+          IconButton(
+            onPressed: controller.showQR,
+            icon: Icon(Iconsax.scan_barcode, color: colorScheme.onSurface),
+            tooltip: 'Show QR Code',
+          ),
+        ],
       ),
       body: Obx(() {
         final userData = controller.user.value;

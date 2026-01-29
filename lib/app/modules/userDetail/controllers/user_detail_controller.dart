@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../models/user_model.dart';
 import '../../../services/user_service.dart';
 import '../../../../utils/common/app_snack_bar.dart';
+import '../widgets/user_qr_code_dialog.dart';
 
 class UserDetailController extends GetxController {
   static const String _logName = 'UserDetailController';
@@ -112,5 +113,11 @@ class UserDetailController extends GetxController {
         Get.back(); // Go back to list
       },
     );
+  }
+
+  void showQR() {
+    if (user.value == null) return;
+
+    Get.dialog(UserQrCodeDialog(user: user.value!), barrierDismissible: true);
   }
 }

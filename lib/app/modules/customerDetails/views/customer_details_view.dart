@@ -147,31 +147,43 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
 
         SizedBox(height: 20.h),
 
-        // Action Buttons Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildActionButton(
-              context,
-              icon: Iconsax.call,
-              label: "Call",
-              onTap: controller.makeCall,
-            ),
-            SizedBox(width: 16.w),
-            _buildActionButton(
-              context,
-              icon: Iconsax.sms,
-              label: "Message",
-              onTap: controller.makeCall,
-            ),
-            SizedBox(width: 16.w),
-            _buildActionButton(
-              context,
-              icon: Iconsax.direct,
-              label: "Email",
-              onTap: controller.sendEmail,
-            ),
-          ],
+        // Action Buttons Row (Scrollable to prevent overflow)
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(width: ASizes.defaultPadding),
+              _buildActionButton(
+                context,
+                icon: Iconsax.call,
+                label: "Call",
+                onTap: controller.makeCall,
+              ),
+              SizedBox(width: 16.w),
+              _buildActionButton(
+                context,
+                icon: Iconsax.sms,
+                label: "Message",
+                onTap: controller.makeCall,
+              ),
+              SizedBox(width: 16.w),
+              _buildActionButton(
+                context,
+                icon: Iconsax.direct,
+                label: "Email",
+                onTap: controller.sendEmail,
+              ),
+              SizedBox(width: 16.w),
+              _buildActionButton(
+                context,
+                icon: Iconsax.scan_barcode4,
+                label: "My QR",
+                onTap: controller.showQR,
+              ),
+              SizedBox(width: ASizes.defaultPadding),
+            ],
+          ),
         ),
       ],
     );
