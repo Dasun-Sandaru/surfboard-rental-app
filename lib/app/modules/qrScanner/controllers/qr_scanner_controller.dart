@@ -57,6 +57,13 @@ class QrScannerController extends GetxController {
         isScanning.value = false;
         isProcessing.value = true;
 
+        if (Get.arguments != null &&
+            Get.arguments is Map &&
+            Get.arguments['returnResult'] == true) {
+          Get.back(result: barcode.rawValue!);
+          return;
+        }
+
         // Identify and navigate
         await _identifyAndNavigate(barcode.rawValue!);
       }

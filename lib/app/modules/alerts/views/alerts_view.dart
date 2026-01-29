@@ -23,8 +23,7 @@ class AlertsView extends GetView<AlertsController> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AAppBar(
-        showbackArrow: true,
-        leadingIcon: Iconsax.arrow_left,
+        showbackArrow: false,
         centerTitle: true,
         title: Text(
           'Activity Logs',

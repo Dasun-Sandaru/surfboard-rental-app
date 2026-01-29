@@ -1,4 +1,8 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:surfboard_rental_app/app/services/customer_service.dart';
+import 'package:surfboard_rental_app/app/services/inventory_service.dart';
+import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
@@ -8,7 +12,7 @@ import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
 import '../../../models/inventory_model.dart';
-import '../../../models/init_rental_model.dart'; // Add intl package for date formatting
+import '../../../models/init_rental_model.dart';
 
 class NewRentalController extends GetxController {
   // -- State Variables --
@@ -70,6 +74,133 @@ class NewRentalController extends GetxController {
   void removeItem(int index) {
     selectedItems.removeAt(index);
     calculateTotal();
+  }
+
+  void scanCustomer() async {
+    final result = await Get.toNamed(
+      Routes.QR_SCANNER,
+      arguments: {'returnResult': true},
+    );
+    if (result != null && result is String) {
+      _handleScannedData(result, isCustomer: true);
+    }
+  }
+
+  void scanItem() async {
+    // Only allow one item
+    if (selectedItems.isNotEmpty) {
+      AppSnackBar.warning(
+        title: "Limit Reached",
+        message: "You can only select one item per rental",
+      );
+      return;
+    }
+
+    final result = await Get.toNamed(
+      Routes.QR_SCANNER,
+      arguments: {'returnResult': true},
+    );
+    if (result != null && result is String) {
+      _handleScannedData(result, isCustomer: false);
+    }
+  }
+
+  Future<void> _handleScannedData(
+    String scannedData, {
+    required bool isCustomer,
+  }) async {
+    try {
+      final parts = scannedData.split(':');
+      if (parts.length < 2) {
+        // Try legacy/direct ID
+        if (isCustomer) {
+          await _fetchAndSetCustomer(scannedData);
+        } else {
+          await _fetchAndSetItem(scannedData);
+        }
+        return;
+      }
+
+      final type = parts[0].toUpperCase();
+      final id = parts[1];
+
+      if (isCustomer) {
+        if (type == 'CUST' || type == 'C') {
+          await _fetchAndSetCustomer(id);
+        } else {
+          AppSnackBar.error(
+            title: "Invalid Code",
+            message: "This QR code is not for a customer.",
+          );
+        }
+      } else {
+        if (type == 'ITEM' || type == 'I') {
+          await _fetchAndSetItem(id);
+        } else {
+          AppSnackBar.error(
+            title: "Invalid Code",
+            message: "This QR code is not for an inventory item.",
+          );
+        }
+      }
+    } catch (e) {
+      log("Error handling scanned data: $e");
+      AppSnackBar.error(title: "Error", message: "Failed to process QR code");
+    }
+  }
+
+  Future<void> _fetchAndSetCustomer(String id) async {
+    // Need customer service to fetch customer by ID
+    // Assuming you have access to a CustomerService or similar
+    final CustomerService customerService = Get.find();
+    final UserService userService = Get.find();
+    final shopId = await userService.getShopIdFromStorage();
+
+    if (shopId != null) {
+      final doc = await customerService.getCustomerOnce(shopId, id);
+      if (doc.exists) {
+        selectedCustomer.value = CustomerModel.fromSnapshot(
+          doc as DocumentSnapshot<Map<String, dynamic>>,
+        );
+        AppSnackBar.success(
+          title: "Customer Added",
+          message: "${selectedCustomer.value!.firstName} elected",
+        );
+      } else {
+        AppSnackBar.warning(title: "Not Found", message: "Customer not found");
+      }
+    }
+  }
+
+  Future<void> _fetchAndSetItem(String id) async {
+    // Need inventory service
+    final InventoryService inventoryService = InventoryService();
+    final UserService userService = Get.find();
+    final shopId = await userService.getShopIdFromStorage();
+
+    if (shopId != null) {
+      final doc = await inventoryService.getInventoryItemOnce(
+        shopId: shopId,
+        itemId: id,
+      );
+      if (doc.exists) {
+        final item = InventoryModel.fromSnapshot(
+          doc as DocumentSnapshot<Map<String, dynamic>>,
+        );
+        if (!selectedItems.any((i) => i.id == item.id)) {
+          selectedItems.add(item);
+          calculateTotal();
+          AppSnackBar.success(
+            title: "Item Added",
+            message: "${item.name} added",
+          );
+        } else {
+          AppSnackBar.info(title: "Info", message: "Item already added");
+        }
+      } else {
+        AppSnackBar.warning(title: "Not Found", message: "Item not found");
+      }
+    }
   }
 
   void pickDate(bool isStart) async {

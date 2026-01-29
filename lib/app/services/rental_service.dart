@@ -321,10 +321,23 @@ class RentalService {
     required int limit,
     DocumentSnapshot? startAfter,
     String? searchTerm,
+    RentalStatus? status,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     try {
       log('Fetching rentals page for shop: $shopId', name: logName);
       Query query = _shopRef(shopId).collection(FirestoreCollections.rentals);
+
+      if (status != null) {
+        query = query.where(FirestoreFields.status, isEqualTo: status.name);
+      }
+
+      if (startDate != null && endDate != null) {
+        query = query
+            .where(FirestoreFields.createdAt, isGreaterThanOrEqualTo: startDate)
+            .where(FirestoreFields.createdAt, isLessThanOrEqualTo: endDate);
+      }
 
       if (searchTerm != null && searchTerm.isNotEmpty) {
         query = query
@@ -338,6 +351,9 @@ class RentalService {
             )
             .limit(limit);
       } else {
+        // If date filter is applied, we must order by createdAt (which we do anyway)
+        // Note: Firestore requires the first orderBy field to match the first inequality filter.
+        // Since we filter by createdAt (range) and order by createdAt, this is valid.
         query = query
             .orderBy(FirestoreFields.createdAt, descending: true)
             .limit(limit);
