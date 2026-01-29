@@ -52,7 +52,7 @@ class SettingsView extends StatelessWidget {
                     icon: Iconsax.shop,
                     title: "Shop Details",
                     subtitle: "Name, Location, Contact",
-                    onTap: () {},
+                    onTap: controller.editShopDetails,
                   ),
                   _buildDivider(context),
                   _buildSettingsTile(

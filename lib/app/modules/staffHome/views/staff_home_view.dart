@@ -163,6 +163,11 @@ class StaffHomeView extends GetView<StaffHomeController> {
         'icon': Iconsax.user,
         'route': Routes.CUSTOMER_LIST,
       },
+      {
+        'title': 'Settings',
+        'icon': Iconsax.setting_2,
+        'route': Routes.SETTINGS,
+      },
     ];
 
     return GridView.builder(

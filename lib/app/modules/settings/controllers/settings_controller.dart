@@ -9,6 +9,7 @@ import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';
 import '../views/edit_profile_view.dart';
+import '../views/edit_shop_view.dart';
 
 class SettingsController extends GetxController {
   final UserService _userService = Get.find();
@@ -22,6 +23,10 @@ class SettingsController extends GetxController {
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
+
+  // -- Text Controllers for Edit Shop --
+  final shopNameController = TextEditingController();
+  final shopLocationController = TextEditingController();
 
   // -- Text Controller for Dialogs (Inventory) --
   final textInputController = TextEditingController();
@@ -117,6 +122,45 @@ class SettingsController extends GetxController {
         AppSnackBar.success(
           title: "Success",
           message: "Profile updated successfully",
+        );
+      }
+    } catch (e) {
+      AppSnackBar.error(title: "Update Failed", message: e.toString());
+    }
+  }
+
+  void editShopDetails() {
+    // Initialize controllers with current shop data
+    shopNameController.text = shopProfile.value['name'] ?? '';
+    shopLocationController.text = shopProfile.value['location'] ?? '';
+
+    // Navigate to Edit Shop View
+    Get.to(() => EditShopView());
+  }
+
+  Future<void> saveShopDetails() async {
+    final newName = shopNameController.text.trim();
+    final newLocation = shopLocationController.text.trim();
+
+    if (newName.isEmpty) {
+      AppSnackBar.error(title: "Error", message: "Shop Name cannot be empty");
+      return;
+    }
+
+    try {
+      final shopId = shopProfile.value['id'];
+      if (shopId != null) {
+        await _shopService.updateShop(
+          shopId: shopId,
+          name: newName,
+          location: newLocation,
+        );
+
+        Get.back();
+        _loadData();
+        AppSnackBar.success(
+          title: "Success",
+          message: "Shop details updated successfully",
         );
       }
     } catch (e) {
