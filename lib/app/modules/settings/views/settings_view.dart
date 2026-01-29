@@ -200,7 +200,9 @@ class SettingsView extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              controller.editPersonalInfo();
+            },
             icon: Icon(Iconsax.edit, color: colorScheme.primary),
           ),
         ],

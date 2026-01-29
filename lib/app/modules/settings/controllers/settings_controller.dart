@@ -8,6 +8,7 @@ import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';
+import '../views/edit_profile_view.dart';
 
 class SettingsController extends GetxController {
   final UserService _userService = Get.find();
@@ -16,6 +17,14 @@ class SettingsController extends GetxController {
 
   final Rx<Map<String, dynamic>> userProfile = Rx<Map<String, dynamic>>({});
   final Rx<Map<String, dynamic>> shopProfile = Rx<Map<String, dynamic>>({});
+
+  // -- Text Controllers for Edit Profile --
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+
+  // -- Text Controller for Dialogs (Inventory) --
+  final textInputController = TextEditingController();
 
   @override
   void onInit() {
@@ -36,6 +45,7 @@ class SettingsController extends GetxController {
         "name": userModel.name,
         "role": userModel.role.name,
         "email": userModel.email,
+        "phone": userModel.phone,
         "image": '',
       };
 
@@ -59,7 +69,6 @@ class SettingsController extends GetxController {
   }
 
   // -- Inventory Configuration Data --
-  // In a real app, these would come from Firebase
   final RxList<String> brands = <String>[
     "Channel Islands",
     "Firewire",
@@ -73,10 +82,47 @@ class SettingsController extends GetxController {
     SurfBoardType.values,
   );
 
-  // -- Text Controller for Dialogs --
-  final textInputController = TextEditingController();
-
   // -- Actions --
+
+  void editPersonalInfo() {
+    // Initialize controllers with current data
+    nameController.text = userProfile.value['name'] ?? '';
+    phoneController.text = userProfile.value['phone'] ?? '';
+    emailController.text = userProfile.value['email'] ?? '';
+
+    // Navigate to Edit Profile View
+    Get.to(() => EditProfileView());
+  }
+
+  Future<void> saveProfile() async {
+    final newName = nameController.text.trim();
+    final newPhone = phoneController.text.trim();
+
+    if (newName.isEmpty) {
+      AppSnackBar.error(title: "Error", message: "Name cannot be empty");
+      return;
+    }
+
+    try {
+      final currentUser = _authService.currentUser;
+      if (currentUser != null) {
+        await _userService.updateUserProfile(
+          userId: currentUser.uid,
+          name: newName,
+          phone: newPhone.isNotEmpty ? newPhone : null,
+        );
+
+        Get.back(); // Close Edit Profile View
+        _loadData(); // Refresh data
+        AppSnackBar.success(
+          title: "Success",
+          message: "Profile updated successfully",
+        );
+      }
+    } catch (e) {
+      AppSnackBar.error(title: "Update Failed", message: e.toString());
+    }
+  }
 
   void logout() {
     Get.defaultDialog(
