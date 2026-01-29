@@ -64,9 +64,166 @@ class QrScannerController extends GetxController {
   }
 
   /// Identify the ID type and navigate to appropriate page
-  Future<void> _identifyAndNavigate(String scannedId) async {
+  Future<void> _identifyAndNavigate(String scannedData) async {
     try {
-      log('Identifying scanned ID: $scannedId', name: _logName);
+      log('Identifying scanned data: $scannedData', name: _logName);
+
+      // Parse the scanned data to extract type and ID
+      final parts = scannedData.split(':');
+
+      if (parts.length != 2) {
+        // No prefix found - treat as legacy/raw ID and try to identify
+        await _legacyIdentify(scannedData);
+        return;
+      }
+
+      final type = parts[0].toUpperCase();
+      final id = parts[1];
+
+      log('Parsed - Type: $type, ID: $id', name: _logName);
+
+      // Route based on type prefix
+      switch (type) {
+        case 'CUST':
+        case 'C':
+          _navigateToCustomer(id);
+          break;
+
+        case 'ITEM':
+        case 'I':
+          _navigateToItem(id);
+          break;
+
+        case 'RENT':
+        case 'R':
+          _navigateToRental(id);
+          break;
+
+        case 'USER':
+        case 'U':
+          _navigateToUser(id);
+          break;
+
+        default:
+          AppSnackBar.warning(
+            title: 'Unknown Type',
+            message: 'QR code type "$type" not recognized',
+          );
+          resetScanner();
+          isProcessing.value = false;
+      }
+    } catch (e) {
+      log('Error identifying QR data: $e', name: _logName);
+      AppSnackBar.error(title: 'Error', message: 'Failed to process QR code');
+      resetScanner();
+      isProcessing.value = false;
+    }
+  }
+
+  /// Navigate to customer details
+  void _navigateToCustomer(String customerId) async {
+    try {
+      final shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null) {
+        AppSnackBar.error(title: 'Error', message: 'Shop ID not found');
+        return;
+      }
+
+      final customerDoc = await _customerService.getCustomerOnce(
+        shopId,
+        customerId,
+      );
+      if (customerDoc.exists) {
+        final customer = CustomerModel.fromSnapshot(
+          customerDoc as DocumentSnapshot<Map<String, dynamic>>,
+        );
+        AppSnackBar.success(
+          title: 'Customer Found',
+          message: '${customer.firstName} ${customer.lastName}',
+        );
+        Get.back(); // Close scanner
+        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
+      } else {
+        AppSnackBar.warning(title: 'Not Found', message: 'Customer not found');
+        resetScanner();
+        isProcessing.value = false;
+      }
+    } catch (e) {
+      log('Error loading customer: $e', name: _logName);
+      AppSnackBar.error(title: 'Error', message: 'Failed to load customer');
+      resetScanner();
+      isProcessing.value = false;
+    }
+  }
+
+  /// Navigate to item details
+  void _navigateToItem(String itemId) {
+    AppSnackBar.success(
+      title: 'Item Found',
+      message: 'Opening item details...',
+    );
+    Get.back(); // Close scanner
+    Get.toNamed(Routes.ITEM_DETAILS, arguments: itemId);
+  }
+
+  /// Navigate to rental details
+  void _navigateToRental(String rentalId) async {
+    try {
+      final shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null) {
+        AppSnackBar.error(title: 'Error', message: 'Shop ID not found');
+        return;
+      }
+
+      final rentalDoc = await _rentalService.getRentalOnce(shopId, rentalId);
+      if (rentalDoc.exists) {
+        final rental = RentalModel.fromSnapshot(
+          rentalDoc as DocumentSnapshot<Map<String, dynamic>>,
+        );
+        AppSnackBar.success(
+          title: 'Rental Found',
+          message: 'Opening rental details...',
+        );
+        Get.back(); // Close scanner
+        Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
+      } else {
+        AppSnackBar.warning(title: 'Not Found', message: 'Rental not found');
+        resetScanner();
+        isProcessing.value = false;
+      }
+    } catch (e) {
+      log('Error loading rental: $e', name: _logName);
+      AppSnackBar.error(title: 'Error', message: 'Failed to load rental');
+      resetScanner();
+      isProcessing.value = false;
+    }
+  }
+
+  /// Navigate to user details
+  void _navigateToUser(String userId) async {
+    try {
+      final user = await _userService.getUser(userId);
+      if (user != null) {
+        AppSnackBar.success(title: 'User Found', message: user.name ?? 'User');
+        Get.back(); // Close scanner
+        Get.toNamed(Routes.USER_DETAIL, arguments: user);
+      } else {
+        AppSnackBar.warning(title: 'Not Found', message: 'User not found');
+        resetScanner();
+        isProcessing.value = false;
+      }
+    } catch (e) {
+      log('Error loading user: $e', name: _logName);
+      AppSnackBar.error(title: 'Error', message: 'Failed to load user');
+      resetScanner();
+      isProcessing.value = false;
+    }
+  }
+
+  /// Legacy identification for QR codes without prefixes (backward compatibility)
+  Future<void> _legacyIdentify(String scannedId) async {
+    try {
+      log('Using legacy identification for: $scannedId', name: _logName);
 
       // Get shop ID
       final shopId = await _userService.getShopIdFromStorage();
@@ -76,8 +233,8 @@ class QrScannerController extends GetxController {
         return;
       }
 
-      // Check each type in order of likelihood
-      // 1. Check if it's a Customer ID
+      // Check each type in order
+      // 1. Check Customer
       final customerDoc = await _customerService.getCustomerOnce(
         shopId,
         scannedId,
@@ -86,79 +243,61 @@ class QrScannerController extends GetxController {
         final customer = CustomerModel.fromSnapshot(
           customerDoc as DocumentSnapshot<Map<String, dynamic>>,
         );
-        log('Found customer: ${customer.firstName}', name: _logName);
         AppSnackBar.success(
           title: 'Customer Found',
-          message: 'Opening ${customer.firstName} ${customer.lastName}',
+          message: '${customer.firstName} ${customer.lastName}',
         );
-        Get.back(); // Close scanner
+        Get.back();
         Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
         return;
       }
 
-      // 2. Check if it's an Inventory Item ID
+      // 2. Check Inventory
       final itemDoc = await _inventoryService.getInventoryItemOnce(
         shopId: shopId,
         itemId: scannedId,
       );
       if (itemDoc.exists) {
-        final item = InventoryModel.fromSnapshot(
-          itemDoc as DocumentSnapshot<Map<String, dynamic>>,
-        );
-        log('Found inventory item: ${item.name}', name: _logName);
-        AppSnackBar.success(
-          title: 'Item Found',
-          message: 'Opening ${item.name}',
-        );
-        Get.back(); // Close scanner
+        AppSnackBar.success(title: 'Item Found', message: 'Opening item...');
+        Get.back();
         Get.toNamed(Routes.ITEM_DETAILS, arguments: scannedId);
         return;
       }
 
-      // 3. Check if it's a Rental ID
+      // 3. Check Rental
       final rentalDoc = await _rentalService.getRentalOnce(shopId, scannedId);
       if (rentalDoc.exists) {
         final rental = RentalModel.fromSnapshot(
           rentalDoc as DocumentSnapshot<Map<String, dynamic>>,
         );
-        log('Found rental: ${rental.id}', name: _logName);
         AppSnackBar.success(
           title: 'Rental Found',
-          message: 'Opening rental details',
+          message: 'Opening rental...',
         );
-        Get.back(); // Close scanner
+        Get.back();
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
         return;
       }
 
-      // 4. Check if it's a User ID
+      // 4. Check User
       final user = await _userService.getUser(scannedId);
       if (user != null) {
-        log('Found user: ${user.name}', name: _logName);
-        AppSnackBar.success(
-          title: 'User Found',
-          message: 'Opening ${user.name}',
-        );
-        Get.back(); // Close scanner
+        AppSnackBar.success(title: 'User Found', message: user.name ?? 'User');
+        Get.back();
         Get.toNamed(Routes.USER_DETAIL, arguments: user);
         return;
       }
 
-      // If nothing found
+      // Nothing found
       AppSnackBar.warning(
         title: 'Not Found',
-        message: 'No record found for ID: $scannedId',
+        message: 'No record found for this QR code',
       );
-
-      // Reset scanner to scan again
       resetScanner();
       isProcessing.value = false;
     } catch (e) {
-      log('Error identifying ID: $e', name: _logName);
-      AppSnackBar.error(
-        title: 'Error',
-        message: 'Failed to process QR code: $e',
-      );
+      log('Error in legacy identification: $e', name: _logName);
+      AppSnackBar.error(title: 'Error', message: 'Failed to process QR code');
       resetScanner();
       isProcessing.value = false;
     }
