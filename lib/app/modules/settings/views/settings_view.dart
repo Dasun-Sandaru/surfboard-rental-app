@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/settings_controller.dart';
-import 'inventory_config_view.dart'; // Import the sub-screen
+import 'rental_config_view.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -52,7 +53,7 @@ class SettingsView extends StatelessWidget {
                     icon: Iconsax.shop,
                     title: "Shop Details",
                     subtitle: "Name, Location, Contact",
-                    onTap: () {},
+                    onTap: controller.editShopDetails,
                   ),
                   _buildDivider(context),
                   _buildSettingsTile(
@@ -63,6 +64,28 @@ class SettingsView extends StatelessWidget {
                     onTap: controller.navigateToInventorySettings,
                     trailingIcon: Iconsax.arrow_right_3,
                     iconColor: colorScheme.primary,
+                  ),
+                  _buildDivider(context),
+                  Obx(
+                    () => _buildSettingsTile(
+                      context,
+                      icon: Iconsax.money,
+                      title: "Currency",
+                      subtitle: controller.currency.value,
+                      onTap: controller.showCurrencyPicker,
+                      trailingIcon: Iconsax.arrow_right_3,
+                      iconColor: Colors.green,
+                    ),
+                  ),
+                  _buildDivider(context),
+                  _buildSettingsTile(
+                    context,
+                    icon: Iconsax.setting_2,
+                    title: "Rental & Pricing Logic",
+                    subtitle: "Rates, Tax, Agreement",
+                    onTap: () => Get.to(() => const RentalConfigView()),
+                    trailingIcon: Iconsax.arrow_right_3,
+                    iconColor: Colors.orange,
                   ),
                 ],
               ),
@@ -87,12 +110,18 @@ class SettingsView extends StatelessWidget {
                     onTap: () {},
                   ),
                   _buildDivider(context),
-                  _buildSettingsTile(
-                    context,
-                    icon: Iconsax.language_square,
-                    title: "Language",
-                    subtitle: "English",
-                    onTap: () {},
+                  Obx(
+                    () => _buildSettingsTile(
+                      context,
+                      icon: Iconsax.language_square,
+                      title: "Language",
+                      subtitle:
+                          controller.supportedLanguages[controller
+                              .currentLanguage
+                              .value] ??
+                          "English",
+                      onTap: controller.showLanguagePicker,
+                    ),
                   ),
                   _buildDivider(context),
                   _buildSettingsTile(
@@ -151,8 +180,8 @@ class SettingsView extends StatelessWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final profile = controller.userProfile.value;
-    final String name = profile['name'] ?? 'Guest';
-    final String email = profile['email'] ?? 'Not logged in';
+    final String name = profile[FirestoreFields.name] ?? 'Guest';
+    final String email = profile[FirestoreFields.email] ?? 'Not logged in';
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -200,7 +229,9 @@ class SettingsView extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              controller.editPersonalInfo();
+            },
             icon: Icon(Iconsax.edit, color: colorScheme.primary),
           ),
         ],

@@ -7,7 +7,7 @@ import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
-import '../../../../utils/helper/a_validator.dart'; // Assuming you have validators
+import '../../../../utils/validators/a_validator.dart'; // Assuming you have validators
 import '../controllers/add_inventory_controller.dart';
 
 class AddInventoryView extends StatelessWidget {

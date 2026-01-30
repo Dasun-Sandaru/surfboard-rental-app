@@ -6,7 +6,7 @@ import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
-import '../../../../utils/helper/a_validator.dart';
+import '../../../../utils/validators/a_validator.dart';
 import '../controllers/sign_up_controller.dart';
 
 class SignUpView extends GetView<SignUpController> {

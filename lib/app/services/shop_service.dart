@@ -61,6 +61,49 @@ class ShopService {
   }
 
   // ---------------------------------------------------------------------------
+  // UPDATE SHOP DETAILS
+  // ---------------------------------------------------------------------------
+  Future<void> updateShop({
+    required String shopId,
+    String? name,
+    String? location,
+    String? contactNumber,
+  }) async {
+    try {
+      log('Updating shop details for: $shopId', name: logName);
+      final data = <String, dynamic>{};
+      if (name != null) data[FirestoreFields.businessName] = name;
+      if (location != null) data[FirestoreFields.location] = location;
+      if (contactNumber != null) {
+        data[FirestoreFields.contactNumber] = contactNumber;
+      }
+
+      await _shopRef(shopId).update(data);
+      log('Shop details updated for: $shopId', name: logName);
+    } catch (e) {
+      log('Error updating shop details: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // UPDATE SHOP FIELDS GENERIC
+  // ---------------------------------------------------------------------------
+  Future<void> updateShopFields(
+    String shopId,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      log('Updating shop fields for: $shopId', name: logName);
+      await _shopRef(shopId).update(data);
+      log('Shop fields updated for: $shopId', name: logName);
+    } catch (e) {
+      log('Error updating shop fields: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // GET SHOP MEMBERS STREAM
   // ---------------------------------------------------------------------------
   Stream<QuerySnapshot> getShopMembers(String shopId) {
@@ -100,7 +143,7 @@ class ShopService {
       log('Adding member to shop: $shopId, userId: $userId', name: logName);
       await _shopRef(shopId).collection('members').doc(userId).set({
         FirestoreFields.role: role,
-        'added_at': FieldValue.serverTimestamp(), 
+        'added_at': FieldValue.serverTimestamp(),
       });
       log('Member added to shop: $userId', name: logName);
     } catch (e) {
