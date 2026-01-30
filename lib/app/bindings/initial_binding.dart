@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../services/auth_service.dart';
 import '../services/config_service.dart';
 import '../services/customer_service.dart';
+import '../services/damage_report_service.dart';
 import '../services/inventory_service.dart';
 import '../services/payment_service.dart';
 import '../services/rental_service.dart';
@@ -20,5 +21,6 @@ class InitialBinding extends Bindings {
     Get.put(InventoryService(), permanent: true);
     Get.put(RentalService(), permanent: true);
     Get.put(PaymentService(), permanent: true);
+    Get.put(DamageReportService(), permanent: true);
   }
 }
