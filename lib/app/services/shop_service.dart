@@ -87,6 +87,23 @@ class ShopService {
   }
 
   // ---------------------------------------------------------------------------
+  // UPDATE SHOP FIELDS GENERIC
+  // ---------------------------------------------------------------------------
+  Future<void> updateShopFields(
+    String shopId,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      log('Updating shop fields for: $shopId', name: logName);
+      await _shopRef(shopId).update(data);
+      log('Shop fields updated for: $shopId', name: logName);
+    } catch (e) {
+      log('Error updating shop fields: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // GET SHOP MEMBERS STREAM
   // ---------------------------------------------------------------------------
   Stream<QuerySnapshot> getShopMembers(String shopId) {

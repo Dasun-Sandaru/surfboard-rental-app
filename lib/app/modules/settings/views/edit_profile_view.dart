@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/validators/app_validator.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
@@ -61,7 +62,9 @@ class EditProfileView extends GetView<SettingsController> {
                         // Logic to show Initials if no image is available
                         child: Obx(() {
                           final name =
-                              controller.userProfile.value['name'] ?? "?";
+                              controller.userProfile.value[FirestoreFields
+                                  .name] ??
+                              "?";
                           return Text(
                             name.isNotEmpty ? name[0].toUpperCase() : "?",
                             style: TextStyle(

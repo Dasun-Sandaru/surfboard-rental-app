@@ -91,6 +91,7 @@ class FirestoreFields {
   static const contactNumber = 'contact_number';
   static const shopCode = 'shop_code';
   static const ownerAdminUid = 'owner_admin_uid';
+  static const currency = 'currency';
 
   // Activity Log
   static const activityType = 'activity_type';

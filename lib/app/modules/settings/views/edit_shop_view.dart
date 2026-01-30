@@ -91,6 +91,19 @@ class EditShopView extends GetView<SettingsController> {
                     AppValidator.validateText(value, 'Location'),
               ),
 
+              SizedBox(height: 20.h),
+
+              /// Shop Contact Number
+              _buildLabel(context, "Shop Contact Number"),
+              SizedBox(height: 8.h),
+              _buildTextField(
+                context,
+                controller: controller.shopContactController,
+                hintText: "Enter shop contact number",
+                icon: Iconsax.call,
+                validator: (value) => AppValidator.validatePhoneNumber(value),
+              ),
+
               SizedBox(height: 40.h),
 
               /// Save Button
