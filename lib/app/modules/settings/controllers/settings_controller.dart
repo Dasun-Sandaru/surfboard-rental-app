@@ -56,8 +56,7 @@ class SettingsController extends GetxController {
   RxString get currentLanguage => _configService.languageCode;
   final Map<String, String> supportedLanguages = {
     'en': 'English',
-    'es': 'Spanish',
-    'si': 'Sinhala',
+    'si': 'සිංහල',
   };
 
   // -- Rental Configuration --
@@ -383,7 +382,7 @@ class SettingsController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Select Currency",
+              "select_currency".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -440,7 +439,7 @@ class SettingsController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Select Date Format",
+              "select_date_format".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -497,7 +496,7 @@ class SettingsController extends GetxController {
         child: Column(
           children: [
             Text(
-              "Select Time Zone",
+              "select_time_zone".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -558,7 +557,7 @@ class SettingsController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Select Language",
+              "select_language".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -592,10 +591,10 @@ class SettingsController extends GetxController {
 
   void logout() {
     Get.defaultDialog(
-      title: "Logout",
-      middleText: "Are you sure you want to logout?",
-      textConfirm: "Yes",
-      textCancel: "No",
+      title: "logout".tr,
+      middleText: "logout_confirm_msg".tr,
+      textConfirm: "yes".tr,
+      textCancel: "no".tr,
       confirmTextColor: Colors.white,
       onConfirm: () {
         // Auth Logic
@@ -609,19 +608,19 @@ class SettingsController extends GetxController {
   void addItem(String title, RxList<dynamic> list) {
     textInputController.clear();
     Get.defaultDialog(
-      title: "Add $title",
+      title: "${'add'.tr} $title",
       content: Padding(
         padding: const EdgeInsets.all(16.0),
         child: TextField(
           controller: textInputController,
           decoration: InputDecoration(
-            hintText: "Enter $title name",
+            hintText: "${'enter_name'.tr} $title",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
       ),
-      textConfirm: "Add",
-      textCancel: "Cancel",
+      textConfirm: "add".tr,
+      textCancel: "cancel".tr,
       confirmTextColor: Colors.white,
       onConfirm: () {
         if (textInputController.text.isNotEmpty) {
@@ -639,10 +638,10 @@ class SettingsController extends GetxController {
   // Generic function to remove item
   void removeItem(dynamic item, RxList<dynamic> list) {
     Get.defaultDialog(
-      title: "Remove Item",
-      middleText: "Delete '$item' from the list?",
-      textConfirm: "Delete",
-      textCancel: "Cancel",
+      title: "remove_item".tr,
+      middleText: "delete_confirm_msg".tr,
+      textConfirm: "delete".tr,
+      textCancel: "cancel".tr,
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () {

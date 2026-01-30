@@ -26,7 +26,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Rental History",
+          "rental_history".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -56,7 +56,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                         size: 20.w,
                         color: colorScheme.onSurfaceVariant,
                       ),
-                      hintText: 'Search...',
+                      hintText: 'search_hint'.tr,
                       hintStyle: TextStyle(
                         color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                       ),
@@ -105,7 +105,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                           color: colorScheme.onSurfaceVariant,
                           size: 20.w,
                         ),
-                        tooltip: 'Clear Date Filter',
+                        tooltip: 'clear_date_filter'.tr,
                       ),
                     );
                   }
@@ -121,46 +121,46 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
             padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
             child: Row(
               children: [
-                _buildFilterChip(context, 'All', null),
+                _buildFilterChip(context, 'all'.tr, null),
                 SizedBox(width: 8.w),
                 _buildFilterChip(
                   context,
-                  'Active',
+                  'active'.tr,
                   RentalStatus.active,
                   Colors.orange,
                 ),
                 SizedBox(width: 8.w),
                 _buildFilterChip(
                   context,
-                  'Completed',
+                  'completed'.tr,
                   RentalStatus.completed,
                   Colors.green,
                 ),
                 SizedBox(width: 8.w),
                 _buildFilterChip(
                   context,
-                  'Overdue',
+                  'overdue'.tr,
                   RentalStatus.overdue,
                   Colors.red,
                 ),
                 SizedBox(width: 8.w),
                 _buildFilterChip(
                   context,
-                  'Returned',
+                  'returned'.tr,
                   RentalStatus.item_returned,
                   Colors.blue,
                 ),
                 SizedBox(width: 8.w),
                 _buildFilterChip(
                   context,
-                  'Cancelled',
+                  'cancelled'.tr,
                   RentalStatus.cancelled,
                   Colors.grey,
                 ),
                 SizedBox(width: 8.w),
                 _buildFilterChip(
                   context,
-                  'Damaged',
+                  'damaged'.tr,
                   RentalStatus.mark_as_damaged,
                   Colors.redAccent,
                 ),
@@ -320,19 +320,19 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                     children: [
                       _buildTimeBadge(
                         context,
-                        "Start: ${AFormatter.formatDate(rental.startTime)}",
+                        "${'start_label'.tr}: ${AFormatter.formatDate(rental.startTime)}",
                       ),
                       SizedBox(width: 8.w),
                       if (rental.actualReturnTime != null)
-                        _buildTimeBadge(
-                          context,
-                          "Returned: ${AFormatter.formatDate(rental.actualReturnTime)}",
-                        )
+                          _buildTimeBadge(
+                            context,
+                            "${'returned_label'.tr}: ${AFormatter.formatDate(rental.actualReturnTime)}",
+                          )
                       else
-                        _buildTimeBadge(
-                          context,
-                          "Due: ${AFormatter.formatDate(rental.expectedReturnTime)}",
-                        ),
+                          _buildTimeBadge(
+                            context,
+                            "${'due_label'.tr}: ${AFormatter.formatDate(rental.expectedReturnTime)}",
+                          ),
                     ],
                   ),
                 ],
@@ -356,27 +356,27 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
     switch (rental.status) {
       case RentalStatus.active:
         if (rental.expectedReturnTime.isBefore(DateTime.now())) {
-          text = 'Overdue';
+          text = 'overdue'.tr;
           color = colorScheme.error;
         } else {
-          text = 'Active';
+          text = 'active'.tr;
           color = statusColors?.warning ?? Colors.orange;
         }
         break;
       case RentalStatus.completed:
-        text = 'Completed';
+        text = 'completed'.tr;
         color = statusColors?.success ?? Colors.green;
         break;
       case RentalStatus.item_returned:
-        text = 'Returned';
+        text = 'returned'.tr;
         color = Colors.blue;
         break;
       case RentalStatus.mark_as_damaged:
-        text = 'Damaged';
+        text = 'damaged'.tr;
         color = colorScheme.error;
         break;
       case RentalStatus.cancelled:
-        text = 'Cancelled';
+        text = 'cancelled'.tr;
         color = Colors.grey;
         break;
       default:
@@ -425,7 +425,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           ),
           SizedBox(height: 16.h),
           Text(
-            "No Rentals Found",
+            "no_rentals_found".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -434,7 +434,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            "Try adjusting your filters",
+            "adjust_filters".tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -454,7 +454,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           Icon(Iconsax.warning_2, size: 40.w, color: colorScheme.error),
           SizedBox(height: 16.h),
           Text(
-            "Something went wrong!",
+            "something_went_wrong".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -464,7 +464,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           SizedBox(height: 8.h),
           ElevatedButton(
             onPressed: () => controller.pagingController.refresh(),
-            child: const Text("Retry"),
+            child: Text("retry".tr),
           ),
         ],
       ),

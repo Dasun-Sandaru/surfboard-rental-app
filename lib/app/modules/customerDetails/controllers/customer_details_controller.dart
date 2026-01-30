@@ -65,21 +65,21 @@ class CustomerDetailsController extends GetxController {
       "items": "Firewire Longboard (9'0\")",
       "duration": "2 Days",
       "cost": "\$40.00",
-      "status": "Returned", // Status for color coding
+      "status": "returned_label", // Status for color coding
     },
     {
       "date": "01 Aug 2024",
       "items": "Channel Islands Fish (6'2\")",
       "duration": "1 Day",
       "cost": "\$25.00",
-      "status": "Late Return",
+      "status": "late_return",
     },
     {
       "date": "20 Jul 2024",
       "items": "Soft Top (8'0\")",
       "duration": "4 Hours",
       "cost": "\5.00",
-      "status": "Returned",
+      "status": "returned_label",
     },
   ].obs;
 

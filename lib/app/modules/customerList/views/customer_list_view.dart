@@ -20,7 +20,7 @@ class CustomerListView extends GetView<CustomerListController> {
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         title: Text(
-          'Customers',
+          'customers'.tr,
           style: TextStyle(color: colorScheme.onSurface),
         ),
         centerTitle: true,
@@ -49,7 +49,7 @@ class CustomerListView extends GetView<CustomerListController> {
                     onChanged: controller.onSearchChanged,
                     style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
-                      hintText: "Search name...",
+                      hintText: "search_name".tr,
                       hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                       prefixIcon: Icon(
                         Iconsax.search_normal,
@@ -110,7 +110,7 @@ class CustomerListView extends GetView<CustomerListController> {
                           ),
                           SizedBox(height: 8.h),
                           Text(
-                            "No customers found",
+                            "no_customers_found".tr,
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                             ),

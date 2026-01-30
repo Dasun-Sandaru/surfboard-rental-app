@@ -23,7 +23,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          'User Management',
+          'user_management'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -62,7 +62,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   size: 20.w,
                   color: colorScheme.onSurfaceVariant,
                 ),
-                hintText: 'Search by name or email',
+                hintText: 'search_user_hint'.tr,
                 hintStyle: TextStyle(
                   color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                 ),
@@ -129,7 +129,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'No users found',
+            'no_users_found'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 16.sp,
@@ -184,7 +184,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.name ?? 'Unknown',
+                    user.name ?? 'unknown'.tr,
                     style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w600,
@@ -193,7 +193,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    user.email ?? 'No email',
+                    user.email ?? 'no_email'.tr,
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 13.sp,
@@ -217,7 +217,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          user.role.name.capitalizeFirst ?? 'Staff',
+                          user.role.name.tr,
                           style: TextStyle(
                             color: isAdmin
                                 ? colorScheme.primary
@@ -242,7 +242,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            'Verified',
+                            'verified'.tr,
                             style: TextStyle(
                               color: successColor,
                               fontSize: 10.sp,
@@ -268,7 +268,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            user.isActive ? 'Active' : 'Inactive',
+                            user.isActive ? 'active'.tr : 'inactive'.tr,
                             style: TextStyle(
                               color: isActive
                                   ? successColor

@@ -22,7 +22,7 @@ class DamageReportView extends StatelessWidget {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Damage Report",
+          "damage_report".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -39,7 +39,7 @@ class DamageReportView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// 1. Damage Details Section
-                  _buildSectionTitle(context, "Damage Details"),
+                  _buildSectionTitle(context, "damage_details".tr),
                   SizedBox(height: 12.h),
 
                   Obx(
@@ -118,7 +118,7 @@ class DamageReportView extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Replacement Cost:",
+                                    "replacement_cost".tr,
                                     style: TextStyle(
                                       color: colorScheme.onSurfaceVariant,
                                       fontSize: 14.sp,
@@ -141,7 +141,7 @@ class DamageReportView extends StatelessWidget {
                                   fee.id != null) ...[
                                 SizedBox(height: 12.h),
                                 Text(
-                                  "Photos (Max 3)",
+                                  "photos_max".tr,
                                   style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontSize: 12.sp,
@@ -191,7 +191,7 @@ class DamageReportView extends StatelessWidget {
                                                     size: 20.w,
                                                   ),
                                                   Text(
-                                                    "Add",
+                                                    "add".tr,
                                                     style: TextStyle(
                                                       color: colorScheme
                                                           .onSurfaceVariant,
@@ -262,7 +262,7 @@ class DamageReportView extends StatelessWidget {
                               if (isSelected && fee.id != null) ...[
                                 SizedBox(height: 12.h),
                                 Text(
-                                  "Notes",
+                                  "notes".tr,
                                   style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontSize: 12.sp,
@@ -276,8 +276,7 @@ class DamageReportView extends StatelessWidget {
                                     color: colorScheme.onSurface,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText:
-                                        "Describe the damage details here...",
+                                    hintText: "describe_damage".tr,
                                     hintStyle: TextStyle(
                                       color: colorScheme.onSurfaceVariant
                                           .withOpacity(0.5),
@@ -332,7 +331,7 @@ class DamageReportView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Total Damage Fees:",
+                            "total_damage_fees".tr,
                             style: TextStyle(
                               color: colorScheme.onSurface,
                               fontSize: 16.sp,
@@ -379,7 +378,7 @@ class DamageReportView extends StatelessWidget {
                   elevation: 4,
                 ),
                 child: Text(
-                  "Damage Report",
+                  "damage_report".tr,
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,

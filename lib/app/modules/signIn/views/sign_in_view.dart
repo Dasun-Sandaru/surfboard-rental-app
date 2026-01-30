@@ -28,7 +28,7 @@ class SignInView extends GetView<SignInController> {
 
                   /// Welcome Text
                   Text(
-                    'Welcome Back!',
+                    'welcome_back'.tr,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
@@ -36,7 +36,7 @@ class SignInView extends GetView<SignInController> {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    "Log in to manage your surfboards rentals",
+                    "login_subtitle".tr,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -134,7 +134,8 @@ class SignInView extends GetView<SignInController> {
               hint: 'hello@surfshop.com',
               icon: Iconsax.sms,
             ),
-            validator: (value) => AValidator.validateText(value, 'E-Mail'.tr),
+            validator: (value) =>
+                AValidator.validateText(value, 'email_address'.tr),
           ),
 
           SizedBox(height: 20.h),
@@ -176,7 +177,7 @@ class SignInView extends GetView<SignInController> {
               onPressed: () => controller.goToForgotPassword(),
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
               child: Text(
-                'Forgot Password?',
+                'forgot_password'.tr,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
@@ -213,7 +214,7 @@ class SignInView extends GetView<SignInController> {
                         ),
                       )
                     : Text(
-                        'Sign In',
+                        'sign_in'.tr,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -281,7 +282,7 @@ class SignInView extends GetView<SignInController> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Text(
-            "Or join us",
+            "or_join_us".tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 12.sp,
@@ -299,7 +300,7 @@ class SignInView extends GetView<SignInController> {
     return Column(
       children: [
         Text(
-          "Don't have an account?",
+          "dont_have_account".tr,
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
             fontSize: 13.sp,
@@ -313,7 +314,7 @@ class SignInView extends GetView<SignInController> {
             Expanded(
               child: _buildOutlineButton(
                 context,
-                text: "As Staff",
+                text: "as_staff".tr,
                 icon: Iconsax.user,
                 color: colorScheme.onSurface,
                 onPressed: () => controller.goToSignUpStaff(),
@@ -326,7 +327,7 @@ class SignInView extends GetView<SignInController> {
             Expanded(
               child: _buildOutlineButton(
                 context,
-                text: "Setup Shop",
+                text: "setup_shop".tr,
                 icon: Iconsax.shop,
                 color: colorScheme.primary,
                 isPrimary: true,

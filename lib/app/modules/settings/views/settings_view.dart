@@ -22,7 +22,7 @@ class SettingsView extends StatelessWidget {
       appBar: AAppBar(
         centerTitle: true,
         title: Text(
-          "Settings",
+          "settings_title".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -39,7 +39,7 @@ class SettingsView extends StatelessWidget {
             SizedBox(height: 24.h),
 
             /// 2. Shop Management Section
-            _buildSectionHeader(context, "Shop Management"),
+            _buildSectionHeader(context, "shop_management".tr),
             SizedBox(height: 8.h),
             Container(
               decoration: BoxDecoration(
@@ -51,16 +51,16 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.shop,
-                    title: "Shop Details",
-                    subtitle: "Name, Location, Contact",
+                    title: "shop_details".tr,
+                    subtitle: "shop_details_sub".tr,
                     onTap: controller.editShopDetails,
                   ),
                   _buildDivider(context),
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.box,
-                    title: "Inventory Configuration",
-                    subtitle: "Manage Brands & Board Types",
+                    title: "inventory_config".tr,
+                    subtitle: "inventory_config_sub".tr,
                     onTap: controller.navigateToInventorySettings,
                     trailingIcon: Iconsax.arrow_right_3,
                     iconColor: colorScheme.primary,
@@ -70,7 +70,7 @@ class SettingsView extends StatelessWidget {
                     () => _buildSettingsTile(
                       context,
                       icon: Iconsax.money,
-                      title: "Currency",
+                      title: "currency".tr,
                       subtitle: controller.currency.value,
                       onTap: controller.showCurrencyPicker,
                       trailingIcon: Iconsax.arrow_right_3,
@@ -82,7 +82,7 @@ class SettingsView extends StatelessWidget {
                     () => _buildSettingsTile(
                       context,
                       icon: Iconsax.calendar_1,
-                      title: "Date Format",
+                      title: "date_format".tr,
                       subtitle: controller.dateFormat.value,
                       onTap: controller.showDateFormatPicker,
                       trailingIcon: Iconsax.arrow_right_3,
@@ -94,7 +94,7 @@ class SettingsView extends StatelessWidget {
                     () => _buildSettingsTile(
                       context,
                       icon: Iconsax.clock,
-                      title: "Time Zone",
+                      title: "time_zone".tr,
                       subtitle: controller.timeZone.value,
                       onTap: controller.showTimeZonePicker,
                       trailingIcon: Iconsax.arrow_right_3,
@@ -106,8 +106,8 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.setting_2,
-                    title: "Rental Pricing Logic",
-                    subtitle: "Rates, Tax",
+                    title: "rental_pricing".tr,
+                    subtitle: "rental_pricing_sub".tr,
                     onTap: () => Get.to(() => const RentalConfigView()),
                     trailingIcon: Iconsax.arrow_right_3,
                     iconColor: Colors.orange,
@@ -119,7 +119,7 @@ class SettingsView extends StatelessWidget {
             SizedBox(height: 24.h),
 
             /// 3. App Settings Section
-            _buildSectionHeader(context, "App Settings"),
+            _buildSectionHeader(context, "app_settings".tr),
             SizedBox(height: 8.h),
             Container(
               decoration: BoxDecoration(
@@ -131,7 +131,7 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.notification,
-                    title: "Notifications",
+                    title: "notifications".tr,
                     onTap: () {},
                   ),
                   _buildDivider(context),
@@ -139,12 +139,12 @@ class SettingsView extends StatelessWidget {
                     () => _buildSettingsTile(
                       context,
                       icon: Iconsax.language_square,
-                      title: "Language",
+                      title: "language".tr,
                       subtitle:
                           controller.supportedLanguages[controller
                               .currentLanguage
                               .value] ??
-                          "English",
+                          "english".tr,
                       onTap: controller.showLanguagePicker,
                     ),
                   ),
@@ -152,7 +152,7 @@ class SettingsView extends StatelessWidget {
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.moon,
-                    title: "Dark Mode",
+                    title: "dark_mode".tr,
                     trailing: Switch(
                       value: Get.isDarkMode,
                       onChanged: (v) {
@@ -177,7 +177,7 @@ class SettingsView extends StatelessWidget {
                 onPressed: controller.logout,
                 icon: Icon(Iconsax.logout, color: colorScheme.error),
                 label: Text(
-                  "Log Out",
+                  "logout".tr,
                   style: TextStyle(
                     color: colorScheme.error,
                     fontWeight: FontWeight.bold,
@@ -205,8 +205,8 @@ class SettingsView extends StatelessWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final profile = controller.userProfile.value;
-    final String name = profile[FirestoreFields.name] ?? 'Guest';
-    final String email = profile[FirestoreFields.email] ?? 'Not logged in';
+    final String name = profile[FirestoreFields.name] ?? 'guest'.tr;
+    final String email = profile[FirestoreFields.email] ?? 'not_logged_in'.tr;
 
     return Container(
       padding: EdgeInsets.all(16.w),

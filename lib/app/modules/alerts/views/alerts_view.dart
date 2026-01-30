@@ -26,7 +26,7 @@ class AlertsView extends GetView<AlertsController> {
         showbackArrow: false,
         centerTitle: true,
         title: Text(
-          'Activity Logs',
+          'activity_logs'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -197,7 +197,7 @@ class AlertsView extends GetView<AlertsController> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'No Activity Logs',
+            'no_activity_logs'.tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -206,7 +206,7 @@ class AlertsView extends GetView<AlertsController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Activity logs will appear here',
+            'activity_logs_sub'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -226,7 +226,7 @@ class AlertsView extends GetView<AlertsController> {
           Icon(Iconsax.info_circle, size: 64.w, color: colorScheme.error),
           SizedBox(height: 16.h),
           Text(
-            'Error Loading Logs',
+            'error_loading_logs'.tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -235,7 +235,7 @@ class AlertsView extends GetView<AlertsController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Tap refresh to try again',
+            'retry_sub'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -245,7 +245,7 @@ class AlertsView extends GetView<AlertsController> {
           ElevatedButton.icon(
             onPressed: controller.refreshLogs,
             icon: Icon(Iconsax.refresh, size: 16.w),
-            label: const Text('Retry'),
+            label: Text('retry'.tr),
           ),
         ],
       ),

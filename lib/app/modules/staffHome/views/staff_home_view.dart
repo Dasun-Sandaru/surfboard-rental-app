@@ -29,7 +29,7 @@ class StaffHomeView extends GetView<StaffHomeController> {
 
               /// Welcome Text
               Text(
-                "Staff Dashboard",
+                "staff_dashboard".tr,
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontSize: 28.sp,
@@ -47,7 +47,7 @@ class StaffHomeView extends GetView<StaffHomeController> {
 
               /// Section Header
               Text(
-                "Operations",
+                "operations".tr,
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontSize: 18.sp,
@@ -99,8 +99,12 @@ class StaffHomeView extends GetView<StaffHomeController> {
   Widget _buildStatsGrid(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final stats = [
-      {'title': 'Active Rentals', 'count': '12', 'color': colorScheme.primary},
-      {'title': 'Due Soon', 'count': '5', 'color': Colors.orange},
+      {
+        'title': 'active_rentals'.tr,
+        'count': '12',
+        'color': colorScheme.primary,
+      },
+      {'title': 'due_soon'.tr, 'count': '5', 'color': Colors.orange},
     ];
 
     return GridView.builder(
@@ -152,19 +156,19 @@ class StaffHomeView extends GetView<StaffHomeController> {
     final colorScheme = Theme.of(context).colorScheme;
     final menuItems = [
       {
-        'title': 'New Rental',
+        'title': 'new_rental'.tr,
         'icon': Iconsax.add_circle,
         'route': Routes.NEW_RENTAL,
       },
-      {'title': 'Rentals', 'icon': Iconsax.receipt, 'route': Routes.RENTALS},
-      {'title': 'Inventory', 'icon': Iconsax.box, 'route': Routes.INVENTORY},
+      {'title': 'rentals'.tr, 'icon': Iconsax.receipt, 'route': Routes.RENTALS},
+      {'title': 'inventory'.tr, 'icon': Iconsax.box, 'route': Routes.INVENTORY},
       {
-        'title': 'Customers',
+        'title': 'customers'.tr,
         'icon': Iconsax.user,
         'route': Routes.CUSTOMER_LIST,
       },
       {
-        'title': 'Settings',
+        'title': 'settings'.tr,
         'icon': Iconsax.setting_2,
         'route': Routes.SETTINGS,
       },

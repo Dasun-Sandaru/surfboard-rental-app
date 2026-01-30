@@ -26,7 +26,7 @@ class RentalPaymentView extends StatelessWidget {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Payment Summary",
+          "payment_summary".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -81,7 +81,7 @@ class RentalPaymentView extends StatelessWidget {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                "Rental #${controller.rentalId}",
+                                "${"rental".tr} #${controller.rentalId}",
                                 style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
                                   fontSize: 14.sp,
@@ -109,7 +109,7 @@ class RentalPaymentView extends StatelessWidget {
                         children: [
                           _buildFeeRow(
                             context,
-                            "Remaining Rental Fee",
+                            "remaining_rental_fee".tr,
                             controller.rentalFee,
                             Iconsax.receipt,
                             colorScheme.onSurfaceVariant,
@@ -118,7 +118,7 @@ class RentalPaymentView extends StatelessWidget {
 
                           _buildFeeRow(
                             context,
-                            "Late Fee",
+                            "late_fee".tr,
                             controller.lateFee,
                             Iconsax.clock,
                             statusColors?.warning ?? Colors.orange,
@@ -127,7 +127,7 @@ class RentalPaymentView extends StatelessWidget {
 
                           _buildFeeRow(
                             context,
-                            "Damage Fee",
+                            "damage_fee".tr,
                             controller.damageFee,
                             Iconsax.setting_2, // Or Tool icon
                             statusColors?.warning ?? Colors.orange,
@@ -142,7 +142,7 @@ class RentalPaymentView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Final Total",
+                                "final_total".tr,
                                 style: TextStyle(
                                   color: colorScheme.onSurface,
                                   fontSize: 18.sp,
@@ -170,7 +170,7 @@ class RentalPaymentView extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Payment History",
+                      "payment_history".tr,
                       style: TextStyle(
                         color: colorScheme.onSurface,
                         fontSize: 18.sp,
@@ -193,7 +193,7 @@ class RentalPaymentView extends StatelessWidget {
                             ),
                             SizedBox(height: 12.h),
                             Text(
-                              "No payments recorded yet",
+                              "no_payments".tr,
                               style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontSize: 14.sp,
@@ -330,7 +330,7 @@ class RentalPaymentView extends StatelessWidget {
                     elevation: 4,
                   ),
                   child: Text(
-                    "Collect Payment",
+                    "collect_payment".tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,

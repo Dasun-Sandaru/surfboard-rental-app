@@ -203,7 +203,7 @@ class DamageFeeController extends GetxController {
     }
 
     Get.defaultDialog(
-      title: isEdit ? "Edit Damage Rule" : "Add Damage Rule",
+      title: isEdit ? "edit_damage_rule".tr : "add_damage_rule".tr,
       titleStyle: TextStyle(
         color: Colors.white,
         fontSize: 18.sp,
@@ -220,7 +220,7 @@ class DamageFeeController extends GetxController {
               selectedValue: selectedDamageType.value.isNotEmpty
                   ? selectedDamageType.value
                   : null,
-              hint: "Select Damage Type",
+              hint: "select_damage_type".tr,
               bgColor: const Color(0xFF101f22),
               textColor: Colors.white,
               hintColor: const Color(0xFF94a3b8),
@@ -239,12 +239,16 @@ class DamageFeeController extends GetxController {
             // Description TextField (User can modify)
             _buildDialogTextField(
               descController,
-              "Description (editable)",
+              "description_editable".tr,
               maxLine: 2,
             ),
             SizedBox(height: 12.h),
             // Fee Amount TextField
-            _buildDialogTextField(feeController, "Fee Amount", isNumber: true),
+            _buildDialogTextField(
+              feeController,
+              "fee_amount".tr,
+              isNumber: true,
+            ),
           ],
         ),
       ),
@@ -320,7 +324,7 @@ class DamageFeeController extends GetxController {
             ),
           ),
           child: Text(
-            isEdit ? "Update" : "Save",
+            isEdit ? "update".tr : "save".tr,
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -329,10 +333,7 @@ class DamageFeeController extends GetxController {
         width: double.infinity,
         child: TextButton(
           onPressed: () => Get.back(),
-          child: const Text(
-            "Cancel",
-            style: TextStyle(color: Color(0xFF94a3b8)),
-          ),
+          child: Text("cancel".tr, style: TextStyle(color: Color(0xFF94a3b8))),
         ),
       ),
     );

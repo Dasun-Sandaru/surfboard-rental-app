@@ -23,7 +23,9 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
         centerTitle: true,
         title: Obx(
           () => Text(
-            controller.isEditMode.value ? "Edit Customer" : "Add Customer",
+            controller.isEditMode.value
+                ? "edit_customer".tr
+                : "add_customer".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -43,7 +45,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// 1. Name Section
-                    _buildSectionHeader(context, "Personal Information"),
+                    _buildSectionHeader(context, "personal_information".tr),
                     SizedBox(height: 16.h),
 
                     Row(
@@ -52,7 +54,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel(context, "First Name"),
+                              _buildLabel(context, "first_name".tr),
                               SizedBox(height: 8.h),
                               _buildTextField(
                                 context,
@@ -60,7 +62,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                                 hintText: "John",
                                 icon: Iconsax.user,
                                 validator: (v) =>
-                                    AValidator.validateText(v, "First Name"),
+                                    AValidator.validateText(v, "first_name".tr),
                               ),
                             ],
                           ),
@@ -70,7 +72,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel(context, "Last Name"),
+                              _buildLabel(context, "last_name".tr),
                               SizedBox(height: 8.h),
                               _buildTextField(
                                 context,
@@ -78,7 +80,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                                 hintText: "Doe",
                                 icon: Iconsax.user,
                                 validator: (v) =>
-                                    AValidator.validateText(v, "Last Name"),
+                                    AValidator.validateText(v, "last_name".tr),
                               ),
                             ],
                           ),
@@ -89,10 +91,10 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                     SizedBox(height: 20.h),
 
                     /// 2. Contact Section
-                    _buildSectionHeader(context, "Contact Details"),
+                    _buildSectionHeader(context, "contact_details".tr),
                     SizedBox(height: 16.h),
 
-                    _buildLabel(context, "Phone Number"),
+                    _buildLabel(context, "phone".tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -105,7 +107,7 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
 
                     SizedBox(height: 20.h),
 
-                    _buildLabel(context, "Email Address"),
+                    _buildLabel(context, "email".tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -119,10 +121,10 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                     SizedBox(height: 20.h),
 
                     /// 3. Identification
-                    _buildSectionHeader(context, "Identification"),
+                    _buildSectionHeader(context, "identification".tr),
                     SizedBox(height: 16.h),
 
-                    _buildLabel(context, "NIC / Passport Number"),
+                    _buildLabel(context, "nic_passport_number".tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -130,21 +132,21 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                       hintText: "N123456789",
                       icon: Iconsax.card,
                       validator: (v) =>
-                          AValidator.validateText(v, "NIC Or Passport Number"),
+                          AValidator.validateText(v, "nic_passport_number".tr),
                     ),
 
                     SizedBox(height: 20.h),
 
                     /// 4. Notes
-                    _buildSectionHeader(context, "Additional Info"),
+                    _buildSectionHeader(context, "additional_info".tr),
                     SizedBox(height: 16.h),
 
-                    _buildLabel(context, "Notes"),
+                    _buildLabel(context, "notes".tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.notesController,
-                      hintText: "Add customer preferences or notes...",
+                      hintText: "enter_customer_notes".tr,
                       icon: Iconsax.note,
                       maxLines: 4,
                       textAction: TextInputAction.newline,
@@ -182,8 +184,8 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
                   child: Obx(
                     () => Text(
                       controller.isEditMode.value
-                          ? "Update Customer"
-                          : "Save Customer",
+                          ? "update_customer".tr
+                          : "save_customer".tr,
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
@@ -254,8 +256,9 @@ class AddEditCustomerView extends GetView<AddEditCustomerController> {
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle:
-            TextStyle(color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
+        hintStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+        ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,
         prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20.w),
