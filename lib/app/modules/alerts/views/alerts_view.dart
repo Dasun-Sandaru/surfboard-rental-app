@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import '../../../../utils/common/a_app_bar.dart';
@@ -26,7 +26,7 @@ class AlertsView extends GetView<AlertsController> {
         showbackArrow: false,
         centerTitle: true,
         title: Text(
-          'Activity Logs',
+          'activity_logs'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -67,7 +67,6 @@ class AlertsView extends GetView<AlertsController> {
     int index,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final timeFormat = DateFormat('MMM dd, yyyy • hh:mm a');
 
     return InkWell(
       onTap: () {
@@ -168,7 +167,7 @@ class AlertsView extends GetView<AlertsController> {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        timeFormat.format(log.timestamp),
+                        AFormatter.formatDate(log.timestamp),
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 11.sp,
@@ -198,7 +197,7 @@ class AlertsView extends GetView<AlertsController> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'No Activity Logs',
+            'no_activity_logs'.tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -207,7 +206,7 @@ class AlertsView extends GetView<AlertsController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Activity logs will appear here',
+            'activity_logs_sub'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -227,7 +226,7 @@ class AlertsView extends GetView<AlertsController> {
           Icon(Iconsax.info_circle, size: 64.w, color: colorScheme.error),
           SizedBox(height: 16.h),
           Text(
-            'Error Loading Logs',
+            'error_loading_logs'.tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -236,7 +235,7 @@ class AlertsView extends GetView<AlertsController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Tap refresh to try again',
+            'retry_sub'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -246,7 +245,7 @@ class AlertsView extends GetView<AlertsController> {
           ElevatedButton.icon(
             onPressed: controller.refreshLogs,
             icon: Icon(Iconsax.refresh, size: 16.w),
-            label: const Text('Retry'),
+            label: Text('retry'.tr),
           ),
         ],
       ),

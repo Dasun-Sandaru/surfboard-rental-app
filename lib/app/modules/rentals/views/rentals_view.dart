@@ -26,7 +26,7 @@ class RentalsView extends GetView<RentalsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Active Rentals",
+          "active_rentals".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -51,7 +51,7 @@ class RentalsView extends GetView<RentalsController> {
                   size: 20.w,
                   color: colorScheme.onSurfaceVariant,
                 ),
-                hintText: 'Search by Customer or Item...',
+                hintText: 'search_customer_item'.tr,
                 hintStyle: TextStyle(
                   color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                 ),
@@ -160,11 +160,14 @@ class RentalsView extends GetView<RentalsController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTimeBadge(context, "Start: ${rental.startTime}"),
+                      _buildTimeBadge(
+                        context,
+                        "${'start_label'.tr}: ${rental.startTime}",
+                      ),
                       SizedBox(width: 8.w),
                       _buildTimeBadge(
                         context,
-                        "Due: ${rental.expectedReturnTime}",
+                        "${'due_label'.tr}: ${rental.expectedReturnTime}",
                       ),
                     ],
                   ),
@@ -189,7 +192,7 @@ class RentalsView extends GetView<RentalsController> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      "Overdue",
+                      "overdue".tr,
                       style: TextStyle(
                         color: colorScheme.error,
                         fontSize: 10.sp,
@@ -214,7 +217,7 @@ class RentalsView extends GetView<RentalsController> {
                       ],
                     ),
                     child: Text(
-                      "Completed",
+                      "completed".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 10.sp,
@@ -238,7 +241,7 @@ class RentalsView extends GetView<RentalsController> {
                       ],
                     ),
                     child: Text(
-                      "Mark as Damaged",
+                      "damaged".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 10.sp,
@@ -262,7 +265,7 @@ class RentalsView extends GetView<RentalsController> {
                       ],
                     ),
                     child: Text(
-                      "Item Returned",
+                      "returned".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 10.sp,
@@ -287,7 +290,7 @@ class RentalsView extends GetView<RentalsController> {
                       ],
                     ),
                     child: Text(
-                      "Active",
+                      "active".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 10.sp,
@@ -311,7 +314,7 @@ class RentalsView extends GetView<RentalsController> {
                       ],
                     ),
                     child: Text(
-                      "Cancelled",
+                      "cancelled".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 10.sp,
@@ -357,7 +360,7 @@ class RentalsView extends GetView<RentalsController> {
           ),
           SizedBox(height: 16.h),
           Text(
-            "No Active Rentals",
+            "no_active_rentals".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -365,7 +368,7 @@ class RentalsView extends GetView<RentalsController> {
             ),
           ),
           Text(
-            "All boards have been returned.",
+            "all_returned_msg".tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -385,7 +388,7 @@ class RentalsView extends GetView<RentalsController> {
           Icon(Iconsax.warning_2, size: 40.w, color: colorScheme.error),
           SizedBox(height: 16.h),
           Text(
-            "Something went wrong!",
+            "something_went_wrong".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -393,7 +396,7 @@ class RentalsView extends GetView<RentalsController> {
             ),
           ),
           Text(
-            "We couldn't load the rentals. Please try again.",
+            "load_error_msg".tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
@@ -407,7 +410,7 @@ class RentalsView extends GetView<RentalsController> {
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
             ),
-            child: const Text("Retry"),
+            child: Text("retry".tr),
           ),
         ],
       ),

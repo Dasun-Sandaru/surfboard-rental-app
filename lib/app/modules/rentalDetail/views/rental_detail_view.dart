@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/app/models/damage_report_model.dart';
 import 'package:surfboard_rental_app/app/models/payment_model.dart';
 import 'package:surfboard_rental_app/app/models/damage_photo_model.dart';
@@ -24,7 +24,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
           title: Text(
-            'Rental details',
+            'rental_details'.tr,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
           centerTitle: true,
@@ -35,10 +35,10 @@ class RentalDetailView extends GetView<RentalDetailController> {
             unselectedLabelColor: colorScheme.onSurfaceVariant,
             indicatorColor: colorScheme.primary,
             dividerColor: Colors.transparent,
-            tabs: const [
-              Tab(text: "Overview"),
-              Tab(text: "Financials"),
-              Tab(text: "Damages"),
+            tabs: [
+              Tab(text: "overview".tr),
+              Tab(text: "financials".tr),
+              Tab(text: "damages".tr),
             ],
           ),
         ),
@@ -53,18 +53,18 @@ class RentalDetailView extends GetView<RentalDetailController> {
                   SizedBox(height: 16.h),
                   _buildSection(
                     context,
-                    title: "Rental Info",
+                    title: "rental_info".tr,
                     icon: Iconsax.box,
                     children: [
                       _buildInfoRow(
                         context,
-                        "Item",
-                        rental.cachedItemName ?? "Unknown Item",
+                        "item".tr,
+                        rental.cachedItemName ?? "unknown".tr,
                         icon: Iconsax.code_circle,
                       ),
                       _buildInfoRow(
                         context,
-                        "Rent Type",
+                        "rent_type".tr,
                         rental.rentType
                             .toString()
                             .split('.')
@@ -74,7 +74,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       ),
                       _buildInfoRow(
                         context,
-                        "Rental ID",
+                        "rental_id".tr,
                         "#${rental.id?.substring(0, 8) ?? '---'}",
                         icon: Iconsax.hashtag,
                       ),
@@ -83,18 +83,18 @@ class RentalDetailView extends GetView<RentalDetailController> {
                   SizedBox(height: 16.h),
                   _buildSection(
                     context,
-                    title: "People",
+                    title: "people".tr,
                     icon: Iconsax.people,
                     children: [
                       _buildInfoRow(
                         context,
-                        "Customer",
-                        rental.cachedCustomerName ?? "Unknown",
+                        "customer".tr,
+                        rental.cachedCustomerName ?? "unknown".tr,
                         icon: Iconsax.user,
                       ),
                       _buildInfoRow(
                         context,
-                        "Staff Member",
+                        "staff_member".tr,
                         rental.cachedStaffName ?? "Unknown",
                         icon: Iconsax.personalcard,
                       ),
@@ -103,25 +103,25 @@ class RentalDetailView extends GetView<RentalDetailController> {
                   SizedBox(height: 16.h),
                   _buildSection(
                     context,
-                    title: "Timings",
+                    title: "timings".tr,
                     icon: Iconsax.calendar,
                     children: [
                       _buildInfoRow(
                         context,
-                        "Start Time",
+                        "start_time".tr,
                         _formatDate(rental.startTime),
                         icon: Iconsax.calendar_add,
                       ),
                       _buildInfoRow(
                         context,
-                        "Expected Return",
+                        "expected_return".tr,
                         _formatDate(rental.expectedReturnTime),
                         icon: Iconsax.calendar_edit,
                       ),
                       if (rental.actualReturnTime != null)
                         _buildInfoRow(
                           context,
-                          "Actual Return",
+                          "actual_return".tr,
                           _formatDate(rental.actualReturnTime!),
                           icon: Iconsax.calendar_tick,
                           valueColor:
@@ -134,7 +134,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       if (rental.overdueTime != null)
                         _buildInfoRow(
                           context,
-                          "Overdue Duration",
+                          "overdue_duration".tr,
                           rental.overdueTime!,
                           icon: Iconsax.clock,
                           valueColor: Colors.red,
@@ -153,26 +153,26 @@ class RentalDetailView extends GetView<RentalDetailController> {
                 children: [
                   _buildSection(
                     context,
-                    title: "Financials",
+                    title: "financials".tr,
                     icon: Iconsax.money_3,
                     children: [
                       _buildInfoRow(
                         context,
-                        "Rate",
-                        "${rental.rate}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hr' : 'day'}",
+                        "rate".tr,
+                        "${AFormatter.formatCurrency(rental.rate)}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hourly'.tr : 'daily'.tr}",
                         icon: Iconsax.tag,
                       ),
                       _buildInfoRow(
                         context,
-                        "Total Expected",
-                        "${rental.amountExpected}",
+                        "total_expected".tr,
+                        AFormatter.formatCurrency(rental.amountExpected),
                         icon: Iconsax.money_tick,
                         isBold: true,
                       ),
                       _buildInfoRow(
                         context,
-                        "Amount Paid",
-                        "${rental.amountPaid}",
+                        "amount_paid".tr,
+                        AFormatter.formatCurrency(rental.amountPaid),
                         icon: Iconsax.wallet_2,
                         valueColor: rental.paymentStatus == PaymentStatus.paid
                             ? Colors.green
@@ -181,18 +181,20 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       Divider(),
                       _buildInfoRow(
                         context,
-                        "Security Deposit",
-                        rental.securityDeposit.amount.toString(),
+                        "security_deposit".tr,
+                        AFormatter.formatCurrency(
+                          rental.securityDeposit.amount,
+                        ),
                         icon: Iconsax.shield_tick,
                       ),
                       _buildInfoRow(
                         context,
-                        "Deposit Status",
+                        "deposit_status".tr,
                         rental.securityDeposit.refunded > 0
-                            ? "Refunded"
+                            ? "refunded".tr
                             : (rental.securityDeposit.paid > 0
-                                  ? "Held"
-                                  : "Not Paid"),
+                                  ? "held".tr
+                                  : "not_paid".tr),
                         icon: Iconsax.info_circle,
                       ),
                     ],
@@ -202,13 +204,13 @@ class RentalDetailView extends GetView<RentalDetailController> {
                     if (controller.payments.isEmpty) {
                       return _buildEmptyState(
                         context,
-                        "No payments recorded",
+                        "no_payments".tr,
                         Iconsax.receipt_item,
                       );
                     }
                     return _buildSection(
                       context,
-                      title: "Payment History",
+                      title: "payment_history".tr,
                       icon: Iconsax.receipt,
                       children: controller.payments
                           .map((payment) => _buildPaymentRow(context, payment))
@@ -229,7 +231,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                     margin: EdgeInsets.only(top: 50.h),
                     child: _buildEmptyState(
                       context,
-                      "No damages reported",
+                      "no_damages".tr,
                       Iconsax.shield_tick,
                     ),
                   );
@@ -277,7 +279,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                payment.category.name.capitalizeFirst!,
+                payment.category.toString().split('.').last.capitalizeFirst!,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
               ),
               Text(
@@ -290,7 +292,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
             ],
           ),
           Text(
-            "+ ${payment.amount}",
+            "+ ${AFormatter.formatCurrency(payment.amount)}",
             style: TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -401,7 +403,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    "Cost: ${report.finalCost}",
+                    "${"cost".tr}: ${AFormatter.formatCurrency(report.finalCost)}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
@@ -464,7 +466,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                rental.status.toString().split('.').last.toUpperCase(),
+                rental.status.toString().split('.').last.tr.toUpperCase(),
                 style: TextStyle(
                   color: statusColor,
                   fontWeight: FontWeight.bold,
@@ -474,7 +476,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
               ),
               SizedBox(height: 4.h),
               Text(
-                "Payment: ${rental.paymentStatus.toString().split('.').last.toUpperCase()}",
+                "${"payment".tr}: ${rental.paymentStatus.toString().split('.').last.tr.toUpperCase()}",
                 style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 12.sp,
@@ -577,6 +579,6 @@ class RentalDetailView extends GetView<RentalDetailController> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy - hh:mm a').format(date);
+    return AFormatter.formatDate(date);
   }
 }

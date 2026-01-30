@@ -24,7 +24,7 @@ class NewRentalView extends StatelessWidget {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "New Rental",
+          "new_rental".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -38,7 +38,7 @@ class NewRentalView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// 1. Customer Section
-            _buildSectionLabel(context, "Customer"),
+            _buildSectionLabel(context, "customer_section".tr),
             SizedBox(height: 8.h),
             Row(
               children: [
@@ -72,14 +72,14 @@ class NewRentalView extends StatelessWidget {
             SizedBox(height: 24.h),
 
             /// 2. Rental Dates
-            _buildSectionLabel(context, "Rental Period"),
+            _buildSectionLabel(context, "rental_period".tr),
             SizedBox(height: 8.h),
             Row(
               children: [
                 Expanded(
                   child: _buildDateTimeCard(
                     context,
-                    "Start Date & Time",
+                    "start_date_time".tr,
                     controller.startDate,
                     controller.startTime,
                     () => controller.pickDate(true),
@@ -90,7 +90,7 @@ class NewRentalView extends StatelessWidget {
                 Expanded(
                   child: _buildDateTimeCard(
                     context,
-                    "Due Date & Time",
+                    "due_date_time".tr,
                     controller.dueDate,
                     controller.dueTime,
                     () => controller.pickDate(false),
@@ -106,7 +106,7 @@ class NewRentalView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSectionLabel(context, "Items"),
+                _buildSectionLabel(context, "items_section".tr),
                 Row(
                   children: [
                     TextButton.icon(
@@ -117,7 +117,7 @@ class NewRentalView extends StatelessWidget {
                         color: colorScheme.primary,
                       ),
                       label: Text(
-                        "Add Item",
+                        "add_item".tr,
                         style: TextStyle(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -132,7 +132,7 @@ class NewRentalView extends StatelessWidget {
                         size: 20.w,
                         color: colorScheme.primary,
                       ),
-                      tooltip: "Scan Item Code",
+                      tooltip: "scan_item_tooltip".tr,
                     ),
                   ],
                 ),
@@ -191,7 +191,7 @@ class NewRentalView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Draft Agreement",
+                    "draft_agreement".tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -221,15 +221,15 @@ class NewRentalView extends StatelessWidget {
       () => SizedBox(
         width: double.infinity,
         child: SegmentedButton<RentType>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: RentType.hourly,
-              label: Text("Hourly"),
+              label: Text("hourly".tr),
               icon: Icon(Iconsax.clock),
             ),
             ButtonSegment(
               value: RentType.daily,
-              label: Text("Daily"),
+              label: Text("daily".tr),
               icon: Icon(Iconsax.calendar),
             ),
           ],
@@ -331,7 +331,7 @@ class NewRentalView extends StatelessWidget {
                   Icon(Iconsax.user_add, color: colorScheme.onSurfaceVariant),
                   SizedBox(width: 8.w),
                   Text(
-                    "Select Customer",
+                    "select_customer".tr,
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 16.sp,
@@ -462,7 +462,7 @@ class NewRentalView extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              "No items added yet",
+              "no_items_added".tr,
               style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
           ],

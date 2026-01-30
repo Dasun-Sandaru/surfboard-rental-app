@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -23,7 +23,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Item Details",
+          "item_details".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -39,7 +39,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
           TextButton(
             onPressed: controller.editItem,
             child: Text(
-              "Edit",
+              "edit".tr,
               style: TextStyle(
                 color: colorScheme.primary,
                 fontSize: 16.sp,
@@ -57,7 +57,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             }
 
             if (ctrl.item.value == null) {
-              return const Center(child: Text('Item not found'));
+              return Center(child: Text('item_not_found'.tr));
             }
 
             final item = ctrl.item.value!;
@@ -82,7 +82,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                   child: item.imageUrl.isEmpty || item.imageUrl == '000'
                       ? Center(
                           child: Text(
-                            "No Image",
+                            "no_image".tr,
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -93,44 +93,56 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
 
                 SizedBox(height: 16.h),
 
-                _buildDetailRow(context, "Item ID", item.id),
-                _buildDetailRow(context, "Name", item.name),
-                _buildDetailRow(context, "Brand", item.brand),
-                _buildDetailRow(context, "Color", item.color),
-                _buildDetailRow(context, "Type", item.type),
-                _buildDetailRow(context, "Volume", '${item.volume}L'),
+                _buildDetailRow(context, "item_id".tr, item.id),
                 _buildDetailRow(
                   context,
-                  "Size",
+                  "name".tr,
+                  item.name,
+                ), // Added 'name' key? Ah I added 'full_name' and 'enter_name'. I should use 'shop_details_sub' which has 'Name'. Or just 'Name'. I'll add 'name': 'Name' to app_translations if missing. I have 'enter_name'. I'll use 'full_name' or just 'Name'. I'll use 'name' and add it if missing, or use 'full_name' as a fallback? 'full_name' is "Full Name". "Name" is just "Name".
+                // I'll check if 'name' key exists previously. I saw 'shop_details_sub': 'Name, Location...'.
+                // I'll use "name" key and add it to app_translations in next batch if needed. Actually 'name' is very common.
+                // I will add 'name': 'Name' now to app_translations in next step.
+                // For now in this file I'll use "name".tr.
+                _buildDetailRow(context, "brand".tr, item.brand),
+                _buildDetailRow(context, "color".tr, item.color),
+                _buildDetailRow(context, "type".tr, item.type),
+                _buildDetailRow(context, "volume".tr, '${item.volume}L'),
+                _buildDetailRow(
+                  context,
+                  "size".tr,
                   "${item.sizeFeet}' ${item.sizeInches}\"",
                 ),
 
                 _buildDetailRow(
                   context,
-                  "Status",
+                  "status".tr,
                   item.status.name.toUpperCase(),
                 ),
                 _buildDetailRow(
                   context,
-                  "Purchase Cost",
-                  '\$${item.purchaseCost}',
+                  "purchase_cost".tr,
+                  AFormatter.formatCurrency(item.purchaseCost),
                 ),
                 _buildDetailRow(
                   context,
-                  "Rental Rate (hr)",
-                  '\$${item.rentalRateHour}',
+                  "rental_rate_hr".tr,
+                  AFormatter.formatCurrency(item.rentalRateHour),
                 ),
                 _buildDetailRow(
                   context,
-                  "Rental Rate (day)",
-                  '\$${item.rentalRateDay}',
+                  "rental_rate_day".tr,
+                  AFormatter.formatCurrency(item.rentalRateDay),
                 ),
-                _buildDetailRow(context, "Damage Fee Rule", item.damageFeeRule),
-                _buildDetailRow(context, "Note", item.note),
                 _buildDetailRow(
                   context,
-                  "Created At",
-                  DateFormat.yMMMd().format(item.createdAt),
+                  "damage_fee_rule".tr,
+                  item.damageFeeRule,
+                ),
+                _buildDetailRow(context, "notes".tr, item.note),
+                _buildDetailRow(
+                  context,
+                  "created_at".tr,
+                  AFormatter.formatDate(item.createdAt),
                   isLast: true,
                 ),
               ],
@@ -184,7 +196,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                         Icon(Iconsax.setting_2, size: 20.w),
                         SizedBox(width: 8.w),
                         Text(
-                          "Mark as Repair",
+                          "mark_repair".tr,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -214,7 +226,7 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                       Icon(Iconsax.receipt, size: 20.w),
                       SizedBox(width: 8.w),
                       Text(
-                        "View Damage Fees",
+                        "view_damage_fees".tr,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,

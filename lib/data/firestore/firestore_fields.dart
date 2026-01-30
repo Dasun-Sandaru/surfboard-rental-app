@@ -113,5 +113,9 @@ class FirestoreFields {
   static const dailyGracePeriodHours = 'daily_grace_period_hours';
 
   // Agreement
+  // Agreement
   static const agreementText = 'agreement_text';
+
+  // Access Control
+  static const staffAccess = 'staff_access';
 }

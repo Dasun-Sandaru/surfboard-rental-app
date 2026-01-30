@@ -8,16 +8,18 @@ import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
-import 'package:surfboard_rental_app/utils/storage/app_storage.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';
 import '../views/edit_profile_view.dart';
 import '../views/edit_shop_view.dart';
+import '../views/access_control_view.dart';
+import '../../../../app/services/config_service.dart';
 
 class SettingsController extends GetxController {
   final UserService _userService = Get.find();
   final ShopService _shopService = Get.find();
   final AuthService _authService = Get.find();
+  final ConfigService _configService = Get.find();
 
   final Rx<Map<String, dynamic>> userProfile = Rx<Map<String, dynamic>>({});
   final Rx<Map<String, dynamic>> shopProfile = Rx<Map<String, dynamic>>({});
@@ -52,10 +54,10 @@ class SettingsController extends GetxController {
   final RxString currency = 'USD'.obs;
   final List<String> availableCurrencies = ['USD', 'EUR', 'LKR', 'AUD', 'GBP'];
 
-  final RxString currentLanguage = 'en'.obs;
+  RxString get currentLanguage => _configService.languageCode;
   final Map<String, String> supportedLanguages = {
     'en': 'English',
-    'es': 'Spanish',
+    'si': 'සිංහල',
   };
 
   // -- Rental Configuration --
@@ -103,11 +105,78 @@ class SettingsController extends GetxController {
     'Asia/Singapore',
   ];
 
+  // -- Access Control --
+  // Initialize with false by default for better security, or true if previously assumed
+  final RxMap<String, bool> staffAccessRules = <String, bool>{
+    // Operations
+    'new_rental': true,
+    'rentals': true, // Active Rentals
+    'rental_history': true,
+    'inventory': true,
+    'customers': true,
+    'alerts': true,
+    'qr_scanner': true,
+
+    // Financials & Reporting
+    'payments': true, // Might want to restrict
+    'damage_fee': true, // Might want to restrict
+    'reports': false,
+
+    // Config / Admin-like (usually restricted)
+    'manage_users': false,
+    'settings': false, // Usually staff shouldn't access full settings
+    'shop_setup': false,
+    'agreement_template': false,
+  }.obs;
+
+  final Map<String, String> AccessRouteLabels = {
+    'new_rental': 'New Rental',
+    'rentals': 'Active Rentals',
+    'rental_history': 'Rental History',
+    'inventory': 'Inventory Management',
+    'customers': 'Customer Management',
+    'alerts': 'Alerts & Notifications',
+    'qr_scanner': 'QR Scanner',
+    'payments': 'Payments & Transactions',
+    'damage_fee': 'Damage Fee Configuration',
+    'reports': 'Reports & Analytics',
+    'manage_users': 'User Management',
+    'settings': 'App Settings',
+    'shop_setup': 'Shop Configuration',
+    'agreement_template': 'Agreement Templates',
+  };
+
+  final List<Map<String, dynamic>> accessGroups = [
+    {
+      'title': 'operations_group', // "Operations"
+      'keys': [
+        'new_rental',
+        'rentals',
+        'rental_history',
+        'inventory',
+        'customers',
+        'qr_scanner',
+        'alerts',
+      ],
+    },
+    {
+      'title': 'financials_group', // "Financials"
+      'keys': ['payments', 'damage_fee'],
+    },
+    {
+      'title': 'analytics_group', // "Analytics"
+      'keys': ['reports'],
+    },
+    {
+      'title': 'admin_only_group', // "Administration"
+      'keys': ['manage_users', 'settings', 'shop_setup', 'agreement_template'],
+    },
+  ];
+
   @override
   void onInit() {
     super.onInit();
     _loadData();
-    _loadLanguage();
   }
 
   Future<void> _loadData() async {
@@ -148,6 +217,19 @@ class SettingsController extends GetxController {
       dateFormat.value = shopData[FirestoreFields.dateFormat] ?? 'dd/MM/yyyy';
       timeZone.value = shopData[FirestoreFields.timeZone] ?? 'UTC';
 
+      // Sync Global Config
+      _configService.updateConfig(
+        newCurrency: currency.value,
+        newDateFormat: dateFormat.value,
+        newTimeZone: timeZone.value,
+        newHourlyGrace:
+            shopData[FirestoreFields.hourlyGracePeriodMinutes] ?? 15,
+        newDailyGrace: shopData[FirestoreFields.dailyGracePeriodHours] ?? 1,
+        newTaxRate:
+            (shopData[FirestoreFields.taxRate] as num?)?.toDouble() ?? 0.0,
+        newIsTaxEnabled: shopData[FirestoreFields.isTaxEnabled] ?? false,
+      );
+
       // Load Rental Config
       defaultHourlyRateController.text =
           (shopData[FirestoreFields.defaultHourlyRate] ?? '').toString();
@@ -161,6 +243,15 @@ class SettingsController extends GetxController {
           (shopData[FirestoreFields.hourlyGracePeriodMinutes] ?? 15).toString();
       dailyGracePeriodController.text =
           (shopData[FirestoreFields.dailyGracePeriodHours] ?? 1).toString();
+
+      // Load Access Rules
+      final accessData =
+          shopData[FirestoreFields.staffAccess] as Map<String, dynamic>?;
+      if (accessData != null) {
+        staffAccessRules.assignAll(
+          accessData.map((key, value) => MapEntry(key, value as bool)),
+        );
+      }
     } catch (e) {
       AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
     }
@@ -281,6 +372,14 @@ class SettingsController extends GetxController {
         FirestoreFields.dailyGracePeriodHours: dailyGrace,
       });
 
+      // Update global config immediately
+      _configService.updateConfig(
+        newHourlyGrace: hourlyGrace,
+        newDailyGrace: dailyGrace,
+        newTaxRate: taxRate,
+        newIsTaxEnabled: isTaxEnabled.value,
+      );
+
       Get.back(); // Close dialog or view
       _loadData();
       AppSnackBar.success(
@@ -361,7 +460,7 @@ class SettingsController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Select Currency",
+              "select_currency".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -396,6 +495,7 @@ class SettingsController extends GetxController {
         FirestoreFields.currency: newCurrency,
       });
       currency.value = newCurrency;
+      _configService.updateConfig(newCurrency: newCurrency);
       AppSnackBar.success(
         title: "Success",
         message: "Currency updated to $newCurrency",
@@ -417,7 +517,7 @@ class SettingsController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Select Date Format",
+              "select_date_format".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -452,6 +552,7 @@ class SettingsController extends GetxController {
         FirestoreFields.dateFormat: newFormat,
       });
       dateFormat.value = newFormat;
+      _configService.updateConfig(newDateFormat: newFormat);
       AppSnackBar.success(title: "Success", message: "Date format updated");
     } catch (e) {
       AppSnackBar.error(
@@ -473,7 +574,7 @@ class SettingsController extends GetxController {
         child: Column(
           children: [
             Text(
-              "Select Time Zone",
+              "select_time_zone".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -515,6 +616,7 @@ class SettingsController extends GetxController {
         FirestoreFields.timeZone: newTimeZone,
       });
       timeZone.value = newTimeZone;
+      _configService.updateConfig(newTimeZone: newTimeZone);
       AppSnackBar.success(title: "Success", message: "Time zone updated");
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to update time zone");
@@ -533,7 +635,7 @@ class SettingsController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Select Language",
+              "select_language".tr,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -561,28 +663,16 @@ class SettingsController extends GetxController {
   }
 
   void updateLanguage(String langCode) {
-    Get.updateLocale(Locale(langCode));
-    currentLanguage.value = langCode;
-    AppLocalStorage().saveData('lang', langCode);
+    _configService.updateLanguage(langCode);
     Get.back();
-  }
-
-  void _loadLanguage() {
-    final savedLang = AppLocalStorage().readData<String>('lang');
-    final locale = savedLang ?? Get.deviceLocale?.languageCode ?? 'en';
-    if (supportedLanguages.containsKey(locale)) {
-      currentLanguage.value = locale;
-    } else {
-      currentLanguage.value = 'en';
-    }
   }
 
   void logout() {
     Get.defaultDialog(
-      title: "Logout",
-      middleText: "Are you sure you want to logout?",
-      textConfirm: "Yes",
-      textCancel: "No",
+      title: "logout".tr,
+      middleText: "logout_confirm_msg".tr,
+      textConfirm: "yes".tr,
+      textCancel: "no".tr,
       confirmTextColor: Colors.white,
       onConfirm: () {
         // Auth Logic
@@ -596,19 +686,19 @@ class SettingsController extends GetxController {
   void addItem(String title, RxList<dynamic> list) {
     textInputController.clear();
     Get.defaultDialog(
-      title: "Add $title",
+      title: "${'add'.tr} $title",
       content: Padding(
         padding: const EdgeInsets.all(16.0),
         child: TextField(
           controller: textInputController,
           decoration: InputDecoration(
-            hintText: "Enter $title name",
+            hintText: "${'enter_name'.tr} $title",
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
       ),
-      textConfirm: "Add",
-      textCancel: "Cancel",
+      textConfirm: "add".tr,
+      textCancel: "cancel".tr,
       confirmTextColor: Colors.white,
       onConfirm: () {
         if (textInputController.text.isNotEmpty) {
@@ -626,10 +716,10 @@ class SettingsController extends GetxController {
   // Generic function to remove item
   void removeItem(dynamic item, RxList<dynamic> list) {
     Get.defaultDialog(
-      title: "Remove Item",
-      middleText: "Delete '$item' from the list?",
-      textConfirm: "Delete",
-      textCancel: "Cancel",
+      title: "remove_item".tr,
+      middleText: "delete_confirm_msg".tr,
+      textConfirm: "delete".tr,
+      textCancel: "cancel".tr,
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () {
@@ -641,5 +731,30 @@ class SettingsController extends GetxController {
 
   void navigateToInventorySettings() {
     Get.to(() => const InventoryConfigView());
+  }
+
+  void navigateToAccessControl() {
+    Get.to(() => const AccessControlView());
+  }
+
+  Future<void> toggleAccess(String key, bool value) async {
+    staffAccessRules[key] = value;
+
+    // Save to Firestore
+    try {
+      final shopId = shopProfile.value[FirestoreFields.id];
+      if (shopId != null) {
+        await _shopService.updateShopFields(shopId, {
+          FirestoreFields.staffAccess: staffAccessRules,
+        });
+      }
+
+      // Sync with global config service immediately
+      _configService.updateAccessRules(staffAccessRules);
+    } catch (e) {
+      AppSnackBar.error(title: "Error", message: "Failed to save access rule");
+      // Revert on failure
+      staffAccessRules[key] = !value;
+    }
   }
 }

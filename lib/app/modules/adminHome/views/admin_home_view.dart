@@ -50,7 +50,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
 
           /// Welcome Text
           Text(
-            "Welcome, Admin!",
+            "welcome_admin".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 28.sp,
@@ -68,7 +68,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
 
           /// Section Header
           Text(
-            "Management",
+            "management".tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,
@@ -129,19 +129,19 @@ class AdminHomeView extends GetView<AdminHomeController> {
     // Data For Stats
     final stats = [
       {
-        'title': 'Active Rentals',
+        'title': 'active_rentals'.tr,
         'count': controller.activeRentals.value.toString(),
       },
       {
-        'title': 'Boards Available',
+        'title': 'boards_available'.tr,
         'count': controller.boardsAvailable.value.toString(),
       },
       {
-        'title': 'Damages Pending',
+        'title': 'damages_pending'.tr,
         'count': controller.damagesPending.value.toString(),
       },
       {
-        'title': 'Total Customers',
+        'title': 'total_customers'.tr,
         'count': controller.totalCustomers.value.toString(),
       },
     ];
@@ -153,7 +153,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         crossAxisCount: 2,
         crossAxisSpacing: 12.w,
         mainAxisSpacing: 12.h,
-        childAspectRatio: 1.4,
+        childAspectRatio: 1.3,
       ),
       itemCount: stats.length,
       itemBuilder: (context, index) {
@@ -206,18 +206,34 @@ class AdminHomeView extends GetView<AdminHomeController> {
     final colorScheme = Theme.of(context).colorScheme;
     // Data For Management Menu
     final menuItems = [
-      {'title': 'Manage Users', 'sub': 'Staff & admin', 'icon': Iconsax.people},
-      {'title': 'Inventory', 'sub': 'Boards & gear', 'icon': Iconsax.box},
-      {'title': 'Customers', 'sub': 'Customer list', 'icon': Iconsax.user},
-      {'title': 'Rentals', 'sub': 'Rental history', 'icon': Iconsax.receipt},
-      {'title': 'Reports', 'sub': 'Performance', 'icon': Iconsax.chart},
       {
-        'title': 'Agreements',
-        'sub': 'Waivers & forms',
+        'title': 'manage_users'.tr,
+        'sub': 'users_sub'.tr,
+        'icon': Iconsax.people,
+      },
+      {'title': 'inventory'.tr, 'sub': 'inventory_sub'.tr, 'icon': Iconsax.box},
+      {
+        'title': 'customers'.tr,
+        'sub': 'customers_sub'.tr,
+        'icon': Iconsax.user,
+      },
+      {'title': 'rentals'.tr, 'sub': 'rentals_sub'.tr, 'icon': Iconsax.receipt},
+      {'title': 'reports'.tr, 'sub': 'reports_sub'.tr, 'icon': Iconsax.chart},
+      {
+        'title': 'agreements'.tr,
+        'sub': 'agreements_sub'.tr,
         'icon': Iconsax.document_text,
       },
-      {'title': 'Settings', 'sub': 'App config', 'icon': Iconsax.setting_2},
-      {'title': 'Seed Data', 'sub': 'DEBUG: Add samples', 'icon': Iconsax.data},
+      {
+        'title': 'settings'.tr,
+        'sub': 'settings_sub'.tr,
+        'icon': Iconsax.setting_2,
+      },
+      {
+        'title': 'seed_data'.tr,
+        'sub': 'seed_data_sub'.tr,
+        'icon': Iconsax.data,
+      },
     ];
 
     return GridView.builder(
@@ -227,7 +243,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         crossAxisCount: 2,
         crossAxisSpacing: 12.w,
         mainAxisSpacing: 12.h,
-        childAspectRatio: 1.3,
+        childAspectRatio: 1.1,
       ),
       itemCount: menuItems.length,
       itemBuilder: (context, index) {
@@ -319,18 +335,18 @@ class AdminHomeView extends GetView<AdminHomeController> {
           unselectedItemColor: colorScheme.onSurfaceVariant,
           selectedFontSize: 12.sp,
           unselectedFontSize: 12.sp,
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Iconsax.element_4),
-              label: "Dashboard",
+              label: "dashboard_tab".tr,
             ),
             BottomNavigationBarItem(
               icon: Icon(Iconsax.add_circle),
-              label: "New Rental",
+              label: "new_rental_tab".tr,
             ),
             BottomNavigationBarItem(
               icon: Icon(Iconsax.notification),
-              label: "Alerts",
+              label: "alerts_tab".tr,
             ),
           ],
         ),

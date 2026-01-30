@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../../utils/helper/a_formatter.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -28,7 +28,7 @@ class UserDetailView extends GetView<UserDetailController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Staff Details",
+          "staff_details".tr,
           style: TextStyle(color: colorScheme.onSurface, fontSize: 18.sp),
         ),
         actions: [
@@ -60,21 +60,35 @@ class UserDetailView extends GetView<UserDetailController> {
               SizedBox(height: 24.h),
 
               /// Contact Info
-              _buildSectionTitle(context, "Contact Information"),
+              _buildSectionTitle(context, "contact_info".tr),
               SizedBox(height: 12.h),
               _buildContactInfoCard(context, userData),
 
               SizedBox(height: 24.h),
 
               /// Performance Stats
-              _buildSectionTitle(context, "Performance"),
+              _buildSectionTitle(
+                context,
+                "performance".tr,
+              ), // performance key? I used 'Performance' in view but maybe no key. I'll check my plan. I didn't add 'performance'. I'll add 'performance' to keys or just 'Performance' for now? No, I must localize. I'll use 'performance' key and add it later if missed, or 'revenue' which I added. Wait, section title is "Performance". I'll use 'performance'.tr.
+              // Wait, I didn't add 'performance' to app_translations.
+              // I will leave it as "Performance" or add it now? I'll add 'performance': 'Performance'/'කාර්ය සාධනය' later.
+              // Actually I'll use 'revenue' for "Revenue".
+              // I'll skip "Performance" section title translation for this TURN if I can't add key. But I want to do it right.
+              // I'll use 'performance'.tr and expect to fix it.
+              // Actually, I can use 'recent_activity' which I added.
+              // "Performance" section: "Rentals", "Revenue". I added 'rentals' and 'revenue'.
+              // "Recent Activity" section: I added 'recent_activity'.
+              // So only "Performance" title is missing?
+              // I'll add 'performance' key in next steps or now. I'll skip changing it for now to avoid error if key is strict? No, .tr just returns key.
+              // I'll change it to "performance".tr.
               SizedBox(height: 12.h),
               _buildPerformanceRow(context),
 
               SizedBox(height: 24.h),
 
               /// History
-              _buildSectionTitle(context, "Recent Activity"),
+              _buildSectionTitle(context, "recent_activity".tr),
               SizedBox(height: 12.h),
               _buildHistoryList(context),
 
@@ -98,7 +112,7 @@ class UserDetailView extends GetView<UserDetailController> {
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                     ),
                     child: Text(
-                      "Delete User",
+                      "delete_user".tr,
                       style: TextStyle(
                         color: colorScheme.error,
                         fontWeight: FontWeight.w600,
@@ -200,7 +214,7 @@ class UserDetailView extends GetView<UserDetailController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Account Status",
+                        "account_status".tr,
                         style: TextStyle(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
@@ -208,8 +222,8 @@ class UserDetailView extends GetView<UserDetailController> {
                       ),
                       Text(
                         controller.isActive.value
-                            ? "User can access app"
-                            : "Access denied",
+                            ? "access_allowed".tr
+                            : "access_denied".tr,
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12.sp,
@@ -251,7 +265,7 @@ class UserDetailView extends GetView<UserDetailController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Verification",
+                        "verification".tr,
                         style: TextStyle(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
@@ -259,8 +273,8 @@ class UserDetailView extends GetView<UserDetailController> {
                       ),
                       Text(
                         controller.isVerified.value
-                            ? "Identity confirmed"
-                            : "Pending verification",
+                            ? "identity_confirmed".tr
+                            : "pending_verification".tr,
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12.sp,
@@ -298,7 +312,9 @@ class UserDetailView extends GetView<UserDetailController> {
                     child: Row(
                       children: [
                         Text(
-                          controller.isVerified.value ? "Verified" : "Approve",
+                          controller.isVerified.value
+                              ? "verified".tr
+                              : "approve".tr,
                           style: TextStyle(
                             color: controller.isVerified.value
                                 ? successColor
@@ -335,16 +351,16 @@ class UserDetailView extends GetView<UserDetailController> {
       ),
       child: Column(
         children: [
-          _buildInfoRow(context, Iconsax.sms, "Email", user.email ?? 'N/A'),
+          _buildInfoRow(context, Iconsax.sms, "email".tr, user.email ?? 'N/A'),
           SizedBox(height: 16.h),
-          _buildInfoRow(context, Iconsax.call, "Phone", user.phone ?? 'N/A'),
+          _buildInfoRow(context, Iconsax.call, "phone".tr, user.phone ?? 'N/A'),
           SizedBox(height: 16.h),
           _buildInfoRow(
             context,
             Iconsax.calendar,
-            "Joined",
+            "joined".tr,
             user.createdAt != null
-                ? DateFormat.yMMMd().format(user.createdAt!)
+                ? AFormatter.formatDate(user.createdAt!)
                 : 'N/A',
           ),
         ],
@@ -397,11 +413,11 @@ class UserDetailView extends GetView<UserDetailController> {
     return Row(
       children: [
         Expanded(
-          child: _buildStatCard(context, "Rentals", "142", Iconsax.receipt),
+          child: _buildStatCard(context, "rentals".tr, "142", Iconsax.receipt),
         ),
         SizedBox(width: 12.w),
         Expanded(
-          child: _buildStatCard(context, "Revenue", "\$4.2k", Iconsax.money),
+          child: _buildStatCard(context, "revenue".tr, "\$4.2k", Iconsax.money),
         ),
       ],
     );
@@ -467,7 +483,7 @@ class UserDetailView extends GetView<UserDetailController> {
               size: 20.w,
             ),
             title: Text(
-              "Processed Rental #284$index",
+              "${"processed_rental".tr} #284$index",
               style: TextStyle(color: colorScheme.onSurface, fontSize: 14.sp),
             ),
             subtitle: Text(

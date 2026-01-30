@@ -17,7 +17,7 @@ class InventoryListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(InventoryController());
-    final isSelectionMode = Get.arguments?['selectMode'] ?? false;
+    final isSelectionMode = controller.isSelectMode.value;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -26,7 +26,7 @@ class InventoryListView extends StatelessWidget {
         showbackArrow: true,
         centerTitle: true,
         title: Text(
-          isSelectionMode ? 'Select Board' : 'Inventory',
+          isSelectionMode ? 'select_board'.tr : 'inventory'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -59,7 +59,7 @@ class InventoryListView extends StatelessWidget {
                           color: colorScheme.onSurfaceVariant,
                         ),
                         Text(
-                          'No inventory found',
+                          'no_inventory_found'.tr,
                           style: TextStyle(color: Colors.white),
                         ),
                       ],
@@ -198,7 +198,7 @@ class InventoryListView extends StatelessWidget {
             Icon(icon, color: textColor, size: 18.w),
             SizedBox(width: 8.w),
             Text(
-              label,
+              label.toLowerCase().tr,
               style: TextStyle(color: textColor, fontSize: 14.sp),
             ),
             SizedBox(width: 4.w),
@@ -246,7 +246,7 @@ class InventoryListView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Filter by $type",
+                  "${"filter_by".tr} ${type.toLowerCase().tr}",
                   style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 20.sp,
@@ -256,7 +256,7 @@ class InventoryListView extends StatelessWidget {
                 TextButton(
                   onPressed: controller.resetFilters,
                   child: Text(
-                    "Reset",
+                    "reset".tr,
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
                 ),
@@ -277,7 +277,7 @@ class InventoryListView extends StatelessWidget {
               height: 54.h,
               child: ElevatedButton(
                 onPressed: controller.applyFilters,
-                child: const Text("Apply Filters"),
+                child: Text("apply_filters".tr),
               ),
             ),
           ],
@@ -345,7 +345,7 @@ class InventoryListView extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              "Surfboard Size",
+              "surfboard_size".tr,
               style: TextStyle(color: colorScheme.onSurface, fontSize: 14.sp),
             ),
           ),
@@ -383,7 +383,7 @@ class InventoryListView extends StatelessWidget {
               controller: controller.feetSizeController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: 'Ft',
+                labelText: 'ft'.tr,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
                 ),
@@ -401,7 +401,7 @@ class InventoryListView extends StatelessWidget {
               controller: controller.inchesSizeController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: 'In',
+                labelText: 'in'.tr,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
                 ),
@@ -423,7 +423,7 @@ class InventoryListView extends StatelessWidget {
     InventoryModel item,
     InventoryController controller,
   ) {
-    final isSelectionMode = Get.arguments?['selectMode'] ?? false;
+    final isSelectionMode = controller.isSelectMode.value;
     final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(

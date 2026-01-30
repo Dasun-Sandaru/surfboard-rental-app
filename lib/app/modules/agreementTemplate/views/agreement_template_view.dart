@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
@@ -200,7 +200,7 @@ class AgreementTemplateListView extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "Last Updated: ${DateFormat.yMMMd().format(template.updatedAt)}",
+                    "Last Updated: ${AFormatter.formatDate(template.updatedAt)}",
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 13.sp,

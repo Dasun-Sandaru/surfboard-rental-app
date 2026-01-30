@@ -21,7 +21,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Damage Fee Rules",
+          "damage_fee_rules".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -88,7 +88,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
                       Icon(Iconsax.add, size: 24.w),
                       SizedBox(width: 8.w),
                       Text(
-                        "Add Damage Rule",
+                        "add_damage_rule".tr,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -224,7 +224,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
           ),
           SizedBox(height: 16.h),
           Text(
-            "No damage fee rules found.",
+            "no_damage_rules".tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 16.sp,
@@ -232,7 +232,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            "Tap the button below to add a new rule.",
+            "tap_add_rule".tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant.withOpacity(0.7),
               fontSize: 14.sp,

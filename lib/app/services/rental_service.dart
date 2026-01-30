@@ -94,7 +94,8 @@ class RentalService {
         }
 
         final currentStatus = inventorySnap.get(FirestoreFields.status);
-        if (currentStatus != InventoryStatus.available.name) {
+        if (currentStatus !=
+            InventoryStatus.available.toString().split('.').last) {
           throw Exception(
             "Item is not available for rent! (Status: $currentStatus)",
           );
@@ -110,7 +111,10 @@ class RentalService {
 
         // Update Inventory Status
         transaction.update(inventoryRef, {
-          FirestoreFields.status: InventoryStatus.rented.name,
+          FirestoreFields.status: InventoryStatus.rented
+              .toString()
+              .split('.')
+              .last,
         });
 
         // Update Customer Stats
@@ -229,14 +233,14 @@ class RentalService {
 
         // Update rental status
         transaction.update(rentalRef, {
-          FirestoreFields.status: status.name,
+          FirestoreFields.status: status.toString().split('.').last,
           FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
           if (overdueTime != null) FirestoreFields.overdueTime: overdueTime,
         });
 
         // Update inventory item status based on damage
         transaction.update(inventoryRef, {
-          FirestoreFields.status: inventoryStatus.name,
+          FirestoreFields.status: inventoryStatus.toString().split('.').last,
         });
 
         // Log Activity
@@ -246,7 +250,10 @@ class RentalService {
           description: "Returned rental $rentalId",
           entityId: rentalId,
           entityType: 'Rental',
-          metadata: {'itemId': itemId, 'inventoryStatus': inventoryStatus.name},
+          metadata: {
+            'itemId': itemId,
+            'inventoryStatus': inventoryStatus.toString().split('.').last,
+          },
           transaction: transaction,
         );
       });
@@ -293,7 +300,9 @@ class RentalService {
       final docRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
-      await docRef.update({FirestoreFields.status: status.name});
+      await docRef.update({
+        FirestoreFields.status: status.toString().split('.').last,
+      });
     } catch (e) {
       log('Error updating rental status: $e', name: logName);
       rethrow;
@@ -309,7 +318,9 @@ class RentalService {
       final docRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.inventory).doc(itemId);
-      await docRef.update({FirestoreFields.status: status.name});
+      await docRef.update({
+        FirestoreFields.status: status.toString().split('.').last,
+      });
     } catch (e) {
       log('Error updating inventory status: $e', name: logName);
       rethrow;
@@ -330,7 +341,10 @@ class RentalService {
       Query query = _shopRef(shopId).collection(FirestoreCollections.rentals);
 
       if (status != null) {
-        query = query.where(FirestoreFields.status, isEqualTo: status.name);
+        query = query.where(
+          FirestoreFields.status,
+          isEqualTo: status.toString().split('.').last,
+        );
       }
 
       if (startDate != null && endDate != null) {

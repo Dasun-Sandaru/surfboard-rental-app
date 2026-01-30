@@ -13,7 +13,6 @@ import '../services/user_service.dart';
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(ConfigService(), permanent: true);
     Get.put(AuthService(), permanent: true);
     Get.put(UserService(), permanent: true);
     Get.put(ShopService(), permanent: true);
@@ -22,5 +21,6 @@ class InitialBinding extends Bindings {
     Get.put(RentalService(), permanent: true);
     Get.put(PaymentService(), permanent: true);
     Get.put(DamageReportService(), permanent: true);
+    Get.put(ConfigService(), permanent: true);
   }
 }

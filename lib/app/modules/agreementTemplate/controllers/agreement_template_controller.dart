@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
@@ -44,10 +44,7 @@ class AgreementTemplateController extends GetxController {
       final fetchedTemplates = await _templateService.getShopTemplates(shopId!);
       templates.assignAll(fetchedTemplates);
     } catch (e) {
-      AppSnackBar.error(
-        title: "Error",
-        message: "Failed to fetch templates.",
-      );
+      AppSnackBar.error(title: "Error", message: "Failed to fetch templates.");
     } finally {
       isLoading.value = false;
     }
@@ -97,10 +94,7 @@ class AgreementTemplateController extends GetxController {
           message: "Template saved successfully!",
         );
       } catch (e) {
-        AppSnackBar.error(
-          title: "Error",
-          message: "Failed to save template.",
-        );
+        AppSnackBar.error(title: "Error", message: "Failed to save template.");
       } finally {
         isLoading.value = false;
       }
@@ -114,10 +108,10 @@ class AgreementTemplateController extends GetxController {
       FirestoreFields.email: "john.doe@example.com",
     };
     final rental = {
-      "startDate": DateFormat('MMM dd, yyyy').format(DateTime.now()),
-      "endDate": DateFormat(
-        'MMM dd, yyyy',
-      ).format(DateTime.now().add(const Duration(days: 3))),
+      "startDate": AFormatter.formatDate(DateTime.now()),
+      "endDate": AFormatter.formatDate(
+        DateTime.now().add(const Duration(days: 3)),
+      ),
       "totalCost": "150.00",
     };
 

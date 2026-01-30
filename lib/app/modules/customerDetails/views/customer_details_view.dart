@@ -22,7 +22,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Customer Profile",
+          "customer_profile".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -33,7 +33,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
           TextButton(
             onPressed: controller.editCustomer,
             child: Text(
-              "Edit",
+              "edit".tr,
               style: TextStyle(
                 color: colorScheme.primary,
                 fontSize: 16.sp,
@@ -51,7 +51,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
 
         final customer = controller.customer.value;
         if (customer == null) {
-          return const Center(child: Text('Customer not found'));
+          return Center(child: Text('customer_not_found'.tr));
         }
 
         return SingleChildScrollView(
@@ -69,7 +69,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
               SizedBox(height: 24.h),
 
               /// 3. History Section
-              _buildSectionHeader(context, "Rental History"),
+              _buildSectionHeader(context, "rental_history".tr),
               SizedBox(height: 12.h),
               _buildHistoryList(context, controller),
 
@@ -157,28 +157,28 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
               _buildActionButton(
                 context,
                 icon: Iconsax.call,
-                label: "Call",
+                label: "call".tr,
                 onTap: controller.makeCall,
               ),
               SizedBox(width: 16.w),
               _buildActionButton(
                 context,
                 icon: Iconsax.sms,
-                label: "Message",
+                label: "message".tr,
                 onTap: controller.makeCall,
               ),
               SizedBox(width: 16.w),
               _buildActionButton(
                 context,
                 icon: Iconsax.direct,
-                label: "Email",
+                label: "email".tr,
                 onTap: controller.sendEmail,
               ),
               SizedBox(width: 16.w),
               _buildActionButton(
                 context,
                 icon: Iconsax.scan_barcode4,
-                label: "My QR",
+                label: "my_qr".tr,
                 onTap: controller.showQR,
               ),
               SizedBox(width: ASizes.defaultPadding),
@@ -232,20 +232,20 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
       ),
       child: Column(
         children: [
-          _buildDetailRow(context, "Phone", customer.phone, Iconsax.call),
+          _buildDetailRow(context, "phone".tr, customer.phone, Iconsax.call),
           Divider(color: colorScheme.outline, height: 24.h),
-          _buildDetailRow(context, "Email", customer.email, Iconsax.sms),
+          _buildDetailRow(context, "email".tr, customer.email, Iconsax.sms),
           Divider(color: colorScheme.outline, height: 24.h),
           _buildDetailRow(
             context,
-            "NIC / Passport",
+            "nic_passport".tr,
             customer.nic,
             Iconsax.card,
           ),
           Divider(color: colorScheme.outline, height: 24.h),
           _buildDetailRow(
             context,
-            "Notes",
+            "notes".tr,
             customer.notes,
             Iconsax.note,
             isMultiLine: true,
@@ -327,7 +327,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         separatorBuilder: (c, i) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
           final item = controller.history[index];
-          final bool isLate = item['status'] == "Late Return";
+          final bool isLate = item['status'] == "late_return";
           final Color statusColor = isLate
               ? (statusColors?.warning ?? Colors.orange)
               : (statusColors?.success ?? Colors.green);
@@ -418,7 +418,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    item['status'],
+                    (item['status'] as String).tr,
                     style: TextStyle(
                       color: statusColor,
                       fontSize: 10.sp,

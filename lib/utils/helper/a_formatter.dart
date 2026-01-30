@@ -6,17 +6,37 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'package:surfboard_rental_app/app/services/config_service.dart';
+
 class AFormatter {
   static String formatDate(DateTime? date, {String? sdate}) {
-    // Default output format is just the date. Pass `outputFormat` to change.
-    return formatDateWithFormat(date, sdate: sdate, outputFormat: 'yyyy-MM-dd');
+    String format = 'yyyy-MM-dd'; // Fallback
+    if (Get.isRegistered<ConfigService>()) {
+      format = Get.find<ConfigService>().dateFormat.value;
+    }
+    return formatDateWithFormat(date, sdate: sdate, outputFormat: format);
   }
 
-  static String formatCurrency(String amount) {
-    double priceDouble = double.parse(amount);
+  static String formatCurrency(dynamic amount) {
+    double priceDouble = 0.0;
+    if (amount is String) {
+      priceDouble = double.tryParse(amount) ?? 0.0;
+    } else if (amount is num) {
+      priceDouble = amount.toDouble();
+    }
+
+    String currencyCode = 'USD';
+    if (Get.isRegistered<ConfigService>()) {
+      currencyCode = Get.find<ConfigService>().currency.value;
+    }
+
+    // Get the symbol for the currency code to append a space
+    final simpleFormat = NumberFormat.simpleCurrency(name: currencyCode);
+    final String symbol = simpleFormat.currencySymbol;
+
     return NumberFormat.currency(
-      locale: 'en_US',
-      symbol: '\$',
+      name: currencyCode,
+      symbol: '$symbol ', // Add space after symbol
     ).format(priceDouble);
   }
 

@@ -5,6 +5,7 @@ import '../middleware/auth_middleware.dart';
 import '../middleware/maintenance_middleware.dart';
 import '../middleware/onboarding_middleware.dart';
 import '../middleware/role_middleware.dart';
+import '../middleware/access_control_middleware.dart';
 import '../modules/addEditCustomer/bindings/add_edit_customer_binding.dart';
 import '../modules/addEditCustomer/views/add_edit_customer_view.dart';
 import '../modules/addInventory/bindings/add_inventory_binding.dart';
@@ -159,16 +160,19 @@ class AppPages {
       name: _Paths.NEW_RENTAL,
       page: () => const NewRentalView(),
       binding: NewRentalBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'new_rental')],
     ),
     GetPage(
       name: _Paths.ALERTS,
       page: () => const AlertsView(),
       binding: AlertsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'alerts')],
     ),
     GetPage(
       name: _Paths.MANAGE_USERS,
       page: () => const ManageUsersView(),
       binding: ManageUsersBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'manage_users')],
     ),
     GetPage(
       name: _Paths.USER_DETAIL,
@@ -179,6 +183,7 @@ class AppPages {
       name: _Paths.INVENTORY,
       page: () => const InventoryListView(),
       binding: InventoryBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'inventory')],
     ),
     GetPage(
       name: _Paths.ADD_INVENTORY,
@@ -189,6 +194,7 @@ class AppPages {
       name: _Paths.SETTINGS,
       page: () => const SettingsView(),
       binding: SettingsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'settings')],
     ),
     GetPage(
       name: _Paths.ITEM_DETAILS,
@@ -199,6 +205,7 @@ class AppPages {
       name: _Paths.CUSTOMER_LIST,
       page: () => const CustomerListView(),
       binding: CustomerListBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'customers')],
     ),
     GetPage(
       name: _Paths.ADD_EDIT_CUSTOMER,
@@ -214,6 +221,7 @@ class AppPages {
       name: _Paths.DAMAGE_FEE,
       page: () => const DamageFeeView(),
       binding: DamageFeeBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'damage_fee')],
     ),
     GetPage(
       name: _Paths.AGREEMENT_WIZARD,
@@ -230,11 +238,13 @@ class AppPages {
       name: _Paths.AGREEMENT_TEMPLATE,
       page: () => const AgreementTemplateListView(),
       binding: AgreementTemplateBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'agreement_template')],
     ),
     GetPage(
       name: _Paths.RENTALS,
       page: () => const RentalsView(),
       binding: RentalsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'rentals')],
     ),
     GetPage(
       name: _Paths.RENTAL_DETAIL,
@@ -250,6 +260,7 @@ class AppPages {
       name: _Paths.PAYMENTS,
       page: () => const RentalPaymentView(),
       binding: RentalPaymentBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'payments')],
     ),
     GetPage(
       name: _Paths.DAMAGE_REPORT,
@@ -265,11 +276,13 @@ class AppPages {
       name: _Paths.QR_SCANNER,
       page: () => const QrScannerView(),
       binding: QrScannerBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'qr_scanner')],
     ),
     GetPage(
       name: _Paths.RENTAL_HISTORY,
       page: () => const RentalHistoryView(),
       binding: RentalHistoryBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'rental_history')],
     ),
   ];
 }
