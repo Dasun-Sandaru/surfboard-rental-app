@@ -17,7 +17,7 @@ class InventoryListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(InventoryController());
-    final isSelectionMode = Get.arguments?['selectMode'] ?? false;
+    final isSelectionMode = controller.isSelectMode.value;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -423,7 +423,7 @@ class InventoryListView extends StatelessWidget {
     InventoryModel item,
     InventoryController controller,
   ) {
-    final isSelectionMode = Get.arguments?['selectMode'] ?? false;
+    final isSelectionMode = controller.isSelectMode.value;
     final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(

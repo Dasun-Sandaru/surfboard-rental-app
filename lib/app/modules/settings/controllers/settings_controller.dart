@@ -8,16 +8,17 @@ import 'package:surfboard_rental_app/app/services/user_service.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 
-import 'package:surfboard_rental_app/utils/storage/app_storage.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';
 import '../views/edit_profile_view.dart';
 import '../views/edit_shop_view.dart';
+import '../../../../app/services/config_service.dart';
 
 class SettingsController extends GetxController {
   final UserService _userService = Get.find();
   final ShopService _shopService = Get.find();
   final AuthService _authService = Get.find();
+  final ConfigService _configService = Get.find();
 
   final Rx<Map<String, dynamic>> userProfile = Rx<Map<String, dynamic>>({});
   final Rx<Map<String, dynamic>> shopProfile = Rx<Map<String, dynamic>>({});
@@ -52,10 +53,11 @@ class SettingsController extends GetxController {
   final RxString currency = 'USD'.obs;
   final List<String> availableCurrencies = ['USD', 'EUR', 'LKR', 'AUD', 'GBP'];
 
-  final RxString currentLanguage = 'en'.obs;
+  RxString get currentLanguage => _configService.languageCode;
   final Map<String, String> supportedLanguages = {
     'en': 'English',
     'es': 'Spanish',
+    'si': 'Sinhala',
   };
 
   // -- Rental Configuration --
@@ -107,7 +109,6 @@ class SettingsController extends GetxController {
   void onInit() {
     super.onInit();
     _loadData();
-    _loadLanguage();
   }
 
   Future<void> _loadData() async {
@@ -147,6 +148,19 @@ class SettingsController extends GetxController {
       currency.value = shopData[FirestoreFields.currency] ?? 'USD';
       dateFormat.value = shopData[FirestoreFields.dateFormat] ?? 'dd/MM/yyyy';
       timeZone.value = shopData[FirestoreFields.timeZone] ?? 'UTC';
+
+      // Sync Global Config
+      _configService.updateConfig(
+        newCurrency: currency.value,
+        newDateFormat: dateFormat.value,
+        newTimeZone: timeZone.value,
+        newHourlyGrace:
+            shopData[FirestoreFields.hourlyGracePeriodMinutes] ?? 15,
+        newDailyGrace: shopData[FirestoreFields.dailyGracePeriodHours] ?? 1,
+        newTaxRate:
+            (shopData[FirestoreFields.taxRate] as num?)?.toDouble() ?? 0.0,
+        newIsTaxEnabled: shopData[FirestoreFields.isTaxEnabled] ?? false,
+      );
 
       // Load Rental Config
       defaultHourlyRateController.text =
@@ -281,6 +295,14 @@ class SettingsController extends GetxController {
         FirestoreFields.dailyGracePeriodHours: dailyGrace,
       });
 
+      // Update global config immediately
+      _configService.updateConfig(
+        newHourlyGrace: hourlyGrace,
+        newDailyGrace: dailyGrace,
+        newTaxRate: taxRate,
+        newIsTaxEnabled: isTaxEnabled.value,
+      );
+
       Get.back(); // Close dialog or view
       _loadData();
       AppSnackBar.success(
@@ -396,6 +418,7 @@ class SettingsController extends GetxController {
         FirestoreFields.currency: newCurrency,
       });
       currency.value = newCurrency;
+      _configService.updateConfig(newCurrency: newCurrency);
       AppSnackBar.success(
         title: "Success",
         message: "Currency updated to $newCurrency",
@@ -452,6 +475,7 @@ class SettingsController extends GetxController {
         FirestoreFields.dateFormat: newFormat,
       });
       dateFormat.value = newFormat;
+      _configService.updateConfig(newDateFormat: newFormat);
       AppSnackBar.success(title: "Success", message: "Date format updated");
     } catch (e) {
       AppSnackBar.error(
@@ -515,6 +539,7 @@ class SettingsController extends GetxController {
         FirestoreFields.timeZone: newTimeZone,
       });
       timeZone.value = newTimeZone;
+      _configService.updateConfig(newTimeZone: newTimeZone);
       AppSnackBar.success(title: "Success", message: "Time zone updated");
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to update time zone");
@@ -561,20 +586,8 @@ class SettingsController extends GetxController {
   }
 
   void updateLanguage(String langCode) {
-    Get.updateLocale(Locale(langCode));
-    currentLanguage.value = langCode;
-    AppLocalStorage().saveData('lang', langCode);
+    _configService.updateLanguage(langCode);
     Get.back();
-  }
-
-  void _loadLanguage() {
-    final savedLang = AppLocalStorage().readData<String>('lang');
-    final locale = savedLang ?? Get.deviceLocale?.languageCode ?? 'en';
-    if (supportedLanguages.containsKey(locale)) {
-      currentLanguage.value = locale;
-    } else {
-      currentLanguage.value = 'en';
-    }
   }
 
   void logout() {

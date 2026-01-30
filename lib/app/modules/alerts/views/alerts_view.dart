@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:intl/intl.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import '../../../../utils/common/a_app_bar.dart';
@@ -67,7 +67,6 @@ class AlertsView extends GetView<AlertsController> {
     int index,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final timeFormat = DateFormat('MMM dd, yyyy • hh:mm a');
 
     return InkWell(
       onTap: () {
@@ -168,7 +167,7 @@ class AlertsView extends GetView<AlertsController> {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        timeFormat.format(log.timestamp),
+                        AFormatter.formatDate(log.timestamp),
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 11.sp,

@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../../utils/helper/a_formatter.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -344,7 +344,7 @@ class UserDetailView extends GetView<UserDetailController> {
             Iconsax.calendar,
             "Joined",
             user.createdAt != null
-                ? DateFormat.yMMMd().format(user.createdAt!)
+                ? AFormatter.formatDate(user.createdAt!)
                 : 'N/A',
           ),
         ],

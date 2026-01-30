@@ -9,6 +9,7 @@ import 'package:surfboard_rental_app/utils/common/a_app_bar.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/rental_history_controller.dart';
 
 class RentalHistoryView extends GetView<RentalHistoryController> {
@@ -317,17 +318,20 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTimeBadge(context, "Start: ${rental.startTime}"),
+                      _buildTimeBadge(
+                        context,
+                        "Start: ${AFormatter.formatDate(rental.startTime)}",
+                      ),
                       SizedBox(width: 8.w),
                       if (rental.actualReturnTime != null)
                         _buildTimeBadge(
                           context,
-                          "Returned: ${rental.actualReturnTime}",
+                          "Returned: ${AFormatter.formatDate(rental.actualReturnTime)}",
                         )
                       else
                         _buildTimeBadge(
                           context,
-                          "Due: ${rental.expectedReturnTime}",
+                          "Due: ${AFormatter.formatDate(rental.expectedReturnTime)}",
                         ),
                     ],
                   ),

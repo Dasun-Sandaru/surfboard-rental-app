@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:surfboard_rental_app/app/services/customer_service.dart';
 import 'package:surfboard_rental_app/app/services/inventory_service.dart';
 import 'package:surfboard_rental_app/app/services/user_service.dart';
+import 'package:surfboard_rental_app/app/services/config_service.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
 import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
@@ -274,6 +275,10 @@ class NewRentalController extends GetxController {
         return;
       }
 
+      final configService = Get.find<ConfigService>();
+      final hourlyGrace = configService.hourlyGracePeriodMinutes.value;
+      final dailyGraceHours = configService.dailyGracePeriodHours.value;
+
       final item = selectedItems.first;
       final double dailyRate = item.rentalRateDay.toDouble();
       final double hourlyRate = item.rentalRateHour.toDouble();
@@ -300,31 +305,43 @@ class NewRentalController extends GetxController {
       }
 
       final Duration difference = dueDateTime.difference(startDateTime);
+      double total = 0.0;
+
       if (rentType.value == RentType.hourly) {
-        final int hours = difference.inHours;
+        int hours = difference.inHours;
         final int minutes = difference.inMinutes % 60;
-        double total = (hours * hourlyRate).toDouble();
-        if (minutes > 0) {
-          total += hourlyRate;
-        }
-        estimatedTotal.value = total;
-      } else {
-        final int days = difference.inDays;
-        int hours = difference.inHours % 24;
-        final int minutes = difference.inMinutes % 60;
-        if (minutes > 0) {
+
+        // Grace period logic
+        if (minutes > hourlyGrace) {
           hours++;
         }
-        double total = (days * dailyRate).toDouble();
-        double remainingHoursCost = (hours * hourlyRate).toDouble();
 
-        if (remainingHoursCost > dailyRate) {
-          total += dailyRate;
-        } else {
-          total += remainingHoursCost;
+        // Minimum 1 hour
+        if (hours == 0) hours = 1;
+
+        total = (hours * hourlyRate).toDouble();
+      } else {
+        int days = difference.inDays;
+        int remainingMinutes = difference.inMinutes % (24 * 60);
+
+        // Daily Grace Logic: if remaining time exceeds grace period (in minutes), charge extra day
+        // Note: dailyGracePeriodHours is in hours.
+        if (remainingMinutes > (dailyGraceHours * 60)) {
+          days++;
         }
-        estimatedTotal.value = total;
+
+        // Minimum 1 day
+        if (days == 0) days = 1;
+
+        total = (days * dailyRate).toDouble();
       }
+
+      // Apply Tax
+      if (configService.isTaxEnabled.value) {
+        total += (total * configService.taxRate.value / 100);
+      }
+
+      estimatedTotal.value = total;
 
       log('Estimated Total Rental: \$${estimatedTotal.value}');
     } catch (e, stackTrace) {
@@ -369,5 +386,5 @@ class NewRentalController extends GetxController {
   }
 
   // Helper for Date Format
-  String formatDate(DateTime date) => DateFormat('dd MMM yyyy').format(date);
+  String formatDate(DateTime date) => AFormatter.formatDate(date);
 }

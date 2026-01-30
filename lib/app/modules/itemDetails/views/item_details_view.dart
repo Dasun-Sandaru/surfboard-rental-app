@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -113,24 +113,24 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                 _buildDetailRow(
                   context,
                   "Purchase Cost",
-                  '\$${item.purchaseCost}',
+                  AFormatter.formatCurrency(item.purchaseCost),
                 ),
                 _buildDetailRow(
                   context,
                   "Rental Rate (hr)",
-                  '\$${item.rentalRateHour}',
+                  AFormatter.formatCurrency(item.rentalRateHour),
                 ),
                 _buildDetailRow(
                   context,
                   "Rental Rate (day)",
-                  '\$${item.rentalRateDay}',
+                  AFormatter.formatCurrency(item.rentalRateDay),
                 ),
                 _buildDetailRow(context, "Damage Fee Rule", item.damageFeeRule),
                 _buildDetailRow(context, "Note", item.note),
                 _buildDetailRow(
                   context,
                   "Created At",
-                  DateFormat.yMMMd().format(item.createdAt),
+                  AFormatter.formatDate(item.createdAt),
                   isLast: true,
                 ),
               ],

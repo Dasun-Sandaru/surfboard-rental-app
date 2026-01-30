@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
+import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/app/models/damage_report_model.dart';
 import 'package:surfboard_rental_app/app/models/payment_model.dart';
 import 'package:surfboard_rental_app/app/models/damage_photo_model.dart';
@@ -159,20 +159,20 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       _buildInfoRow(
                         context,
                         "Rate",
-                        "${rental.rate}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hr' : 'day'}",
+                        "${AFormatter.formatCurrency(rental.rate)}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hr' : 'day'}",
                         icon: Iconsax.tag,
                       ),
                       _buildInfoRow(
                         context,
                         "Total Expected",
-                        "${rental.amountExpected}",
+                        AFormatter.formatCurrency(rental.amountExpected),
                         icon: Iconsax.money_tick,
                         isBold: true,
                       ),
                       _buildInfoRow(
                         context,
                         "Amount Paid",
-                        "${rental.amountPaid}",
+                        AFormatter.formatCurrency(rental.amountPaid),
                         icon: Iconsax.wallet_2,
                         valueColor: rental.paymentStatus == PaymentStatus.paid
                             ? Colors.green
@@ -182,7 +182,9 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       _buildInfoRow(
                         context,
                         "Security Deposit",
-                        rental.securityDeposit.amount.toString(),
+                        AFormatter.formatCurrency(
+                          rental.securityDeposit.amount,
+                        ),
                         icon: Iconsax.shield_tick,
                       ),
                       _buildInfoRow(
@@ -290,7 +292,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
             ],
           ),
           Text(
-            "+ ${payment.amount}",
+            "+ ${AFormatter.formatCurrency(payment.amount)}",
             style: TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -401,7 +403,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    "Cost: ${report.finalCost}",
+                    "Cost: ${AFormatter.formatCurrency(report.finalCost)}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
@@ -577,6 +579,6 @@ class RentalDetailView extends GetView<RentalDetailController> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy - hh:mm a').format(date);
+    return AFormatter.formatDate(date);
   }
 }
