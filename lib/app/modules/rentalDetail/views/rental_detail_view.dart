@@ -279,7 +279,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                payment.category.name.capitalizeFirst!,
+                payment.category.toString().split('.').last.capitalizeFirst!,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
               ),
               Text(
@@ -466,7 +466,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                rental.status.name.tr.toUpperCase(),
+                rental.status.toString().split('.').last.tr.toUpperCase(),
                 style: TextStyle(
                   color: statusColor,
                   fontWeight: FontWeight.bold,
@@ -476,7 +476,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
               ),
               SizedBox(height: 4.h),
               Text(
-                "${"payment".tr}: ${rental.paymentStatus.name.tr.toUpperCase()}",
+                "${"payment".tr}: ${rental.paymentStatus.toString().split('.').last.tr.toUpperCase()}",
                 style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 12.sp,

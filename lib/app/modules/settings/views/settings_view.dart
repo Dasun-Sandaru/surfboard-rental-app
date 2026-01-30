@@ -118,6 +118,35 @@ class SettingsView extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
+            /// 2.5 Access Control Section (Admin Only)
+            Obx(() {
+              final isOwnerAdmin =
+                  controller.userProfile.value[FirestoreFields.role] == 'admin';
+              if (!isOwnerAdmin) return const SizedBox.shrink();
+
+              return Column(
+                children: [
+                  _buildSectionHeader(context, "staff_access_control".tr),
+                  SizedBox(height: 8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: _buildSettingsTile(
+                      context,
+                      icon: Iconsax.lock,
+                      title: "manage_staff_access".tr,
+                      onTap: controller.navigateToAccessControl,
+                      trailingIcon: Iconsax.arrow_right_3,
+                    ),
+                  ),
+                ],
+              );
+            }),
+
+            SizedBox(height: 24.h),
+
             /// 3. App Settings Section
             _buildSectionHeader(context, "app_settings".tr),
             SizedBox(height: 8.h),

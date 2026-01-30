@@ -12,6 +12,7 @@ import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';
 import '../views/edit_profile_view.dart';
 import '../views/edit_shop_view.dart';
+import '../views/access_control_view.dart';
 import '../../../../app/services/config_service.dart';
 
 class SettingsController extends GetxController {
@@ -104,6 +105,74 @@ class SettingsController extends GetxController {
     'Asia/Singapore',
   ];
 
+  // -- Access Control --
+  // Initialize with false by default for better security, or true if previously assumed
+  final RxMap<String, bool> staffAccessRules = <String, bool>{
+    // Operations
+    'new_rental': true,
+    'rentals': true, // Active Rentals
+    'rental_history': true,
+    'inventory': true,
+    'customers': true,
+    'alerts': true,
+    'qr_scanner': true,
+
+    // Financials & Reporting
+    'payments': true, // Might want to restrict
+    'damage_fee': true, // Might want to restrict
+    'reports': false,
+
+    // Config / Admin-like (usually restricted)
+    'manage_users': false,
+    'settings': false, // Usually staff shouldn't access full settings
+    'shop_setup': false,
+    'agreement_template': false,
+  }.obs;
+
+  final Map<String, String> AccessRouteLabels = {
+    'new_rental': 'New Rental',
+    'rentals': 'Active Rentals',
+    'rental_history': 'Rental History',
+    'inventory': 'Inventory Management',
+    'customers': 'Customer Management',
+    'alerts': 'Alerts & Notifications',
+    'qr_scanner': 'QR Scanner',
+    'payments': 'Payments & Transactions',
+    'damage_fee': 'Damage Fee Configuration',
+    'reports': 'Reports & Analytics',
+    'manage_users': 'User Management',
+    'settings': 'App Settings',
+    'shop_setup': 'Shop Configuration',
+    'agreement_template': 'Agreement Templates',
+  };
+
+  final List<Map<String, dynamic>> accessGroups = [
+    {
+      'title': 'operations_group', // "Operations"
+      'keys': [
+        'new_rental',
+        'rentals',
+        'rental_history',
+        'inventory',
+        'customers',
+        'qr_scanner',
+        'alerts',
+      ],
+    },
+    {
+      'title': 'financials_group', // "Financials"
+      'keys': ['payments', 'damage_fee'],
+    },
+    {
+      'title': 'analytics_group', // "Analytics"
+      'keys': ['reports'],
+    },
+    {
+      'title': 'admin_only_group', // "Administration"
+      'keys': ['manage_users', 'settings', 'shop_setup', 'agreement_template'],
+    },
+  ];
+
   @override
   void onInit() {
     super.onInit();
@@ -174,6 +243,15 @@ class SettingsController extends GetxController {
           (shopData[FirestoreFields.hourlyGracePeriodMinutes] ?? 15).toString();
       dailyGracePeriodController.text =
           (shopData[FirestoreFields.dailyGracePeriodHours] ?? 1).toString();
+
+      // Load Access Rules
+      final accessData =
+          shopData[FirestoreFields.staffAccess] as Map<String, dynamic>?;
+      if (accessData != null) {
+        staffAccessRules.assignAll(
+          accessData.map((key, value) => MapEntry(key, value as bool)),
+        );
+      }
     } catch (e) {
       AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
     }
@@ -653,5 +731,30 @@ class SettingsController extends GetxController {
 
   void navigateToInventorySettings() {
     Get.to(() => const InventoryConfigView());
+  }
+
+  void navigateToAccessControl() {
+    Get.to(() => const AccessControlView());
+  }
+
+  Future<void> toggleAccess(String key, bool value) async {
+    staffAccessRules[key] = value;
+
+    // Save to Firestore
+    try {
+      final shopId = shopProfile.value[FirestoreFields.id];
+      if (shopId != null) {
+        await _shopService.updateShopFields(shopId, {
+          FirestoreFields.staffAccess: staffAccessRules,
+        });
+      }
+
+      // Sync with global config service immediately
+      _configService.updateAccessRules(staffAccessRules);
+    } catch (e) {
+      AppSnackBar.error(title: "Error", message: "Failed to save access rule");
+      // Revert on failure
+      staffAccessRules[key] = !value;
+    }
   }
 }

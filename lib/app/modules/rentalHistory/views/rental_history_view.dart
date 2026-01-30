@@ -324,15 +324,15 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                       ),
                       SizedBox(width: 8.w),
                       if (rental.actualReturnTime != null)
-                          _buildTimeBadge(
-                            context,
-                            "${'returned_label'.tr}: ${AFormatter.formatDate(rental.actualReturnTime)}",
-                          )
+                        _buildTimeBadge(
+                          context,
+                          "${'returned_label'.tr}: ${AFormatter.formatDate(rental.actualReturnTime)}",
+                        )
                       else
-                          _buildTimeBadge(
-                            context,
-                            "${'due_label'.tr}: ${AFormatter.formatDate(rental.expectedReturnTime)}",
-                          ),
+                        _buildTimeBadge(
+                          context,
+                          "${'due_label'.tr}: ${AFormatter.formatDate(rental.expectedReturnTime)}",
+                        ),
                     ],
                   ),
                 ],
@@ -380,7 +380,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
         color = Colors.grey;
         break;
       default:
-        text = rental.status.name;
+        text = rental.status.toString().split('.').last;
         color = Colors.grey;
     }
 

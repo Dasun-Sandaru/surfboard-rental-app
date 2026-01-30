@@ -138,6 +138,21 @@ class ConfigService extends GetxService {
     if (newIsTaxEnabled != null) isTaxEnabled.value = newIsTaxEnabled;
   }
 
+  // -- Access Control --
+  final RxMap<String, bool> staffAccessRules = <String, bool>{}.obs;
+
+  void updateAccessRules(Map<String, dynamic> newRules) {
+    // Safely cast to Map<String, bool>
+    final castedRules = <String, bool>{};
+    newRules.forEach((key, value) {
+      if (value is bool) {
+        castedRules[key] = value;
+      }
+    });
+    staffAccessRules.assignAll(castedRules);
+    log('Access rules updated: $staffAccessRules', name: logName);
+  }
+
   void _listenToMaintenanceConfig() {
     try {
       log('Listening to maintenance config', name: logName);
