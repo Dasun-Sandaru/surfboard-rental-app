@@ -36,13 +36,6 @@ class AgreementTemplateListView extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: controller.addTemplate,
-            icon: Icon(Iconsax.add, color: colorScheme.primary, size: 28.w),
-          ),
-          SizedBox(width: 8.w),
-        ],
       ),
       body: Column(
         children: [

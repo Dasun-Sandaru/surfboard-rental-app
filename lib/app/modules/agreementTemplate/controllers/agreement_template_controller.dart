@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
+import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/agreement_preview_view.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
@@ -131,14 +132,8 @@ class AgreementTemplateController extends GetxController {
     content = content.replaceAll('{{rental.endDate}}', rental['endDate']!);
     content = content.replaceAll('{{rental.totalCost}}', rental['totalCost']!);
 
-    // 4. Show the preview dialog
-    AppDialogs.defaultDialog(
-      context: Get.context!,
-      title: "Template Preview",
-      contentWidget: Text(content, style: const TextStyle(fontSize: 14)),
-      confirmText: "Close",
-      onConfirm: () => Get.back(),
-    );
+    // 4. Navigate to preview screen
+    Get.to(() => const AgreementPreviewView(), arguments: content);
   }
 
   @override
@@ -147,6 +142,79 @@ class AgreementTemplateController extends GetxController {
     templateNameController.dispose();
     contentController.dispose();
     super.onClose();
+  }
+
+  final List<String> availablePlaceholders = [
+    '{{customer.name}}',
+    '{{customer.email}}',
+    '{{customer.phone}}',
+    '{{customer.passport}}',
+    '{{rental.date}}',
+    '{{rental.startTime}}',
+    '{{rental.returnTime}}',
+    '{{rental.item}}',
+    '{{rental.rate}}',
+    '{{rental.totalCost}}',
+    '{{shop.name}}',
+    '{{shop.phone}}',
+  ];
+
+  void loadDefaultContent() {
+    contentController.text = """
+RENTAL AGREEMENT
+
+This Rental Agreement ("Agreement") is made and entered into on {{rental.date}}, by and between:
+
+Lessor: {{shop.name}} ("Shop")
+Phone: {{shop.phone}}
+
+Lessee: {{customer.name}} ("Customer")
+Phone: {{customer.phone}}
+ID/Passport: {{customer.passport}}
+
+1. EQUIPMENT
+The Shop agrees to rent the following equipment to the Customer:
+Item: {{rental.item}}
+
+2. RENTAL PERIOD
+Start Time: {{rental.startTime}}
+Expected Return Time: {{rental.returnTime}}
+
+3. CHARGES
+Rate: {{rental.rate}}
+Total Estimated Cost: {{rental.totalCost}}
+
+4. LIABILITY
+The Customer agrees to return the equipment in the same condition as received. The Customer acknowledges that they are responsible for any loss, theft, or damage to the equipment during the rental period.
+
+5. WAIVER
+The Customer hereby releases, waives, discharges and covenants not to sue the Shop from any liability, claims, demands, action and causes of action whatsoever arising out of or related to any loss, damage, or injury, including death, that may be sustained by the Customer.
+
+Signed: ___________________________
+Date: _____________________________
+""";
+  }
+
+  void insertPlaceholder(String placeholder) {
+    final text = contentController.text;
+    final selection = contentController.selection;
+
+    if (selection.isValid) {
+      final newText = text.replaceRange(
+        selection.start,
+        selection.end,
+        placeholder,
+      );
+      contentController.text = newText;
+      contentController.selection = TextSelection.collapsed(
+        offset: selection.start + placeholder.length,
+      );
+    } else {
+      contentController.text = text + placeholder;
+      contentController.selection = TextSelection.collapsed(
+        offset: contentController.text.length,
+      );
+    }
   }
 
   void addDefaultTemplate() {
