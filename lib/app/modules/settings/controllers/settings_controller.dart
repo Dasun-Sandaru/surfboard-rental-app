@@ -35,6 +35,74 @@ class SettingsController extends GetxController {
   // -- Text Controller for Dialogs (Inventory) --
   final textInputController = TextEditingController();
 
+  // -- Inventory Configuration Data --
+  final RxList<String> brands = <String>[
+    "Channel Islands",
+    "Firewire",
+    "Pyzel",
+    "Lost",
+    "JS Industries",
+    "Torq",
+  ].obs;
+
+  final RxList<SurfBoardType> boardTypes = RxList<SurfBoardType>.from(
+    SurfBoardType.values,
+  );
+
+  final RxString currency = 'USD'.obs;
+  final List<String> availableCurrencies = ['USD', 'EUR', 'LKR', 'AUD', 'GBP'];
+
+  final RxString currentLanguage = 'en'.obs;
+  final Map<String, String> supportedLanguages = {
+    'en': 'English',
+    'es': 'Spanish',
+  };
+
+  // -- Rental Configuration --
+  final GlobalKey<FormState> rentalConfigFormKey = GlobalKey<FormState>();
+  final defaultHourlyRateController = TextEditingController();
+  final defaultDailyRateController = TextEditingController();
+  final taxRateController = TextEditingController();
+  final RxBool isTaxEnabled = false.obs;
+
+  final hourlyGracePeriodController = TextEditingController();
+  final dailyGracePeriodController = TextEditingController();
+
+  // -- Price Simulator State --
+  final Rx<RentType> simRentType = RentType.hourly.obs;
+  final RxInt simDurationDays = 0.obs;
+  final RxInt simDurationHours = 1.obs;
+  final RxInt simDurationMinutes = 0.obs;
+  final RxDouble simulatedPrice = 0.0.obs;
+
+  // -- Date & Time Configuration --
+  final RxString dateFormat = 'dd/MM/yyyy'.obs;
+  final List<String> availableDateFormats = [
+    'dd/MM/yyyy',
+    'MM/dd/yyyy',
+    'yyyy-MM-dd',
+    'dd MMM yyyy',
+    'MMM dd, yyyy',
+  ];
+
+  final RxString timeZone = 'UTC'.obs;
+  // A simplified list of major timezones.
+  final List<String> availableTimeZones = [
+    'UTC',
+    'Asia/Colombo',
+    'Asia/Dubai',
+    'Europe/London',
+    'Europe/Paris',
+    'Europe/Berlin',
+    'America/New_York',
+    'America/Los_Angeles',
+    'America/Chicago',
+    'Australia/Sydney',
+    'Pacific/Honolulu',
+    'Asia/Tokyo',
+    'Asia/Singapore',
+  ];
+
   @override
   void onInit() {
     super.onInit();
@@ -77,6 +145,8 @@ class SettingsController extends GetxController {
       };
 
       currency.value = shopData[FirestoreFields.currency] ?? 'USD';
+      dateFormat.value = shopData[FirestoreFields.dateFormat] ?? 'dd/MM/yyyy';
+      timeZone.value = shopData[FirestoreFields.timeZone] ?? 'UTC';
 
       // Load Rental Config
       defaultHourlyRateController.text =
@@ -91,52 +161,10 @@ class SettingsController extends GetxController {
           (shopData[FirestoreFields.hourlyGracePeriodMinutes] ?? 15).toString();
       dailyGracePeriodController.text =
           (shopData[FirestoreFields.dailyGracePeriodHours] ?? 1).toString();
-
-      // Load Agreement
     } catch (e) {
       AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
     }
   }
-
-  // -- Inventory Configuration Data --
-  final RxList<String> brands = <String>[
-    "Channel Islands",
-    "Firewire",
-    "Pyzel",
-    "Lost",
-    "JS Industries",
-    "Torq",
-  ].obs;
-
-  final RxList<SurfBoardType> boardTypes = RxList<SurfBoardType>.from(
-    SurfBoardType.values,
-  );
-
-  final RxString currency = 'USD'.obs;
-  final List<String> availableCurrencies = ['USD', 'EUR', 'LKR', 'AUD', 'GBP'];
-
-  final RxString currentLanguage = 'en'.obs;
-  final Map<String, String> supportedLanguages = {
-    'en': 'English',
-    'es': 'Spanish',
-  };
-
-  // -- Rental Configuration --
-  final GlobalKey<FormState> rentalConfigFormKey = GlobalKey<FormState>();
-  final defaultHourlyRateController = TextEditingController();
-  final defaultDailyRateController = TextEditingController();
-  final taxRateController = TextEditingController();
-  final RxBool isTaxEnabled = false.obs;
-
-  final hourlyGracePeriodController = TextEditingController();
-  final dailyGracePeriodController = TextEditingController();
-
-  // -- Price Simulator State --
-  final Rx<RentType> simRentType = RentType.hourly.obs;
-  final RxInt simDurationDays = 0.obs;
-  final RxInt simDurationHours = 1.obs;
-  final RxInt simDurationMinutes = 0.obs;
-  final RxDouble simulatedPrice = 0.0.obs;
 
   // -- Actions --
 
@@ -374,6 +402,122 @@ class SettingsController extends GetxController {
       );
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to update currency");
+    }
+  }
+
+  void showDateFormatPicker() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Get.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Select Date Format",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Get.theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...availableDateFormats.map(
+              (f) => ListTile(
+                title: Text(f),
+                trailing: dateFormat.value == f
+                    ? Icon(Icons.check, color: Get.theme.primaryColor)
+                    : null,
+                onTap: () {
+                  updateDateFormat(f);
+                  Get.back();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> updateDateFormat(String newFormat) async {
+    try {
+      final shopId = shopProfile.value[FirestoreFields.id];
+      if (shopId == null) return;
+
+      await _shopService.updateShopFields(shopId, {
+        FirestoreFields.dateFormat: newFormat,
+      });
+      dateFormat.value = newFormat;
+      AppSnackBar.success(title: "Success", message: "Date format updated");
+    } catch (e) {
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to update date format",
+      );
+    }
+  }
+
+  void showTimeZonePicker() {
+    Get.bottomSheet(
+      Container(
+        height: Get.height * 0.5,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Get.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Text(
+              "Select Time Zone",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Get.theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: availableTimeZones.length,
+                itemBuilder: (context, index) {
+                  final tz = availableTimeZones[index];
+                  return ListTile(
+                    title: Text(tz),
+                    trailing: timeZone.value == tz
+                        ? Icon(Icons.check, color: Get.theme.primaryColor)
+                        : null,
+                    onTap: () {
+                      updateTimeZone(tz);
+                      Get.back();
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Future<void> updateTimeZone(String newTimeZone) async {
+    try {
+      final shopId = shopProfile.value[FirestoreFields.id];
+      if (shopId == null) return;
+
+      await _shopService.updateShopFields(shopId, {
+        FirestoreFields.timeZone: newTimeZone,
+      });
+      timeZone.value = newTimeZone;
+      AppSnackBar.success(title: "Success", message: "Time zone updated");
+    } catch (e) {
+      AppSnackBar.error(title: "Error", message: "Failed to update time zone");
     }
   }
 

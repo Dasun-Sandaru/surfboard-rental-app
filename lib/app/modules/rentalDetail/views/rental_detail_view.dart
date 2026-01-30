@@ -18,197 +18,244 @@ class RentalDetailView extends GetView<RentalDetailController> {
     final colorScheme = Theme.of(context).colorScheme;
     final rental = controller.rental;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'Rental details',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
-        ),
-        centerTitle: true,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
         backgroundColor: colorScheme.surface,
-        scrolledUnderElevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(ASizes.defaultPadding),
-        child: Column(
+        appBar: AppBar(
+          title: Text(
+            'Rental details',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+          ),
+          centerTitle: true,
+          backgroundColor: colorScheme.surface,
+          scrolledUnderElevation: 0,
+          bottom: TabBar(
+            labelColor: colorScheme.primary,
+            unselectedLabelColor: colorScheme.onSurfaceVariant,
+            indicatorColor: colorScheme.primary,
+            dividerColor: Colors.transparent,
+            tabs: const [
+              Tab(text: "Overview"),
+              Tab(text: "Financials"),
+              Tab(text: "Damages"),
+            ],
+          ),
+        ),
+        body: TabBarView(
           children: [
-            // 1. Status Card
-            _buildStatusCard(context, rental),
-            SizedBox(height: 16.h),
-
-            // 2. Main Details (Item & Type)
-            _buildSection(
-              context,
-              title: "Rental Info",
-              icon: Iconsax.box,
-              children: [
-                _buildInfoRow(
-                  context,
-                  "Item",
-                  rental.cachedItemName ?? "Unknown Item",
-                  icon: Iconsax.code_circle,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Rent Type",
-                  rental.rentType.toString().split('.').last.capitalizeFirst!,
-                  icon: Iconsax.timer_1,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Rental ID",
-                  "#${rental.id?.substring(0, 8) ?? '---'}",
-                  icon: Iconsax.hashtag,
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-
-            // 3. Participants (Customer & Staff)
-            _buildSection(
-              context,
-              title: "People",
-              icon: Iconsax.people,
-              children: [
-                _buildInfoRow(
-                  context,
-                  "Customer",
-                  rental.cachedCustomerName ?? "Unknown",
-                  icon: Iconsax.user,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Staff Member",
-                  rental.cachedStaffName ?? "Unknown",
-                  icon: Iconsax.personalcard,
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-
-            // 4. Timings
-            _buildSection(
-              context,
-              title: "Timings",
-              icon: Iconsax.calendar,
-              children: [
-                _buildInfoRow(
-                  context,
-                  "Start Time",
-                  _formatDate(rental.startTime),
-                  icon: Iconsax.calendar_add,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Expected Return",
-                  _formatDate(rental.expectedReturnTime),
-                  icon: Iconsax.calendar_edit,
-                ),
-                if (rental.actualReturnTime != null)
-                  _buildInfoRow(
+            // ---------------- TAB 1: OVERVIEW ----------------
+            SingleChildScrollView(
+              padding: EdgeInsets.all(ASizes.defaultPadding),
+              child: Column(
+                children: [
+                  _buildStatusCard(context, rental),
+                  SizedBox(height: 16.h),
+                  _buildSection(
                     context,
-                    "Actual Return",
-                    _formatDate(rental.actualReturnTime!),
-                    icon: Iconsax.calendar_tick,
-                    valueColor:
-                        rental.actualReturnTime!.isAfter(
-                          rental.expectedReturnTime,
-                        )
-                        ? Colors.red
-                        : Colors.green,
+                    title: "Rental Info",
+                    icon: Iconsax.box,
+                    children: [
+                      _buildInfoRow(
+                        context,
+                        "Item",
+                        rental.cachedItemName ?? "Unknown Item",
+                        icon: Iconsax.code_circle,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Rent Type",
+                        rental.rentType
+                            .toString()
+                            .split('.')
+                            .last
+                            .capitalizeFirst!,
+                        icon: Iconsax.timer_1,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Rental ID",
+                        "#${rental.id?.substring(0, 8) ?? '---'}",
+                        icon: Iconsax.hashtag,
+                      ),
+                    ],
                   ),
-                if (rental.overdueTime != null)
-                  _buildInfoRow(
+                  SizedBox(height: 16.h),
+                  _buildSection(
                     context,
-                    "Overdue Duration",
-                    rental.overdueTime!,
-                    icon: Iconsax.clock,
-                    valueColor: Colors.red,
+                    title: "People",
+                    icon: Iconsax.people,
+                    children: [
+                      _buildInfoRow(
+                        context,
+                        "Customer",
+                        rental.cachedCustomerName ?? "Unknown",
+                        icon: Iconsax.user,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Staff Member",
+                        rental.cachedStaffName ?? "Unknown",
+                        icon: Iconsax.personalcard,
+                      ),
+                    ],
                   ),
-              ],
+                  SizedBox(height: 16.h),
+                  _buildSection(
+                    context,
+                    title: "Timings",
+                    icon: Iconsax.calendar,
+                    children: [
+                      _buildInfoRow(
+                        context,
+                        "Start Time",
+                        _formatDate(rental.startTime),
+                        icon: Iconsax.calendar_add,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Expected Return",
+                        _formatDate(rental.expectedReturnTime),
+                        icon: Iconsax.calendar_edit,
+                      ),
+                      if (rental.actualReturnTime != null)
+                        _buildInfoRow(
+                          context,
+                          "Actual Return",
+                          _formatDate(rental.actualReturnTime!),
+                          icon: Iconsax.calendar_tick,
+                          valueColor:
+                              rental.actualReturnTime!.isAfter(
+                                rental.expectedReturnTime,
+                              )
+                              ? Colors.red
+                              : Colors.green,
+                        ),
+                      if (rental.overdueTime != null)
+                        _buildInfoRow(
+                          context,
+                          "Overdue Duration",
+                          rental.overdueTime!,
+                          icon: Iconsax.clock,
+                          valueColor: Colors.red,
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: 32.h),
+                ],
+              ),
             ),
-            SizedBox(height: 16.h),
 
-            // 5. Financials
-            _buildSection(
-              context,
-              title: "Financials",
-              icon: Iconsax.money_3,
-              children: [
-                _buildInfoRow(
-                  context,
-                  "Rate",
-                  "${rental.rate}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hr' : 'day'}",
-                  icon: Iconsax.tag,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Total Expected",
-                  "${rental.amountExpected}",
-                  icon: Iconsax.money_tick,
-                  isBold: true,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Amount Paid",
-                  "${rental.amountPaid}",
-                  icon: Iconsax.wallet_2,
-                  valueColor: rental.paymentStatus == PaymentStatus.paid
-                      ? Colors.green
-                      : colorScheme.primary,
-                ),
-                Divider(),
-                _buildInfoRow(
-                  context,
-                  "Security Deposit",
-                  rental.securityDeposit.amount.toString(),
-                  icon: Iconsax.shield_tick,
-                ),
-                _buildInfoRow(
-                  context,
-                  "Deposit Status",
-                  rental.securityDeposit.refunded > 0
-                      ? "Refunded"
-                      : (rental.securityDeposit.paid > 0 ? "Held" : "Not Paid"),
-                  icon: Iconsax.info_circle,
-                ),
-              ],
+            // ---------------- TAB 2: FINANCIALS ----------------
+            SingleChildScrollView(
+              padding: EdgeInsets.all(ASizes.defaultPadding),
+              child: Column(
+                children: [
+                  _buildSection(
+                    context,
+                    title: "Financials",
+                    icon: Iconsax.money_3,
+                    children: [
+                      _buildInfoRow(
+                        context,
+                        "Rate",
+                        "${rental.rate}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hr' : 'day'}",
+                        icon: Iconsax.tag,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Total Expected",
+                        "${rental.amountExpected}",
+                        icon: Iconsax.money_tick,
+                        isBold: true,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Amount Paid",
+                        "${rental.amountPaid}",
+                        icon: Iconsax.wallet_2,
+                        valueColor: rental.paymentStatus == PaymentStatus.paid
+                            ? Colors.green
+                            : colorScheme.primary,
+                      ),
+                      Divider(),
+                      _buildInfoRow(
+                        context,
+                        "Security Deposit",
+                        rental.securityDeposit.amount.toString(),
+                        icon: Iconsax.shield_tick,
+                      ),
+                      _buildInfoRow(
+                        context,
+                        "Deposit Status",
+                        rental.securityDeposit.refunded > 0
+                            ? "Refunded"
+                            : (rental.securityDeposit.paid > 0
+                                  ? "Held"
+                                  : "Not Paid"),
+                        icon: Iconsax.info_circle,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  Obx(() {
+                    if (controller.payments.isEmpty) {
+                      return _buildEmptyState(
+                        context,
+                        "No payments recorded",
+                        Iconsax.receipt_item,
+                      );
+                    }
+                    return _buildSection(
+                      context,
+                      title: "Payment History",
+                      icon: Iconsax.receipt,
+                      children: controller.payments
+                          .map((payment) => _buildPaymentRow(context, payment))
+                          .toList(),
+                    );
+                  }),
+                  SizedBox(height: 32.h),
+                ],
+              ),
             ),
-            SizedBox(height: 16.h),
 
-            // 6. Payment History
-            Obx(() {
-              if (controller.payments.isEmpty) return SizedBox.shrink();
-              return _buildSection(
-                context,
-                title: "Payment History",
-                icon: Iconsax.receipt,
-                children: controller.payments
-                    .map((payment) => _buildPaymentRow(context, payment))
-                    .toList(),
-              );
-            }),
-
-            // 7. Damage Reports
-            Obx(() {
-              if (controller.damageReports.isEmpty) return SizedBox.shrink();
-              return Padding(
-                padding: EdgeInsets.only(top: 16.h),
-                child: _buildSection(
-                  context,
-                  title: "Damage Reports",
-                  icon: Iconsax.warning_2,
+            // ---------------- TAB 3: DAMAGES ----------------
+            SingleChildScrollView(
+              padding: EdgeInsets.all(ASizes.defaultPadding),
+              child: Obx(() {
+                if (controller.damageReports.isEmpty) {
+                  return Container(
+                    margin: EdgeInsets.only(top: 50.h),
+                    child: _buildEmptyState(
+                      context,
+                      "No damages reported",
+                      Iconsax.shield_tick,
+                    ),
+                  );
+                }
+                return Column(
                   children: controller.damageReports
                       .map((report) => _buildDamageRow(context, report))
                       .toList(),
-                ),
-              );
-            }),
-
-            SizedBox(height: 32.h),
+                );
+              }),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context, String message, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        children: [
+          Icon(icon, size: 48, color: colorScheme.outline.withOpacity(0.5)),
+          SizedBox(height: 12.h),
+          Text(message, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+        ],
       ),
     );
   }
