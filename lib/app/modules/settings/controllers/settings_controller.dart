@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:surfboard_rental_app/app/services/auth_service.dart';
@@ -75,6 +77,22 @@ class SettingsController extends GetxController {
       };
 
       currency.value = shopData[FirestoreFields.currency] ?? 'USD';
+
+      // Load Rental Config
+      defaultHourlyRateController.text =
+          (shopData[FirestoreFields.defaultHourlyRate] ?? '').toString();
+      defaultDailyRateController.text =
+          (shopData[FirestoreFields.defaultDailyRate] ?? '').toString();
+      taxRateController.text = (shopData[FirestoreFields.taxRate] ?? '')
+          .toString();
+      isTaxEnabled.value = shopData[FirestoreFields.isTaxEnabled] ?? false;
+
+      hourlyGracePeriodController.text =
+          (shopData[FirestoreFields.hourlyGracePeriodMinutes] ?? 15).toString();
+      dailyGracePeriodController.text =
+          (shopData[FirestoreFields.dailyGracePeriodHours] ?? 1).toString();
+
+      // Load Agreement
     } catch (e) {
       AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
     }
@@ -102,6 +120,23 @@ class SettingsController extends GetxController {
     'en': 'English',
     'es': 'Spanish',
   };
+
+  // -- Rental Configuration --
+  final GlobalKey<FormState> rentalConfigFormKey = GlobalKey<FormState>();
+  final defaultHourlyRateController = TextEditingController();
+  final defaultDailyRateController = TextEditingController();
+  final taxRateController = TextEditingController();
+  final RxBool isTaxEnabled = false.obs;
+
+  final hourlyGracePeriodController = TextEditingController();
+  final dailyGracePeriodController = TextEditingController();
+
+  // -- Price Simulator State --
+  final Rx<RentType> simRentType = RentType.hourly.obs;
+  final RxInt simDurationDays = 0.obs;
+  final RxInt simDurationHours = 1.obs;
+  final RxInt simDurationMinutes = 0.obs;
+  final RxDouble simulatedPrice = 0.0.obs;
 
   // -- Actions --
 
@@ -188,6 +223,102 @@ class SettingsController extends GetxController {
     } catch (e) {
       AppSnackBar.error(title: "Update Failed", message: e.toString());
     }
+  }
+
+  Future<void> saveRentalConfig() async {
+    if (!rentalConfigFormKey.currentState!.validate()) {
+      return;
+    }
+
+    try {
+      final shopId = shopProfile.value[FirestoreFields.id];
+      if (shopId == null) return;
+
+      final hourlyRate =
+          double.tryParse(defaultHourlyRateController.text.trim()) ?? 0.0;
+      final dailyRate =
+          double.tryParse(defaultDailyRateController.text.trim()) ?? 0.0;
+      final taxRate = double.tryParse(taxRateController.text.trim()) ?? 0.0;
+      final hourlyGrace =
+          int.tryParse(hourlyGracePeriodController.text.trim()) ?? 15;
+      final dailyGrace =
+          int.tryParse(dailyGracePeriodController.text.trim()) ?? 1;
+
+      await _shopService.updateShopFields(shopId, {
+        FirestoreFields.defaultHourlyRate: hourlyRate,
+        FirestoreFields.defaultDailyRate: dailyRate,
+        FirestoreFields.taxRate: taxRate,
+        FirestoreFields.isTaxEnabled: isTaxEnabled.value,
+        FirestoreFields.hourlyGracePeriodMinutes: hourlyGrace,
+        FirestoreFields.dailyGracePeriodHours: dailyGrace,
+      });
+
+      Get.back(); // Close dialog or view
+      _loadData();
+      AppSnackBar.success(
+        title: "Success",
+        message: "Rental configuration updated",
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to save configuration",
+      );
+    }
+  }
+
+  void calculateSimulatedPrice() {
+    final hourlyRate =
+        double.tryParse(defaultHourlyRateController.text.trim()) ?? 0.0;
+    final dailyRate =
+        double.tryParse(defaultDailyRateController.text.trim()) ?? 0.0;
+    final hourlyGrace =
+        int.tryParse(hourlyGracePeriodController.text.trim()) ?? 15;
+    final dailyGrace =
+        int.tryParse(dailyGracePeriodController.text.trim()) ?? 1;
+
+    double price = 0.0;
+
+    if (simRentType.value == RentType.hourly) {
+      int hours = simDurationHours.value;
+      final minutes = simDurationMinutes.value;
+
+      // Logic: Minimum 1 hour
+      if (hours == 0 && minutes == 0) hours = 1;
+
+      // Logic: Grace Period
+      if (minutes > hourlyGrace) {
+        hours += 1;
+      }
+
+      price = hours * hourlyRate;
+    } else {
+      int days = simDurationDays.value;
+      final hours = simDurationHours.value;
+      final minutes = simDurationMinutes.value;
+
+      // Logic: Minimum 1 day
+      if (days == 0 && hours == 0 && minutes == 0) days = 1;
+
+      // Convert excess time to minutes
+      final excessMinutes = (hours * 60) + minutes;
+
+      // Logic: Grace Period for extra day
+      if (excessMinutes > dailyGrace) {
+        days += 1;
+      }
+
+      price = days * dailyRate;
+    }
+
+    // Apply Tax if enabled
+    if (isTaxEnabled.value) {
+      final tax = double.tryParse(taxRateController.text.trim()) ?? 0.0;
+      price += (price * tax / 100);
+    }
+
+    simulatedPrice.value = price;
+    log("Simulated Price: ${simulatedPrice.value}");
   }
 
   void showCurrencyPicker() {

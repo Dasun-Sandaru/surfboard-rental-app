@@ -7,7 +7,7 @@ import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/settings_controller.dart';
-import 'inventory_config_view.dart'; // Import the sub-screen
+import 'rental_config_view.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -76,6 +76,16 @@ class SettingsView extends StatelessWidget {
                       trailingIcon: Iconsax.arrow_right_3,
                       iconColor: Colors.green,
                     ),
+                  ),
+                  _buildDivider(context),
+                  _buildSettingsTile(
+                    context,
+                    icon: Iconsax.setting_2,
+                    title: "Rental & Pricing Logic",
+                    subtitle: "Rates, Tax, Agreement",
+                    onTap: () => Get.to(() => const RentalConfigView()),
+                    trailingIcon: Iconsax.arrow_right_3,
+                    iconColor: Colors.orange,
                   ),
                 ],
               ),

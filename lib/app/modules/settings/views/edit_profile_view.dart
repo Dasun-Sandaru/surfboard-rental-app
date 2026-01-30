@@ -3,10 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/validators/app_validator.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/validators/a_validator.dart';
 import '../controllers/settings_controller.dart';
 
 class EditProfileView extends GetView<SettingsController> {
@@ -125,7 +125,7 @@ class EditProfileView extends GetView<SettingsController> {
                 controller: controller.nameController,
                 hintText: "Enter your full name",
                 icon: Iconsax.user,
-                validator: (value) => AppValidator.validateText(value, 'Name'),
+                validator: (value) => AValidator.validateText(value, 'Name'),
               ),
 
               SizedBox(height: 20.h),
@@ -138,7 +138,7 @@ class EditProfileView extends GetView<SettingsController> {
                 hintText: "Enter phone number",
                 icon: Iconsax.call,
                 inputType: TextInputType.phone,
-                validator: (value) => AppValidator.validatePhoneNumber(value),
+                validator: (value) => AValidator.validatePhoneNumber(value),
               ),
 
               SizedBox(height: 20.h),

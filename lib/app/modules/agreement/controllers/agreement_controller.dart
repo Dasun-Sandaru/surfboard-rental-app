@@ -11,6 +11,7 @@ import 'package:surfboard_rental_app/app/services/pdf_service.dart';
 
 import 'package:surfboard_rental_app/app/services/rental_service.dart';
 import 'package:surfboard_rental_app/app/services/shop_service.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../../utils/constants/a_enums.dart';
@@ -33,6 +34,10 @@ class AgreementController extends GetxController {
 
   // -- Agreement Data --
   final Rxn<InitRentalModel> initRentalModel = Rxn<InitRentalModel>();
+
+  // -- Shop Config --
+  final RxInt hourlyGracePeriod = 15.obs;
+  final RxInt dailyGracePeriod = 0.obs;
 
   // -- Step Management --
   final RxInt currentStep = 0.obs;
@@ -112,7 +117,7 @@ class AgreementController extends GetxController {
       final int remainingMinutes = difference.inMinutes % 60;
 
       // Add extra hour only if grace period exceeded
-      if (remainingMinutes > 15) {
+      if (remainingMinutes > hourlyGracePeriod.value) {
         hours += 1;
       }
 
@@ -129,8 +134,11 @@ class AgreementController extends GetxController {
         days = 1;
       }
 
-      // Any extra time counts as another day
-      if (difference > Duration(days: days)) {
+      // Calculate remaining time after full days
+      final remainingDuration = difference - Duration(days: days);
+
+      // Any extra time exceeding daily grace period counts as another day
+      if (remainingDuration.inMinutes > dailyGracePeriod.value) {
         days += 1;
       }
 
@@ -190,7 +198,7 @@ class AgreementController extends GetxController {
     super.onInit();
     if (Get.arguments != null && Get.arguments is InitRentalModel) {
       initRentalModel.value = Get.arguments as InitRentalModel;
-      _loadDamageFees();
+      _loadShopConfig();
     }
     // Listeners to invalidate generated agreement on data change
     rentalPriceController.addListener(_onInputChanged);
@@ -200,7 +208,7 @@ class AgreementController extends GetxController {
     ever(customerSignature, (_) => _onInputChanged());
   }
 
-  Future<void> _loadDamageFees() async {
+  Future<void> _loadShopConfig() async {
     try {
       final itemId = board?.id;
       final shopId = await _userService.getShopIdFromStorage();
@@ -209,6 +217,7 @@ class AgreementController extends GetxController {
         return;
       }
 
+      // Load Damage Fees
       availableDamageFees.bindStream(
         _damageFeeService.streamDamageRules(shopId: shopId, itemId: itemId),
       );
@@ -219,10 +228,20 @@ class AgreementController extends GetxController {
           selectedDamageFees[fee.id!] = false;
         }
       });
+
+      // Load Shop Grace Periods
+      final shopDoc = await _shopService.getShop(shopId);
+      if (shopDoc.exists) {
+        final data = shopDoc.data() as Map<String, dynamic>;
+        hourlyGracePeriod.value =
+            data[FirestoreFields.hourlyGracePeriodMinutes] ?? 15;
+        dailyGracePeriod.value =
+            data[FirestoreFields.dailyGracePeriodHours] ?? 1;
+      }
     } catch (e) {
       AppSnackBar.error(
         title: 'Error',
-        message: 'Failed to load damage fees: $e',
+        message: 'Failed to load shop configuration: $e',
       );
     }
   }

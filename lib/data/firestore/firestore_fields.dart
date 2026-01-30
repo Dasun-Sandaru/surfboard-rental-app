@@ -100,4 +100,16 @@ class FirestoreFields {
   static const entityId = 'entity_id';
   static const entityType = 'entity_type';
   static const metadata = 'metadata';
+
+  // Business Logic & Config
+  static const defaultHourlyRate = 'default_hourly_rate';
+  static const defaultDailyRate = 'default_daily_rate';
+  static const taxRate = 'tax_rate';
+  static const isTaxEnabled = 'is_tax_enabled';
+
+  static const hourlyGracePeriodMinutes = 'hourly_grace_period_minutes';
+  static const dailyGracePeriodHours = 'daily_grace_period_hours';
+
+  // Agreement
+  static const agreementText = 'agreement_text';
 }

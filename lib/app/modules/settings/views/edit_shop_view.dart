@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/validators/app_validator.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/validators/a_validator.dart';
 import '../controllers/settings_controller.dart';
 
 class EditShopView extends GetView<SettingsController> {
@@ -74,7 +74,7 @@ class EditShopView extends GetView<SettingsController> {
                 hintText: "Enter shop name",
                 icon: Iconsax.shop,
                 validator: (value) =>
-                    AppValidator.validateText(value, 'Shop Name'),
+                    AValidator.validateText(value, 'Shop Name'),
               ),
 
               SizedBox(height: 20.h),
@@ -88,7 +88,7 @@ class EditShopView extends GetView<SettingsController> {
                 hintText: "Enter shop location",
                 icon: Iconsax.location,
                 validator: (value) =>
-                    AppValidator.validateText(value, 'Location'),
+                    AValidator.validateText(value, 'Location'),
               ),
 
               SizedBox(height: 20.h),
@@ -101,7 +101,7 @@ class EditShopView extends GetView<SettingsController> {
                 controller: controller.shopContactController,
                 hintText: "Enter shop contact number",
                 icon: Iconsax.call,
-                validator: (value) => AppValidator.validatePhoneNumber(value),
+                validator: (value) => AValidator.validatePhoneNumber(value),
               ),
 
               SizedBox(height: 40.h),
