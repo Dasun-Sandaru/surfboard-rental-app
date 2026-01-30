@@ -147,6 +147,6 @@ class RentalHistoryController extends GetxController {
   }
 
   void selectRental(RentalModel rental) {
-    Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental.id);
+    Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
   }
 }

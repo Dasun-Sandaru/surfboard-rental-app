@@ -92,6 +92,8 @@ class FirestoreFields {
   static const shopCode = 'shop_code';
   static const ownerAdminUid = 'owner_admin_uid';
   static const currency = 'currency';
+  static const dateFormat = 'date_format';
+  static const timeZone = 'time_zone';
 
   // Activity Log
   static const activityType = 'activity_type';

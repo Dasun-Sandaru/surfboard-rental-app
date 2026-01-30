@@ -78,11 +78,36 @@ class SettingsView extends StatelessWidget {
                     ),
                   ),
                   _buildDivider(context),
+                  Obx(
+                    () => _buildSettingsTile(
+                      context,
+                      icon: Iconsax.calendar_1,
+                      title: "Date Format",
+                      subtitle: controller.dateFormat.value,
+                      onTap: controller.showDateFormatPicker,
+                      trailingIcon: Iconsax.arrow_right_3,
+                      iconColor: Colors.purple,
+                    ),
+                  ),
+                  _buildDivider(context),
+                  Obx(
+                    () => _buildSettingsTile(
+                      context,
+                      icon: Iconsax.clock,
+                      title: "Time Zone",
+                      subtitle: controller.timeZone.value,
+                      onTap: controller.showTimeZonePicker,
+                      trailingIcon: Iconsax.arrow_right_3,
+                      iconColor: Colors.blue,
+                    ),
+                  ),
+
+                  _buildDivider(context),
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.setting_2,
-                    title: "Rental & Pricing Logic",
-                    subtitle: "Rates, Tax, Agreement",
+                    title: "Rental Pricing Logic",
+                    subtitle: "Rates, Tax",
                     onTap: () => Get.to(() => const RentalConfigView()),
                     trailingIcon: Iconsax.arrow_right_3,
                     iconColor: Colors.orange,
