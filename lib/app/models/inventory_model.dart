@@ -4,6 +4,7 @@ import '../../utils/constants/a_enums.dart';
 
 class InventoryModel {
   final String id;
+  final String shopId; // Added for multi-shop data isolation
   final String imageUrl;
   final String name;
   final String type;
@@ -23,9 +24,11 @@ class InventoryModel {
   final String note;
   final InventoryStatus status;
   final DateTime createdAt;
+  final DateTime? updatedAt;
 
   const InventoryModel({
     required this.id,
+    this.shopId = '',
     required this.imageUrl,
     required this.name,
     required this.type,
@@ -42,6 +45,7 @@ class InventoryModel {
     required this.note,
     required this.status,
     required this.createdAt,
+    this.updatedAt,
   });
 
   /// Computed display value
@@ -51,6 +55,7 @@ class InventoryModel {
   factory InventoryModel.fromMap(Map<String, dynamic> data) {
     return InventoryModel(
       id: data[FirestoreFields.id] as String? ?? '',
+      shopId: data[FirestoreFields.shopId] as String? ?? '',
       imageUrl: data[FirestoreFields.imageUrl] as String? ?? '',
       name: data[FirestoreFields.name] as String? ?? '',
       type: data[FirestoreFields.type] as String? ?? '',
@@ -79,6 +84,9 @@ class InventoryModel {
       createdAt: data[FirestoreFields.createdAt] != null
           ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
           : DateTime.now(),
+      updatedAt: data[FirestoreFields.updatedAt] != null
+          ? (data[FirestoreFields.updatedAt] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -93,6 +101,7 @@ class InventoryModel {
   Map<String, dynamic> toMap() {
     return {
       FirestoreFields.id: id,
+      FirestoreFields.shopId: shopId,
       FirestoreFields.imageUrl: imageUrl,
       FirestoreFields.name: name,
       FirestoreFields.type: type,
@@ -112,6 +121,54 @@ class InventoryModel {
 
       FirestoreFields.status: status.name,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
+      FirestoreFields.updatedAt: updatedAt != null
+          ? Timestamp.fromDate(updatedAt!)
+          : null,
     };
+  }
+
+  /// CopyWith method for immutable updates
+  InventoryModel copyWith({
+    String? id,
+    String? shopId,
+    String? imageUrl,
+    String? name,
+    String? type,
+    String? brand,
+    int? sizeFeet,
+    int? sizeInches,
+    int? sizeTotalInches,
+    int? volume,
+    String? color,
+    int? purchaseCost,
+    String? damageFeeRule,
+    int? rentalRateHour,
+    int? rentalRateDay,
+    String? note,
+    InventoryStatus? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return InventoryModel(
+      id: id ?? this.id,
+      shopId: shopId ?? this.shopId,
+      imageUrl: imageUrl ?? this.imageUrl,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      brand: brand ?? this.brand,
+      sizeFeet: sizeFeet ?? this.sizeFeet,
+      sizeInches: sizeInches ?? this.sizeInches,
+      sizeTotalInches: sizeTotalInches ?? this.sizeTotalInches,
+      volume: volume ?? this.volume,
+      color: color ?? this.color,
+      purchaseCost: purchaseCost ?? this.purchaseCost,
+      damageFeeRule: damageFeeRule ?? this.damageFeeRule,
+      rentalRateHour: rentalRateHour ?? this.rentalRateHour,
+      rentalRateDay: rentalRateDay ?? this.rentalRateDay,
+      note: note ?? this.note,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }

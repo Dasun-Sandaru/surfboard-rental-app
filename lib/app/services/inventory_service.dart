@@ -153,6 +153,8 @@ class InventoryService {
       final itemData = {
         ...data,
         FirestoreFields.id: docRef.id,
+        FirestoreFields.shopId:
+            shopId, // Set shopId for multi-shop data isolation
         FirestoreFields.createdAt: FieldValue.serverTimestamp(),
         FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       };
@@ -306,7 +308,9 @@ class InventoryService {
       final itemRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.inventory).doc(itemId);
-      final feesCollection = itemRef.collection('damage_fees'); // Use constant?
+      final feesCollection = itemRef.collection(
+        FirestoreCollections.damageFees,
+      );
 
       await feesCollection.add({
         ...feeData,

@@ -538,7 +538,17 @@ class SampleDataService {
           .map((e) => _convertFirestoreData(e.data()))
           .toList();
 
-      // 3. Fetch Customers
+      // 3. Fetch Members (Sub-collection)
+      final members = await _db
+          .collection(FirestoreCollections.shops)
+          .doc(shopId)
+          .collection(FirestoreCollections.members)
+          .get();
+      dataMap['members'] = members.docs
+          .map((e) => _convertFirestoreData(e.data()))
+          .toList();
+
+      // 4. Fetch Customers
       final customers = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
@@ -548,17 +558,32 @@ class SampleDataService {
           .map((e) => _convertFirestoreData(e.data()))
           .toList();
 
-      // 4. Fetch Inventory
+      // 5. Fetch Inventory (Items + Damage Fees)
       final inventory = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .get();
-      dataMap['inventory'] = inventory.docs
-          .map((e) => _convertFirestoreData(e.data()))
-          .toList();
 
-      // 5. Fetch Rentals (including sub-collection payments)
+      final inventoryList = [];
+      for (var doc in inventory.docs) {
+        final Map<String, dynamic> itemData = Map<String, dynamic>.from(
+          _convertFirestoreData(doc.data()) ?? {},
+        );
+
+        // Fetch sub-collection: damage_fees
+        final damageFees = await doc.reference
+            .collection(FirestoreCollections.damageFees)
+            .get();
+        itemData['damage_fees'] = damageFees.docs
+            .map((p) => _convertFirestoreData(p.data()))
+            .toList();
+
+        inventoryList.add(itemData);
+      }
+      dataMap['inventory'] = inventoryList;
+
+      // 6. Fetch Rentals (Rentals + Payments + Damage Reports + Photos)
       final rentals = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
@@ -570,6 +595,7 @@ class SampleDataService {
         final Map<String, dynamic> rentalData = Map<String, dynamic>.from(
           _convertFirestoreData(doc.data()) ?? {},
         );
+
         // Fetch sub-collection: payments
         final payments = await doc.reference
             .collection(FirestoreCollections.payments)
@@ -577,11 +603,35 @@ class SampleDataService {
         rentalData['payments'] = payments.docs
             .map((p) => _convertFirestoreData(p.data()))
             .toList();
+
+        // Fetch sub-collection: damage_reports
+        final damageReports = await doc.reference
+            .collection(FirestoreCollections.damageReports)
+            .get();
+
+        final reportList = [];
+        for (var reportDoc in damageReports.docs) {
+          final Map<String, dynamic> reportData = Map<String, dynamic>.from(
+            _convertFirestoreData(reportDoc.data()) ?? {},
+          );
+
+          // Fetch nested sub-collection: photos
+          final photos = await reportDoc.reference
+              .collection(FirestoreCollections.photos)
+              .get();
+          reportData['photos'] = photos.docs
+              .map((ph) => _convertFirestoreData(ph.data()))
+              .toList();
+
+          reportList.add(reportData);
+        }
+        rentalData['damage_reports'] = reportList;
+
         rentalList.add(rentalData);
       }
       dataMap['rentals'] = rentalList;
 
-      // 6. Fetch Activity Logs
+      // 7. Fetch Activity Logs
       final activityLogs = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
@@ -593,13 +643,13 @@ class SampleDataService {
           .map((e) => _convertFirestoreData(e.data()))
           .toList();
 
-      // 7. Fetch Damage Reports
-      final damageReports = await _db
+      // 8. Fetch Agreement Templates
+      final agreementTemplates = await _db
           .collection(FirestoreCollections.shops)
           .doc(shopId)
-          .collection(FirestoreCollections.damageReports)
+          .collection(FirestoreCollections.agreementTemplates)
           .get();
-      dataMap['damage_reports'] = damageReports.docs
+      dataMap['agreement_templates'] = agreementTemplates.docs
           .map((e) => _convertFirestoreData(e.data()))
           .toList();
 
@@ -655,3 +705,18 @@ class SampleDataService {
     return data;
   }
 }
+
+
+
+// Users (Root)
+// Shops (Root)
+  // Activity Logs (Sub)
+  // Customers (Sub)
+  // Inventory (Sub)
+    // Damage Fees (Nested Sub)
+  // Members (Sub)
+  // Rentals (Sub)
+    // Damage Reports (Nested Sub)
+      // Photos (Nested Nested Sub)
+    // Payments (Nested Sub)
+  // Agreement Templates (Sub)

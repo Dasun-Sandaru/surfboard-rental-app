@@ -198,4 +198,42 @@ class CustomerService {
       rethrow;
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // UPDATE CUSTOMER RENTAL STATS
+  // ---------------------------------------------------------------------------
+  /// Updates the customer's rental statistics.
+  /// Called when a new rental is created (increment) or cancelled (decrement).
+  /// Note: RentalService.createRental already handles this in a transaction.
+  /// This method is for edge cases or manual corrections.
+  Future<void> updateCustomerRentalStats({
+    required String shopId,
+    required String customerId,
+    int incrementBy = 1,
+    bool updateLastRentalDate = true,
+  }) async {
+    try {
+      log('Updating rental stats for customer: $customerId', name: logName);
+
+      final customerRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc(customerId);
+
+      final updateData = <String, dynamic>{
+        FirestoreFields.rentalsCount: FieldValue.increment(incrementBy),
+      };
+
+      if (updateLastRentalDate && incrementBy > 0) {
+        updateData[FirestoreFields.lastRentalDate] =
+            FieldValue.serverTimestamp();
+      }
+
+      await customerRef.update(updateData);
+
+      log('Customer rental stats updated: $customerId', name: logName);
+    } catch (e) {
+      log('Error updating customer rental stats: $e', name: logName);
+      rethrow;
+    }
+  }
 }

@@ -1,0 +1,573 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-01-31T15:43:44.728175",
+  "shopId": "tLhXYTZ3b4UWAmICKae7",
+  "data": {
+    "shop": {
+      "created_at": "2026-01-27T14:26:44.709",
+      "hourly_grace_period_minutes": 15,
+      "default_daily_rate": 1500.0,
+      "time_zone": "Asia/Colombo",
+      "tax_rate": 0.0,
+      "contact_number": "0767959732",
+      "is_tax_enabled": false,
+      "daily_grace_period_hours": 3,
+      "staff_access": {
+        "reports": true,
+        "manage_users": false,
+        "settings_edit_currency": false,
+        "rentals": true,
+        "customers": true,
+        "inventory": true
+      },
+      "name": "4dots",
+      "date_format": "yyyy-MM-dd",
+      "location": "Ahangama",
+      "currency": "LKR",
+      "default_hourly_rate": 1000.0,
+      "owner_admin_uid": "wcuCaegjdIZnysACLG51HbnivCi1"
+    },
+    "users": [],
+    "members": [
+      {
+        "role": "admin",
+        "is_active": true,
+        "phone": "0797959732",
+        "verified": true,
+        "name": "Dasun",
+        "created_at": "2026-01-27T14:26:44.709",
+        "email": "dasunsandaru98@gmail.com"
+      },
+      {
+        "is_active": true,
+        "role": "staff",
+        "phone": "8745622389",
+        "name": "Marco",
+        "verified": false,
+        "created_at": "2026-01-30T15:57:03.770",
+        "email": "asusvivobook15datalib@gmail.com"
+      }
+    ],
+    "customers": [
+      {
+        "notes": "to be test",
+        "phone": "0874558539",
+        "image_url": "",
+        "rentals_count": 1,
+        "last_name": "3",
+        "created_at": "2026-01-31T10:56:25.704",
+        "nic": "nffhkhddkk467",
+        "id": "HJRkzBJQTac4IIpY5x8O",
+        "last_rental_date": "2026-01-31T11:01:19.469",
+        "first_name": "Leon",
+        "email": "leon@gmail.com"
+      },
+      {
+        "notes": "1st customer",
+        "phone": "0785967652",
+        "image_url": "",
+        "rentals_count": 1,
+        "created_at": "2026-01-27T15:28:20.699",
+        "nic": "N9837363873",
+        "last_name": "Doe",
+        "id": "HuckAqEN5tknV136SVOv",
+        "last_rental_date": "2026-01-27T15:31:53.262",
+        "first_name": "John",
+        "email": "john@gmail.com"
+      }
+    ],
+    "inventory": [
+      {
+        "note": "Good board",
+        "rental_rate_day": 1500,
+        "color": "white and black",
+        "rental_rate_hour": 1000,
+        "created_at": "2026-01-31T10:53:46.806",
+        "type": "shortboard",
+        "volume": 35,
+        "updated_at": "2026-01-31T10:53:46.806",
+        "damage_fee_rule": "rule",
+        "name": "5' 9\" Obx 35L shortboard",
+        "size_total_inches": 69,
+        "size_feet": 5,
+        "purchase_cost": 500,
+        "id": "mvfTbRAKjwzMe3joifNm",
+        "brand": "Obx",
+        "size_inches": 9,
+        "status": "damaged",
+        "damage_fees": [
+          {
+            "damage_type": "Leash Broken",
+            "itemId": "mvfTbRAKjwzMe3joifNm",
+            "fee_amount": 250.0,
+            "active_status": true,
+            "updated_at": "2026-01-31T10:54:29.006",
+            "description": "Leash is snapped or missing",
+            "created_at": "2026-01-31T10:54:29.006"
+          },
+          {
+            "damage_type": "Fin Damaged",
+            "itemId": "mvfTbRAKjwzMe3joifNm",
+            "fee_amount": 100.0,
+            "active_status": true,
+            "updated_at": "2026-01-31T10:54:17.680",
+            "created_at": "2026-01-31T10:54:17.680",
+            "description": "Fin is broken or missing"
+          }
+        ]
+      },
+      {
+        "note": "Traditional single fin feel",
+        "rental_rate_day": 1500,
+        "color": "white/grey",
+        "rental_rate_hour": 1000,
+        "created_at": "2026-01-27T15:06:46.513",
+        "type": "longboard",
+        "volume": 72,
+        "updated_at": "2026-01-27T15:06:46.513",
+        "damage_fee_rule": "rule",
+        "name": "9' 0\" Torq 72L longboard",
+        "size_total_inches": 108,
+        "size_feet": 9,
+        "id": "x2ilEwQ6INmpx5939Mdr",
+        "purchase_cost": 650,
+        "brand": "Torq",
+        "size_inches": 0,
+        "status": "mark_as_damaged",
+        "damage_fees": [
+          {
+            "damage_type": "Fin Damaged",
+            "itemId": "x2ilEwQ6INmpx5939Mdr",
+            "fee_amount": 100.0,
+            "active_status": true,
+            "updated_at": "2026-01-27T15:10:50.987",
+            "created_at": "2026-01-27T15:10:50.987",
+            "description": "Fin is broken or missing"
+          },
+          {
+            "itemId": "x2ilEwQ6INmpx5939Mdr",
+            "damage_type": "Lost",
+            "fee_amount": 850.0,
+            "active_status": true,
+            "updated_at": "2026-01-27T15:23:01.314",
+            "created_at": "2026-01-27T15:19:19.452",
+            "description": "Board is lost completely"
+          },
+          {
+            "damage_type": "Board Cracked",
+            "itemId": "x2ilEwQ6INmpx5939Mdr",
+            "fee_amount": 250.0,
+            "active_status": true,
+            "updated_at": "2026-01-27T15:11:01.961",
+            "description": "Body of the board is cracked",
+            "created_at": "2026-01-27T15:11:01.961"
+          },
+          {
+            "damage_type": "Leash Broken",
+            "itemId": "x2ilEwQ6INmpx5939Mdr",
+            "fee_amount": 150.0,
+            "active_status": true,
+            "updated_at": "2026-01-27T15:11:12.292",
+            "description": "Leash is snapped or missing",
+            "created_at": "2026-01-27T15:11:12.292"
+          }
+        ]
+      }
+    ],
+    "rentals": [
+      {
+        "agreementLink": "https://qiixlmgafogukwzhamkz.supabase.co/storage/v1/object/public/agreements/shops/tLhXYTZ3b4UWAmICKae7/rentals/0ln3Y38PwX8H3h9EeEXY/agreement.pdf",
+        "rentType": "daily",
+        "created_at": "2026-01-27T15:31:53.262",
+        "securityDeposit": {
+          "amount": 500.0,
+          "paid": 0.0,
+          "refunded": 0.0,
+          "enabled": true
+        },
+        "cached_item_name": "9' 0\" Torq 72L longboard",
+        "cached_staff_name": "Dasun",
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "itemId": "x2ilEwQ6INmpx5939Mdr",
+        "expectedReturnTime": "2026-01-27T16:30:00.000",
+        "amountPaid": 2350.0,
+        "rate": 1500.0,
+        "cached_customer_name": "John Doe",
+        "customerId": "HuckAqEN5tknV136SVOv",
+        "actualReturnTime": "2026-01-29T09:19:31.910",
+        "amountExpected": 2450.0,
+        "startTime": "2026-01-27T15:30:00.000",
+        "id": "0ln3Y38PwX8H3h9EeEXY",
+        "overdueTime": "40:49:30",
+        "staffId": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "paymentStatus": "paid",
+        "status": "item_returned",
+        "payments": [
+          {
+            "handledBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "note": null,
+            "amount": 2350.0,
+            "method": "cash",
+            "category": "rental",
+            "timestamp": "2026-01-27T15:54:56.571408",
+            "rentalId": "0ln3Y38PwX8H3h9EeEXY"
+          },
+          {
+            "handledBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "note": "Damage Fee: Fin Damaged",
+            "amount": 100.0,
+            "method": "cash",
+            "category": "damageFee",
+            "timestamp": "2026-01-29T09:19:08.052838",
+            "rentalId": "0ln3Y38PwX8H3h9EeEXY"
+          },
+          {
+            "note": "Damage Fee: Lost",
+            "handledBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "amount": 850.0,
+            "method": "cash",
+            "category": "damageFee",
+            "rentalId": "0ln3Y38PwX8H3h9EeEXY",
+            "timestamp": "2026-01-27T15:45:33.052789"
+          }
+        ],
+        "damage_reports": [
+          {
+            "reportedAt": "2026-01-29T09:19:07.434281",
+            "note": "",
+            "itemId": "x2ilEwQ6INmpx5939Mdr",
+            "resolvedAt": null,
+            "finalCost": null,
+            "estimatedCost": 100.0,
+            "reportedBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "damageType": "Fin Damaged",
+            "rentalId": "0ln3Y38PwX8H3h9EeEXY",
+            "status": "reported",
+            "photos": []
+          },
+          {
+            "reportedAt": "2026-01-27T15:45:32.555282",
+            "note": "testing lost",
+            "itemId": "x2ilEwQ6INmpx5939Mdr",
+            "resolvedAt": null,
+            "finalCost": null,
+            "estimatedCost": 850.0,
+            "damageType": "Lost",
+            "reportedBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "rentalId": "0ln3Y38PwX8H3h9EeEXY",
+            "status": "reported",
+            "photos": []
+          }
+        ]
+      },
+      {
+        "agreementLink": "https://qiixlmgafogukwzhamkz.supabase.co/storage/v1/object/public/agreements/shops/tLhXYTZ3b4UWAmICKae7/rentals/d4SrAxlItFRhRk3QItPx/agreement.pdf",
+        "rentType": "hourly",
+        "created_at": "2026-01-31T11:01:19.469",
+        "securityDeposit": {
+          "amount": 500.0,
+          "paid": 0.0,
+          "refunded": 0.0,
+          "enabled": true
+        },
+        "cached_item_name": "5' 9\" Obx 35L shortboard",
+        "cached_staff_name": "Dasun sandaru",
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "itemId": "mvfTbRAKjwzMe3joifNm",
+        "expectedReturnTime": "2026-01-31T12:00:00.000",
+        "amountPaid": 1350.0,
+        "rate": 1000.0,
+        "cached_customer_name": "Leon 3",
+        "customerId": "HJRkzBJQTac4IIpY5x8O",
+        "startTime": "2026-01-31T11:00:00.000",
+        "amountExpected": 1350.0,
+        "actualReturnTime": "2026-01-31T11:26:29.901",
+        "id": "d4SrAxlItFRhRk3QItPx",
+        "overdueTime": null,
+        "paymentStatus": "paid",
+        "staffId": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "status": "completed",
+        "payments": [
+          {
+            "note": null,
+            "handledBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "amount": 1350.0,
+            "method": "cash",
+            "category": "rental",
+            "rentalId": "d4SrAxlItFRhRk3QItPx",
+            "timestamp": "2026-01-31T11:26:28.654945"
+          },
+          {
+            "handledBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "note": "Damage Fee: Leash Broken",
+            "amount": 250.0,
+            "method": "cash",
+            "category": "damageFee",
+            "timestamp": "2026-01-31T11:19:45.256939",
+            "rentalId": "d4SrAxlItFRhRk3QItPx"
+          },
+          {
+            "handledBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "note": "Damage Fee: Fin Damaged",
+            "amount": 100.0,
+            "method": "cash",
+            "category": "damageFee",
+            "timestamp": "2026-01-31T11:19:50.065955",
+            "rentalId": "d4SrAxlItFRhRk3QItPx"
+          }
+        ],
+        "damage_reports": [
+          {
+            "reportedAt": "2026-01-31T11:19:44.707633",
+            "itemId": "mvfTbRAKjwzMe3joifNm",
+            "note": "",
+            "resolvedAt": null,
+            "finalCost": null,
+            "estimatedCost": 250.0,
+            "damageType": "Leash Broken",
+            "reportedBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "status": "reported",
+            "rentalId": "d4SrAxlItFRhRk3QItPx",
+            "photos": [
+              {
+                "photoUrl": "https://qiixlmgafogukwzhamkz.supabase.co/storage/v1/object/public/damage_images/shops/tLhXYTZ3b4UWAmICKae7/rentals/d4SrAxlItFRhRk3QItPx/damages/0ISkaaTrsvImNltR2sOu/1769838585907.jpg",
+                "damageId": "0ISkaaTrsvImNltR2sOu",
+                "uploadedAt": "2026-01-31T11:19:49.544051",
+                "uploadedBy": "wcuCaegjdIZnysACLG51HbnivCi1"
+              }
+            ]
+          },
+          {
+            "reportedAt": "2026-01-31T11:19:49.759477",
+            "itemId": "mvfTbRAKjwzMe3joifNm",
+            "note": "",
+            "resolvedAt": null,
+            "finalCost": null,
+            "estimatedCost": 100.0,
+            "damageType": "Fin Damaged",
+            "reportedBy": "wcuCaegjdIZnysACLG51HbnivCi1",
+            "rentalId": "d4SrAxlItFRhRk3QItPx",
+            "status": "reported",
+            "photos": [
+              {
+                "photoUrl": "https://qiixlmgafogukwzhamkz.supabase.co/storage/v1/object/public/damage_images/shops/tLhXYTZ3b4UWAmICKae7/rentals/d4SrAxlItFRhRk3QItPx/damages/naqbzIpj6auUP9fveMF5/1769838590476.jpg",
+                "damageId": "naqbzIpj6auUP9fveMF5",
+                "uploadedAt": "2026-01-31T11:19:51.501615",
+                "uploadedBy": "wcuCaegjdIZnysACLG51HbnivCi1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "activity_logs": [
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "itemId": "mvfTbRAKjwzMe3joifNm",
+          "inventoryStatus": "damaged"
+        },
+        "entity_type": "Rental",
+        "activity_type": "return_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Returned rental d4SrAxlItFRhRk3QItPx",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "d4SrAxlItFRhRk3QItPx",
+        "timestamp": "2026-01-31T11:26:29.112094"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "amount": 1350.0,
+          "category": "rental",
+          "rentalId": "d4SrAxlItFRhRk3QItPx"
+        },
+        "entity_type": "Payment",
+        "activity_type": "add_payment",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Added payment of 1350.0 for rental d4SrAxlItFRhRk3QItPx",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "La6XWyLKL23PWOxgdAPU",
+        "timestamp": "2026-01-31T11:26:28.880770"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "itemId": "mvfTbRAKjwzMe3joifNm",
+          "inventoryStatus": "available"
+        },
+        "entity_type": "Rental",
+        "activity_type": "return_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Returned rental d4SrAxlItFRhRk3QItPx",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "d4SrAxlItFRhRk3QItPx",
+        "timestamp": "2026-01-31T11:23:50.086314"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "amountExpected": 1000.0,
+          "items": "mvfTbRAKjwzMe3joifNm"
+        },
+        "entity_type": "Rental",
+        "activity_type": "create_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Created rental for HJRkzBJQTac4IIpY5x8O",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "d4SrAxlItFRhRk3QItPx",
+        "timestamp": "2026-01-31T11:01:18.633387"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": null,
+        "entity_type": "Customer",
+        "activity_type": "add_customer",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Added customer Leon 3",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "HJRkzBJQTac4IIpY5x8O",
+        "timestamp": "2026-01-31T10:56:24.825726"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": null,
+        "entity_type": "Inventory",
+        "activity_type": "add_inventory",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Added inventory item: 5' 9\" Obx 35L shortboard",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "mvfTbRAKjwzMe3joifNm",
+        "timestamp": "2026-01-31T10:53:45.923393"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "itemId": "x2ilEwQ6INmpx5939Mdr",
+          "inventoryStatus": "available"
+        },
+        "entity_type": "Rental",
+        "activity_type": "return_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Returned rental 0ln3Y38PwX8H3h9EeEXY",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "0ln3Y38PwX8H3h9EeEXY",
+        "timestamp": "2026-01-29T09:19:31.334329"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "itemId": "x2ilEwQ6INmpx5939Mdr"
+        },
+        "entity_type": "Rental",
+        "activity_type": "return_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Returned rental 0ln3Y38PwX8H3h9EeEXY",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "0ln3Y38PwX8H3h9EeEXY",
+        "timestamp": "2026-01-27T15:54:57.293729"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "amount": 2350.0,
+          "category": "rental",
+          "rentalId": "0ln3Y38PwX8H3h9EeEXY"
+        },
+        "entity_type": "Payment",
+        "activity_type": "add_payment",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Added payment of 2350.0 for rental 0ln3Y38PwX8H3h9EeEXY",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "ftvDOBXHZC1hFVRkyQpR",
+        "timestamp": "2026-01-27T15:54:56.994379"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "itemId": "x2ilEwQ6INmpx5939Mdr"
+        },
+        "entity_type": "Rental",
+        "activity_type": "return_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Returned rental 0ln3Y38PwX8H3h9EeEXY",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "0ln3Y38PwX8H3h9EeEXY",
+        "timestamp": "2026-01-27T15:47:07.543203"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": {
+          "amountExpected": 1500.0,
+          "items": "x2ilEwQ6INmpx5939Mdr"
+        },
+        "entity_type": "Rental",
+        "activity_type": "create_rental",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Created rental for HuckAqEN5tknV136SVOv",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "0ln3Y38PwX8H3h9EeEXY",
+        "timestamp": "2026-01-27T15:31:53.052409"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": null,
+        "entity_type": "Customer",
+        "activity_type": "add_customer",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Added customer John Doe",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "HuckAqEN5tknV136SVOv",
+        "timestamp": "2026-01-27T15:28:20.472493"
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "metadata": null,
+        "entity_type": "Inventory",
+        "activity_type": "add_inventory",
+        "actor_name": "dasunsandaru98@gmail.com",
+        "description": "Added inventory item: 9' 0\" Torq 72L longboard",
+        "actor_id": "wcuCaegjdIZnysACLG51HbnivCi1",
+        "entity_id": "x2ilEwQ6INmpx5939Mdr",
+        "timestamp": "2026-01-27T15:06:46.294908"
+      }
+    ],
+    "agreement_templates": [
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "template_name": "Default Agreement",
+        "updated_at": "2026-01-30T15:19:03.781291",
+        "created_at": "2026-01-30T15:19:03.781291",
+        "description": "Default surfboard rental agreement",
+        "is_default": true,
+        "sections": {
+          "damage_responsibility_title": "6. DAMAGE, LOSS, OR THEFT",
+          "condition_of_equipment_title": "7. CONDITION OF EQUIPMENT",
+          "condition_of_equipment": "The renter confirms the equipment was received in good condition and agrees to return it in the same condition, excluding normal wear.",
+          "governing_law": "This agreement is governed by the laws of your jurisdiction.",
+          "assumption_of_risk_title": "4. ASSUMPTION OF RISK",
+          "governing_law_title": "8. GOVERNING LAW",
+          "damage_responsibility": "The renter is fully responsible for the surfboard and accessories during the rental period. The renter agrees to pay for:\n• Dings, cracks, breaks, snapped boards, or fin damage\n• Broken or lost leashes or fins\n• Water damage caused by unrepaired dings\n• Loss or theft of the surfboard or accessories\n\nNormal wear from proper use is acceptable. Any damage beyond normal wear will be charged.\n\nIf the board is lost, stolen, or damaged beyond repair, the renter agrees to pay the full replacement value.",
+          "signature_statement": "I have read and agree to all terms of this agreement.",
+          "assumption_of_risk": "The renter understands that surfing is a dangerous activity and accepts full responsibility for any injury, accident, or loss that may occur while using the rented equipment.",
+          "use_of_equipment_title": "3. USE OF EQUIPMENT",
+          "liability_waiver_title": "5. LIABILITY WAIVER",
+          "use_of_equipment": "The renter agrees to:\n• Use the surfboard safely and only for surfing\n• Not allow anyone else to use the equipment\n• Follow all local beach and surf rules\n• Not surf under the influence of alcohol or drugs",
+          "header": "SURFBOARD RENTAL AGREEMENT",
+          "liability_waiver": "The renter releases and agrees not to hold the rental company responsible for any injury, damage, or loss resulting from the use of the surfboard or accessories."
+        }
+      },
+      {
+        "shop_id": "tLhXYTZ3b4UWAmICKae7",
+        "template_name": "agg",
+        "updated_at": "2026-01-31T11:50:50.648",
+        "description": "Default surfboard rental agreement",
+        "created_at": "2026-01-27T14:26:44.708557",
+        "is_default": true,
+        "sections": {
+          "content": "RENTAL AGREEMENT\n\nThis Rental Agreement (\"Agreement\") is made and entered into on {{rental.date}}, by and between:\n\nLessor:{{rental.totalCost}}\nPhone: {{shop.phone}}\n\nLessee: {{customer.name}} (\"Customer\")\nPhone: {{customer.phone}}\nID/Passport: {{customer.passport}}\n\n1. EQUIPMENT\nThe Shop agrees to rent the following equipment to the Customer:\nItem: {{rental.item}}\n\n2. RENTAL PERIOD\nStart Time: {{rental.startTime}}\nExpected Return Time: {{rental.returnTime}}\n\n3. CHARGES\nRate: {{rental.rate}}\nTotal Estimated Cost: {{rental.totalCost}}\n\n4. LIABILITY\nThe Customer agrees to return the equipment in the same condition as received. The Customer acknowledges that they are responsible for any loss, theft, or damage to the equipment during the rental period.\n\n5. WAIVER\nThe Customer here{{shop.name}}"
+        }
+      }
+    ]
+  }
+}
