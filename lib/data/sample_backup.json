@@ -1,0 +1,23 @@
+{
+    "version": "1.0",
+    "exportDate": "2026-01-31T12:56:00Z",
+    "shopId": "sample_shop_id",
+    "data": {
+        "shop": {
+            "id": "sample_shop_id",
+            "name": "Sample Surf Shop",
+            "location": "Arugam Bay"
+        },
+        "users": [
+            {
+                "uid": "sample_admin",
+                "name": "Admin User",
+                "role": "admin",
+                "shopId": "sample_shop_id"
+            }
+        ],
+        "customers": [],
+        "inventory": [],
+        "rentals": []
+    }
+}

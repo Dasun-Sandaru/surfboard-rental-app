@@ -61,9 +61,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log(
-      'device width: ${MediaQuery.of(context).size.width} height: ${MediaQuery.of(context).size.height}',
-    );
+    try {
+      log(
+        'device width: ${MediaQuery.of(context).size.width} height: ${MediaQuery.of(context).size.height}',
+      );
+    } catch (e) {
+      debugPrint('Error logging device info: $e');
+    }
     final box = AppLocalStorage();
     String? lang = box.readData('lang');
     Locale initialLocale = lang != null ? Locale(lang) : const Locale('en');

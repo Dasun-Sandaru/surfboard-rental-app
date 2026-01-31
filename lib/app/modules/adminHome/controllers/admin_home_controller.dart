@@ -100,27 +100,73 @@ class AdminHomeController extends GetxController {
   /// Sign out
   Future<void> signOut() async => await _authService.signOut();
 
-  /// Seed Sample Data
-  Future<void> seedSampleData() async {
+  /// Granular Seeding Tasks
+  Future<void> runSeedTask(String taskType) async {
     if (shopId == null) return;
     final adminUid = _userService.currentUser?.uid;
     if (adminUid == null) return;
 
+    final sampleService = SampleDataService();
+    isLoadingStats.value = true;
+
     try {
       AppSnackBar.info(
         title: "Seeding...",
-        message: "Populating sample data...",
+        message: "Seeding $taskType data...",
       );
-      final sampleService = SampleDataService();
-      await sampleService.seedData(shopId!, adminUid);
+
+      switch (taskType) {
+        case 'Users':
+          await sampleService.seedUsers(shopId!);
+          break;
+        case 'Inventory':
+          await sampleService.seedInventory(shopId!);
+          break;
+        case 'Customers':
+          await sampleService.seedCustomers(shopId!);
+          break;
+        case 'Rentals':
+          // We need IDs for these, so we call a helper that fetches them first or just seeds all for consistency
+          final cIds = await sampleService.seedCustomers(shopId!);
+          final iIds = await sampleService.seedInventory(shopId!);
+          await sampleService.seedRentals(
+            shopId: shopId!,
+            customerIds: cIds,
+            inventoryIds: iIds,
+            staffId: adminUid,
+            staffName: "Admin User",
+          );
+          break;
+        case 'All':
+          await sampleService.seedAll(shopId!, adminUid);
+          break;
+        case 'Backup':
+          final path = await sampleService.exportFullDatabase(shopId!);
+          AppSnackBar.success(
+            title: "Export Success",
+            message: "Database backup saved to: $path",
+          );
+          return; // Skip the default success message below
+      }
 
       await loadDashboardStats();
       AppSnackBar.success(
         title: "Success",
-        message: "Sample data populated successfully!",
+        message: "$taskType data populated successfully!",
       );
     } catch (e) {
-      AppSnackBar.error(title: "Error", message: "Failed to seed data: $e");
+      log('Error seeding $taskType: $e', name: 'AdminHomeController');
+      AppSnackBar.error(
+        title: "Error",
+        message: "Failed to seed $taskType: $e",
+      );
+    } finally {
+      isLoadingStats.value = false;
     }
+  }
+
+  /// Original method trigger (can be updated to show options)
+  Future<void> seedSampleData() async {
+    // We will show the options in the View via a BottomSheet
   }
 }

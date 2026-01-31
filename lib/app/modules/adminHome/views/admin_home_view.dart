@@ -280,7 +280,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 Get.toNamed(Routes.SETTINGS);
                 break;
               case 7:
-                controller.seedSampleData();
+                _showSeedOptions(context);
                 break;
             }
           },
@@ -361,6 +361,54 @@ class AdminHomeView extends GetView<AdminHomeController> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSeedOptions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("seed_data_options".tr),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _seedTile(context, "Seed Users", "Users"),
+            _seedTile(context, "Seed Inventory", "Inventory"),
+            _seedTile(context, "Seed Customers", "Customers"),
+            _seedTile(context, "Seed Rentals", "Rentals"),
+            const Divider(),
+            _seedTile(context, "Seed All", "All", isPrimary: true),
+            const Divider(),
+            _seedTile(
+              context,
+              "Backup Database (JSON)",
+              "Backup",
+              isPrimary: true,
+              icon: Iconsax.document_download,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _seedTile(
+    BuildContext context,
+    String label,
+    String task, {
+    bool isPrimary = false,
+    IconData? icon,
+  }) {
+    return ListTile(
+      title: Text(label),
+      leading: Icon(
+        icon ?? (isPrimary ? Iconsax.flash : Iconsax.data),
+        color: isPrimary ? Theme.of(context).colorScheme.primary : null,
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        controller.runSeedTask(task);
+      },
     );
   }
 }
