@@ -674,10 +674,10 @@ class SettingsController extends GetxController {
       textConfirm: "yes".tr,
       textCancel: "no".tr,
       confirmTextColor: Colors.white,
-      onConfirm: () {
-        // Auth Logic
-        Get.back();
-        Get.offAllNamed('/login');
+      onConfirm: () async {
+        Get.back(); // Close dialog
+        await _authService.signOut();
+        // AuthController will handle the redirection to SIGN_IN or SPLASH based on state
       },
     );
   }

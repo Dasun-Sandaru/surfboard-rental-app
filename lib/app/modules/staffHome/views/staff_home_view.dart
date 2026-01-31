@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/auth_service.dart';
+
+import '../../alerts/views/alerts_view.dart';
 import '../controllers/staff_home_controller.dart';
 
 class StaffHomeView extends GetView<StaffHomeController> {
@@ -12,71 +14,97 @@ class StaffHomeView extends GetView<StaffHomeController> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final List<Widget> tabPages = [
+      _buildDashboardContent(context),
+      Container(), // Index 1 (Placeholder for New Rental, handled by changeIndex)
+      _buildAlertsContent(context),
+    ];
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 16.h),
-
-              /// Top Bar
-              _buildTopBar(context),
-
-              SizedBox(height: 24.h),
-
-              /// Welcome Text
-              Text(
-                "staff_dashboard".tr,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-              ),
-
-              SizedBox(height: 24.h),
-
-              /// Stats Section
-              _buildStatsGrid(context),
-
-              SizedBox(height: 24.h),
-
-              /// Section Header
-              Text(
-                "operations".tr,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              SizedBox(height: 16.h),
-
-              /// Management Grid
-              _buildManagementGrid(context),
-
-              SizedBox(height: 20.h),
-            ],
+        child: Obx(
+          () => IndexedStack(
+            index: controller.selectedIndex.value,
+            children: tabPages,
           ),
         ),
+      ),
+      bottomNavigationBar: _buildBottomNav(context),
+    );
+  }
+
+  // WIDGET BUILDERS
+  Widget _buildDashboardContent(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 16.h),
+
+          /// Top Bar
+          _buildTopBar(context),
+
+          SizedBox(height: 24.h),
+
+          /// Welcome Text
+          Text(
+            "staff_dashboard".tr,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 28.sp,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
+
+          SizedBox(height: 24.h),
+
+          /// Stats Grid (4 items)
+          _buildStatsGrid(context),
+
+          SizedBox(height: 24.h),
+
+          /// Section Header
+          Text(
+            "operations".tr,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          SizedBox(height: 16.h),
+
+          /// Management Grid
+          _buildManagementGrid(context),
+
+          SizedBox(height: 20.h),
+        ],
       ),
     );
   }
 
+  /// Tab 2: Alerts
+  Widget _buildAlertsContent(BuildContext context) {
+    return const AlertsView();
+  }
+
   Widget _buildTopBar(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final AuthService authService = Get.find<AuthService>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        // Logo
         Icon(Icons.surfing, size: 40.sp, color: colorScheme.primary),
+
+        // QR Scanner
         InkWell(
-          onTap: () => authService.signOut(),
+          onTap: () {
+            Get.toNamed(Routes.QR_SCANNER);
+          },
           child: Container(
             height: 40.w,
             width: 40.w,
@@ -86,7 +114,7 @@ class StaffHomeView extends GetView<StaffHomeController> {
               border: Border.all(color: colorScheme.outline),
             ),
             child: Icon(
-              Iconsax.logout,
+              Iconsax.scan_barcode,
               color: colorScheme.onSurface,
               size: 20.sp,
             ),
@@ -98,79 +126,23 @@ class StaffHomeView extends GetView<StaffHomeController> {
 
   Widget _buildStatsGrid(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    // Data For Stats
     final stats = [
       {
         'title': 'active_rentals'.tr,
-        'count': '12',
-        'color': colorScheme.primary,
-      },
-      {'title': 'due_soon'.tr, 'count': '5', 'color': Colors.orange},
-    ];
-
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12.w,
-        mainAxisSpacing: 12.h,
-        childAspectRatio: 1.4,
-      ),
-      itemCount: stats.length,
-      itemBuilder: (context, index) {
-        return Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: colorScheme.outline),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                stats[index]['title'] as String,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 14.sp,
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                stats[index]['count'] as String,
-                style: TextStyle(
-                  color: stats[index]['color'] as Color,
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildManagementGrid(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final menuItems = [
-      {
-        'title': 'new_rental'.tr,
-        'icon': Iconsax.add_circle,
-        'route': Routes.NEW_RENTAL,
-      },
-      {'title': 'rentals'.tr, 'icon': Iconsax.receipt, 'route': Routes.RENTALS},
-      {'title': 'inventory'.tr, 'icon': Iconsax.box, 'route': Routes.INVENTORY},
-      {
-        'title': 'customers'.tr,
-        'icon': Iconsax.user,
-        'route': Routes.CUSTOMER_LIST,
+        'count': controller.activeRentals.value.toString(),
       },
       {
-        'title': 'settings'.tr,
-        'icon': Iconsax.setting_2,
-        'route': Routes.SETTINGS,
+        'title': 'boards_available'.tr,
+        'count': controller.boardsAvailable.value.toString(),
+      },
+      {
+        'title': 'damages_pending'.tr,
+        'count': controller.damagesPending.value.toString(),
+      },
+      {
+        'title': 'total_customers'.tr,
+        'count': controller.totalCustomers.value.toString(),
       },
     ];
 
@@ -183,10 +155,107 @@ class StaffHomeView extends GetView<StaffHomeController> {
         mainAxisSpacing: 12.h,
         childAspectRatio: 1.3,
       ),
+      itemCount: stats.length,
+      itemBuilder: (context, index) {
+        return InkWell(
+          onTap: () {
+            // Handle Navigation Here
+            switch (index) {
+              case 0:
+                Get.toNamed(Routes.RENTALS);
+                break;
+              case 1:
+                Get.toNamed(Routes.AVAILABLE_INVENTORY);
+                break;
+              case 2:
+                Get.toNamed(Routes.DAMAGES_PENDING);
+                break;
+            }
+          },
+          borderRadius: BorderRadius.circular(12.r),
+          child: Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: colorScheme.outline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  stats[index]['title']!,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  stats[index]['count']!,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildManagementGrid(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    // Data For Management Menu (Filtered for Staff)
+    final menuItems = [
+      {'title': 'inventory'.tr, 'sub': 'inventory_sub'.tr, 'icon': Iconsax.box},
+      {
+        'title': 'customers'.tr,
+        'sub': 'customers_sub'.tr,
+        'icon': Iconsax.user,
+      },
+      {'title': 'rentals'.tr, 'sub': 'rentals_sub'.tr, 'icon': Iconsax.receipt},
+      {
+        'title': 'settings'.tr,
+        'sub': 'settings_sub'.tr,
+        'icon': Iconsax.setting_2,
+      },
+    ];
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.w,
+        mainAxisSpacing: 12.h,
+        childAspectRatio: 1.1,
+      ),
       itemCount: menuItems.length,
       itemBuilder: (context, index) {
         return InkWell(
-          onTap: () => Get.toNamed(menuItems[index]['route'] as String),
+          onTap: () {
+            // Handle Navigation Here
+            switch (index) {
+              case 0:
+                Get.toNamed(Routes.INVENTORY);
+                break;
+              case 1:
+                Get.toNamed(Routes.CUSTOMER_LIST);
+                break;
+              case 2:
+                Get.toNamed(Routes.RENTAL_HISTORY);
+                break;
+              case 3:
+                Get.toNamed(Routes.SETTINGS);
+                break;
+            }
+          },
           borderRadius: BorderRadius.circular(12.r),
           child: Container(
             padding: EdgeInsets.all(16.w),
@@ -213,11 +282,57 @@ class StaffHomeView extends GetView<StaffHomeController> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 4.h),
+                Text(
+                  menuItems[index]['sub'] as String,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildBottomNav(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer.withValues(alpha: 0.95),
+        border: Border(top: BorderSide(color: colorScheme.outline)),
+      ),
+      child: Obx(
+        () => BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: controller.selectedIndex.value,
+          onTap: controller.changeIndex,
+          selectedItemColor: colorScheme.primary,
+          unselectedItemColor: colorScheme.onSurfaceVariant,
+          selectedFontSize: 12.sp,
+          unselectedFontSize: 12.sp,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Iconsax.element_4),
+              label: "dashboard_tab".tr,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Iconsax.add_circle),
+              label: "new_rental_tab".tr,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Iconsax.notification),
+              label: "alerts_tab".tr,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

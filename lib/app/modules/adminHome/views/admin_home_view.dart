@@ -164,6 +164,12 @@ class AdminHomeView extends GetView<AdminHomeController> {
               case 0:
                 Get.toNamed(Routes.RENTALS);
                 break;
+              case 1:
+                Get.toNamed(Routes.AVAILABLE_INVENTORY);
+                break;
+              case 2:
+                Get.toNamed(Routes.DAMAGES_PENDING);
+                break;
             }
           },
           child: Container(

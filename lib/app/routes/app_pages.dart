@@ -38,6 +38,10 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/inventory/bindings/inventory_binding.dart';
 import '../modules/inventory/views/inventory_view.dart';
+import '../modules/inventory/views/available_inventory_view.dart';
+import '../modules/inventory/bindings/available_inventory_binding.dart';
+import '../modules/damagesPending/bindings/damages_pending_binding.dart';
+import '../modules/damagesPending/views/damages_pending_view.dart';
 import '../modules/itemDetails/bindings/item_details_binding.dart';
 import '../modules/itemDetails/views/item_details_view.dart';
 import '../modules/manageUsers/bindings/manage_users_binding.dart';
@@ -186,9 +190,23 @@ class AppPages {
       middlewares: [AccessControlMiddleware(routeKey: 'inventory')],
     ),
     GetPage(
+      name: _Paths.AVAILABLE_INVENTORY,
+      page: () => const AvailableInventoryView(),
+      binding: AvailableInventoryBinding(),
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'inventory'),
+      ], // Using same permission as inventory
+    ),
+    GetPage(
       name: _Paths.ADD_INVENTORY,
       page: () => const AddInventoryView(),
       binding: AddInventoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAMAGES_PENDING,
+      page: () => const DamagesPendingView(),
+      binding: DamagesPendingBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'rentals')],
     ),
     GetPage(
       name: _Paths.SETTINGS,

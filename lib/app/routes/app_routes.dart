@@ -40,6 +40,8 @@ abstract class Routes {
   static const MAINTENANCE = _Paths.MAINTENANCE;
   static const QR_SCANNER = _Paths.QR_SCANNER;
   static const RENTAL_HISTORY = _Paths.RENTAL_HISTORY;
+  static const AVAILABLE_INVENTORY = _Paths.AVAILABLE_INVENTORY;
+  static const DAMAGES_PENDING = _Paths.DAMAGES_PENDING;
 }
 
 abstract class _Paths {
@@ -79,4 +81,6 @@ abstract class _Paths {
   static const MAINTENANCE = '/maintenance';
   static const QR_SCANNER = '/qr-scanner';
   static const RENTAL_HISTORY = '/rental-history';
+  static const AVAILABLE_INVENTORY = '/available-inventory';
+  static const DAMAGES_PENDING = '/damages-pending';
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
@@ -41,27 +43,52 @@ class EditShopView extends GetView<SettingsController> {
               SizedBox(height: 20.h),
 
               /// Shop Icon (Static for now)
-              Center(
-                child: Container(
-                  padding: EdgeInsets.all(4.w),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: colorScheme.primary.withOpacity(0.5),
-                      width: 2,
-                    ),
+              /// Shop QR Code
+              Obx(() {
+                final shopId = controller.shopProfile.value[FirestoreFields.id];
+                if (shopId == null || shopId.toString().isEmpty) {
+                  return const SizedBox();
+                }
+                return Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: colorScheme.primary.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: QrImageView(
+                          data: shopId.toString(),
+                          version: QrVersions.auto,
+                          size: 160.w,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      SelectableText(
+                        'ID: $shopId',
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12.sp,
+                          fontFamily: 'Monospace',
+                        ),
+                      ),
+                    ],
                   ),
-                  child: CircleAvatar(
-                    radius: 50.w,
-                    backgroundColor: colorScheme.surfaceContainer,
-                    child: Icon(
-                      Iconsax.shop,
-                      color: colorScheme.primary,
-                      size: 40.w,
-                    ),
-                  ),
-                ),
-              ),
+                );
+              }),
 
               SizedBox(height: 40.h),
 
