@@ -68,18 +68,23 @@ class RentalsView extends GetView<RentalsController> {
 
           /// 2. Rental List
           Expanded(
-            child: PagedListView<DocumentSnapshot?, RentalModel>(
-              pagingController: controller.pagingController,
-              padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
-              builderDelegate: PagedChildBuilderDelegate<RentalModel>(
-                itemBuilder: (context, rental, index) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: _buildRentalCard(context, rental, controller),
+            child: RefreshIndicator(
+              onRefresh: controller.onRefresh,
+              child: PagedListView<DocumentSnapshot?, RentalModel>(
+                pagingController: controller.pagingController,
+                padding: EdgeInsets.symmetric(
+                  horizontal: ASizes.defaultPadding,
                 ),
-                noItemsFoundIndicatorBuilder: (context) =>
-                    _buildEmptyState(context),
-                firstPageErrorIndicatorBuilder: (context) =>
-                    _buildErrorState(context),
+                builderDelegate: PagedChildBuilderDelegate<RentalModel>(
+                  itemBuilder: (context, rental, index) => Padding(
+                    padding: EdgeInsets.only(bottom: 12.h),
+                    child: _buildRentalCard(context, rental, controller),
+                  ),
+                  noItemsFoundIndicatorBuilder: (context) =>
+                      _buildEmptyState(context),
+                  firstPageErrorIndicatorBuilder: (context) =>
+                      _buildErrorState(context),
+                ),
               ),
             ),
           ),
@@ -202,24 +207,19 @@ class RentalsView extends GetView<RentalsController> {
                   )
                 else if (rental.status == RentalStatus.completed)
                   Container(
-                    height: 12.w,
-                    width: 12.w,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: statusColors?.success ?? Colors.green,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: (statusColors?.success ?? Colors.green)
-                              .withOpacity(0.4),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                      color: (statusColors?.success ?? Colors.green)
+                          .withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "completed".tr,
                       style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
+                        color: statusColors?.success ?? Colors.green,
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -227,23 +227,18 @@ class RentalsView extends GetView<RentalsController> {
                   )
                 else if (rental.status == RentalStatus.mark_as_damaged)
                   Container(
-                    height: 12.w,
-                    width: 12.w,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: colorScheme.error,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorScheme.error.withOpacity(0.4),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                      color: colorScheme.error.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "damaged".tr,
                       style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
+                        color: colorScheme.error,
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -251,23 +246,18 @@ class RentalsView extends GetView<RentalsController> {
                   )
                 else if (rental.status == RentalStatus.item_returned)
                   Container(
-                    height: 12.w,
-                    width: 12.w,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.4),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                      color: Colors.blue.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "returned".tr,
                       style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
+                        color: Colors.blue,
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -275,24 +265,19 @@ class RentalsView extends GetView<RentalsController> {
                   )
                 else if (rental.status == RentalStatus.active)
                   Container(
-                    height: 12.w,
-                    width: 12.w,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: statusColors?.warning ?? Colors.orange,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: (statusColors?.warning ?? Colors.orange)
-                              .withOpacity(0.4),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                      color: (statusColors?.warning ?? Colors.orange)
+                          .withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "active".tr,
                       style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
+                        color: statusColors?.warning ?? Colors.orange,
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -300,18 +285,13 @@ class RentalsView extends GetView<RentalsController> {
                   )
                 else
                   Container(
-                    height: 12.w,
-                    width: 12.w,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: colorScheme.onSurfaceVariant,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorScheme.onSurfaceVariant.withOpacity(0.4),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "cancelled".tr,

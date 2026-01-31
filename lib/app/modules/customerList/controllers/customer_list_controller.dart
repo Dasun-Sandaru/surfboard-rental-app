@@ -91,6 +91,8 @@ class CustomerListController extends GetxController {
 
       final QuerySnapshot snapshot = await query.get();
 
+      if (isClosed) return;
+
       final newItems = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         data[FirestoreFields.id] = doc.id;
@@ -121,7 +123,7 @@ class CustomerListController extends GetxController {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _currentSearchTerm = query;
       // Triggers a complete reload of the list
-      pagingController.refresh();
+      if (!isClosed) pagingController.refresh();
     });
   }
 

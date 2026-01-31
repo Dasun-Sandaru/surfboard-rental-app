@@ -20,6 +20,7 @@ class UserService {
   // AUTH GETTERS
   // ---------------------------------------------------------------------------
   User? get currentUser => _auth.currentUser;
+  String? get currentUid => _auth.currentUser?.uid;
 
   // ---------------------------------------------------------------------------
   // GET SHOP ID FROM LOCAL STORAGE

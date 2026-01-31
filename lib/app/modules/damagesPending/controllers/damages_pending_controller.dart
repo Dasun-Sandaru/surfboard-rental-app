@@ -67,6 +67,8 @@ class DamagesPendingController extends GetxController {
         status: RentalStatus.mark_as_damaged,
       );
 
+      if (isClosed) return;
+
       final newItems = snapshot.docs
           .map(
             (doc) => RentalModel.fromSnapshot(
@@ -97,7 +99,7 @@ class DamagesPendingController extends GetxController {
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _currentSearchTerm = query;
-      pagingController.refresh();
+      if (!isClosed) pagingController.refresh();
     });
   }
 

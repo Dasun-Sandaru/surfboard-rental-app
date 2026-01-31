@@ -88,6 +88,10 @@ class StaffHomeController extends GetxController {
     }
   }
 
+  Future<void> onRefresh() async {
+    await loadDashboardStats();
+  }
+
   /// Sign out
   Future<void> signOut() async => await _authService.signOut();
 }

@@ -36,53 +36,57 @@ class AdminHomeView extends GetView<AdminHomeController> {
   // WIDGET BUILDERS
   Widget _buildDashboardContent(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16.h),
+    return RefreshIndicator(
+      onRefresh: controller.onRefresh,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16.h),
 
-          /// Top Bar
-          _buildTopBar(context),
+            /// Top Bar
+            _buildTopBar(context),
 
-          SizedBox(height: 24.h),
+            SizedBox(height: 24.h),
 
-          /// Welcome Text
-          Text(
-            "welcome_admin".tr,
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
+            /// Welcome Text
+            Text(
+              "welcome_admin".tr,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 28.sp,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
             ),
-          ),
 
-          SizedBox(height: 24.h),
+            SizedBox(height: 24.h),
 
-          /// Stats Grid (4 items)
-          _buildStatsGrid(context),
+            /// Stats Grid (4 items)
+            _buildStatsGrid(context),
 
-          SizedBox(height: 24.h),
+            SizedBox(height: 24.h),
 
-          /// Section Header
-          Text(
-            "management".tr,
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
+            /// Section Header
+            Text(
+              "management".tr,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
 
-          SizedBox(height: 16.h),
+            SizedBox(height: 16.h),
 
-          /// Management Grid
-          _buildManagementGrid(context),
+            /// Management Grid
+            _buildManagementGrid(context),
 
-          SizedBox(height: 20.h),
-        ],
+            SizedBox(height: 20.h),
+          ],
+        ),
       ),
     );
   }

@@ -22,6 +22,7 @@ import '../../../models/init_rental_model.dart';
 import '../../../models/security_deposit_model.dart';
 import '../../../models/shop_model.dart';
 import '../../../services/damage_fee_service.dart';
+import '../../../services/payment_service.dart';
 import '../../../services/user_service.dart';
 
 class AgreementController extends GetxController {
@@ -31,6 +32,7 @@ class AgreementController extends GetxController {
   final PdfService _pdfService = PdfService();
   final ShopService _shopService = ShopService();
   final RentalService _rentalService = RentalService();
+  final PaymentService _paymentService = PaymentService();
 
   // -- Agreement Data --
   final Rxn<InitRentalModel> initRentalModel = Rxn<InitRentalModel>();
@@ -432,9 +434,13 @@ class AgreementController extends GetxController {
         rentalData.dueDate.year,
         rentalData.dueDate.month,
         rentalData.dueDate.day,
-        rentalData.dueTime.hour,
-        rentalData.dueTime.minute,
+        rentalData.dueDate.hour,
+        rentalData.dueDate.minute,
       );
+
+      final deposit = requireDeposit.value
+          ? (double.tryParse(depositController.text) ?? 0.0)
+          : 0.0;
 
       final newRental = RentalModel(
         shopId: shopId,
@@ -452,10 +458,8 @@ class AgreementController extends GetxController {
         amountPaid: 0.0,
         securityDeposit: SecurityDepositModel(
           enabled: requireDeposit.value,
-          amount: requireDeposit.value
-              ? (double.tryParse(depositController.text) ?? 0.0)
-              : 0.0,
-          paid: 0.0,
+          amount: deposit,
+          paid: requireDeposit.value ? deposit : 0.0,
           refunded: 0.0,
         ),
         agreementLink: null,
@@ -471,6 +475,19 @@ class AgreementController extends GetxController {
         newRental,
         generatedPdfData.value!,
       );
+
+      // Create Payment Record for Security Deposit if paid
+      if (requireDeposit.value && deposit > 0) {
+        await _paymentService.addPayment(
+          shopId: shopId,
+          rentalId: rentalId,
+          category: PaymentCategory.deposit,
+          amount: deposit,
+          handledBy: staffName,
+          method: PaymentMethod.cash, // Defaulting to cash for now
+          note: "Initial Security Deposit",
+        );
+      }
 
       AppSnackBar.success(
         title: "Success",

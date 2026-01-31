@@ -51,23 +51,33 @@ class InventoryListView extends StatelessWidget {
               // }
 
               if (controller.items.isEmpty) {
-                return Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Iconsax.add,
-                          size: 48.w,
-                          color: colorScheme.onSurfaceVariant,
+                return RefreshIndicator(
+                  onRefresh: controller.onRefresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 100.h),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Iconsax.add,
+                                size: 48.w,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              Text(
+                                'no_inventory_found'.tr,
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          'no_inventory_found'.tr,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -78,36 +88,44 @@ class InventoryListView extends StatelessWidget {
               //   );
               // }
 
-              return ListView.separated(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ASizes.defaultPadding,
-                  vertical: 8.h,
-                ),
-                itemCount: controller.items.length + 1,
-                separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                itemBuilder: (context, index) {
-                  if (index == controller.items.length) {
-                    controller.loadMore();
-                    return controller.hasMoreItems.value
-                        ? const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
-                          )
-                        : const SizedBox.shrink();
-                  }
+              return RefreshIndicator(
+                onRefresh: controller.onRefresh,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ASizes.defaultPadding,
+                    vertical: 8.h,
+                  ),
+                  itemCount: controller.items.length + 1,
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    if (index == controller.items.length) {
+                      controller.loadMore();
+                      return controller.hasMoreItems.value
+                          ? const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                          : const SizedBox.shrink();
+                    }
 
-                  return _buildInventoryCard(
-                    context,
-                    controller.items[index],
-                    controller,
-                  );
-                },
+                    return _buildInventoryCard(
+                      context,
+                      controller.items[index],
+                      controller,
+                    );
+                  },
+                ),
               );
             }),
           ),
         ],
       ),
       floatingActionButton: Obx(() {
+        // Check for Admin Override via ConfigService (or just ConfigService rules if they are correct)
+        // Note: We need to ensure ConfigService has the "effective" rules for Admin.
+        // If ConfigService takes raw rules from DB, then Admin might be blocked.
+        // I will fix this in ConfigService. For now, I'll rely on ConfigService.
         final canAdd =
             _configService.staffAccessRules['inventory_add'] ?? false;
 

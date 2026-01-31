@@ -66,6 +66,8 @@ class RentalHistoryController extends GetxController {
         endDate: dateRange.value?.end,
       );
 
+      if (isClosed) return;
+
       final newItems = snapshot.docs
           .map(
             (doc) => RentalModel.fromSnapshot(
@@ -93,7 +95,7 @@ class RentalHistoryController extends GetxController {
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _currentSearchTerm = query;
-      pagingController.refresh();
+      if (!isClosed) pagingController.refresh();
     });
   }
 
@@ -128,7 +130,7 @@ class RentalHistoryController extends GetxController {
           const Duration(hours: 23, minutes: 59, seconds: 59),
         ),
       );
-      pagingController.refresh();
+      if (!isClosed) pagingController.refresh();
     }
   }
 

@@ -12,6 +12,37 @@ class ConfigService extends GetxService {
   static const String logName = 'ConfigService';
 
   // -- App Configurations --
+
+  // Known permission keys
+  static const List<String> _permissionKeys = [
+    'new_rental',
+    'rentals',
+    'rental_history',
+    'alerts',
+    'qr_scanner',
+    'inventory_view',
+    'inventory_view_damage_fees',
+    'inventory_add',
+    'inventory_edit',
+    'inventory_delete',
+    'customers_view',
+    'customers_add',
+    'customers_edit',
+    'customer_contact',
+    'payments',
+    'damage_fee',
+    'reports',
+    'settings_view_shop',
+    'settings_edit_shop',
+    'settings_edit_currency',
+    'settings_edit_date_format',
+    'settings_edit_timezone',
+    'settings_edit_rental_logic',
+    'settings_manage_access',
+    'shop_setup',
+    'agreement_template',
+  ];
+
   final RxString currency = 'USD'.obs;
   final RxString dateFormat = 'dd/MM/yyyy'.obs;
   final RxString timeZone = 'UTC'.obs;
@@ -112,6 +143,29 @@ class ConfigService extends GetxService {
             'Tax=${isTaxEnabled.value ? taxRate.value : "Disabled"}',
             name: logName,
           );
+          // Load Access Rules
+          bool isAdmin = false;
+          final currentUser = await userService.getUser(
+            userService.currentUid ?? '',
+          );
+          if (currentUser != null && currentUser.role.name == 'admin') {
+            isAdmin = true;
+          }
+
+          if (isAdmin) {
+            final adminRules = <String, bool>{};
+            for (var key in _permissionKeys) {
+              adminRules[key] = true;
+            }
+            updateAccessRules(adminRules);
+          } else {
+            // Load from Shop
+            if (data[FirestoreFields.staffAccess] != null) {
+              updateAccessRules(
+                data[FirestoreFields.staffAccess] as Map<String, dynamic>,
+              );
+            }
+          }
         }
       }
     } catch (e) {

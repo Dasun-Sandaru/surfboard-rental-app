@@ -214,4 +214,11 @@ class InventoryController extends GetxController {
   void toggleLessThan() {
     isLessThan.value = !isLessThan.value;
   }
+
+  Future<void> onRefresh() async {
+    items.clear();
+    lastDocument = null;
+    hasMoreItems.value = true;
+    await loadMore();
+  }
 }

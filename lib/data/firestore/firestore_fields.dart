@@ -54,6 +54,7 @@ class FirestoreFields {
   static const amountPaid = 'amountPaid';
   static const securityDeposit = 'securityDeposit';
   static const agreementLink = 'agreementLink';
+  static const invoiceLink = 'invoiceLink';
   static const overdueTime = 'overdueTime';
   static const cachedCustomerName = 'cached_customer_name';
   static const cachedItemName = 'cached_item_name';
