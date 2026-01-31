@@ -34,137 +34,153 @@ class EditShopView extends GetView<SettingsController> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(ASizes.defaultPadding),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              SizedBox(height: 20.h),
+      body: Obx(() {
+        final canEdit = controller.hasPermission('settings_edit_shop');
 
-              /// Shop Icon (Static for now)
-              /// Shop QR Code
-              Obx(() {
-                final shopId = controller.shopProfile.value[FirestoreFields.id];
-                if (shopId == null || shopId.toString().isEmpty) {
-                  return const SizedBox();
-                }
-                return Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(12.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: colorScheme.primary.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: QrImageView(
-                          data: shopId.toString(),
-                          version: QrVersions.auto,
-                          size: 160.w,
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      SelectableText(
-                        'ID: $shopId',
-                        style: TextStyle(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: 12.sp,
-                          fontFamily: 'Monospace',
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(ASizes.defaultPadding),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(height: 20.h),
 
-              SizedBox(height: 40.h),
-
-              /// Shop Name
-              _buildLabel(context, "Shop Name"),
-              SizedBox(height: 8.h),
-              _buildTextField(
-                context,
-                controller: controller.shopNameController,
-                hintText: "Enter shop name",
-                icon: Iconsax.shop,
-                validator: (value) =>
-                    AValidator.validateText(value, 'Shop Name'),
-              ),
-
-              SizedBox(height: 20.h),
-
-              /// Location
-              _buildLabel(context, "Location"),
-              SizedBox(height: 8.h),
-              _buildTextField(
-                context,
-                controller: controller.shopLocationController,
-                hintText: "Enter shop location",
-                icon: Iconsax.location,
-                validator: (value) =>
-                    AValidator.validateText(value, 'Location'),
-              ),
-
-              SizedBox(height: 20.h),
-
-              /// Shop Contact Number
-              _buildLabel(context, "Shop Contact Number"),
-              SizedBox(height: 8.h),
-              _buildTextField(
-                context,
-                controller: controller.shopContactController,
-                hintText: "Enter shop contact number",
-                icon: Iconsax.call,
-                validator: (value) => AValidator.validatePhoneNumber(value),
-              ),
-
-              SizedBox(height: 40.h),
-
-              /// Save Button
-              SizedBox(
-                width: double.infinity,
-                height: 54.h,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      controller.saveShopDetails();
+                /// Shop Icon (Static for now)
+                /// Shop QR Code
+                // Re-using exiting Obx logic? No, we are inside Obx now.
+                // Just access the values directly.
+                Builder(
+                  builder: (context) {
+                    // Using Builder to keep context if needed, or just inline
+                    final shopId =
+                        controller.shopProfile.value[FirestoreFields.id];
+                    if (shopId == null || shopId.toString().isEmpty) {
+                      return const SizedBox();
                     }
+                    return Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(12.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: colorScheme.primary.withValues(
+                                  alpha: 0.2,
+                                ),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: QrImageView(
+                              data: shopId.toString(),
+                              version: QrVersions.auto,
+                              size: 160.w,
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          SelectableText(
+                            'ID: $shopId',
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 12.sp,
+                              fontFamily: 'Monospace',
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 4,
-                    shadowColor: colorScheme.primary.withOpacity(0.4),
-                  ),
-                  child: Text(
-                    "Save Changes",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
-              ),
-            ],
+
+                SizedBox(height: 40.h),
+
+                /// Shop Name
+                _buildLabel(context, "Shop Name"),
+                SizedBox(height: 8.h),
+                _buildTextField(
+                  context,
+                  controller: controller.shopNameController,
+                  hintText: "Enter shop name",
+                  icon: Iconsax.shop,
+                  enabled: canEdit,
+                  validator: (value) =>
+                      AValidator.validateText(value, 'Shop Name'),
+                ),
+
+                SizedBox(height: 20.h),
+
+                /// Location
+                _buildLabel(context, "Location"),
+                SizedBox(height: 8.h),
+                _buildTextField(
+                  context,
+                  controller: controller.shopLocationController,
+                  hintText: "Enter shop location",
+                  icon: Iconsax.location,
+                  enabled: canEdit,
+                  validator: (value) =>
+                      AValidator.validateText(value, 'Location'),
+                ),
+
+                SizedBox(height: 20.h),
+
+                /// Shop Contact Number
+                _buildLabel(context, "Shop Contact Number"),
+                SizedBox(height: 8.h),
+                _buildTextField(
+                  context,
+                  controller: controller.shopContactController,
+                  hintText: "Enter shop contact number",
+                  icon: Iconsax.call,
+                  enabled: canEdit,
+                  validator: (value) => AValidator.validatePhoneNumber(value),
+                ),
+
+                SizedBox(height: 40.h),
+
+                /// Save Button
+                if (canEdit)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54.h,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          controller.saveShopDetails();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 4,
+                        shadowColor: colorScheme.primary.withOpacity(0.4),
+                      ),
+                      child: Text(
+                        "Save Changes",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 

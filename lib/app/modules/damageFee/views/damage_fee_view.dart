@@ -7,9 +7,12 @@ import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/damage_fee_controller.dart';
+import '../../../../app/services/config_service.dart';
 
 class DamageFeeView extends GetView<DamageFeeController> {
-  const DamageFeeView({super.key});
+  DamageFeeView({super.key});
+
+  final ConfigService _configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +48,11 @@ class DamageFeeView extends GetView<DamageFeeController> {
             }
 
             // List Content
-            return Obx(
-              () => ListView.separated(
+            return Obx(() {
+              final canEdit =
+                  _configService.staffAccessRules['inventory_edit'] ?? false;
+
+              return ListView.separated(
                 padding: EdgeInsets.fromLTRB(
                   ASizes.defaultPadding,
                   ASizes.defaultPadding,
@@ -57,10 +63,15 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 separatorBuilder: (context, index) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
                   final rule = controller.damageRules[index];
-                  return _buildDamageRuleCard(context, rule, controller);
+                  return _buildDamageRuleCard(
+                    context,
+                    rule,
+                    controller,
+                    canEdit: canEdit,
+                  );
                 },
-              ),
-            );
+              );
+            });
           }),
 
           // Floating Action Button (Centered at bottom like HTML)
@@ -69,34 +80,43 @@ class DamageFeeView extends GetView<DamageFeeController> {
             left: 0,
             right: 0,
             child: Center(
-              child: SizedBox(
-                height: 50.h,
-                child: ElevatedButton(
-                  onPressed: () => controller.openAddEditDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Iconsax.add, size: 24.w),
-                      SizedBox(width: 8.w),
-                      Text(
-                        "add_damage_rule".tr,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+              child: Center(
+                child: Obx(() {
+                  final canEdit =
+                      _configService.staffAccessRules['inventory_edit'] ??
+                      false;
+                  if (!canEdit) return const SizedBox.shrink();
+
+                  return SizedBox(
+                    height: 50.h,
+                    child: ElevatedButton(
+                      onPressed: () => controller.openAddEditDialog(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
+                        elevation: 4,
                       ),
-                    ],
-                  ),
-                ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Iconsax.add, size: 24.w),
+                          SizedBox(width: 8.w),
+                          Text(
+                            "add_damage_rule".tr,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
               ),
             ),
           ),
@@ -108,8 +128,9 @@ class DamageFeeView extends GetView<DamageFeeController> {
   Widget _buildDamageRuleCard(
     BuildContext context,
     DamageFeeModel rule,
-    DamageFeeController controller,
-  ) {
+    DamageFeeController controller, {
+    bool canEdit = false,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final bool isActive = rule.activeStatus;
 
@@ -167,27 +188,28 @@ class DamageFeeView extends GetView<DamageFeeController> {
           ),
 
           // Actions
-          Row(
-            children: [
-              // Edit Button
-              _buildIconButton(
-                icon: Iconsax.edit,
-                color: colorScheme.onSurfaceVariant,
-                bgColor: colorScheme.surface,
-                onTap: () => controller.openAddEditDialog(rule: rule),
-              ),
+          if (canEdit)
+            Row(
+              children: [
+                // Edit Button
+                _buildIconButton(
+                  icon: Iconsax.edit,
+                  color: colorScheme.onSurfaceVariant,
+                  bgColor: colorScheme.surface,
+                  onTap: () => controller.openAddEditDialog(rule: rule),
+                ),
 
-              SizedBox(width: 8.w),
+                SizedBox(width: 8.w),
 
-              // Delete Button
-              _buildIconButton(
-                icon: Iconsax.trash,
-                color: colorScheme.error,
-                bgColor: colorScheme.error.withOpacity(0.1),
-                onTap: () => controller.deleteRule(rule.id!),
-              ),
-            ],
-          ),
+                // Delete Button
+                _buildIconButton(
+                  icon: Iconsax.trash,
+                  color: colorScheme.error,
+                  bgColor: colorScheme.error.withOpacity(0.1),
+                  onTap: () => controller.deleteRule(rule.id!),
+                ),
+              ],
+            ),
         ],
       ),
     );

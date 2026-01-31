@@ -121,6 +121,10 @@ class SignUpView extends GetView<SignUpController> {
               hintText: 'SHP-1234',
               icon: Iconsax.shop,
               validator: (v) => AValidator.validateText(v, 'Shop Code'),
+              suffix: IconButton(
+                icon: Icon(Iconsax.scan_barcode, color: colorScheme.primary),
+                onPressed: controller.scanShopCode,
+              ),
             ),
 
             SizedBox(height: 16.h),
@@ -468,6 +472,7 @@ class SignUpView extends GetView<SignUpController> {
     TextInputAction textAction = TextInputAction.next,
     RxBool? isObscure,
     String? Function(String?)? validator,
+    Widget? suffix,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     InputDecoration decoration = InputDecoration(
@@ -495,6 +500,7 @@ class SignUpView extends GetView<SignUpController> {
         borderSide: BorderSide(color: colorScheme.error),
       ),
       contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+      suffixIcon: suffix,
     );
 
     if (isObscure != null) {

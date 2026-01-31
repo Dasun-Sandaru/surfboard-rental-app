@@ -11,8 +11,12 @@ import '../../../models/inventory_model.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/inventory_controller.dart';
 
+import '../../../../app/services/config_service.dart';
+
 class InventoryListView extends StatelessWidget {
-  const InventoryListView({super.key});
+  InventoryListView({super.key});
+
+  final ConfigService _configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -103,18 +107,23 @@ class InventoryListView extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: !isSelectionMode
-          ? FloatingActionButton(
-              backgroundColor: colorScheme.primary,
-              onPressed: () {
-                Get.toNamed(
-                  Routes.ADD_INVENTORY,
-                  arguments: {'mode': InventoryFormMode.add},
-                );
-              },
-              child: Icon(Iconsax.add, color: colorScheme.onPrimary),
-            )
-          : null,
+      floatingActionButton: Obx(() {
+        final canAdd =
+            _configService.staffAccessRules['inventory_add'] ?? false;
+
+        if (isSelectionMode || !canAdd) return const SizedBox.shrink();
+
+        return FloatingActionButton(
+          backgroundColor: colorScheme.primary,
+          onPressed: () {
+            Get.toNamed(
+              Routes.ADD_INVENTORY,
+              arguments: {'mode': InventoryFormMode.add},
+            );
+          },
+          child: Icon(Iconsax.add, color: colorScheme.onPrimary),
+        );
+      }),
     );
   }
 

@@ -60,6 +60,7 @@ import '../modules/rentals/bindings/rentals_binding.dart';
 import '../modules/rentals/views/rentals_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
+import '../modules/settings/views/rental_pricing_logic_view.dart';
 import '../modules/shopSetup/bindings/shop_setup_binding.dart';
 import '../modules/shopSetup/views/shop_setup_view.dart';
 import '../modules/signIn/bindings/sign_in_binding.dart';
@@ -185,7 +186,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.INVENTORY,
-      page: () => const InventoryListView(),
+      page: () => InventoryListView(),
       binding: InventoryBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'inventory')],
     ),
@@ -216,12 +217,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.ITEM_DETAILS,
-      page: () => const ItemDetailsView(),
+      page: () => ItemDetailsView(),
       binding: ItemDetailsBinding(),
     ),
     GetPage(
       name: _Paths.CUSTOMER_LIST,
-      page: () => const CustomerListView(),
+      page: () => CustomerListView(),
       binding: CustomerListBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'customers')],
     ),
@@ -232,12 +233,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CUSTOMER_DETAILS,
-      page: () => const CustomerDetailsView(),
+      page: () => CustomerDetailsView(),
       binding: CustomerDetailsBinding(),
     ),
     GetPage(
       name: _Paths.DAMAGE_FEE,
-      page: () => const DamageFeeView(),
+      page: () => DamageFeeView(),
       binding: DamageFeeBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'damage_fee')],
     ),
@@ -301,6 +302,14 @@ class AppPages {
       page: () => const RentalHistoryView(),
       binding: RentalHistoryBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'rental_history')],
+    ),
+    GetPage(
+      name: _Paths.RENTAL_PRICING_LOGIC,
+      page: () => const RentalPricingLogicView(),
+      binding: SettingsBinding(), // Re-use SettingsBinding
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'settings_edit_rental_logic'),
+      ],
     ),
   ];
 }

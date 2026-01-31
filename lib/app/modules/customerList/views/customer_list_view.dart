@@ -9,8 +9,12 @@ import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/customer_list_controller.dart';
 
+import '../../../../app/services/config_service.dart';
+
 class CustomerListView extends GetView<CustomerListController> {
-  const CustomerListView({super.key});
+  CustomerListView({super.key});
+
+  final ConfigService _configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +31,16 @@ class CustomerListView extends GetView<CustomerListController> {
         elevation: 0,
         iconTheme: IconThemeData(color: colorScheme.onSurface),
         actions: [
-          IconButton(
-            onPressed: () => controller.addCustomer(),
-            icon: Icon(Iconsax.user_add, color: colorScheme.onSurface),
-          ),
+          Obx(() {
+            final canAdd =
+                _configService.staffAccessRules['customers_add'] ?? false;
+            if (!canAdd) return const SizedBox.shrink();
+
+            return IconButton(
+              onPressed: () => controller.addCustomer(),
+              icon: Icon(Iconsax.user_add, color: colorScheme.onSurface),
+            );
+          }),
         ],
       ),
       body: SafeArea(

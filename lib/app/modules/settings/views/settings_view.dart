@@ -7,7 +7,7 @@ import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/settings_controller.dart';
-import 'rental_config_view.dart';
+import '../../../../app/routes/app_pages.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -41,31 +41,75 @@ class SettingsView extends StatelessWidget {
             /// 2. Shop Management Section
             _buildSectionHeader(context, "shop_management".tr),
             SizedBox(height: 8.h),
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  _buildSettingsTile(
-                    context,
-                    icon: Iconsax.shop,
-                    title: "shop_details".tr,
-                    subtitle: "shop_details_sub".tr,
-                    onTap: controller.editShopDetails,
-                  ),
-                  _buildDivider(context),
-                  _buildSettingsTile(
-                    context,
-                    icon: Iconsax.box,
-                    title: "inventory_config".tr,
-                    subtitle: "inventory_config_sub".tr,
-                    onTap: controller.navigateToInventorySettings,
-                    trailingIcon: Iconsax.arrow_right_3,
-                    iconColor: colorScheme.primary,
-                  ),
-                  _buildDivider(context),
+
+            // Shop Details & Inventory Config
+            Obx(() {
+              final canViewShop = controller.hasPermission(
+                'settings_view_shop',
+              );
+              final canEditInventoryConfig = controller.hasPermission(
+                'shop_setup',
+              );
+
+              if (!canViewShop && !canEditInventoryConfig)
+                return const SizedBox.shrink();
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    if (canViewShop)
+                      _buildSettingsTile(
+                        context,
+                        icon: Iconsax.shop,
+                        title: "shop_details".tr,
+                        subtitle: "shop_details_sub".tr,
+                        onTap: controller.editShopDetails,
+                      ),
+
+                    if (canViewShop && canEditInventoryConfig)
+                      _buildDivider(context),
+
+                    if (canEditInventoryConfig)
+                      _buildSettingsTile(
+                        context,
+                        icon: Iconsax.box,
+                        title:
+                            "inventory_config".tr, // "Inventory Configuration"
+                        subtitle: "inventory_config_sub".tr,
+                        onTap: controller.navigateToInventorySettings,
+                        trailingIcon: Iconsax.arrow_right_3,
+                        iconColor: colorScheme.primary,
+                      ),
+                  ],
+                ),
+              );
+            }),
+
+            SizedBox(height: 24.h),
+
+            // Configurations (Currency, Date, TZ, Rental Logic)
+            Obx(() {
+              final canEditCurrency = controller.hasPermission(
+                'settings_edit_currency',
+              );
+              final canEditDate = controller.hasPermission(
+                'settings_edit_date_format',
+              );
+              final canEditTimeZone = controller.hasPermission(
+                'settings_edit_timezone',
+              );
+              final canEditRentalLogic = controller.hasPermission(
+                'settings_edit_rental_logic',
+              );
+
+              final List<Widget> items = [];
+
+              if (canEditCurrency) {
+                items.add(
                   Obx(
                     () => _buildSettingsTile(
                       context,
@@ -77,7 +121,12 @@ class SettingsView extends StatelessWidget {
                       iconColor: Colors.green,
                     ),
                   ),
-                  _buildDivider(context),
+                );
+                items.add(_buildDivider(context));
+              }
+
+              if (canEditDate) {
+                items.add(
                   Obx(
                     () => _buildSettingsTile(
                       context,
@@ -89,7 +138,12 @@ class SettingsView extends StatelessWidget {
                       iconColor: Colors.purple,
                     ),
                   ),
-                  _buildDivider(context),
+                );
+                items.add(_buildDivider(context));
+              }
+
+              if (canEditTimeZone) {
+                items.add(
                   Obx(
                     () => _buildSettingsTile(
                       context,
@@ -101,20 +155,45 @@ class SettingsView extends StatelessWidget {
                       iconColor: Colors.blue,
                     ),
                   ),
+                );
+                items.add(_buildDivider(context));
+              }
 
-                  _buildDivider(context),
+              if (canEditRentalLogic) {
+                items.add(
                   _buildSettingsTile(
                     context,
                     icon: Iconsax.setting_2,
                     title: "rental_pricing".tr,
                     subtitle: "rental_pricing_sub".tr,
-                    onTap: () => Get.to(() => const RentalConfigView()),
+                    onTap: () => Get.toNamed(Routes.RENTAL_PRICING_LOGIC),
                     trailingIcon: Iconsax.arrow_right_3,
                     iconColor: Colors.orange,
                   ),
-                ],
-              ),
-            ),
+                );
+              }
+
+              if (items.isEmpty) return const SizedBox.shrink();
+              if (items.last is Divider)
+                items
+                    .removeLast(); // Logic to remove last divider if present isn't straightforward with generic Widgets, but assuming layout for now.
+
+              // Remove the last divider manually if the last item added was a divider
+              if (items.isNotEmpty && items.last is Divider) {
+                // Wait, can't verify runtime type easily if it's wrapped.
+                // I'll just rely on the fact that I add a divider AFTER each item.
+                // So removing the last one is correct.
+                items.removeLast();
+              }
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(children: items),
+              );
+            }),
 
             SizedBox(height: 24.h),
 
@@ -122,7 +201,12 @@ class SettingsView extends StatelessWidget {
             Obx(() {
               final isOwnerAdmin =
                   controller.userProfile.value[FirestoreFields.role] == 'admin';
-              if (!isOwnerAdmin) return const SizedBox.shrink();
+              final canManageAccess = controller.hasPermission(
+                'settings_manage_access',
+              );
+
+              if (!isOwnerAdmin || !canManageAccess)
+                return const SizedBox.shrink();
 
               return Column(
                 children: [

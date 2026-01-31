@@ -42,6 +42,7 @@ abstract class Routes {
   static const RENTAL_HISTORY = _Paths.RENTAL_HISTORY;
   static const AVAILABLE_INVENTORY = _Paths.AVAILABLE_INVENTORY;
   static const DAMAGES_PENDING = _Paths.DAMAGES_PENDING;
+  static const RENTAL_PRICING_LOGIC = _Paths.RENTAL_PRICING_LOGIC;
 }
 
 abstract class _Paths {
@@ -83,4 +84,5 @@ abstract class _Paths {
   static const RENTAL_HISTORY = '/rental-history';
   static const AVAILABLE_INVENTORY = '/available-inventory';
   static const DAMAGES_PENDING = '/damages-pending';
+  static const RENTAL_PRICING_LOGIC = '/rental-pricing-logic';
 }
