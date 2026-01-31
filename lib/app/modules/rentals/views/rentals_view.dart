@@ -44,6 +44,8 @@ class RentalsView extends GetView<RentalsController> {
             ),
             child: TextFormField(
               controller: controller.searchTextController,
+              onChanged: controller.onSearchChanged,
+              onFieldSubmitted: controller.onSearchChanged,
               style: TextStyle(color: colorScheme.onSurface),
               decoration: InputDecoration(
                 prefixIcon: Icon(

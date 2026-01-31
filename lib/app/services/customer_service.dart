@@ -174,10 +174,13 @@ class CustomerService {
       if (searchTerm != null && searchTerm.isNotEmpty) {
         query = query
             .where(
-              'name_lowercase', // Needs optimization (TODO: add to FirestoreFields if used widely)
+              FirestoreFields.nameLowercase,
               isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
             )
-            .where('name_lowercase', isLessThan: '${searchTerm.toLowerCase()}z')
+            .where(
+              FirestoreFields.nameLowercase,
+              isLessThan: '${searchTerm.toLowerCase()}z',
+            )
             .limit(20);
       } else {
         query = query

@@ -161,6 +161,9 @@ class RentalModel {
       FirestoreFields.cachedItemName: cachedItemName,
       FirestoreFields.cachedStaffName: cachedStaffName,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
+      FirestoreFields.itemNameLowercase: cachedItemName?.toLowerCase() ?? '',
+      FirestoreFields.customerNameLowercase:
+          cachedCustomerName?.toLowerCase() ?? '',
     };
   }
 }

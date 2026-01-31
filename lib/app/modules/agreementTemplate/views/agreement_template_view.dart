@@ -83,7 +83,7 @@ class AgreementTemplateListView extends StatelessWidget {
                   );
                 }
 
-                if (controller.templates.isEmpty) {
+                if (controller.filteredTemplates.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -116,14 +116,14 @@ class AgreementTemplateListView extends StatelessWidget {
 
                 return ListView.separated(
                   padding: EdgeInsets.zero,
-                  itemCount: controller.templates.length,
+                  itemCount: controller.filteredTemplates.length,
                   separatorBuilder: (context, index) => Divider(
                     color: colorScheme.outline.withOpacity(0.3),
                     height: 1,
                     thickness: 1,
                   ),
                   itemBuilder: (context, index) {
-                    final template = controller.templates[index];
+                    final template = controller.filteredTemplates[index];
                     return _buildTemplateTile(context, template, controller);
                   },
                 );

@@ -31,9 +31,6 @@ class RentalHistoryController extends GetxController {
     pagingController.addPageRequestListener((pageKey) async {
       await _fetchPage(pageKey);
     });
-    searchTextController.addListener(() {
-      onSearchChanged(searchTextController.text);
-    });
     _initializeAndFetch();
   }
 

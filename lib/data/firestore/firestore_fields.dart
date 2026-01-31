@@ -59,6 +59,9 @@ class FirestoreFields {
   static const cachedCustomerName = 'cached_customer_name';
   static const cachedItemName = 'cached_item_name';
   static const cachedStaffName = 'cached_staff_name';
+  static const nameLowercase = 'name_lowercase';
+  static const itemNameLowercase = 'itemName_lowercase';
+  static const customerNameLowercase = 'customerName_lowercase';
 
   // Payment
   static const rentalId = 'rentalId';
@@ -85,6 +88,7 @@ class FirestoreFields {
   static const templateName = 'template_name';
   static const section = 'sections';
   static const isDefault = 'is_default';
+  static const templateNameLowercase = 'templateName_lowercase';
 
   // Shop
   static const businessName = 'name';

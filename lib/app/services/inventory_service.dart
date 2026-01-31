@@ -25,6 +25,7 @@ class InventoryService {
     String? sizeFeet,
     String? sizeInches,
     bool isLessThan = false,
+    String? searchTerm,
     int pageSize = 10,
   }) async {
     try {
@@ -68,6 +69,19 @@ class InventoryService {
             isGreaterThanOrEqualTo: sizeValue,
           );
         }
+      }
+
+      // Search filter
+      if (searchTerm != null && searchTerm.isNotEmpty) {
+        query = query
+            .where(
+              FirestoreFields.nameLowercase,
+              isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
+            )
+            .where(
+              FirestoreFields.nameLowercase,
+              isLessThan: '${searchTerm.toLowerCase()}z',
+            );
       }
 
       // Pagination

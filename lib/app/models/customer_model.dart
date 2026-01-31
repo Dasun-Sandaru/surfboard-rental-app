@@ -72,6 +72,7 @@ class CustomerModel {
           ? Timestamp.fromDate(createdAt!)
           : null,
       FirestoreFields.imageUrl: imageUrl ?? '',
+      FirestoreFields.nameLowercase: "$firstName $lastName".toLowerCase(),
     };
   }
 }

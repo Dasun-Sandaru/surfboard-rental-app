@@ -89,18 +89,18 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   ),
                 ),
                 child: Obx(() {
-                  if (controller.users.isEmpty) {
+                  if (controller.filteredUsers.isEmpty) {
                     return _buildEmptyList(context);
                   }
                   return ListView.separated(
-                    itemCount: controller.users.length,
+                    itemCount: controller.filteredUsers.length,
                     padding: EdgeInsets.zero,
                     separatorBuilder: (context, index) => Divider(
                       color: colorScheme.outline.withOpacity(0.5),
                       height: 1,
                     ),
                     itemBuilder: (context, index) {
-                      final user = controller.users[index];
+                      final user = controller.filteredUsers[index];
                       return _buildUserListItem(context, user);
                     },
                   );

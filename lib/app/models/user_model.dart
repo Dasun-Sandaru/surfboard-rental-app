@@ -79,6 +79,7 @@ class UserModel {
           ? Timestamp.fromDate(updatedAt!)
           : null,
       FirestoreFields.emailVerified: emailVerified,
+      FirestoreFields.nameLowercase: name?.toLowerCase(),
     };
   }
 

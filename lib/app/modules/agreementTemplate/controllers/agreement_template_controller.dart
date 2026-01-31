@@ -25,6 +25,8 @@ class AgreementTemplateController extends GetxController {
 
   final RxList<AgreementTemplateModel> templates =
       <AgreementTemplateModel>[].obs;
+  final RxList<AgreementTemplateModel> filteredTemplates =
+      <AgreementTemplateModel>[].obs;
   String? shopId;
 
   @override
@@ -35,6 +37,7 @@ class AgreementTemplateController extends GetxController {
     if (shopId != null) {
       await fetchTemplates();
     }
+    searchTextController.addListener(_filterTemplates);
     isLoading.value = false;
   }
 
@@ -44,6 +47,7 @@ class AgreementTemplateController extends GetxController {
     try {
       final fetchedTemplates = await _templateService.getShopTemplates(shopId!);
       templates.assignAll(fetchedTemplates);
+      _filterTemplates();
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to fetch templates.");
     } finally {
@@ -134,6 +138,17 @@ class AgreementTemplateController extends GetxController {
 
     // 4. Navigate to preview screen
     Get.to(() => const AgreementPreviewView(), arguments: content);
+  }
+
+  void _filterTemplates() {
+    final query = searchTextController.text.toLowerCase();
+    if (query.isEmpty) {
+      filteredTemplates.assignAll(templates);
+    } else {
+      filteredTemplates.assignAll(
+        templates.where((t) => t.templateName.toLowerCase().contains(query)),
+      );
+    }
   }
 
   @override

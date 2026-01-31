@@ -40,6 +40,40 @@ class InventoryListView extends StatelessWidget {
       ),
       body: Column(
         children: [
+          /// 1. Search Bar
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              ASizes.defaultPadding,
+              12.h,
+              ASizes.defaultPadding,
+              8.h,
+            ),
+            child: TextFormField(
+              controller: controller.searchTextController,
+              onChanged: controller.onSearchChanged,
+              onFieldSubmitted: controller.onSearchChanged,
+              style: TextStyle(color: colorScheme.onSurface),
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Iconsax.search_normal,
+                  size: 20.w,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                hintText: 'search_inventory_hint'.tr,
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                ),
+                filled: true,
+                fillColor: colorScheme.surfaceContainer,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+              ),
+            ),
+          ),
+
           _buildFilterHeader(context, controller),
           SizedBox(height: 16.h),
 
