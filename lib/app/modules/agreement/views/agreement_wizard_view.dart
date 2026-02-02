@@ -80,7 +80,9 @@ class AgreementWizardView extends StatelessWidget {
                   width: double.infinity,
                   height: 54.h,
                   child: ElevatedButton(
-                    onPressed: controller.nextStep,
+                    onPressed: controller.isGeneratingAgreement.value
+                        ? null
+                        : controller.nextStep,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
@@ -89,8 +91,18 @@ class AgreementWizardView extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: Obx(
-                      () => Text(
+                    child: Obx(() {
+                      if (controller.isGeneratingAgreement.value) {
+                        return SizedBox(
+                          width: 24.w,
+                          height: 24.h,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: colorScheme.onPrimary,
+                          ),
+                        );
+                      }
+                      return Text(
                         controller.currentStep.value == 3
                             ? "Generate Agreement"
                             : "Continue",
@@ -98,8 +110,8 @@ class AgreementWizardView extends StatelessWidget {
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   ),
                 ),
               );
@@ -120,10 +132,10 @@ class AgreementWizardView extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            "View Agreement",
+                            "View PDF",
                             style: TextStyle(
                               color: colorScheme.primary,
-                              fontSize: 16.sp,
+                              fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -153,7 +165,7 @@ class AgreementWizardView extends StatelessWidget {
                             return Text(
                               "Create Rental",
                               style: TextStyle(
-                                fontSize: 16.sp,
+                                fontSize: 15.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             );

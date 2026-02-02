@@ -62,6 +62,94 @@ class AdminHomeView extends GetView<AdminHomeController> {
               ),
             ),
 
+            /// Setup Warning Banner
+            Obx(() {
+              if (!controller.showSetupBanner.value) {
+                return const SizedBox.shrink();
+              }
+              return Container(
+                margin: EdgeInsets.only(top: 16.h),
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Iconsax.warning_2,
+                          color: Colors.orange,
+                          size: 24.sp,
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Text(
+                            "complete_shop_setup".tr,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: controller.dismissSetupBanner,
+                          child: Icon(
+                            Iconsax.close_circle,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 20.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    ...controller.setupWarnings.map(
+                      (warning) => Padding(
+                        padding: EdgeInsets.only(left: 36.w, bottom: 4.h),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Iconsax.info_circle,
+                              color: Colors.orange,
+                              size: 14.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              warning,
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Get.toNamed(Routes.SETTINGS),
+                        icon: Icon(Iconsax.setting_2, size: 18.sp),
+                        label: Text("go_to_settings".tr),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+
             SizedBox(height: 24.h),
 
             /// Stats Grid (4 items)
