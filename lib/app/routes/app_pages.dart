@@ -61,6 +61,7 @@ import '../modules/rentals/views/rentals_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
 import '../modules/settings/views/rental_pricing_logic_view.dart';
+import '../modules/settings/views/rental_config_view.dart';
 import '../modules/shopSetup/bindings/shop_setup_binding.dart';
 import '../modules/shopSetup/views/shop_setup_view.dart';
 import '../modules/signIn/bindings/sign_in_binding.dart';
@@ -306,6 +307,14 @@ class AppPages {
     GetPage(
       name: _Paths.RENTAL_PRICING_LOGIC,
       page: () => const RentalPricingLogicView(),
+      binding: SettingsBinding(), // Re-use SettingsBinding
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'settings_edit_rental_logic'),
+      ],
+    ),
+    GetPage(
+      name: _Paths.RENTAL_CONFIG,
+      page: () => const RentalConfigView(),
       binding: SettingsBinding(), // Re-use SettingsBinding
       middlewares: [
         AccessControlMiddleware(routeKey: 'settings_edit_rental_logic'),

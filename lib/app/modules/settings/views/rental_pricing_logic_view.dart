@@ -41,16 +41,17 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   "The grace period allowed after an hour has passed before charging for the next hour.",
               example:
                   "Example: If set to 15 minutes.\nRent Start: 10:00 AM\nReturn: 11:14 AM -> Charged for 1 Hour\nReturn: 11:16 AM -> Charged for 2 Hours",
-              child: Obx(
-                () => _buildNumberInput(
-                  context,
-                  label: "Minutes",
-                  value: configService.hourlyGracePeriodMinutes.value,
-                  onChanged: (val) {
-                    controller.updateConfig(newHourlyGrace: val);
-                  },
-                ),
-              ),
+              child: SizedBox.shrink(),
+              // Obx(
+              //   () => _buildNumberInput(
+              //     context,
+              //     label: "Minutes",
+              //     value: configService.hourlyGracePeriodMinutes.value,
+              //     onChanged: (val) {
+              //       controller.updateConfig(newHourlyGrace: val);
+              //     },
+              //   ),
+              // ),
             ),
             SizedBox(height: 16.h),
             _buildExplanationCard(
@@ -60,16 +61,17 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   "The grace period allowed after a 24-hour cycle before charging for the next day.",
               example:
                   "Example: If set to 1 hour.\nRent Start: Today 10:00 AM\nReturn: Tomorrow 11:00 AM -> Charged for 1 Day\nReturn: Tomorrow 11:01 AM -> Charged for 2 Days",
-              child: Obx(
-                () => _buildNumberInput(
-                  context,
-                  label: "Hours",
-                  value: configService.dailyGracePeriodHours.value,
-                  onChanged: (val) {
-                    controller.updateConfig(newDailyGrace: val);
-                  },
-                ),
-              ),
+              child: SizedBox.shrink(),
+              // Obx(
+              //   () => _buildNumberInput(
+              //     context,
+              //     label: "Hours",
+              //     value: configService.dailyGracePeriodHours.value,
+              //     onChanged: (val) {
+              //       controller.updateConfig(newDailyGrace: val);
+              //     },
+              //   ),
+              // ),
             ),
             SizedBox(height: 16.h),
             _buildExplanationCard(
@@ -78,39 +80,41 @@ class RentalPricingLogicView extends GetView<SettingsController> {
               description: "Apply a percentage tax to the final rental total.",
               example:
                   "Example: If rate = 10% and Total = \$100\nFinal Amount = \$110",
-              child: Column(
-                children: [
-                  Obx(
-                    () => SwitchListTile(
-                      title: Text(
-                        "Enable Tax",
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      value: configService.isTaxEnabled.value,
-                      onChanged: (val) {
-                        controller.updateConfig(newIsTaxEnabled: val);
-                      },
-                      activeColor: colorScheme.primary,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Obx(
-                    () => _buildNumberInput(
-                      context,
-                      label: "Tax Rate (%)",
-                      value: configService.taxRate.value,
-                      isDouble: true,
-                      onChanged: (val) {
-                        controller.updateConfig(newTaxRate: val.toDouble());
-                      },
-                    ),
-                  ),
-                ],
-              ),
+              child: SizedBox.shrink(),
+
+              // Column(
+              //   children: [
+              //     Obx(
+              //       () => SwitchListTile(
+              //         title: Text(
+              //           "Enable Tax",
+              //           style: TextStyle(
+              //             color: colorScheme.onSurface,
+              //             fontWeight: FontWeight.w500,
+              //           ),
+              //         ),
+              //         value: configService.isTaxEnabled.value,
+              //         onChanged: (val) {
+              //           controller.updateConfig(newIsTaxEnabled: val);
+              //         },
+              //         activeColor: colorScheme.primary,
+              //         contentPadding: EdgeInsets.zero,
+              //       ),
+              //     ),
+              //     SizedBox(height: 8.h),
+              //     Obx(
+              //       () => _buildNumberInput(
+              //         context,
+              //         label: "Tax Rate (%)",
+              //         value: configService.taxRate.value,
+              //         isDouble: true,
+              //         onChanged: (val) {
+              //           controller.updateConfig(newTaxRate: val.toDouble());
+              //         },
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ),
           ],
         ),

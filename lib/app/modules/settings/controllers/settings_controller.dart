@@ -282,6 +282,8 @@ class SettingsController extends GetxController {
         "image": '',
       };
 
+      print(userProfile.value);
+
       // Get shop data
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) throw 'Shop ID not found in storage';

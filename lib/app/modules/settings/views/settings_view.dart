@@ -159,7 +159,25 @@ class SettingsView extends StatelessWidget {
                 items.add(_buildDivider(context));
               }
 
-              if (canEditRentalLogic) {
+              // Rental Pricing - Admin gets full config, Staff gets pricing logic only
+              final isAdmin =
+                  controller.userProfile.value[FirestoreFields.role] == 'admin';
+
+              if (isAdmin) {
+                // Admin gets full Rental Config View
+                items.add(
+                  _buildSettingsTile(
+                    context,
+                    icon: Iconsax.setting_2,
+                    title: "rental_pricing".tr,
+                    subtitle: "rental_pricing_sub".tr,
+                    onTap: () => Get.toNamed(Routes.RENTAL_CONFIG),
+                    trailingIcon: Iconsax.arrow_right_3,
+                    iconColor: Colors.orange,
+                  ),
+                );
+              } else if (canEditRentalLogic) {
+                // Staff with permission gets Rental Pricing Logic View
                 items.add(
                   _buildSettingsTile(
                     context,
