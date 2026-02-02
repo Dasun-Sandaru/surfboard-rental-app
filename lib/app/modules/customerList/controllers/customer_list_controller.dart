@@ -3,12 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'dart:async';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/user_service.dart';
+import '../../../services/customer_service.dart';
 
 class CustomerListController extends GetxController {
   final PagingController<DocumentSnapshot?, CustomerModel> pagingController =
@@ -16,8 +16,8 @@ class CustomerListController extends GetxController {
 
   final TextEditingController searchController = TextEditingController();
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
   final UserService _userService = Get.find();
+  final CustomerService _customerService = CustomerService();
   String? shopId;
   static const int _limit = 15;
   Timer? _debounce;
@@ -59,37 +59,14 @@ class CustomerListController extends GetxController {
       return;
     }
     try {
-      Query query = _db
-          .collection(FirestoreCollections.shops)
-          .doc(shopId!)
-          .collection(FirestoreCollections.customers);
+      final snapshot = await _customerService.getCustomersPage(
+        shopId: shopId!,
+        limit: _limit,
+        startAfter: pageKey,
+        searchTerm: _currentSearchTerm,
+      );
 
-      // A. APPLY SEARCH OR SORT
-      if (_currentSearchTerm.isNotEmpty) {
-        // Search Mode: Simple query, limit 20, no pagination needed for typical search
-        // Note: Firestore search requires exact case handling or specific setup.
-        query = query
-            .where(
-              'name_lowercase', // TODO: Add to fields if necessary
-              isGreaterThanOrEqualTo: _currentSearchTerm.toLowerCase(),
-            )
-            .where(
-              'name_lowercase',
-              isLessThan: '${_currentSearchTerm.toLowerCase()}z',
-            )
-            .limit(20);
-      } else {
-        // Standard Mode: Chronological order
-        query = query
-            .orderBy(FirestoreFields.createdAt, descending: true)
-            .limit(_limit);
-
-        if (pageKey != null) {
-          query = query.startAfterDocument(pageKey);
-        }
-      }
-
-      final QuerySnapshot snapshot = await query.get();
+      if (isClosed) return;
 
       final newItems = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -97,7 +74,6 @@ class CustomerListController extends GetxController {
         return CustomerModel.fromJson(data);
       }).toList();
 
-      // B. DETERMINE IF LAST PAGE
       final isLastPage =
           newItems.length < _limit || _currentSearchTerm.isNotEmpty;
 
@@ -121,7 +97,7 @@ class CustomerListController extends GetxController {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _currentSearchTerm = query;
       // Triggers a complete reload of the list
-      pagingController.refresh();
+      if (!isClosed) pagingController.refresh();
     });
   }
 

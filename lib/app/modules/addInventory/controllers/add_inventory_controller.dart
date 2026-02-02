@@ -209,8 +209,6 @@ class AddInventoryController extends GetxController {
         );
         clearForm();
       }
-
-      Get.back();
     } catch (e) {
       log('Error saving item: $e', name: _logName);
       AppSnackBar.error(

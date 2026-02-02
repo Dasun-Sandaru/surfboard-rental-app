@@ -9,9 +9,12 @@ import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/item_details_controller.dart';
+import '../../../../app/services/config_service.dart';
 
 class ItemDetailsView extends GetView<ItemDetailsController> {
-  const ItemDetailsView({super.key});
+  ItemDetailsView({super.key});
+
+  final ConfigService _configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,17 +39,23 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             icon: Icon(Iconsax.scan_barcode, color: colorScheme.onSurface),
             tooltip: 'Show QR Code',
           ),
-          TextButton(
-            onPressed: controller.editItem,
-            child: Text(
-              "edit".tr,
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
+          Obx(() {
+            final canEdit =
+                _configService.staffAccessRules['inventory_edit'] ?? false;
+            if (!canEdit) return const SizedBox.shrink();
+
+            return TextButton(
+              onPressed: controller.editItem,
+              child: Text(
+                "edit".tr,
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
       body: GetBuilder<ItemDetailsController>(
@@ -178,25 +187,78 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
             children: [
               // Mark as Repair Button
               if (item.status == InventoryStatus.damaged) ...[
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: controller.markAsRepair,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: statusColors?.warning ?? Colors.orange,
-                      foregroundColor: colorScheme.surface,
+                Obx(() {
+                  final canEdit =
+                      _configService.staffAccessRules['inventory_edit'] ??
+                      false;
+                  if (!canEdit) return const SizedBox.shrink();
+
+                  return Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: controller.markAsRepair,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  statusColors?.warning ?? Colors.orange,
+                              foregroundColor: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Iconsax.setting_2, size: 20.w),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "mark_repair".tr,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+
+              // View Damage Fees Button
+              Obx(() {
+                final canViewFees =
+                    _configService
+                        .staffAccessRules['inventory_view_damage_fees'] ??
+                    false;
+                // User said "can view damage feees".
+                if (!canViewFees) return const SizedBox.shrink();
+
+                return Expanded(
+                  child: TextButton(
+                    onPressed: controller.viewDamageFees,
+                    style: TextButton.styleFrom(
+                      backgroundColor: colorScheme.primary.withOpacity(0.15),
+                      foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 16.h),
-                      elevation: 0,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Iconsax.setting_2, size: 20.w),
+                        Icon(Iconsax.receipt, size: 20.w),
                         SizedBox(width: 8.w),
                         Text(
-                          "mark_repair".tr,
+                          "view_damage_fees".tr,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -205,37 +267,8 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                       ],
                     ),
                   ),
-                ),
-                SizedBox(width: 12.w),
-              ],
-              // View Damage Fees Button
-              Expanded(
-                child: TextButton(
-                  onPressed: controller.viewDamageFees,
-                  style: TextButton.styleFrom(
-                    backgroundColor: colorScheme.primary.withOpacity(0.15),
-                    foregroundColor: colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Iconsax.receipt, size: 20.w),
-                      SizedBox(width: 8.w),
-                      Text(
-                        "view_damage_fees".tr,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                );
+              }),
             ],
           ),
         ),

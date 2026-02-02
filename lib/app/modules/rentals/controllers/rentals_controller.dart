@@ -31,9 +31,6 @@ class RentalsController extends GetxController {
     pagingController.addPageRequestListener((pageKey) async {
       await _fetchPage(pageKey);
     });
-    searchTextController.addListener(() {
-      onSearchChanged(searchTextController.text);
-    });
     _initializeAndFetch();
   }
 
@@ -66,6 +63,8 @@ class RentalsController extends GetxController {
         searchTerm: _currentSearchTerm,
       );
 
+      if (isClosed) return;
+
       final newItems = snapshot.docs
           .map(
             (doc) => RentalModel.fromSnapshot(
@@ -96,7 +95,7 @@ class RentalsController extends GetxController {
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _currentSearchTerm = query;
-      pagingController.refresh();
+      if (!isClosed) pagingController.refresh();
     });
   }
 
@@ -106,6 +105,8 @@ class RentalsController extends GetxController {
         Routes.PAYMENTS,
         arguments: {'rentalId': rental.id, 'shopId': rental.shopId},
       );
+    } else if (rental.status == RentalStatus.completed) {
+      Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
     } else {
       Get.toNamed(Routes.BOARD_INSPECTION, arguments: rental.id);
     }
@@ -129,6 +130,10 @@ class RentalsController extends GetxController {
   Future<void> refreshRentals() async {
     _currentSearchTerm = '';
     searchTextController.clear();
+    pagingController.refresh();
+  }
+
+  Future<void> onRefresh() async {
     pagingController.refresh();
   }
 }

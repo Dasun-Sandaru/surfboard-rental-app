@@ -38,6 +38,10 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/inventory/bindings/inventory_binding.dart';
 import '../modules/inventory/views/inventory_view.dart';
+import '../modules/inventory/views/available_inventory_view.dart';
+import '../modules/inventory/bindings/available_inventory_binding.dart';
+import '../modules/damagesPending/bindings/damages_pending_binding.dart';
+import '../modules/damagesPending/views/damages_pending_view.dart';
 import '../modules/itemDetails/bindings/item_details_binding.dart';
 import '../modules/itemDetails/views/item_details_view.dart';
 import '../modules/manageUsers/bindings/manage_users_binding.dart';
@@ -56,6 +60,8 @@ import '../modules/rentals/bindings/rentals_binding.dart';
 import '../modules/rentals/views/rentals_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
+import '../modules/settings/views/rental_pricing_logic_view.dart';
+import '../modules/settings/views/rental_config_view.dart';
 import '../modules/shopSetup/bindings/shop_setup_binding.dart';
 import '../modules/shopSetup/views/shop_setup_view.dart';
 import '../modules/signIn/bindings/sign_in_binding.dart';
@@ -181,14 +187,28 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.INVENTORY,
-      page: () => const InventoryListView(),
+      page: () => InventoryListView(),
       binding: InventoryBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'inventory')],
+    ),
+    GetPage(
+      name: _Paths.AVAILABLE_INVENTORY,
+      page: () => const AvailableInventoryView(),
+      binding: AvailableInventoryBinding(),
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'inventory'),
+      ], // Using same permission as inventory
     ),
     GetPage(
       name: _Paths.ADD_INVENTORY,
       page: () => const AddInventoryView(),
       binding: AddInventoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAMAGES_PENDING,
+      page: () => const DamagesPendingView(),
+      binding: DamagesPendingBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'rentals')],
     ),
     GetPage(
       name: _Paths.SETTINGS,
@@ -198,12 +218,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.ITEM_DETAILS,
-      page: () => const ItemDetailsView(),
+      page: () => ItemDetailsView(),
       binding: ItemDetailsBinding(),
     ),
     GetPage(
       name: _Paths.CUSTOMER_LIST,
-      page: () => const CustomerListView(),
+      page: () => CustomerListView(),
       binding: CustomerListBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'customers')],
     ),
@@ -214,12 +234,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CUSTOMER_DETAILS,
-      page: () => const CustomerDetailsView(),
+      page: () => CustomerDetailsView(),
       binding: CustomerDetailsBinding(),
     ),
     GetPage(
       name: _Paths.DAMAGE_FEE,
-      page: () => const DamageFeeView(),
+      page: () => DamageFeeView(),
       binding: DamageFeeBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'damage_fee')],
     ),
@@ -283,6 +303,22 @@ class AppPages {
       page: () => const RentalHistoryView(),
       binding: RentalHistoryBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'rental_history')],
+    ),
+    GetPage(
+      name: _Paths.RENTAL_PRICING_LOGIC,
+      page: () => const RentalPricingLogicView(),
+      binding: SettingsBinding(), // Re-use SettingsBinding
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'settings_edit_rental_logic'),
+      ],
+    ),
+    GetPage(
+      name: _Paths.RENTAL_CONFIG,
+      page: () => const RentalConfigView(),
+      binding: SettingsBinding(), // Re-use SettingsBinding
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'settings_edit_rental_logic'),
+      ],
     ),
   ];
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,9 @@ class InventoryController extends GetxController {
   final RxBool isSelectMode = false.obs;
   RxBool isLessThan = false.obs;
   RxBool isSizeFilterActive = false.obs;
+  final TextEditingController searchTextController = TextEditingController();
+  Timer? _debounce;
+  String _currentSearchTerm = '';
 
   String? shopId;
   DocumentSnapshot? lastDocument;
@@ -67,6 +71,8 @@ class InventoryController extends GetxController {
     inchesSizeController.removeListener(_updateSizeFilterState);
     feetSizeController.dispose();
     inchesSizeController.dispose();
+    searchTextController.dispose();
+    _debounce?.cancel();
     super.onClose();
   }
 
@@ -102,6 +108,7 @@ class InventoryController extends GetxController {
             ? inchesSizeController.text
             : null,
         isLessThan: isLessThan.value,
+        searchTerm: _currentSearchTerm,
       );
 
       if (snapshot.docs.isNotEmpty) {
@@ -213,5 +220,24 @@ class InventoryController extends GetxController {
   /// toggle Less Than / Greater Than for size filter
   void toggleLessThan() {
     isLessThan.value = !isLessThan.value;
+  }
+
+  Future<void> onRefresh() async {
+    items.clear();
+    lastDocument = null;
+    hasMoreItems.value = true;
+    await loadMore();
+  }
+
+  void onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _currentSearchTerm = query;
+      items.clear();
+      lastDocument = null;
+      hasMoreItems.value = true;
+      loadMore();
+    });
   }
 }

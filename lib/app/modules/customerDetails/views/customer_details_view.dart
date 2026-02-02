@@ -8,9 +8,12 @@ import 'package:surfboard_rental_app/app/models/customer_model.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/customer_details_controller.dart';
+import '../../../../app/services/config_service.dart';
 
 class CustomerDetailsView extends GetView<CustomerDetailsController> {
-  const CustomerDetailsView({super.key});
+  CustomerDetailsView({super.key});
+
+  final ConfigService _configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -30,17 +33,24 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: controller.editCustomer,
-            child: Text(
-              "edit".tr,
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
+          Obx(() {
+            final canEdit =
+                _configService.staffAccessRules['customers_edit'] ?? false;
+
+            if (!canEdit) return const SizedBox.shrink();
+
+            return TextButton(
+              onPressed: controller.editCustomer,
+              child: Text(
+                "edit".tr,
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ),
+            );
+          }),
           SizedBox(width: 8.w),
         ],
       ),
@@ -154,27 +164,40 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(width: ASizes.defaultPadding),
-              _buildActionButton(
-                context,
-                icon: Iconsax.call,
-                label: "call".tr,
-                onTap: controller.makeCall,
-              ),
-              SizedBox(width: 16.w),
-              _buildActionButton(
-                context,
-                icon: Iconsax.sms,
-                label: "message".tr,
-                onTap: controller.makeCall,
-              ),
-              SizedBox(width: 16.w),
-              _buildActionButton(
-                context,
-                icon: Iconsax.direct,
-                label: "email".tr,
-                onTap: controller.sendEmail,
-              ),
-              SizedBox(width: 16.w),
+              Obx(() {
+                final canContact =
+                    _configService.staffAccessRules['customer_contact'] ??
+                    false;
+
+                if (!canContact) return const SizedBox.shrink();
+
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildActionButton(
+                      context,
+                      icon: Iconsax.call,
+                      label: "call".tr,
+                      onTap: controller.makeCall,
+                    ),
+                    SizedBox(width: 16.w),
+                    _buildActionButton(
+                      context,
+                      icon: Iconsax.sms,
+                      label: "message".tr,
+                      onTap: controller.makeCall,
+                    ),
+                    SizedBox(width: 16.w),
+                    _buildActionButton(
+                      context,
+                      icon: Iconsax.direct,
+                      label: "email".tr,
+                      onTap: controller.sendEmail,
+                    ),
+                    SizedBox(width: 16.w),
+                  ],
+                );
+              }),
               _buildActionButton(
                 context,
                 icon: Iconsax.scan_barcode4,

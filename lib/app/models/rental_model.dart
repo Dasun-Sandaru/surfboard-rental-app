@@ -36,6 +36,7 @@ class RentalModel {
 
   // Agreement
   final String? agreementLink;
+  final String? invoiceLink;
   final String? overdueTime;
   final String? cachedCustomerName;
   final String? cachedItemName;
@@ -61,6 +62,7 @@ class RentalModel {
     required this.amountPaid,
     required this.securityDeposit,
     this.agreementLink,
+    this.invoiceLink,
     this.overdueTime,
     this.cachedCustomerName,
     this.cachedItemName,
@@ -115,6 +117,7 @@ class RentalModel {
       ),
 
       agreementLink: data[FirestoreFields.agreementLink],
+      invoiceLink: data[FirestoreFields.invoiceLink],
       overdueTime: data[FirestoreFields.overdueTime],
       cachedCustomerName: data[FirestoreFields.cachedCustomerName],
       cachedItemName: data[FirestoreFields.cachedItemName],
@@ -152,11 +155,15 @@ class RentalModel {
       FirestoreFields.securityDeposit: securityDeposit.toMap(),
 
       FirestoreFields.agreementLink: agreementLink,
+      FirestoreFields.invoiceLink: invoiceLink,
       FirestoreFields.overdueTime: overdueTime,
       FirestoreFields.cachedCustomerName: cachedCustomerName,
       FirestoreFields.cachedItemName: cachedItemName,
       FirestoreFields.cachedStaffName: cachedStaffName,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
+      FirestoreFields.itemNameLowercase: cachedItemName?.toLowerCase() ?? '',
+      FirestoreFields.customerNameLowercase:
+          cachedCustomerName?.toLowerCase() ?? '',
     };
   }
 }

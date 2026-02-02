@@ -72,6 +72,9 @@ class AppTranslations extends Translations {
       'dashboard_tab': 'Dashboard',
       'new_rental_tab': 'New Rental',
       'alerts_tab': 'Alerts',
+      // Setup Banner
+      'complete_shop_setup': 'Complete Your Shop Setup',
+      'go_to_settings': 'Go to Settings',
       // Auth
       'welcome_back': 'Welcome Back!',
       'login_subtitle': 'Log In To Manage Your Surfboards Rentals',
@@ -373,6 +376,9 @@ class AppTranslations extends Translations {
       'dashboard_tab': 'උ시ඛ පුවරුව',
       'new_rental_tab': 'නව කුලියක්',
       'alerts_tab': 'ඇඟවීම්',
+      // Setup Banner
+      'complete_shop_setup': 'ඔබගේ සාප්පු සැකසුම සම්පූර්ණ කරන්න',
+      'go_to_settings': 'සැකසුම් වෙත යන්න',
       // Auth
       'welcome_back': 'ආයුබෝවන්!',
       'login_subtitle': 'ඔබගේ සර්ෆ්බෝඩ් කුලියට දීම කළමනාකරණය කිරීමට පුරනය වන්න',

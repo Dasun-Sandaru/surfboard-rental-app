@@ -25,6 +25,7 @@ class InventoryService {
     String? sizeFeet,
     String? sizeInches,
     bool isLessThan = false,
+    String? searchTerm,
     int pageSize = 10,
   }) async {
     try {
@@ -68,6 +69,19 @@ class InventoryService {
             isGreaterThanOrEqualTo: sizeValue,
           );
         }
+      }
+
+      // Search filter
+      if (searchTerm != null && searchTerm.isNotEmpty) {
+        query = query
+            .where(
+              FirestoreFields.nameLowercase,
+              isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
+            )
+            .where(
+              FirestoreFields.nameLowercase,
+              isLessThan: '${searchTerm.toLowerCase()}z',
+            );
       }
 
       // Pagination
@@ -139,6 +153,8 @@ class InventoryService {
       final itemData = {
         ...data,
         FirestoreFields.id: docRef.id,
+        FirestoreFields.shopId:
+            shopId, // Set shopId for multi-shop data isolation
         FirestoreFields.createdAt: FieldValue.serverTimestamp(),
         FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       };
@@ -292,7 +308,9 @@ class InventoryService {
       final itemRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.inventory).doc(itemId);
-      final feesCollection = itemRef.collection('damage_fees'); // Use constant?
+      final feesCollection = itemRef.collection(
+        FirestoreCollections.damageFees,
+      );
 
       await feesCollection.add({
         ...feeData,

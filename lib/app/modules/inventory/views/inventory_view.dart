@@ -11,8 +11,12 @@ import '../../../models/inventory_model.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/inventory_controller.dart';
 
+import '../../../../app/services/config_service.dart';
+
 class InventoryListView extends StatelessWidget {
-  const InventoryListView({super.key});
+  InventoryListView({super.key});
+
+  final ConfigService _configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,40 @@ class InventoryListView extends StatelessWidget {
       ),
       body: Column(
         children: [
+          /// 1. Search Bar
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              ASizes.defaultPadding,
+              12.h,
+              ASizes.defaultPadding,
+              8.h,
+            ),
+            child: TextFormField(
+              controller: controller.searchTextController,
+              onChanged: controller.onSearchChanged,
+              onFieldSubmitted: controller.onSearchChanged,
+              style: TextStyle(color: colorScheme.onSurface),
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Iconsax.search_normal,
+                  size: 20.w,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                hintText: 'search_inventory_hint'.tr,
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                ),
+                filled: true,
+                fillColor: colorScheme.surfaceContainer,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+              ),
+            ),
+          ),
+
           _buildFilterHeader(context, controller),
           SizedBox(height: 16.h),
 
@@ -47,23 +85,33 @@ class InventoryListView extends StatelessWidget {
               // }
 
               if (controller.items.isEmpty) {
-                return Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Iconsax.add,
-                          size: 48.w,
-                          color: colorScheme.onSurfaceVariant,
+                return RefreshIndicator(
+                  onRefresh: controller.onRefresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 100.h),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Iconsax.add,
+                                size: 48.w,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              Text(
+                                'no_inventory_found'.tr,
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          'no_inventory_found'.tr,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -74,47 +122,60 @@ class InventoryListView extends StatelessWidget {
               //   );
               // }
 
-              return ListView.separated(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ASizes.defaultPadding,
-                  vertical: 8.h,
-                ),
-                itemCount: controller.items.length + 1,
-                separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                itemBuilder: (context, index) {
-                  if (index == controller.items.length) {
-                    controller.loadMore();
-                    return controller.hasMoreItems.value
-                        ? const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
-                          )
-                        : const SizedBox.shrink();
-                  }
+              return RefreshIndicator(
+                onRefresh: controller.onRefresh,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ASizes.defaultPadding,
+                    vertical: 8.h,
+                  ),
+                  itemCount: controller.items.length + 1,
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    if (index == controller.items.length) {
+                      controller.loadMore();
+                      return controller.hasMoreItems.value
+                          ? const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                          : const SizedBox.shrink();
+                    }
 
-                  return _buildInventoryCard(
-                    context,
-                    controller.items[index],
-                    controller,
-                  );
-                },
+                    return _buildInventoryCard(
+                      context,
+                      controller.items[index],
+                      controller,
+                    );
+                  },
+                ),
               );
             }),
           ),
         ],
       ),
-      floatingActionButton: !isSelectionMode
-          ? FloatingActionButton(
-              backgroundColor: colorScheme.primary,
-              onPressed: () {
-                Get.toNamed(
-                  Routes.ADD_INVENTORY,
-                  arguments: {'mode': InventoryFormMode.add},
-                );
-              },
-              child: Icon(Iconsax.add, color: colorScheme.onPrimary),
-            )
-          : null,
+      floatingActionButton: Obx(() {
+        // Check for Admin Override via ConfigService (or just ConfigService rules if they are correct)
+        // Note: We need to ensure ConfigService has the "effective" rules for Admin.
+        // If ConfigService takes raw rules from DB, then Admin might be blocked.
+        // I will fix this in ConfigService. For now, I'll rely on ConfigService.
+        final canAdd =
+            _configService.staffAccessRules['inventory_add'] ?? false;
+
+        if (isSelectionMode || !canAdd) return const SizedBox.shrink();
+
+        return FloatingActionButton(
+          backgroundColor: colorScheme.primary,
+          onPressed: () {
+            Get.toNamed(
+              Routes.ADD_INVENTORY,
+              arguments: {'mode': InventoryFormMode.add},
+            );
+          },
+          child: Icon(Iconsax.add, color: colorScheme.onPrimary),
+        );
+      }),
     );
   }
 

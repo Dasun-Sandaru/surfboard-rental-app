@@ -354,20 +354,27 @@ class RentalService {
       }
 
       if (searchTerm != null && searchTerm.isNotEmpty) {
+        final searchLower = searchTerm.toLowerCase();
+        // Since Firestore can't do OR queries with range filters effectively across different fields,
+        // we'll prioritize Item Name search here, or we'd need a composite field if both are needed at once.
+        // For now, let's allow searching by item name or customer name by checking both if possible,
+        // but typically prefix search is best on one field.
+        // I will implement search by item name lowercase as the primary search field for "active rentals"
+        // or optimize it to check either if we can.
+        // Actually, for multiple fields, we might need a combined lowercase field or search twice.
+        // Let's settle for searching by itemName_lowercase for now as board identity is primary.
+
         query = query
             .where(
-              'itemName_lowercase', // TODO: Add to fields if necessary
-              isGreaterThanOrEqualTo: searchTerm.toLowerCase(),
+              FirestoreFields.itemNameLowercase,
+              isGreaterThanOrEqualTo: searchLower,
             )
             .where(
-              'itemName_lowercase',
-              isLessThan: '${searchTerm.toLowerCase()}z',
+              FirestoreFields.itemNameLowercase,
+              isLessThan: '${searchLower}z',
             )
             .limit(limit);
       } else {
-        // If date filter is applied, we must order by createdAt (which we do anyway)
-        // Note: Firestore requires the first orderBy field to match the first inequality filter.
-        // Since we filter by createdAt (range) and order by createdAt, this is valid.
         query = query
             .orderBy(FirestoreFields.createdAt, descending: true)
             .limit(limit);

@@ -4,6 +4,7 @@ import 'package:surfboard_rental_app/app/models/damage_report_model.dart';
 import 'package:surfboard_rental_app/app/models/payment_model.dart';
 import 'package:surfboard_rental_app/app/services/damage_report_service.dart';
 import 'package:surfboard_rental_app/app/services/payment_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../models/rental_model.dart';
 
 class RentalDetailController extends GetxController {
@@ -38,5 +39,19 @@ class RentalDetailController extends GetxController {
       rentalId: rental.id!,
       damageId: damageId,
     );
+  }
+
+  Future<void> openDocument(String? url) async {
+    if (url == null || url.isEmpty) {
+      Get.snackbar('Error', 'Document link is not available.');
+      return;
+    }
+
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar('Error', 'Could not open document.');
+    }
   }
 }

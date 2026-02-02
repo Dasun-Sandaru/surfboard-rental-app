@@ -377,12 +377,23 @@ class DamageReportView extends StatelessWidget {
                   ),
                   elevation: 4,
                 ),
-                child: Text(
-                  "damage_report".tr,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Obx(
+                  () => controller.isSaving.value
+                      ? SizedBox(
+                          height: 24.h,
+                          width: 24.h,
+                          child: CircularProgressIndicator(
+                            color: colorScheme.onPrimary,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : Text(
+                          "damage_report".tr,
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),

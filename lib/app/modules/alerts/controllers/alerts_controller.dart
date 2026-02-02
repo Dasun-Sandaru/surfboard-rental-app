@@ -57,6 +57,7 @@ class AlertsController extends GetxController {
       }
 
       final snapshot = await query.get();
+      if (isClosed) return;
       final logs = snapshot.docs
           .map(
             (doc) => ActivityLogModel.fromSnapshot(

@@ -2,7 +2,7 @@
 
 enum UserRole { admin, staff, customer }
 
-enum SurfBoardType { shortboard, longboard, fish, consultant }
+enum SurfBoardType { shortboard, longboard, fish, funboard, hybrid, sup }
 
 enum InventoryStatus { available, rented, repair, retired, damaged }
 

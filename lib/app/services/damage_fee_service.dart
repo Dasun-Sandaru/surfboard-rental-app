@@ -27,7 +27,7 @@ class DamageFeeService {
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .doc(itemId)
-          .collection('damage_fees') // TODO: Constant for damage_fees?
+          .collection(FirestoreCollections.damageFees)
           .orderBy(FirestoreFields.createdAt, descending: true)
           .get();
 
@@ -64,7 +64,7 @@ class DamageFeeService {
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .doc(itemId)
-          .collection('damage_fees')
+          .collection(FirestoreCollections.damageFees)
           .add({
             ...damageRule.toMap(),
             FirestoreFields.createdAt: FieldValue.serverTimestamp(),
@@ -100,7 +100,7 @@ class DamageFeeService {
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .doc(itemId)
-          .collection('damage_fees')
+          .collection(FirestoreCollections.damageFees)
           .doc(damageRule.id)
           .update({
             ...damageRule.toMap(),
@@ -130,7 +130,7 @@ class DamageFeeService {
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .doc(itemId)
-          .collection('damage_fees')
+          .collection(FirestoreCollections.damageFees)
           .doc(ruleId)
           .delete();
 
@@ -159,7 +159,7 @@ class DamageFeeService {
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .doc(itemId)
-          .collection('damage_fees')
+          .collection(FirestoreCollections.damageFees)
           .orderBy(FirestoreFields.createdAt, descending: true);
 
       return query.snapshots().map((snapshot) {

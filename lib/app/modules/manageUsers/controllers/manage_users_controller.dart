@@ -22,12 +22,14 @@ class ManageUsersController extends GetxController {
 
   /// Shop Members List (Using UserModel instead of Map)
   final RxList<UserModel> users = <UserModel>[].obs;
+  final RxList<UserModel> filteredUsers = <UserModel>[].obs;
 
   StreamSubscription? _usersSub;
 
   @override
   void onInit() {
     super.onInit();
+    searchTextController.addListener(_filterUsers);
     _initShopMembers();
   }
 
@@ -75,6 +77,7 @@ class ManageUsersController extends GetxController {
 
           log('Fetched ${fetchedUsers.length} users', name: _logName);
           users.assignAll(fetchedUsers);
+          _filterUsers();
         } catch (e) {
           log("Error processing users: $e", name: _logName);
           AppSnackBar.error(
@@ -121,9 +124,26 @@ class ManageUsersController extends GetxController {
     return colors[input.hashCode % colors.length];
   }
 
+  void _filterUsers() {
+    final query = searchTextController.text.toLowerCase();
+    if (query.isEmpty) {
+      filteredUsers.assignAll(users);
+    } else {
+      filteredUsers.assignAll(
+        users.where((user) {
+          final nameMatched = user.name?.toLowerCase().contains(query) ?? false;
+          final emailMatched =
+              user.email?.toLowerCase().contains(query) ?? false;
+          return nameMatched || emailMatched;
+        }).toList(),
+      );
+    }
+  }
+
   @override
   void onClose() {
     _usersSub?.cancel();
+    searchTextController.removeListener(_filterUsers);
     searchTextController.dispose();
     super.onClose();
   }

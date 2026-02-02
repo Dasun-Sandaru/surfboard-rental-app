@@ -36,17 +36,15 @@ class SignUpController extends GetxController {
   final AuthService _authService = Get.find();
   final UserService _userService = Get.find();
 
-
   @override
   void onInit() {
     super.onInit();
-    final args = Get.arguments; 
-  if (args != null && args['role'] is UserRole) {
-    role.value = args['role'] as UserRole;
-    log('SignUp role: ${role.value}');
+    final args = Get.arguments;
+    if (args != null && args['role'] is UserRole) {
+      role.value = args['role'] as UserRole;
+      log('SignUp role: ${role.value}');
+    }
   }
-}
-
 
   /// REGISTER SHOP OWNER
   Future<void> registerShopOwner() async {
@@ -112,6 +110,17 @@ class SignUpController extends GetxController {
       AppErrorHandler.handleError(e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> scanShopCode() async {
+    try {
+      final result = await Get.toNamed(Routes.QR_SCANNER);
+      if (result != null && result is String) {
+        shopCodeController.text = result;
+      }
+    } catch (e) {
+      log('Error scanning shop code: $e');
     }
   }
 

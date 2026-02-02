@@ -36,53 +36,145 @@ class AdminHomeView extends GetView<AdminHomeController> {
   // WIDGET BUILDERS
   Widget _buildDashboardContent(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16.h),
+    return RefreshIndicator(
+      onRefresh: controller.onRefresh,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16.h),
 
-          /// Top Bar
-          _buildTopBar(context),
+            /// Top Bar
+            _buildTopBar(context),
 
-          SizedBox(height: 24.h),
+            SizedBox(height: 24.h),
 
-          /// Welcome Text
-          Text(
-            "welcome_admin".tr,
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
+            /// Welcome Text
+            Text(
+              "welcome_admin".tr,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 28.sp,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
             ),
-          ),
 
-          SizedBox(height: 24.h),
+            /// Setup Warning Banner
+            Obx(() {
+              if (!controller.showSetupBanner.value) {
+                return const SizedBox.shrink();
+              }
+              return Container(
+                margin: EdgeInsets.only(top: 16.h),
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Iconsax.warning_2,
+                          color: Colors.orange,
+                          size: 24.sp,
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Text(
+                            "complete_shop_setup".tr,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: controller.dismissSetupBanner,
+                          child: Icon(
+                            Iconsax.close_circle,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 20.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    ...controller.setupWarnings.map(
+                      (warning) => Padding(
+                        padding: EdgeInsets.only(left: 36.w, bottom: 4.h),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Iconsax.info_circle,
+                              color: Colors.orange,
+                              size: 14.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              warning,
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Get.toNamed(Routes.SETTINGS),
+                        icon: Icon(Iconsax.setting_2, size: 18.sp),
+                        label: Text("go_to_settings".tr),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
 
-          /// Stats Grid (4 items)
-          _buildStatsGrid(context),
+            SizedBox(height: 24.h),
 
-          SizedBox(height: 24.h),
+            /// Stats Grid (4 items)
+            _buildStatsGrid(context),
 
-          /// Section Header
-          Text(
-            "management".tr,
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 24.h),
+
+            /// Section Header
+            Text(
+              "management".tr,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
 
-          SizedBox(height: 16.h),
+            SizedBox(height: 16.h),
 
-          /// Management Grid
-          _buildManagementGrid(context),
+            /// Management Grid
+            _buildManagementGrid(context),
 
-          SizedBox(height: 20.h),
-        ],
+            SizedBox(height: 20.h),
+          ],
+        ),
       ),
     );
   }
@@ -163,6 +255,12 @@ class AdminHomeView extends GetView<AdminHomeController> {
             switch (index) {
               case 0:
                 Get.toNamed(Routes.RENTALS);
+                break;
+              case 1:
+                Get.toNamed(Routes.AVAILABLE_INVENTORY);
+                break;
+              case 2:
+                Get.toNamed(Routes.DAMAGES_PENDING);
                 break;
             }
           },
@@ -270,7 +368,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 Get.toNamed(Routes.SETTINGS);
                 break;
               case 7:
-                controller.seedSampleData();
+                _showSeedOptions(context);
                 break;
             }
           },
@@ -351,6 +449,54 @@ class AdminHomeView extends GetView<AdminHomeController> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSeedOptions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("seed_data_options".tr),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _seedTile(context, "Seed Users", "Users"),
+            _seedTile(context, "Seed Inventory", "Inventory"),
+            _seedTile(context, "Seed Customers", "Customers"),
+            _seedTile(context, "Seed Rentals", "Rentals"),
+            const Divider(),
+            _seedTile(context, "Seed All", "All", isPrimary: true),
+            const Divider(),
+            _seedTile(
+              context,
+              "Backup Database (JSON)",
+              "Backup",
+              isPrimary: true,
+              icon: Iconsax.document_download,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _seedTile(
+    BuildContext context,
+    String label,
+    String task, {
+    bool isPrimary = false,
+    IconData? icon,
+  }) {
+    return ListTile(
+      title: Text(label),
+      leading: Icon(
+        icon ?? (isPrimary ? Iconsax.flash : Iconsax.data),
+        color: isPrimary ? Theme.of(context).colorScheme.primary : null,
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        controller.runSeedTask(task);
+      },
     );
   }
 }

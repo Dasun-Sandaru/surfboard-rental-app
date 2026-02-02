@@ -5,7 +5,10 @@ import '../../../services/auth_service.dart';
 class VerifyEmailBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthService>(() => AuthService());
-    Get.lazyPut<VerifyEmailController>(() => VerifyEmailController());
+    // Delete existing controller if any to prevent conflicts
+    Get.delete<VerifyEmailController>(force: true);
+
+    Get.lazyPut<AuthService>(() => AuthService(), fenix: true);
+    Get.put<VerifyEmailController>(VerifyEmailController());
   }
 }

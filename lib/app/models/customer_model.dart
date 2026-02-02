@@ -12,6 +12,10 @@ class CustomerModel {
   final DateTime? createdAt;
   final String? imageUrl;
 
+  // Rental Statistics
+  final int rentalsCount;
+  final DateTime? lastRentalDate;
+
   const CustomerModel({
     this.id,
     required this.firstName,
@@ -22,7 +26,12 @@ class CustomerModel {
     required this.notes,
     this.createdAt,
     this.imageUrl,
+    this.rentalsCount = 0,
+    this.lastRentalDate,
   });
+
+  /// Full name helper
+  String get fullName => '$firstName $lastName'.trim();
 
   factory CustomerModel.fromJson(Map<String, dynamic> json) {
     return CustomerModel(
@@ -37,6 +46,10 @@ class CustomerModel {
           ? (json[FirestoreFields.createdAt] as Timestamp).toDate()
           : null,
       imageUrl: json[FirestoreFields.imageUrl],
+      rentalsCount: (json[FirestoreFields.rentalsCount] as num?)?.toInt() ?? 0,
+      lastRentalDate: json[FirestoreFields.lastRentalDate] is Timestamp
+          ? (json[FirestoreFields.lastRentalDate] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -56,6 +69,10 @@ class CustomerModel {
           ? (data[FirestoreFields.createdAt] as Timestamp).toDate()
           : null,
       imageUrl: data[FirestoreFields.imageUrl],
+      rentalsCount: (data[FirestoreFields.rentalsCount] as num?)?.toInt() ?? 0,
+      lastRentalDate: data[FirestoreFields.lastRentalDate] is Timestamp
+          ? (data[FirestoreFields.lastRentalDate] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -72,6 +89,40 @@ class CustomerModel {
           ? Timestamp.fromDate(createdAt!)
           : null,
       FirestoreFields.imageUrl: imageUrl ?? '',
+      FirestoreFields.nameLowercase: "$firstName $lastName".toLowerCase(),
+      FirestoreFields.rentalsCount: rentalsCount,
+      FirestoreFields.lastRentalDate: lastRentalDate != null
+          ? Timestamp.fromDate(lastRentalDate!)
+          : null,
     };
+  }
+
+  /// CopyWith method for immutable updates
+  CustomerModel copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? nic,
+    String? email,
+    String? notes,
+    DateTime? createdAt,
+    String? imageUrl,
+    int? rentalsCount,
+    DateTime? lastRentalDate,
+  }) {
+    return CustomerModel(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phone: phone ?? this.phone,
+      nic: nic ?? this.nic,
+      email: email ?? this.email,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      imageUrl: imageUrl ?? this.imageUrl,
+      rentalsCount: rentalsCount ?? this.rentalsCount,
+      lastRentalDate: lastRentalDate ?? this.lastRentalDate,
+    );
   }
 }

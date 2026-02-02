@@ -19,7 +19,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
     final rental = controller.rental;
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
@@ -35,10 +35,15 @@ class RentalDetailView extends GetView<RentalDetailController> {
             unselectedLabelColor: colorScheme.onSurfaceVariant,
             indicatorColor: colorScheme.primary,
             dividerColor: Colors.transparent,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            padding: EdgeInsets.zero,
+            labelPadding: EdgeInsets.symmetric(horizontal: 16.w),
             tabs: [
               Tab(text: "overview".tr),
               Tab(text: "financials".tr),
               Tab(text: "damages".tr),
+              Tab(text: "documents".tr),
             ],
           ),
         ),
@@ -242,6 +247,103 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       .toList(),
                 );
               }),
+            ),
+
+            // ---------------- TAB 4: DOCUMENTS ----------------
+            SingleChildScrollView(
+              padding: EdgeInsets.all(ASizes.defaultPadding),
+              child: Column(
+                children: [
+                  _buildDocumentCard(
+                    context,
+                    title: "rental_agreement".tr,
+                    subtitle: "signed_agreement_msg".tr,
+                    icon: Iconsax.document_text,
+                    onTap: () => controller.openDocument(rental.agreementLink),
+                    isAvailable: rental.agreementLink != null,
+                  ),
+                  SizedBox(height: 16.h),
+                  _buildDocumentCard(
+                    context,
+                    title: "invoice".tr,
+                    subtitle: "rental_invoice_msg".tr,
+                    icon: Iconsax.receipt_2,
+                    onTap: () => controller.openDocument(rental.invoiceLink),
+                    isAvailable: rental.invoiceLink != null,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDocumentCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool isAvailable,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: isAvailable ? onTap : null,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: colorScheme.outline.withOpacity(isAvailable ? 0.5 : 0.2),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: (isAvailable ? colorScheme.primary : Colors.grey)
+                    .withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isAvailable ? colorScheme.primary : Colors.grey,
+                size: 24,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.sp,
+                      color: isAvailable ? colorScheme.onSurface : Colors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    isAvailable ? subtitle : "not_available".tr,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Iconsax.arrow_right_3,
+              size: 18,
+              color: isAvailable ? colorScheme.primary : Colors.grey,
             ),
           ],
         ),

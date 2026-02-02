@@ -70,6 +70,7 @@ class AgreementTemplateModel {
       FirestoreFields.isDefault: isDefault,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
       FirestoreFields.updatedAt: Timestamp.fromDate(updatedAt),
+      FirestoreFields.templateNameLowercase: templateName.toLowerCase(),
     };
   }
 

@@ -21,6 +21,26 @@ class SettingsController extends GetxController {
   final AuthService _authService = Get.find();
   final ConfigService _configService = Get.find();
 
+  void updateConfig({
+    String? newCurrency,
+    String? newDateFormat,
+    String? newTimeZone,
+    int? newHourlyGrace,
+    int? newDailyGrace,
+    double? newTaxRate,
+    bool? newIsTaxEnabled,
+  }) {
+    _configService.updateConfig(
+      newCurrency: newCurrency,
+      newDateFormat: newDateFormat,
+      newTimeZone: newTimeZone,
+      newHourlyGrace: newHourlyGrace,
+      newDailyGrace: newDailyGrace,
+      newTaxRate: newTaxRate,
+      newIsTaxEnabled: newIsTaxEnabled,
+    );
+  }
+
   final Rx<Map<String, dynamic>> userProfile = Rx<Map<String, dynamic>>({});
   final Rx<Map<String, dynamic>> shopProfile = Rx<Map<String, dynamic>>({});
 
@@ -106,25 +126,48 @@ class SettingsController extends GetxController {
   ];
 
   // -- Access Control --
+
+  bool get isAdmin => userProfile.value[FirestoreFields.role] == 'admin';
+
+  bool hasPermission(String key) {
+    if (isAdmin) return true;
+    return staffAccessRules[key] ?? false;
+  }
+
   // Initialize with false by default for better security, or true if previously assumed
   final RxMap<String, bool> staffAccessRules = <String, bool>{
     // Operations
     'new_rental': true,
     'rentals': true, // Active Rentals
     'rental_history': true,
-    'inventory': true,
-    'customers': true,
     'alerts': true,
     'qr_scanner': true,
 
+    // Inventory
+    'inventory_view': true,
+    'inventory_view_damage_fees': true,
+    'inventory_add': false,
+    'inventory_edit': false,
+    'inventory_delete': false,
+
+    // Customers
+    'customers_view': true,
+    'customers_add': true,
+    'customers_edit': true,
+    'customer_contact': false, // Can't call, msg, email
     // Financials & Reporting
     'payments': true, // Might want to restrict
     'damage_fee': true, // Might want to restrict
     'reports': false,
 
-    // Config / Admin-like (usually restricted)
-    'manage_users': false,
-    'settings': false, // Usually staff shouldn't access full settings
+    // Settings & Configuration
+    'settings_view_shop': true,
+    'settings_edit_shop': false,
+    'settings_edit_currency': false,
+    'settings_edit_date_format': false,
+    'settings_edit_timezone': false,
+    'settings_edit_rental_logic': true,
+    'settings_manage_access': false,
     'shop_setup': false,
     'agreement_template': false,
   }.obs;
@@ -133,15 +176,31 @@ class SettingsController extends GetxController {
     'new_rental': 'New Rental',
     'rentals': 'Active Rentals',
     'rental_history': 'Rental History',
-    'inventory': 'Inventory Management',
-    'customers': 'Customer Management',
     'alerts': 'Alerts & Notifications',
     'qr_scanner': 'QR Scanner',
+
+    'inventory_view': 'View Inventory',
+    'inventory_view_damage_fees': 'View Damage Fees',
+    'inventory_add': 'Add Items',
+    'inventory_edit': 'Edit Items',
+    'inventory_delete': 'Delete Items',
+
+    'customers_view': 'View Customers',
+    'customers_add': 'Add Customers',
+    'customers_edit': 'Edit Customers',
+    'customer_contact': 'Contact Customers (Call/Msg/Email)',
+
     'payments': 'Payments & Transactions',
     'damage_fee': 'Damage Fee Configuration',
     'reports': 'Reports & Analytics',
-    'manage_users': 'User Management',
-    'settings': 'App Settings',
+
+    'settings_view_shop': 'View Shop Details',
+    'settings_edit_shop': 'Edit Shop Details',
+    'settings_edit_currency': 'Edit Currency',
+    'settings_edit_date_format': 'Edit Date Format',
+    'settings_edit_timezone': 'Edit Time Zone',
+    'settings_edit_rental_logic': 'Edit Rental Pricing Logic',
+    'settings_manage_access': 'Manage Access Rules',
     'shop_setup': 'Shop Configuration',
     'agreement_template': 'Agreement Templates',
   };
@@ -153,10 +212,27 @@ class SettingsController extends GetxController {
         'new_rental',
         'rentals',
         'rental_history',
-        'inventory',
-        'customers',
         'qr_scanner',
         'alerts',
+      ],
+    },
+    {
+      'title': 'inventory_group',
+      'keys': [
+        'inventory_view',
+        'inventory_view_damage_fees',
+        'inventory_add',
+        'inventory_edit',
+        'inventory_delete',
+      ],
+    },
+    {
+      'title': 'Customer Management',
+      'keys': [
+        'customers_view',
+        'customers_add',
+        'customers_edit',
+        'customer_contact',
       ],
     },
     {
@@ -168,8 +244,18 @@ class SettingsController extends GetxController {
       'keys': ['reports'],
     },
     {
-      'title': 'admin_only_group', // "Administration"
-      'keys': ['manage_users', 'settings', 'shop_setup', 'agreement_template'],
+      'title': 'configuration_group', // "Configuration"
+      'keys': [
+        'settings_view_shop',
+        'settings_edit_shop',
+        'settings_edit_currency',
+        'settings_edit_date_format',
+        'settings_edit_timezone',
+        'settings_edit_rental_logic',
+        'settings_manage_access',
+        'shop_setup',
+        'agreement_template',
+      ],
     },
   ];
 
@@ -195,6 +281,8 @@ class SettingsController extends GetxController {
         FirestoreFields.phone: userModel.phone,
         "image": '',
       };
+
+      print(userProfile.value);
 
       // Get shop data
       final shopId = await _userService.getShopIdFromStorage();
@@ -252,6 +340,29 @@ class SettingsController extends GetxController {
           accessData.map((key, value) => MapEntry(key, value as bool)),
         );
       }
+
+      // Update ConfigService with EFFECTIVE rules
+      final effectiveRules = <String, bool>{};
+
+      // We iterate over known keys to ensure complete map
+      staffAccessRules.keys.forEach((key) {
+        if (isAdmin) {
+          effectiveRules[key] = true;
+        } else {
+          effectiveRules[key] = staffAccessRules[key] ?? false;
+        }
+      });
+      // Also ensure keys that might be missing from staffAccessRules but present in defaults are handled?
+      // staffAccessRules was initialized with defaults. assignAll overwrites it.
+      // If DB has partial data, assignAll might lose keys if accessData is partial.
+      // But usually we save the whole map.
+      // If isAdmin, we just want full access for other modules using ConfigService.
+      if (isAdmin) {
+        // Fill all known keys with true
+        AccessRouteLabels.keys.forEach((k) => effectiveRules[k] = true);
+      }
+
+      _configService.updateAccessRules(effectiveRules);
     } catch (e) {
       AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
     }
@@ -316,6 +427,15 @@ class SettingsController extends GetxController {
     final newName = shopNameController.text.trim();
     final newLocation = shopLocationController.text.trim();
     final newContactNumber = shopContactController.text.trim();
+
+    final canEdit = staffAccessRules['settings_edit_shop'] ?? false;
+    if (!canEdit) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to edit shop details",
+      );
+      return;
+    }
 
     if (newName.isEmpty) {
       AppSnackBar.error(title: "Error", message: "Shop Name cannot be empty");
@@ -674,10 +794,10 @@ class SettingsController extends GetxController {
       textConfirm: "yes".tr,
       textCancel: "no".tr,
       confirmTextColor: Colors.white,
-      onConfirm: () {
-        // Auth Logic
-        Get.back();
-        Get.offAllNamed('/login');
+      onConfirm: () async {
+        Get.back(); // Close dialog
+        await _authService.signOut();
+        // AuthController will handle the redirection to SIGN_IN or SPLASH based on state
       },
     );
   }
@@ -750,7 +870,9 @@ class SettingsController extends GetxController {
       }
 
       // Sync with global config service immediately
-      _configService.updateAccessRules(staffAccessRules);
+      if (!isAdmin) {
+        _configService.updateAccessRules(staffAccessRules);
+      }
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to save access rule");
       // Revert on failure
