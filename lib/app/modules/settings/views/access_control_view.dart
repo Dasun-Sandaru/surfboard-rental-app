@@ -64,7 +64,7 @@ class AccessControlView extends GetView<SettingsController> {
                             final isAllowed =
                                 controller.staffAccessRules[key] ?? false;
                             final label =
-                                controller.AccessRouteLabels[key] ?? key;
+                                controller.accessRouteLabels[key] ?? key;
                             final isLast = key == keys.last;
 
                             return Column(
@@ -95,7 +95,7 @@ class AccessControlView extends GetView<SettingsController> {
                                     value: isAllowed,
                                     onChanged: (val) =>
                                         controller.toggleAccess(key, val),
-                                    activeColor: colorScheme.primary,
+                                    activeThumbColor: colorScheme.primary,
                                   ),
                                   onTap: () =>
                                       controller.toggleAccess(key, !isAllowed),

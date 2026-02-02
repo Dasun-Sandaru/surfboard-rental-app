@@ -260,7 +260,7 @@ class PdfService {
                 "R\$ ${fee.feeAmount.toStringAsFixed(2)}",
               ),
             )
-            .toList(),
+            ,
         pw.SizedBox(height: 5),
         pw.Text(
           "Prices are estimates. Final charges depend on repair or replacement cost.",

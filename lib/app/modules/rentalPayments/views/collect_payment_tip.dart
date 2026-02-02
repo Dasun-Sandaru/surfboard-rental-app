@@ -18,7 +18,7 @@ class CollectPaymentTip extends StatelessWidget {
     final statusColors = Theme.of(context).extension<StatusColors>();
     // Use Scaffold backgroundColor for overlay effect
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.8),
+      backgroundColor: Colors.black.withValues(alpha: 0.8),
       body: Center(
         child: Container(
           width: 340.w,
@@ -30,7 +30,7 @@ class CollectPaymentTip extends StatelessWidget {
             border: Border.all(color: colorScheme.outline),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -43,7 +43,7 @@ class CollectPaymentTip extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -122,13 +122,13 @@ class CollectPaymentTip extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color: (statusColors?.warning ?? Colors.orange).withOpacity(
-                    0.1,
+                  color: (statusColors?.warning ?? Colors.orange).withValues(
+                    alpha: 0.1,
                   ),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: (statusColors?.warning ?? Colors.orange).withOpacity(
-                      0.3,
+                    color: (statusColors?.warning ?? Colors.orange).withValues(
+                      alpha: 0.3,
                     ),
                   ),
                 ),

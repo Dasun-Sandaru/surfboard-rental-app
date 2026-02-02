@@ -14,7 +14,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final ConfigService configService = Get.find<ConfigService>();
+    Get.find<ConfigService>();
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -168,9 +168,11 @@ class RentalPricingLogicView extends GetView<SettingsController> {
             padding: EdgeInsets.all(12.w),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: colorScheme.surface.withOpacity(0.5),
+              color: colorScheme.surface.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.5),
+              ),
             ),
             child: Text(
               example,
@@ -189,66 +191,66 @@ class RentalPricingLogicView extends GetView<SettingsController> {
     );
   }
 
-  Widget _buildNumberInput(
-    BuildContext context, {
-    required String label,
-    required num value,
-    required Function(dynamic) onChanged,
-    bool isDouble = false,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        Text(
-          "$label:",
-          style: TextStyle(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        SizedBox(width: 16.w),
-        Expanded(
-          child: Container(
-            height: 40.h,
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outline),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    value.toString(),
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    // Simple decrement
-                    if (value > 0) {
-                      onChanged(isDouble ? value - 0.5 : value - 1);
-                    }
-                  },
-                  child: Icon(Icons.remove, size: 20.sp),
-                ),
-                SizedBox(width: 8.w),
-                InkWell(
-                  onTap: () {
-                    // Simple increment
-                    onChanged(isDouble ? value + 0.5 : value + 1);
-                  },
-                  child: Icon(Icons.add, size: 20.sp),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildNumberInput(
+  //   BuildContext context, {
+  //   required String label,
+  //   required num value,
+  //   required Function(dynamic) onChanged,
+  //   bool isDouble = false,
+  // }) {
+  //   final colorScheme = Theme.of(context).colorScheme;
+  //   return Row(
+  //     children: [
+  //       Text(
+  //         "$label:",
+  //         style: TextStyle(
+  //           color: colorScheme.onSurface,
+  //           fontWeight: FontWeight.w500,
+  //         ),
+  //       ),
+  //       SizedBox(width: 16.w),
+  //       Expanded(
+  //         child: Container(
+  //           height: 40.h,
+  //           padding: EdgeInsets.symmetric(horizontal: 12.w),
+  //           decoration: BoxDecoration(
+  //             color: colorScheme.surface,
+  //             borderRadius: BorderRadius.circular(8),
+  //             border: Border.all(color: colorScheme.outline),
+  //           ),
+  //           child: Row(
+  //             children: [
+  //               Expanded(
+  //                 child: Text(
+  //                   value.toString(),
+  //                   style: TextStyle(
+  //                     color: colorScheme.onSurface,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //               ),
+  //               InkWell(
+  //                 onTap: () {
+  //                   // Simple decrement
+  //                   if (value > 0) {
+  //                     onChanged(isDouble ? value - 0.5 : value - 1);
+  //                   }
+  //                 },
+  //                 child: Icon(Icons.remove, size: 20.sp),
+  //               ),
+  //               SizedBox(width: 8.w),
+  //               InkWell(
+  //                 onTap: () {
+  //                   // Simple increment
+  //                   onChanged(isDouble ? value + 0.5 : value + 1);
+  //                 },
+  //                 child: Icon(Icons.add, size: 20.sp),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 }

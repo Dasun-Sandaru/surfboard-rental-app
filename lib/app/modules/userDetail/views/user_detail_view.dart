@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -138,7 +136,7 @@ class UserDetailView extends GetView<UserDetailController> {
       children: [
         CircleAvatar(
           radius: 40.w,
-          backgroundColor: colorScheme.primary.withOpacity(0.2),
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
           child: Text(
             name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?',
             style: TextStyle(
@@ -161,9 +159,11 @@ class UserDetailView extends GetView<UserDetailController> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colorScheme.primary.withOpacity(0.3)),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.3),
+            ),
           ),
           child: Text(
             user.role.name.toUpperCase(),
@@ -235,7 +235,7 @@ class UserDetailView extends GetView<UserDetailController> {
               ),
               Switch(
                 value: controller.isActive.value,
-                activeColor: successColor,
+                activeThumbColor: successColor,
                 inactiveTrackColor: colorScheme.surface,
                 onChanged: user.role == UserRole.admin
                     ? null
@@ -300,7 +300,7 @@ class UserDetailView extends GetView<UserDetailController> {
                     ),
                     decoration: BoxDecoration(
                       color: controller.isVerified.value
-                          ? successColor.withOpacity(0.1)
+                          ? successColor.withValues(alpha: 0.1)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
@@ -347,7 +347,7 @@ class UserDetailView extends GetView<UserDetailController> {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -435,7 +435,7 @@ class UserDetailView extends GetView<UserDetailController> {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

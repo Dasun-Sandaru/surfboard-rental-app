@@ -282,7 +282,7 @@ class AddInventoryView extends StatelessWidget {
       prefixIcon: Icon(icon, size: 20.w, color: colorScheme.onSurfaceVariant),
       hintText: hintText,
       hintStyle: TextStyle(
-        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
       ),
       filled: true,
       fillColor: colorScheme.surfaceContainer,
@@ -363,7 +363,7 @@ class AddInventoryView extends StatelessWidget {
               : colorScheme.surface,
           child: InkWell(
             onTap: onItemSelect,
-            splashColor: colorScheme.primary.withOpacity(0.1),
+            splashColor: colorScheme.primary.withValues(alpha: 0.1),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: Text(
@@ -401,7 +401,7 @@ class AddInventoryView extends StatelessWidget {
           selectedColor: colorScheme.primaryContainer,
         ),
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           fontSize: 16.sp,
         ),
         closedErrorBorder: Border.all(color: colorScheme.error),

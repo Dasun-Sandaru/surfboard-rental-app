@@ -54,7 +54,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Enter template name (e.g., Shortboard Rental)',
                   hintStyle: TextStyle(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                   ),
                   filled: true,
                   fillColor: colorScheme.surfaceContainer,
@@ -107,7 +107,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Write your agreement here...',
                   hintStyle: TextStyle(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                   ),
                   filled: true,
                   fillColor: colorScheme.surfaceContainer,
@@ -140,7 +140,7 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                   color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.5),
+                    color: colorScheme.outline.withValues(alpha: 0.5),
                   ),
                 ),
                 child: Wrap(
@@ -156,10 +156,10 @@ class AddEditAgreementTemplateView extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.secondary.withOpacity(0.1),
+                          color: colorScheme.secondary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: colorScheme.secondary.withOpacity(0.3),
+                            color: colorScheme.secondary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(

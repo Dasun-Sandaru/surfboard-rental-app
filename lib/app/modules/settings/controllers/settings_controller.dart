@@ -172,7 +172,7 @@ class SettingsController extends GetxController {
     'agreement_template': false,
   }.obs;
 
-  final Map<String, String> AccessRouteLabels = {
+  final Map<String, String> accessRouteLabels = {
     'new_rental': 'New Rental',
     'rentals': 'Active Rentals',
     'rental_history': 'Rental History',
@@ -282,8 +282,6 @@ class SettingsController extends GetxController {
         "image": '',
       };
 
-      print(userProfile.value);
-
       // Get shop data
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) throw 'Shop ID not found in storage';
@@ -345,13 +343,13 @@ class SettingsController extends GetxController {
       final effectiveRules = <String, bool>{};
 
       // We iterate over known keys to ensure complete map
-      staffAccessRules.keys.forEach((key) {
+      for (var key in staffAccessRules.keys) {
         if (isAdmin) {
           effectiveRules[key] = true;
         } else {
           effectiveRules[key] = staffAccessRules[key] ?? false;
         }
-      });
+      }
       // Also ensure keys that might be missing from staffAccessRules but present in defaults are handled?
       // staffAccessRules was initialized with defaults. assignAll overwrites it.
       // If DB has partial data, assignAll might lose keys if accessData is partial.
@@ -359,7 +357,9 @@ class SettingsController extends GetxController {
       // If isAdmin, we just want full access for other modules using ConfigService.
       if (isAdmin) {
         // Fill all known keys with true
-        AccessRouteLabels.keys.forEach((k) => effectiveRules[k] = true);
+        for (var k in accessRouteLabels.keys) {
+          effectiveRules[k] = true;
+        }
       }
 
       _configService.updateAccessRules(effectiveRules);

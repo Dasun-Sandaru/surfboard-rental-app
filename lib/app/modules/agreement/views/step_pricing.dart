@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../../utils/constants/a_enums.dart';
 import '../controllers/agreement_controller.dart';
 
 class StepPricing extends GetView<AgreementController> {
@@ -251,7 +250,7 @@ class StepPricing extends GetView<AgreementController> {
                     Container(
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
+                        color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -345,7 +344,7 @@ class StepPricing extends GetView<AgreementController> {
                       ),
                       value: controller.requireDeposit.value,
                       onChanged: (val) => controller.requireDeposit.value = val,
-                      activeColor: colorScheme.primary,
+                      activeThumbColor: colorScheme.primary,
                     ),
                   ),
 

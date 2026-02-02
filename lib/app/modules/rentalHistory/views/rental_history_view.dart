@@ -60,7 +60,9 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                       ),
                       hintText: 'search_hint'.tr,
                       hintStyle: TextStyle(
-                        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                       filled: true,
                       fillColor: colorScheme.surfaceContainer,
@@ -225,7 +227,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
             if (status != null) controller.updateFilter(null);
           }
         },
-        selectedColor: (color ?? colorScheme.primary).withOpacity(0.2),
+        selectedColor: (color ?? colorScheme.primary).withValues(alpha: 0.2),
         labelStyle: TextStyle(
           color: isSelected
               ? (color ?? colorScheme.primary)
@@ -257,7 +259,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isOverdue
-                ? colorScheme.error.withOpacity(0.3)
+                ? colorScheme.error.withValues(alpha: 0.3)
                 : Colors.transparent,
           ),
         ),
@@ -389,9 +391,9 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         text,
@@ -408,7 +410,9 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
     return Text(
       text,
       style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+        color: Theme.of(
+          context,
+        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
         fontSize: 12.sp,
       ),
     );
@@ -423,7 +427,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           Icon(
             Iconsax.receipt,
             size: 64.w,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           SizedBox(height: 16.h),
           Text(

@@ -4,7 +4,6 @@ import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/add_edit_agreement_template_view.dart';
 import 'package:surfboard_rental_app/app/modules/agreementTemplate/views/agreement_preview_view.dart';
 import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/common/app_dialogs.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../models/agreement_template_model.dart';

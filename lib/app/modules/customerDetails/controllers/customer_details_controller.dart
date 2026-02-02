@@ -78,7 +78,7 @@ class CustomerDetailsController extends GetxController {
       "date": "20 Jul 2024",
       "items": "Soft Top (8'0\")",
       "duration": "4 Hours",
-      "cost": "\5.00",
+      "cost": "5.00",
       "status": "returned_label",
     },
   ].obs;

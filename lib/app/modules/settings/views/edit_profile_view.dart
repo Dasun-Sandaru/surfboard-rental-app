@@ -52,7 +52,7 @@ class EditProfileView extends GetView<SettingsController> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.5),
+                          color: colorScheme.primary.withValues(alpha: 0.5),
                           width: 2,
                         ),
                       ),
@@ -97,7 +97,7 @@ class EditProfileView extends GetView<SettingsController> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: Offset(0, 2),
                               ),
@@ -173,7 +173,7 @@ class EditProfileView extends GetView<SettingsController> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                     elevation: 4,
-                    shadowColor: colorScheme.primary.withOpacity(0.4),
+                    shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                   ),
                   child: Text(
                     "Save Changes",
@@ -231,7 +231,7 @@ class EditProfileView extends GetView<SettingsController> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,
@@ -239,7 +239,7 @@ class EditProfileView extends GetView<SettingsController> {
           icon,
           color: enabled
               ? colorScheme.onSurfaceVariant
-              : colorScheme.onSurfaceVariant.withOpacity(0.5),
+              : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           size: 20.w,
         ),
         border: OutlineInputBorder(
@@ -256,7 +256,9 @@ class EditProfileView extends GetView<SettingsController> {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

@@ -79,7 +79,7 @@ class SignaturePadView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -110,8 +110,8 @@ class SignaturePadView extends StatelessWidget {
                       : controller.saveSignature,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
-                    disabledBackgroundColor: colorScheme.primary.withOpacity(
-                      0.3,
+                    disabledBackgroundColor: colorScheme.primary.withValues(
+                      alpha: 0.3,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),

@@ -53,7 +53,7 @@ class ActivityLogService {
             // A better approach: The caller should pass actor info if known.
             // Optimization: If UserService has cached user, use it.
             if (Get.isRegistered<UserService>()) {
-              final userService = Get.find<UserService>();
+              Get.find<UserService>();
               // This might trigger a fetch if not cached, which is slow for a log.
               // We will skip deep fetch and rely on Auth Display Name if available.
               actorName = user.displayName ?? user.email ?? 'Staff';

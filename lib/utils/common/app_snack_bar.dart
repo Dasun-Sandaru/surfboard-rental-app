@@ -23,7 +23,7 @@ class AppSnackBar {
     Get.snackbar(
       title,
       message,
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       colorText: color,
       borderColor: color,
       borderWidth: 1,
@@ -47,7 +47,7 @@ class AppSnackBar {
     Get.snackbar(
       title,
       message,
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       colorText: color,
       borderColor: color,
       borderWidth: 1,
@@ -71,7 +71,7 @@ class AppSnackBar {
     Get.snackbar(
       title,
       message,
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       colorText: color,
       borderColor: color,
       borderWidth: 1,
@@ -95,7 +95,7 @@ class AppSnackBar {
     Get.snackbar(
       title,
       message,
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       colorText: color,
       borderColor: color,
       borderWidth: 1,

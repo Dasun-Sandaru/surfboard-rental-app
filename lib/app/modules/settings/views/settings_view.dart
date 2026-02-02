@@ -51,8 +51,9 @@ class SettingsView extends StatelessWidget {
                 'shop_setup',
               );
 
-              if (!canViewShop && !canEditInventoryConfig)
+              if (!canViewShop && !canEditInventoryConfig) {
                 return const SizedBox.shrink();
+              }
 
               return Container(
                 decoration: BoxDecoration(
@@ -192,9 +193,10 @@ class SettingsView extends StatelessWidget {
               }
 
               if (items.isEmpty) return const SizedBox.shrink();
-              if (items.last is Divider)
+              if (items.last is Divider) {
                 items
                     .removeLast(); // Logic to remove last divider if present isn't straightforward with generic Widgets, but assuming layout for now.
+              }
 
               // Remove the last divider manually if the last item added was a divider
               if (items.isNotEmpty && items.last is Divider) {
@@ -223,8 +225,9 @@ class SettingsView extends StatelessWidget {
                 'settings_manage_access',
               );
 
-              if (!isOwnerAdmin || !canManageAccess)
+              if (!isOwnerAdmin || !canManageAccess) {
                 return const SizedBox.shrink();
+              }
 
               return Column(
                 children: [
@@ -291,7 +294,7 @@ class SettingsView extends StatelessWidget {
                           v ? ThemeMode.dark : ThemeMode.light,
                         );
                       },
-                      activeColor: colorScheme.primary,
+                      activeThumbColor: colorScheme.primary,
                     ),
                   ),
                 ],
@@ -315,7 +318,9 @@ class SettingsView extends StatelessWidget {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: colorScheme.error.withOpacity(0.5)),
+                  side: BorderSide(
+                    color: colorScheme.error.withValues(alpha: 0.5),
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

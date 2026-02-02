@@ -674,10 +674,12 @@ class SampleDataService {
 
       // Trigger Share Dialog so the user can save it elsewhere (Publicly)
       log('Triggering share dialog for: ${file.path}', name: logName);
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        subject: 'Database Backup for Shop $shopId',
-        text: 'Attached is the JSON database backup for shop ID: $shopId',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'Database Backup for Shop $shopId',
+          text: 'Attached is the JSON database backup for shop ID: $shopId',
+        ),
       );
 
       log('Database exported successfully to: ${file.path}', name: logName);

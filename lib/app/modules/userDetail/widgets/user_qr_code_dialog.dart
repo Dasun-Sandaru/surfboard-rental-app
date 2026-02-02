@@ -66,7 +66,7 @@ class UserQrCodeDialog extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 20.w,
-                    backgroundColor: colorScheme.primary.withOpacity(0.1),
+                    backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
                     child: Icon(
                       Iconsax.user,
                       color: colorScheme.primary,

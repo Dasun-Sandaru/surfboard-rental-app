@@ -6,7 +6,6 @@ import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
-import '../../../models/inventory_model.dart';
 import '../../../services/inventory_service.dart';
 import '../../../services/user_service.dart';
 

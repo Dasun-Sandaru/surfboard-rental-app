@@ -73,12 +73,14 @@ class BoardInspectionView extends StatelessWidget {
                           color: colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: controller.timeColor.value.withOpacity(0.5),
+                            color: controller.timeColor.value.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: controller.timeColor.value.withOpacity(
-                                0.1,
+                              color: controller.timeColor.value.withValues(
+                                alpha: 0.1,
                               ),
                               blurRadius: 10,
                               spreadRadius: 2,
@@ -297,7 +299,7 @@ class BoardInspectionView extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,7 +395,7 @@ class BoardInspectionView extends StatelessWidget {
         border: Border(
           bottom: isLast
               ? BorderSide.none
-              : BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+              : BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
         ),
       ),
       child: Row(

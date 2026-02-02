@@ -479,7 +479,7 @@ class SignUpView extends GetView<SignUpController> {
       prefixIcon: Icon(icon, size: 20.w, color: colorScheme.onSurfaceVariant),
       hintText: hintText,
       hintStyle: TextStyle(
-        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
       ),
       filled: true,
       fillColor: colorScheme.surfaceContainer,

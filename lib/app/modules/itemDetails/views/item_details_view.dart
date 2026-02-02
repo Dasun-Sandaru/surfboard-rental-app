@@ -245,7 +245,9 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                   child: TextButton(
                     onPressed: controller.viewDamageFees,
                     style: TextButton.styleFrom(
-                      backgroundColor: colorScheme.primary.withOpacity(0.15),
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.15,
+                      ),
                       foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),

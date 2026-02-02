@@ -145,7 +145,6 @@ class AppTranslations extends Translations {
       'delete': 'Delete',
       'update': 'Update',
       'save': 'Save',
-      'revenue': 'Revenue',
       'enter_name': 'Enter name',
       'remove_item': 'Remove Item',
       'delete_confirm_msg': 'Delete item?',
@@ -471,9 +470,7 @@ class AppTranslations extends Translations {
       'enter_phone': 'දුරකථන අංකය ඇතුලත් කරන්න',
       'email': 'විද්‍යුත් තැපෑල',
       'phone': 'දුරකථන',
-      'rental_history': 'කුලී ඉතිහාසය',
-      'rentals': 'කුලී',
-      'rental_history': 'කුලී ඉතිහාසය',
+
       'rent_type': 'කුලී වර්ගය',
       'item': 'අයිතමය',
       'refunded': 'ආපසු ගෙවන ලදී',
@@ -481,7 +478,7 @@ class AppTranslations extends Translations {
       'not_paid': 'ගෙවා නැත',
       'paid': 'ගෙවා ඇත',
       'pending': 'බලාපොරොත්තුවෙන්',
-      'unknown': 'නොදන්නා',
+
       'processed_rental': 'සැකසූ කුලී',
       'enter_email': 'විද්‍යුත් තැපැල් ලිපිනය ඇතුලත් කරන්න',
       'save_changes': 'වෙනස්කම් සුරකින්න',
@@ -612,7 +609,6 @@ class AppTranslations extends Translations {
       'approve': 'අනුමත කරන්න',
       'contact_info': 'සම්බන්ධතා තොරතුරු',
       'joined': 'සම්බන්ධ විය',
-      'revenue': 'ආදායම',
       'recent_activity': 'මෑත ක්‍රියාකාරකම්',
     },
   };

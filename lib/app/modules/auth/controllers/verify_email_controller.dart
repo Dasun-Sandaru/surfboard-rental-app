@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import '../../../../utils/common/a_app_error_handler.dart';
 import '../../../../utils/common/a_app_snacks.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/user_service.dart';
@@ -60,9 +61,9 @@ class VerifyEmailController extends GetxController {
           final role = membership.role;
           // final shopId = membership['shopId']!;
 
-          if (role == 'admin') {
+          if (role == UserRole.admin) {
             Get.offAllNamed(Routes.ADMIN_HOME);
-          } else if (role == 'staff') {
+          } else if (role == UserRole.staff) {
             Get.offAllNamed(Routes.STAFF_HOME);
           } else {
             await _authService.signOut();

@@ -6,7 +6,7 @@ import '../../../../utils/common/app_snack_bar.dart';
 import '../widgets/user_qr_code_dialog.dart';
 
 class UserDetailController extends GetxController {
-  static const String _logName = 'UserDetailController';
+  // static const String _logName = 'UserDetailController';
   final UserService _userService = Get.find();
 
   final Rx<UserModel?> user = Rx<UserModel?>(null);

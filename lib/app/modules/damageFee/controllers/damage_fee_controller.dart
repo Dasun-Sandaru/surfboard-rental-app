@@ -361,7 +361,7 @@ class DamageFeeController extends GetxController {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
+        hintStyle: TextStyle(color: Colors.grey.withValues(alpha: 0.5)),
         filled: true,
         fillColor: const Color(0xFF101f22), // BG Dark
         border: OutlineInputBorder(

@@ -229,8 +229,10 @@ class RentalPaymentView extends StatelessWidget {
                                 padding: EdgeInsets.all(10.w),
                                 decoration: BoxDecoration(
                                   color: isRefund
-                                      ? successColor.withOpacity(0.1)
-                                      : colorScheme.primary.withOpacity(0.1),
+                                      ? successColor.withValues(alpha: 0.1)
+                                      : colorScheme.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(

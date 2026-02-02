@@ -27,9 +27,11 @@ class AuthGateView extends GetView<AuthGateController> {
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: controller.mainColor.value.withOpacity(0.1), // Glow
+                  color: controller.mainColor.value.withValues(
+                    alpha: 0.1,
+                  ), // Glow
                   border: Border.all(
-                    color: controller.mainColor.value.withOpacity(0.3),
+                    color: controller.mainColor.value.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),

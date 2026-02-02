@@ -6,7 +6,7 @@ import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../models/payment_model.dart';
-import '../models/rental_model.dart'; // Import RentalModel for status checks
+// Import RentalModel for status checks
 
 class PaymentService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

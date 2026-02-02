@@ -40,7 +40,7 @@ class AlertDetailsView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: _getActivityColor(
                         log.activityType,
-                      ).withOpacity(0.1),
+                      ).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -128,7 +128,7 @@ class AlertDetailsView extends StatelessWidget {
                   color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.3),
+                    color: colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -211,7 +211,7 @@ class AlertDetailsView extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

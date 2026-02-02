@@ -78,7 +78,7 @@ class AlertsView extends GetView<AlertsController> {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +88,9 @@ class AlertsView extends GetView<AlertsController> {
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
-                color: _getActivityColor(log.activityType).withOpacity(0.1),
+                color: _getActivityColor(
+                  log.activityType,
+                ).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -193,7 +195,7 @@ class AlertsView extends GetView<AlertsController> {
           Icon(
             Iconsax.document_text,
             size: 64.w,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           SizedBox(height: 16.h),
           Text(

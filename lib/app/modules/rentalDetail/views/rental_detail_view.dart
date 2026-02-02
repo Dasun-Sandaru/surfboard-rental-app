@@ -298,7 +298,9 @@ class RentalDetailView extends GetView<RentalDetailController> {
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: colorScheme.outline.withOpacity(isAvailable ? 0.5 : 0.2),
+            color: colorScheme.outline.withValues(
+              alpha: isAvailable ? 0.5 : 0.2,
+            ),
           ),
         ),
         child: Row(
@@ -307,7 +309,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: (isAvailable ? colorScheme.primary : Colors.grey)
-                    .withOpacity(0.1),
+                    .withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -356,7 +358,11 @@ class RentalDetailView extends GetView<RentalDetailController> {
     return Center(
       child: Column(
         children: [
-          Icon(icon, size: 48, color: colorScheme.outline.withOpacity(0.5)),
+          Icon(
+            icon,
+            size: 48,
+            color: colorScheme.outline.withValues(alpha: 0.5),
+          ),
           SizedBox(height: 12.h),
           Text(message, style: TextStyle(color: colorScheme.onSurfaceVariant)),
         ],
@@ -372,7 +378,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -412,9 +418,9 @@ class RentalDetailView extends GetView<RentalDetailController> {
       margin: EdgeInsets.symmetric(vertical: 4),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.05),
+        color: Colors.red.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withOpacity(0.2)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,7 +439,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -471,7 +477,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: snapshot.data!.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 8.w),
+                    separatorBuilder: (_, _) => SizedBox(width: 8.w),
                     itemBuilder: (context, index) {
                       final photo = snapshot.data![index];
                       return ClipRRect(
@@ -549,16 +555,16 @@ class RentalDetailView extends GetView<RentalDetailController> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.1),
+        color: statusColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: statusColor.withOpacity(0.3)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.2),
+              color: statusColor.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(statusIcon, color: statusColor, size: 24),
@@ -604,7 +610,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -626,7 +632,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
               ],
             ),
           ),
-          Divider(color: colorScheme.outline.withOpacity(0.3), height: 1),
+          Divider(color: colorScheme.outline.withValues(alpha: 0.3), height: 1),
           SizedBox(height: 8.h),
           ...children,
           SizedBox(height: 8.h),

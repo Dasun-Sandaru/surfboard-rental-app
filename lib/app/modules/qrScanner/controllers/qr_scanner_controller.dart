@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/models/inventory_model.dart';
 import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
 
 import '../../../models/customer_model.dart';

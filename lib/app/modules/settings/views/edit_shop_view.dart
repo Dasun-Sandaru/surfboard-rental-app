@@ -165,7 +165,7 @@ class EditShopView extends GetView<SettingsController> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 4,
-                        shadowColor: colorScheme.primary.withOpacity(0.4),
+                        shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                       ),
                       child: Text(
                         "Save Changes",
@@ -220,7 +220,7 @@ class EditShopView extends GetView<SettingsController> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,
@@ -228,7 +228,7 @@ class EditShopView extends GetView<SettingsController> {
           icon,
           color: enabled
               ? colorScheme.onSurfaceVariant
-              : colorScheme.onSurfaceVariant.withOpacity(0.5),
+              : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           size: 20.w,
         ),
         border: OutlineInputBorder(

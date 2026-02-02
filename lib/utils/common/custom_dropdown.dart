@@ -13,7 +13,7 @@ class CustomDropdown extends StatefulWidget {
   final Color borderColor;
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     required this.items,
     this.selectedValue,
     required this.onChanged,
@@ -22,7 +22,7 @@ class CustomDropdown extends StatefulWidget {
     this.textColor = Colors.white,
     this.hintColor = const Color(0xFF94a3b8),
     this.borderColor = const Color(0xFF334155),
-  }) : super(key: key);
+  });
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
@@ -120,7 +120,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
                           vertical: 12.h,
                         ),
                         color: _selectedValue == item.value
-                            ? const Color(0xFF4A90E2).withOpacity(0.2)
+                            ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
                             : Colors.transparent,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +142,9 @@ class _CustomDropdownState extends State<CustomDropdown> {
                                 child: Text(
                                   item.description!,
                                   style: TextStyle(
-                                    color: widget.hintColor.withOpacity(0.7),
+                                    color: widget.hintColor.withValues(
+                                      alpha: 0.7,
+                                    ),
                                     fontSize: 12.sp,
                                     fontStyle: FontStyle.italic,
                                   ),
@@ -154,7 +156,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
                     ),
                     if (!isLast)
                       Divider(
-                        color: widget.borderColor.withOpacity(0.5),
+                        color: widget.borderColor.withValues(alpha: 0.5),
                         height: 0,
                       ),
                   ],

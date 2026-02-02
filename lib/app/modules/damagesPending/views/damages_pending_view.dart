@@ -51,7 +51,7 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
                 ),
                 hintText: 'search_customer_item'.tr,
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: colorScheme.surfaceContainer,
@@ -107,8 +107,8 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: colorScheme.error.withOpacity(
-              0.5,
+            color: colorScheme.error.withValues(
+              alpha: 0.3,
             ), // Red border for damages/overdue
           ),
         ),
@@ -120,7 +120,7 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
               height: 48.w,
               width: 48.w,
               decoration: BoxDecoration(
-                color: colorScheme.errorContainer.withOpacity(0.5),
+                color: colorScheme.errorContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -179,7 +179,7 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: colorScheme.error.withOpacity(0.2),
+                  color: colorScheme.error.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -201,7 +201,9 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
     return Text(
       text,
       style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+        color: Theme.of(
+          context,
+        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
         fontSize: 12.sp,
       ),
     );

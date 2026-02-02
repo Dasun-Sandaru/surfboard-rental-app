@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -105,7 +106,7 @@ class BoardInspectionController extends GetxController {
             paymentHistory.assignAll(payments);
           },
           onError: (e) {
-            print('Error listening to payments: $e');
+            log('Error listening to payments: $e');
           },
         );
   }
@@ -206,36 +207,36 @@ class BoardInspectionController extends GetxController {
   }
 
   // -- UI Interaction --
-  void _showSettlementDialog({required double damageFee}) {
-    double finalTotal = balanceDue + damageFee;
-    String actionText = finalTotal > 0 ? "Collect Payment" : "Refund Customer";
-    final colorScheme = Get.theme.colorScheme;
-    final statusColors = Get.theme.extension<StatusColors>();
+  // void _showSettlementDialog({required double damageFee}) {
+  //   double finalTotal = balanceDue + damageFee;
+  //   String actionText = finalTotal > 0 ? "Collect Payment" : "Refund Customer";
+  //   final colorScheme = Get.theme.colorScheme;
+  //   final statusColors = Get.theme.extension<StatusColors>();
 
-    Get.defaultDialog(
-      title: "Settlement Required",
-      backgroundColor: colorScheme.surfaceContainer,
-      titleStyle: TextStyle(color: colorScheme.onSurface),
-      content: Column(
-        children: [
-          _summaryRow("Outstanding Rent", balanceDue),
-          if (damageFee > 0) _summaryRow("Damage Fee", damageFee),
-          Divider(color: colorScheme.outline),
-          _summaryRow("Net Payable", finalTotal, isBold: true),
-        ],
-      ),
-      textConfirm: actionText,
-      confirmTextColor: colorScheme.onPrimary,
-      buttonColor: finalTotal > 0
-          ? colorScheme.primary
-          : (statusColors?.warning ?? Colors.orange),
-      onConfirm: () {
-        _finalizeReturn(damageFee: damageFee, finalPayment: finalTotal);
-      },
-      textCancel: "Cancel",
-      cancelTextColor: colorScheme.primary,
-    );
-  }
+  //   Get.defaultDialog(
+  //     title: "Settlement Required",
+  //     backgroundColor: colorScheme.surfaceContainer,
+  //     titleStyle: TextStyle(color: colorScheme.onSurface),
+  //     content: Column(
+  //       children: [
+  //         _summaryRow("Outstanding Rent", balanceDue),
+  //         if (damageFee > 0) _summaryRow("Damage Fee", damageFee),
+  //         Divider(color: colorScheme.outline),
+  //         _summaryRow("Net Payable", finalTotal, isBold: true),
+  //       ],
+  //     ),
+  //     textConfirm: actionText,
+  //     confirmTextColor: colorScheme.onPrimary,
+  //     buttonColor: finalTotal > 0
+  //         ? colorScheme.primary
+  //         : (statusColors?.warning ?? Colors.orange),
+  //     onConfirm: () {
+  //       _finalizeReturn(damageFee: damageFee, finalPayment: finalTotal);
+  //     },
+  //     textCancel: "Cancel",
+  //     cancelTextColor: colorScheme.primary,
+  //   );
+  // }
 
   Future<void> _finalizeReturn({
     required double damageFee,
@@ -275,22 +276,22 @@ class BoardInspectionController extends GetxController {
     }
   }
 
-  Widget _summaryRow(String label, double amount, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(
-            "\$${amount.abs().toStringAsFixed(2)}",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _summaryRow(String label, double amount, {bool isBold = false}) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 4.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(label, style: const TextStyle(color: Colors.grey)),
+  //         Text(
+  //           "\$${amount.abs().toStringAsFixed(2)}",
+  //           style: TextStyle(
+  //             color: Colors.white,
+  //             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

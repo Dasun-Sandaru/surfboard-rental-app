@@ -106,7 +106,7 @@ class DamageReportView extends StatelessWidget {
                                         controller.toggleDamage(fee.id!, val);
                                       }
                                     },
-                                    activeColor: colorScheme.primary,
+                                    activeThumbColor: colorScheme.primary,
                                   ),
                                 ],
                               ),
@@ -279,7 +279,7 @@ class DamageReportView extends StatelessWidget {
                                     hintText: "describe_damage".tr,
                                     hintStyle: TextStyle(
                                       color: colorScheme.onSurfaceVariant
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                       fontSize: 12.sp,
                                     ),
                                     filled: true,
@@ -323,7 +323,7 @@ class DamageReportView extends StatelessWidget {
                     return Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
+                        color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: colorScheme.primary),
                       ),

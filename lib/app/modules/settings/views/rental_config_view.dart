@@ -112,7 +112,7 @@ class RentalConfigView extends GetView<SettingsController> {
                   ),
                   value: controller.isTaxEnabled.value,
                   onChanged: (val) => controller.isTaxEnabled.value = val,
-                  activeColor: colorScheme.primary,
+                  activeThumbColor: colorScheme.primary,
                   contentPadding: EdgeInsets.zero,
                 ),
               ),

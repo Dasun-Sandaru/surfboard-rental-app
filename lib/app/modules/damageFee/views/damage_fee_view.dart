@@ -141,8 +141,8 @@ class DamageFeeView extends GetView<DamageFeeController> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isActive
-              ? colorScheme.outline.withOpacity(0.5)
-              : colorScheme.outline.withOpacity(0.2),
+              ? colorScheme.outline.withValues(alpha: 0.5)
+              : colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -175,7 +175,9 @@ class DamageFeeView extends GetView<DamageFeeController> {
                   Text(
                     rule.description,
                     style: TextStyle(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.6,
+                      ),
                       fontSize: 12.sp,
                       fontStyle: FontStyle.italic,
                     ),
@@ -205,7 +207,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 _buildIconButton(
                   icon: Iconsax.trash,
                   color: colorScheme.error,
-                  bgColor: colorScheme.error.withOpacity(0.1),
+                  bgColor: colorScheme.error.withValues(alpha: 0.1),
                   onTap: () => controller.deleteRule(rule.id!),
                 ),
               ],
@@ -256,7 +258,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
           Text(
             "tap_add_rule".tr,
             style: TextStyle(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               fontSize: 14.sp,
             ),
           ),

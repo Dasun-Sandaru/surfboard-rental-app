@@ -528,7 +528,7 @@ class AgreementController extends GetxController {
   double getTotalDamageFees() {
     return getSelectedDamageFees().fold<double>(
       0.0,
-      (sum, fee) => sum + fee.feeAmount,
+      (total, fee) => total + fee.feeAmount,
     );
   }
 }

@@ -288,7 +288,7 @@ class NewRentalView extends StatelessWidget {
             ? Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: colorScheme.primary.withOpacity(0.2),
+                    backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
                     child: Text(
                       customer.firstName.isNotEmpty
                           ? customer.firstName[0]

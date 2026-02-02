@@ -64,7 +64,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                 ),
                 hintText: 'search_user_hint'.tr,
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: colorScheme.surfaceContainer,
@@ -85,7 +85,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                   color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.5),
+                    color: colorScheme.outline.withValues(alpha: 0.5),
                   ),
                 ),
                 child: Obx(() {
@@ -96,7 +96,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                     itemCount: controller.filteredUsers.length,
                     padding: EdgeInsets.zero,
                     separatorBuilder: (context, index) => Divider(
-                      color: colorScheme.outline.withOpacity(0.5),
+                      color: colorScheme.outline.withValues(alpha: 0.5),
                       height: 1,
                     ),
                     itemBuilder: (context, index) {
@@ -125,7 +125,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
           Icon(
             Iconsax.user_search,
             size: 60.w,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -161,7 +161,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
               decoration: BoxDecoration(
                 color: controller
                     .avatarColor(user.name ?? 'User')
-                    .withOpacity(0.2),
+                    .withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -212,8 +212,10 @@ class ManageUsersView extends GetView<ManageUsersController> {
                         ),
                         decoration: BoxDecoration(
                           color: isAdmin
-                              ? colorScheme.primary.withOpacity(0.2)
-                              : colorScheme.onSurfaceVariant.withOpacity(0.2),
+                              ? colorScheme.primary.withValues(alpha: 0.2)
+                              : colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.2,
+                                ),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -238,7 +240,7 @@ class ManageUsersView extends GetView<ManageUsersController> {
                             vertical: 2.h,
                           ),
                           decoration: BoxDecoration(
-                            color: successColor.withOpacity(0.2),
+                            color: successColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(

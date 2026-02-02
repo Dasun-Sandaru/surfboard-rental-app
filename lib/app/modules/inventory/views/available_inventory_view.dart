@@ -72,7 +72,7 @@ class AvailableInventoryView extends GetView<AvailableInventoryController> {
                   vertical: 8.h,
                 ),
                 itemCount: controller.items.length + 1,
-                separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                separatorBuilder: (_, _) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
                   if (index == controller.items.length) {
                     controller.loadMore();
@@ -149,7 +149,7 @@ class AvailableInventoryView extends GetView<AvailableInventoryController> {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final bgColor = isActive
-        ? colorScheme.primary.withOpacity(0.2)
+        ? colorScheme.primary.withValues(alpha: 0.2)
         : colorScheme.secondaryContainer;
     final textColor = isActive ? colorScheme.primary : colorScheme.onSurface;
     final borderColor = isActive ? colorScheme.primary : Colors.transparent;
@@ -207,7 +207,7 @@ class AvailableInventoryView extends GetView<AvailableInventoryController> {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -311,7 +311,7 @@ class AvailableInventoryView extends GetView<AvailableInventoryController> {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colorScheme.primary.withOpacity(0.15),
+                  color: colorScheme.primary.withValues(alpha: 0.15),
                 ),
                 child: Icon(
                   controller.isLessThan.value

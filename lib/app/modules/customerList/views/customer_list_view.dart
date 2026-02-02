@@ -158,7 +158,7 @@ class CustomerListView extends GetView<CustomerListController> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: colorScheme.primary.withOpacity(0.2),
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
               child: Text(
                 customer.firstName.isNotEmpty ? customer.firstName[0] : "C",
                 style: TextStyle(color: colorScheme.primary),

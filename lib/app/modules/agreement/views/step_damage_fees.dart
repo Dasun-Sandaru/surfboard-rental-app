@@ -105,7 +105,7 @@ class StepDamageFees extends GetView<AgreementController> {
                                   onChanged: (val) {
                                     controller.toggleDamageFee(fee.id!, val);
                                   },
-                                  activeColor: colorScheme.primary,
+                                  activeThumbColor: colorScheme.primary,
                                 ),
                               ],
                             ),

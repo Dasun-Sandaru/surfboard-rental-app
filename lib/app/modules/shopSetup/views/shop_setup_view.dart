@@ -113,7 +113,6 @@ class ShopSetupView extends GetView<ShopSetupController> {
                 height: 54.h,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement shop setup logic
                     Get.back();
                   },
                   style: ElevatedButton.styleFrom(
@@ -166,7 +165,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,
