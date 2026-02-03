@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:surfboard_rental_app/utils/constants/a_image_strings.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
@@ -25,10 +26,13 @@ class SplashView extends GetView<SplashController> {
                 shape: BoxShape.circle,
                 color: colorScheme.primary.withValues(alpha: 0.1),
               ),
-              child: Icon(
-                Icons.surfing,
-                size: 80.sp,
-                color: colorScheme.primary,
+              child: ClipOval(
+                child: Image.asset(
+                  AImageStrings.appLogo,
+                  width: 80.sp,
+                  height: 80.sp,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
 
@@ -36,7 +40,7 @@ class SplashView extends GetView<SplashController> {
 
             /// App Name
             Text(
-              "SURF RENTAL",
+              "SURF DESK",
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 24.sp,
@@ -48,7 +52,7 @@ class SplashView extends GetView<SplashController> {
             SizedBox(height: 8.h),
 
             Text(
-              "Manager App",
+              "Effortless Rental Management",
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,

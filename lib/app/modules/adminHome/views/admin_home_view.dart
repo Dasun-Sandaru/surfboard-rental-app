@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:surfboard_rental_app/app/routes/app_pages.dart';
+import 'package:surfboard_rental_app/utils/constants/a_image_strings.dart';
 
 import '../../alerts/views/alerts_view.dart';
 import '../controllers/admin_home_controller.dart';
@@ -192,7 +193,14 @@ class AdminHomeView extends GetView<AdminHomeController> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // Logo
-        Icon(Icons.surfing, size: 40.sp, color: colorScheme.primary),
+        ClipOval(
+          child: Image.asset(
+            AImageStrings.appLogo,
+            width: 40.sp,
+            height: 40.sp,
+            fit: BoxFit.cover,
+          ),
+        ),
 
         // Profile Pic
         InkWell(
