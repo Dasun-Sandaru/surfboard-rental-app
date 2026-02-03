@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
-import 'package:surfboard_rental_app/app/services/customer_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
+import '../../../models/customer_model.dart';
+import '../../../services/customer_service.dart';
+import '../../../services/user_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../routes/app_pages.dart';

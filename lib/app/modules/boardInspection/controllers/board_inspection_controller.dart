@@ -3,17 +3,17 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/models/payment_model.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../models/payment_model.dart';
+import '../../../routes/app_pages.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/user_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/rental_model.dart';
 
-import 'package:surfboard_rental_app/app/services/payment_service.dart';
+import '../../../services/payment_service.dart';
 
 class BoardInspectionController extends GetxController {
   final RentalService _rentalService = Get.find();

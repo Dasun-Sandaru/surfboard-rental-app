@@ -1,4 +1,4 @@
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import 'package:get/get.dart';
 import '../../../models/payment_model.dart';
 import '../../../models/rental_model.dart';

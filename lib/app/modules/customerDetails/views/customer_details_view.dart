@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../models/customer_model.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/theme/app_material_theme.dart';

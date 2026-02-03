@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import 'app_snack_bar.dart';
 
 void appSnackBarM(String message) {
   ScaffoldMessenger.of(Get.context!).showSnackBar(

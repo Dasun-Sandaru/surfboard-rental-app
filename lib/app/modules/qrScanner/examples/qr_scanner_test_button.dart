@@ -5,8 +5,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 class QrScannerTestButton extends StatelessWidget {
   const QrScannerTestButton({super.key});

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import '../../../models/damage_fee_model.dart';
 import '../../../models/damage_report_model.dart';
 import '../../../models/damage_photo_model.dart';

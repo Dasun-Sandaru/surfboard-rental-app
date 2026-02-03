@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../services/customer_service.dart';

@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/inventory_service.dart';
-import 'package:surfboard_rental_app/app/services/customer_service.dart';
-import 'package:surfboard_rental_app/app/services/sample_data_service.dart';
-import 'package:surfboard_rental_app/app/services/shop_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../services/user_service.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/inventory_service.dart';
+import '../../../services/customer_service.dart';
+import '../../../services/sample_data_service.dart';
+import '../../../services/shop_service.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 

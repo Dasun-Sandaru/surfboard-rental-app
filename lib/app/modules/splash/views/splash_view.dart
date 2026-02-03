@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/constants/a_image_strings.dart';
+import '../../../../utils/constants/a_image_strings.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {

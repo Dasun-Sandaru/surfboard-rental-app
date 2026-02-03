@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../data/firestore/firestore_fields.dart';
+import '../../utils/constants/a_enums.dart';
 
 class ActivityLogModel {
   final String? id;

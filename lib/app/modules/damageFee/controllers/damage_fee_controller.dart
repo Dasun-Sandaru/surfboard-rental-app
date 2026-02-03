@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
-import 'package:surfboard_rental_app/app/services/damage_fee_service.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/common/custom_dropdown.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../models/damage_fee_model.dart';
+import '../../../services/damage_fee_service.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/common/custom_dropdown.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
-import 'package:surfboard_rental_app/app/services/user_service.dart';
+import '../../../services/user_service.dart';
 
 class DamageFeeController extends GetxController {
   final DamageFeeService _damageFeeService = DamageFeeService();

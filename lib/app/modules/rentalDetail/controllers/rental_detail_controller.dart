@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/models/damage_photo_model.dart';
-import 'package:surfboard_rental_app/app/models/damage_report_model.dart';
-import 'package:surfboard_rental_app/app/models/payment_model.dart';
-import 'package:surfboard_rental_app/app/services/damage_report_service.dart';
-import 'package:surfboard_rental_app/app/services/payment_service.dart';
+import '../../../models/damage_photo_model.dart';
+import '../../../models/damage_report_model.dart';
+import '../../../models/payment_model.dart';
+import '../../../services/damage_report_service.dart';
+import '../../../services/payment_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/rental_model.dart';
 

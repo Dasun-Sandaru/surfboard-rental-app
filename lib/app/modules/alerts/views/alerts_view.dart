@@ -4,10 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../models/activity_log_model.dart';
 import '../controllers/alerts_controller.dart';

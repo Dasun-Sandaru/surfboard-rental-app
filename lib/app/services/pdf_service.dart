@@ -2,13 +2,13 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:surfboard_rental_app/app/models/agreement_template_model.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
-import 'package:surfboard_rental_app/app/models/inventory_model.dart';
-import 'package:surfboard_rental_app/app/models/init_rental_model.dart';
-import 'package:surfboard_rental_app/app/models/shop_model.dart';
-import 'package:surfboard_rental_app/app/services/agreement_template_service.dart';
+import '../models/agreement_template_model.dart';
+import '../models/customer_model.dart';
+import '../models/damage_fee_model.dart';
+import '../models/inventory_model.dart';
+import '../models/init_rental_model.dart';
+import '../models/shop_model.dart';
+import 'agreement_template_service.dart';
 
 class PdfService {
   final AgreementTemplateService _templateService = AgreementTemplateService();

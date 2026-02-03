@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../../utils/storage/app_storage.dart';

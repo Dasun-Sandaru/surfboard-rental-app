@@ -1,16 +1,16 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/services/customer_service.dart';
-import 'package:surfboard_rental_app/app/services/inventory_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/app/services/config_service.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../services/customer_service.dart';
+import '../../../services/inventory_service.dart';
+import '../../../services/user_service.dart';
+import '../../../services/config_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../../utils/helper/a_formatter.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
 import '../../../models/inventory_model.dart';
 import '../../../models/init_rental_model.dart';

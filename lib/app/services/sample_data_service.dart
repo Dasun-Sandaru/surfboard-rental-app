@@ -4,15 +4,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
-import 'package:surfboard_rental_app/app/models/inventory_model.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/app/models/payment_model.dart';
-import 'package:surfboard_rental_app/app/models/security_deposit_model.dart';
-import 'package:surfboard_rental_app/app/models/user_model.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../models/customer_model.dart';
+import '../models/inventory_model.dart';
+import '../models/rental_model.dart';
+import '../models/payment_model.dart';
+import '../models/security_deposit_model.dart';
+import '../models/user_model.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import '../../utils/constants/a_enums.dart';
 
 class SampleDataService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

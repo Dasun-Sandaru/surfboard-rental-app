@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../../../../data/firestore/firestore_fields.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';

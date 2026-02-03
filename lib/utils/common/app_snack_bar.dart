@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../theme/app_material_theme.dart';
 
 class AppSnackBar {
   static const String _logName = 'AppSnackBar';

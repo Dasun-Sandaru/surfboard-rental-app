@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/pdf_service.dart';
+import '../../../models/rental_model.dart';
+import '../../../routes/app_pages.dart';
+import '../../../services/pdf_service.dart';
 
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/shop_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/shop_service.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';

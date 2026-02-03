@@ -1,9 +1,9 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../models/damage_fee_model.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
 
 class DamageFeeService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

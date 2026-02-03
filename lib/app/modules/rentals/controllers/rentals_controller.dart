@@ -9,7 +9,7 @@ import '../../../models/rental_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/user_service.dart';
 
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
+import '../../../services/rental_service.dart';
 
 class RentalsController extends GetxController {
   final PagingController<DocumentSnapshot?, RentalModel> pagingController =

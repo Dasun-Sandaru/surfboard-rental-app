@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../../../models/init_rental_model.dart';
 import '../../signature/views/signature_view.dart';
 import '../controllers/agreement_controller.dart';

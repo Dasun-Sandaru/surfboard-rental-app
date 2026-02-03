@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';

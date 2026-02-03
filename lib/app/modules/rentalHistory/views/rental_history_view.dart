@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/utils/common/a_app_bar.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../models/rental_model.dart';
+import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/rental_history_controller.dart';
 

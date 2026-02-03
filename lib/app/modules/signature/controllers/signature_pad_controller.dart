@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:signature/signature.dart';

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/services/config_service.dart';
-import 'package:surfboard_rental_app/utils/common/a_app_bar.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../services/config_service.dart';
+import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../controllers/settings_controller.dart';
 

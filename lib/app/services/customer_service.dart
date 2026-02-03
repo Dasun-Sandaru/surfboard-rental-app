@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import 'activity_log_service.dart';
+import '../../utils/constants/a_enums.dart';
 
 import '../models/customer_model.dart';
 

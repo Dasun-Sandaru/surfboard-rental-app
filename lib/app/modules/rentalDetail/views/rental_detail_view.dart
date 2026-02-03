@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
-import 'package:surfboard_rental_app/app/models/damage_report_model.dart';
-import 'package:surfboard_rental_app/app/models/payment_model.dart';
-import 'package:surfboard_rental_app/app/models/damage_photo_model.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/helper/a_formatter.dart';
+import '../../../models/damage_report_model.dart';
+import '../../../models/payment_model.dart';
+import '../../../models/damage_photo_model.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
 import '../controllers/rental_detail_controller.dart';
 
 class RentalDetailView extends GetView<RentalDetailController> {

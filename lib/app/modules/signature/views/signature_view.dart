@@ -3,9 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:signature/signature.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/signature_pad_controller.dart';

@@ -2,11 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/services/auth_service.dart';
-import 'package:surfboard_rental_app/app/services/shop_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../services/auth_service.dart';
+import '../../../services/shop_service.dart';
+import '../../../services/user_service.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/constants/a_enums.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
 import '../views/inventory_config_view.dart';

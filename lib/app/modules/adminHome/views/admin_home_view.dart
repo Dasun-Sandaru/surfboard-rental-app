@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/constants/a_image_strings.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/constants/a_image_strings.dart';
 
 import '../../alerts/views/alerts_view.dart';
 import '../controllers/admin_home_controller.dart';

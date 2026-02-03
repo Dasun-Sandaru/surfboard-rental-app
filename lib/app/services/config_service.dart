@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/services/shop_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import 'shop_service.dart';
+import 'user_service.dart';
+import '../../data/firestore/firestore_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:surfboard_rental_app/utils/storage/app_storage.dart';
+import '../../utils/storage/app_storage.dart';
 
 class ConfigService extends GetxService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

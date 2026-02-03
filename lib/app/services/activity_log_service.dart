@@ -1,12 +1,12 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/models/activity_log_model.dart';
-import 'package:surfboard_rental_app/app/services/auth_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../models/activity_log_model.dart';
+import 'auth_service.dart';
+import 'user_service.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import '../../utils/constants/a_enums.dart';
 
 class ActivityLogService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
