@@ -1,0 +1,1488 @@
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-001: Before Due Time (Early) | No Damage | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 1500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-002: Before Due Time (Early) | No Damage | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-003: Before Due Time (Early) | No Damage | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 1500.0 LKR
+   - Refund to Customer  : 3500.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-004: Before Due Time (Early) | No Damage | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 5000.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-005: Before Due Time (Early) | Minor Damage (Broken Fin) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 1850.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-006: Before Due Time (Early) | Minor Damage (Broken Fin) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 350.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-007: Before Due Time (Early) | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 1850.0 LKR
+   - Refund to Customer  : 3150.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-008: Before Due Time (Early) | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 350.0 LKR
+   - Refund to Customer  : 4650.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-009: Before Due Time (Early) | Total Loss (Broken Board) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 121500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-010: Before Due Time (Early) | Total Loss (Broken Board) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 120000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-011: Before Due Time (Early) | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 116500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-012: Before Due Time (Early) | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 05:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 115000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-013: Exact Due Time (On-Time) | No Damage | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 1500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-014: Exact Due Time (On-Time) | No Damage | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-015: Exact Due Time (On-Time) | No Damage | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 1500.0 LKR
+   - Refund to Customer  : 3500.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-016: Exact Due Time (On-Time) | No Damage | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 5000.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-017: Exact Due Time (On-Time) | Minor Damage (Broken Fin) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 1850.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-018: Exact Due Time (On-Time) | Minor Damage (Broken Fin) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 350.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-019: Exact Due Time (On-Time) | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 1850.0 LKR
+   - Refund to Customer  : 3150.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-020: Exact Due Time (On-Time) | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 350.0 LKR
+   - Refund to Customer  : 4650.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-021: Exact Due Time (On-Time) | Total Loss (Broken Board) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 121500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-022: Exact Due Time (On-Time) | Total Loss (Broken Board) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 120000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-023: Exact Due Time (On-Time) | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 116500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-024: Exact Due Time (On-Time) | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 115000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-025: Within Grace Period | No Damage | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 1500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-026: Within Grace Period | No Damage | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-027: Within Grace Period | No Damage | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 1500.0 LKR
+   - Refund to Customer  : 3500.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-028: Within Grace Period | No Damage | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 5000.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-029: Within Grace Period | Minor Damage (Broken Fin) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 1850.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-030: Within Grace Period | Minor Damage (Broken Fin) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 350.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-031: Within Grace Period | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 1850.0 LKR
+   - Refund to Customer  : 3150.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-032: Within Grace Period | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 1850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 350.0 LKR
+   - Refund to Customer  : 4650.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-033: Within Grace Period | Total Loss (Broken Board) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 121500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-034: Within Grace Period | Total Loss (Broken Board) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 120000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-035: Within Grace Period | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 116500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-036: Within Grace Period | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-02 11:30:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 1500.0 LKR
+   - Overdue Penalty Fee : 0.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 121500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 115000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-037: Overdue (1 Day Late) | No Damage | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 4500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-038: Overdue (1 Day Late) | No Damage | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 3000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-039: Overdue (1 Day Late) | No Damage | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 4500.0 LKR
+   - Refund to Customer  : 500.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-040: Overdue (1 Day Late) | No Damage | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 0.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 3000.0 LKR
+   - Refund to Customer  : 2000.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : AVAILABLE
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-041: Overdue (1 Day Late) | Minor Damage (Broken Fin) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 4850.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-042: Overdue (1 Day Late) | Minor Damage (Broken Fin) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 3350.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-043: Overdue (1 Day Late) | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 4850.0 LKR
+   - Refund to Customer  : 150.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-044: Overdue (1 Day Late) | Minor Damage (Broken Fin) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 350.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 4850.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 3350.0 LKR
+   - Refund to Customer  : 1650.0 LKR
+   >> FINAL BALANCE DUE  : 0.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-045: Overdue (1 Day Late) | Total Loss (Broken Board) | No Security Deposit | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 124500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 124500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-046: Overdue (1 Day Late) | Total Loss (Broken Board) | No Security Deposit | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 0.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 124500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 0.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 123000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-047: Overdue (1 Day Late) | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | No Upfront Payment
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 0.0 LKR (No Upfront Payment)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 124500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 119500.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
+
+======================================================================
+🎯 EXECUTION LOG FOR: SCN-048: Overdue (1 Day Late) | Total Loss (Broken Board) | Has Security Deposit (5000 LKR) | Paid 1-Day Upfront
+======================================================================
+[BOARD DETAILS]
+   - Board        : QA Board
+   - Value        : 120000.0 LKR
+   - Pricing      : Daily: 1500.0 LKR / Hourly: 100.0 LKR
+
+[RENTAL CONTEXT]
+   - Start Time   : 2026-01-01 10:00:00.000
+   - Expected Due : 2026-01-02 10:00:00.000
+   - Actual Return: 2026-01-03 10:00:00.000
+   - Upfront Paid : 1500.0 LKR (Paid 1-Day Upfront)
+   - Deposit Cash : 5000.0 LKR
+
+[CALCULATED RESULTS]
+   - Base Rent           : 3000.0 LKR
+   - Overdue Penalty Fee : 1500.0 LKR
+   - Damage Fee Applied  : 120000.0 LKR
+   ----------------------------------------
+   >> TOTAL CHARGES      : 124500.0 LKR
+   ----------------------------------------
+   - Deposit Used        : 5000.0 LKR
+   - Refund to Customer  : 0.0 LKR
+   >> FINAL BALANCE DUE  : 118000.0 LKR
+
+[SYSTEM IMPACT]
+   - Inventory Status    : DAMAGED
+======================================================================
+
