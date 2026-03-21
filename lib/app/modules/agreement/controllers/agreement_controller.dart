@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -509,6 +510,7 @@ class AgreementController extends GetxController {
       Get.offAllNamed(Routes.ADMIN_HOME);
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to create rental: $e");
+      log(e.toString());
     } finally {
       isCreatingRental.value = false;
     }

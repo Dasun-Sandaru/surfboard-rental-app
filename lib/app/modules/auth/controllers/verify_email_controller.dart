@@ -67,7 +67,7 @@ class VerifyEmailController extends GetxController {
             Get.offAllNamed(Routes.STAFF_HOME);
           } else {
             await _authService.signOut();
-            Get.offAllNamed(Routes.SIGN_IN);
+            // AuthController listens to this and automatically signs them out
           }
         }
       }
@@ -117,7 +117,7 @@ class VerifyEmailController extends GetxController {
   Future<void> goToLogin() async {
     try {
       await _authService.signOut();
-      Get.offAllNamed(Routes.SIGN_IN);
+      // AuthController will automatically route them to SIGN_IN
     } catch (e) {
       AppErrorHandler.handleError(e);
     }

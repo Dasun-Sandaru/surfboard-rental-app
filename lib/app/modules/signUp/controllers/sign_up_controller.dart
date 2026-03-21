@@ -73,7 +73,7 @@ class SignUpController extends GetxController {
         phone: phoneController.text.trim(),
       );
 
-      Get.offAllNamed(Routes.VERIFY_EMAIL);
+      // Navigate automatically via AuthController
     } catch (e) {
       AppErrorHandler.handleError(e);
     } finally {
@@ -105,7 +105,7 @@ class SignUpController extends GetxController {
         phone: phoneController.text.trim(),
       );
 
-      Get.offAllNamed(Routes.VERIFY_EMAIL);
+      // Navigate automatically via AuthController
     } catch (e) {
       AppErrorHandler.handleError(e);
     } finally {
