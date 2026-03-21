@@ -315,20 +315,29 @@ class StepReview extends GetView<AgreementController> {
       padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 14.sp,
+          Flexible(
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14.sp,
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              color: valueColor ?? colorScheme.onSurface,
-              fontSize: 16.sp,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+          SizedBox(width: 8.w),
+          Flexible(
+            flex: 3,
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: valueColor ?? colorScheme.onSurface,
+                fontSize: 16.sp,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
           ),
         ],

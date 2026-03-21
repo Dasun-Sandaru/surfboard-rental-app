@@ -91,13 +91,18 @@ class ItemDetailsController extends GetxController {
     }
   }
 
-  void editItem() {
+  Future<void> editItem() async {
     try {
       log('Editing item: $itemId', name: _logName);
-      Get.toNamed(
+      final result = await Get.toNamed(
         Routes.ADD_INVENTORY,
         arguments: {'mode': InventoryFormMode.edit, 'itemId': itemId},
       );
+
+      if (result == true) {
+        log('Item updated, refreshing details...', name: _logName);
+        _loadItemDetails();
+      }
     } catch (e) {
       log('Error editing item: $e', name: _logName);
       AppSnackBar.error(

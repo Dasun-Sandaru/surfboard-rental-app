@@ -83,10 +83,15 @@ class CustomerDetailsController extends GetxController {
     },
   ].obs;
 
-  void editCustomer() {
+  void editCustomer() async {
     if (customer.value == null) return;
-    // Navigate to Edit Screen with current data
-    Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: customer.value);
+    // Navigate to Edit Screen and wait for result
+    final result = await Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: customer.value);
+    
+    // If we got an updated customer back, refresh our local state
+    if (result != null && result is CustomerModel) {
+      customer.value = result;
+    }
   }
 
   void makeCall() async {

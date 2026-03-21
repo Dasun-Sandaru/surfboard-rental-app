@@ -192,6 +192,7 @@ class AddInventoryController extends GetxController {
           data: data,
         );
         log('Item updated successfully: $itemId', name: _logName);
+        Get.back(result: true);
         AppSnackBar.success(
           title: 'Success',
           message: 'Item updated successfully',

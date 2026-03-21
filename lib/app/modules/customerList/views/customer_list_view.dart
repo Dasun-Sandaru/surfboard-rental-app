@@ -141,8 +141,13 @@ class CustomerListView extends GetView<CustomerListController> {
   Widget _buildCustomerCard(BuildContext context, CustomerModel customer) {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
-      onTap: () {
-        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
+      onTap: () async {
+        final result = await Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
+        // If we returning from details, and an edit happened, refresh list
+        // Note: Details screen returns the updated model when edited
+        if (result != null) {
+          controller.pagingController.refresh();
+        }
       },
       onLongPress: () {
         if (controller.isSelectionMode) {

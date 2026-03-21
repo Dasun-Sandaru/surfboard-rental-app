@@ -177,13 +177,22 @@ class AgreementController extends GetxController {
     }
 
     final difference = dueDateTime.difference(startDateTime);
-    int totalHours = difference.inHours;
-    if (difference.inMinutes % 60 > 0) {
-      totalHours++;
+    final int hours = difference.inHours;
+    final int minutes = difference.inMinutes % 60;
+
+    // Use grace period logic: only round up if minutes exceed the grace period
+    int displayHours = hours;
+    if (minutes > hourlyGracePeriod.value) {
+      displayHours++;
+    }
+    
+    // Ensure minimum 1 hour if any duration exists
+    if (displayHours == 0 && difference.inMinutes > 0) {
+      displayHours = 1;
     }
 
-    final days = totalHours ~/ 24;
-    final remainingHours = totalHours % 24;
+    final days = displayHours ~/ 24;
+    final remainingHours = displayHours % 24;
 
     if (days > 0) {
       String duration = "$days d";
@@ -192,7 +201,7 @@ class AgreementController extends GetxController {
       }
       return duration;
     } else {
-      return "$totalHours h";
+      return "$displayHours h";
     }
   }
 
