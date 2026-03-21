@@ -457,8 +457,8 @@ class AgreementController extends GetxController {
         rentalData.dueDate.year,
         rentalData.dueDate.month,
         rentalData.dueDate.day,
-        rentalData.dueDate.hour,
-        rentalData.dueDate.minute,
+        rentalData.dueTime.hour,
+        rentalData.dueTime.minute,
       );
 
       final deposit = requireDeposit.value
