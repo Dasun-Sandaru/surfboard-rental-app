@@ -236,4 +236,10 @@ class CustomerService {
       rethrow;
     }
   }
+  Stream<int> streamCustomerCount(String shopId) {
+    return _shopRef(shopId)
+        .collection(FirestoreCollections.customers)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
 }

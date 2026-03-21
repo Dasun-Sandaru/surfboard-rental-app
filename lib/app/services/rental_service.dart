@@ -408,4 +408,12 @@ class RentalService {
       rethrow;
     }
   }
+
+  Stream<int> streamRentalCountByStatus(String shopId, String status) {
+    return _shopRef(shopId)
+        .collection(FirestoreCollections.rentals)
+        .where(FirestoreFields.status, isEqualTo: status)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
 }

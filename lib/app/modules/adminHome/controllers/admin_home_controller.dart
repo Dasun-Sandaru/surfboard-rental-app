@@ -56,7 +56,7 @@ class AdminHomeController extends GetxController {
 
   Future<void> _initialize() async {
     await _setShopId();
-    loadDashboardStats();
+    _setupRealTimeStats();
     checkSetupStatus();
   }
 
@@ -65,41 +65,40 @@ class AdminHomeController extends GetxController {
     log('shopId: $shopId');
   }
 
-  /// Load Dashboard Stats (Future based)
-  Future<void> loadDashboardStats() async {
+  /// Setup Real-Time Dashboard Stats
+  void _setupRealTimeStats() {
     if (shopId == null) return;
 
-    // Optional: Only show loading if it's the first load or explicit refresh
-    // isLoadingStats.value = true;
+    log('Setting up real-time dashboard stats...', name: 'AdminHomeController');
 
-    try {
-      log('Loading dashboard stats...', name: 'AdminHomeController');
+    // 1. Active Rentals Stream
+    activeRentals.bindStream(
+      _rentalService.streamRentalCountByStatus(shopId!, RentalStatus.active.name),
+    );
 
-      final results = await Future.wait([
-        _rentalService.getRentalCountByStatus(
-          shopId!,
-          RentalStatus.active.name,
-        ),
-        _inventoryService.getInventoryCountByStatus(
-          shopId!,
-          InventoryStatus.available.name,
-        ),
-        _customerService.getCustomerCount(shopId!),
-        _rentalService.getRentalCountByStatus(
-          shopId!,
-          RentalStatus.overdue.name,
-        ),
-      ]);
+    // 2. Boards Available Stream
+    boardsAvailable.bindStream(
+      _inventoryService.streamInventoryCountByStatus(
+        shopId!,
+        InventoryStatus.available.name,
+      ),
+    );
 
-      activeRentals.value = results[0];
-      boardsAvailable.value = results[1];
-      totalCustomers.value = results[2];
-      damagesPending.value = results[3];
-    } catch (e) {
-      log('Error loading dashboard stats: $e', name: 'AdminHomeController');
-    } finally {
-      isLoadingStats.value = false;
-    }
+    // 3. Total Customers Stream
+    totalCustomers.bindStream(_customerService.streamCustomerCount(shopId!));
+
+    // 4. Overdue Rentals (Damages Pending) Stream
+    damagesPending.bindStream(
+      _rentalService.streamRentalCountByStatus(
+        shopId!,
+        RentalStatus.overdue.name,
+      ),
+    );
+  }
+
+  /// Keep for legacy refresh or manual override
+  Future<void> loadDashboardStats() async {
+    _setupRealTimeStats();
   }
 
   Future<void> onRefresh() async {
