@@ -74,17 +74,15 @@ class SettingsView extends StatelessWidget {
                     if (canViewShop && canEditInventoryConfig)
                       _buildDivider(context),
 
-                    if (canEditInventoryConfig)
-                      _buildSettingsTile(
-                        context,
-                        icon: Iconsax.box,
-                        title:
-                            "inventory_config".tr, // "Inventory Configuration"
-                        subtitle: "inventory_config_sub".tr,
-                        onTap: controller.navigateToInventorySettings,
-                        trailingIcon: Iconsax.arrow_right_3,
-                        iconColor: colorScheme.primary,
-                      ),
+                    _buildSettingsTile(
+                      context,
+                      icon: Iconsax.box,
+                      title: "inventory_config".tr, // "Inventory Configuration"
+                      subtitle: "inventory_config_sub".tr,
+                      onTap: controller.navigateToInventorySettings,
+                      trailingIcon: Iconsax.arrow_right_3,
+                      iconColor: colorScheme.primary,
+                    ),
                   ],
                 ),
               );
