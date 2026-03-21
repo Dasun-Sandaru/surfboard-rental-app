@@ -14,6 +14,7 @@ import '../views/edit_profile_view.dart';
 import '../views/edit_shop_view.dart';
 import '../views/access_control_view.dart';
 import '../../../../app/services/config_service.dart';
+import '../../../../utils/helper/rental_calculator.dart';
 
 class SettingsController extends GetxController {
   final UserService _userService = Get.find();
@@ -524,45 +525,35 @@ class SettingsController extends GetxController {
     final dailyGrace =
         int.tryParse(dailyGracePeriodController.text.trim()) ?? 1;
 
-    double price = 0.0;
+    final startDateTime = DateTime.now();
+    DateTime dueDateTime;
 
     if (simRentType.value == RentType.hourly) {
-      int hours = simDurationHours.value;
-      final minutes = simDurationMinutes.value;
-
-      // Logic: Minimum 1 hour
-      if (hours == 0 && minutes == 0) hours = 1;
-
-      // Logic: Grace Period
-      if (minutes > hourlyGrace) {
-        hours += 1;
-      }
-
-      price = hours * hourlyRate;
+      dueDateTime = startDateTime.add(Duration(
+        hours: simDurationHours.value,
+        minutes: simDurationMinutes.value,
+      ));
     } else {
-      int days = simDurationDays.value;
-      final hours = simDurationHours.value;
-      final minutes = simDurationMinutes.value;
-
-      // Logic: Minimum 1 day
-      if (days == 0 && hours == 0 && minutes == 0) days = 1;
-
-      // Convert excess time to minutes
-      final excessMinutes = (hours * 60) + minutes;
-
-      // Logic: Grace Period for extra day
-      if (excessMinutes > dailyGrace) {
-        days += 1;
-      }
-
-      price = days * dailyRate;
+      dueDateTime = startDateTime.add(Duration(
+        days: simDurationDays.value,
+        hours: simDurationHours.value,
+        minutes: simDurationMinutes.value,
+      ));
     }
 
-    // Apply Tax if enabled
-    if (isTaxEnabled.value) {
-      final tax = double.tryParse(taxRateController.text.trim()) ?? 0.0;
-      price += (price * tax / 100);
-    }
+    final tax = double.tryParse(taxRateController.text.trim()) ?? 0.0;
+
+    final price = RentalCalculator.calculateEstimatedTotal(
+      startDateTime: startDateTime,
+      dueDateTime: dueDateTime,
+      rentType: simRentType.value,
+      hourlyRate: hourlyRate,
+      dailyRate: dailyRate,
+      hourlyGraceMinutes: hourlyGrace,
+      dailyGraceHours: dailyGrace,
+      isTaxEnabled: isTaxEnabled.value,
+      taxRate: tax,
+    );
 
     simulatedPrice.value = price;
     log("Simulated Price: ${simulatedPrice.value}");
