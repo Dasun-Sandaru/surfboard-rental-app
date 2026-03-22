@@ -148,24 +148,55 @@ class BoardInspectionController extends GetxController {
 
   // --- Actions ---
   Future<void> reportNoDamage() async {
-    // Save overdue time in rental document using timeRemaining
-    // Logic: If balance is 0, just close (item_returned/completed).
-    // If balance exists, show Payment Dialog.
-    // if (balanceDue.abs() > 0.01) {
-    //   _showSettlementDialog(damageFee: 0);
-    // } else {
+    final r = rental.value;
+    if (r == null) return;
+
+    double calculatedLateFee = 0;
+
+    // 1. Check if overdue
+    if (timeLabel.value == "Overdue") {
+      final now = DateTime.now();
+      final difference = r.expectedReturnTime.difference(now).abs();
+
+      // Calculation logic based on rentType
+      if (r.rentType == RentType.hourly) {
+        // Round up to next full hour
+        final hours = (difference.inMinutes / 60).ceil();
+        calculatedLateFee = hours * r.rate;
+      } else {
+        // Daily: Round up to next full day
+        final days = (difference.inHours / 24).ceil();
+        calculatedLateFee = days * r.rate;
+      }
+
+      // 2. Save Late Fee if > 0
+      if (calculatedLateFee > 0) {
+        final currentStaffId = _userService.currentUser?.uid ?? 'System';
+        final shopId = await _userService.getShopIdFromStorage();
+        if (shopId != null) {
+          await _rentalService.addLateFeeCharge(
+            shopId: shopId,
+            rentalId: r.id!,
+            amount: calculatedLateFee,
+            handledBy: currentStaffId,
+          );
+        }
+      }
+    }
+
+    // 3. Finalize Return (Updates Status to item_returned)
     await _finalizeReturn(
       damageFee: 0,
       finalPayment: 0,
       status: RentalStatus.item_returned,
     );
 
-    // Navigate to Rental Payment
+    // 4. Navigate to Rental Payment Screen
+    // We use offAllNamed or similar to ensure we start fresh on the payments flow
     Get.offAllNamed(
       Routes.PAYMENTS,
-      arguments: {'rentalId': rental.value!.id, 'shopId': rental.value!.shopId},
+      arguments: {'rentalId': r.id, 'shopId': r.shopId},
     );
-    // }
   }
 
   void reportDamage() {
@@ -261,8 +292,6 @@ class BoardInspectionController extends GetxController {
         overdueTime: overdueString,
       );
 
-      Get.back(); // Close dialog
-      Get.back(); // Close screen
       AppSnackBar.success(
         title: "Return Complete",
         message:

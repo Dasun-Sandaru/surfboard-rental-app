@@ -39,30 +39,29 @@ class RentalPaymentController extends GetxController {
   double get totalBalance =>
       (rental.value?.amountExpected ?? 0.0) - (rental.value?.amountPaid ?? 0.0);
 
-  // "Remaining Rental Fee" is assumed to be the Balance minus specific fees like damage/late
-  // If balance < 0, it wraps to 0.
-  double get rentalFeeValue {
-    double base = totalBalance - damageFeeValue - lateFeeValue;
-    return base < 0 ? 0 : base;
+  // -- Getters (Computed) --
+  double get totalExpected => rental.value?.amountExpected ?? 0.0;
+  double get totalPaid => rental.value?.amountPaid ?? 0.0;
+
+  double get damageFee => damageFeeValue;
+  double get lateFee => lateFeeValue;
+
+  // Base rental is what's left after subtracting fees from total expected
+  double get rentalFee => totalExpected - damageFee - lateFee;
+
+  double get depositHeld {
+    final deposit = rental.value?.securityDeposit;
+    if (deposit != null && deposit.paid > 0 && deposit.refunded == 0) {
+      return deposit.paid;
+    }
+    return 0.0;
   }
 
-  // Expose obs for View compatibility if needed, or update View to use getters
-  // For now, I'll keep the View's .value access pattern by using computed Rx properties or updating View.
-  // View uses property.value. Let's provide Getters that return simple doubles,
-  // and update View to simple property access (removed .value), OR return RxDouble.
-  // It's cleaner to update View. But here I will return Rx wrapper to minimize View changes if I can.
-  // Actually, View uses `controller.rentalFee.value`.
-  // I will make these non-Rx getters and update View locally or use simple Obx in View.
-  // Let's use Rx wrappers to match current View access.
+  double get netCashToCollect {
+    double balance = totalBalance;
+    return balance - depositHeld;
+  }
 
-  // -- Getters (Computed) --
-  // These return the primitive value.
-  // Accessing them inside an Obx() in the View will trigger updates
-  // because they depend on 'payments' and 'rental' observable variables.
-
-  double get rentalFee => rentalFeeValue;
-  double get lateFee => lateFeeValue;
-  double get damageFee => damageFeeValue;
   double get totalAmount => totalBalance;
 
   @override
@@ -84,12 +83,8 @@ class RentalPaymentController extends GetxController {
   }
 
   Future<void> collectPayment() async {
-    if (totalBalance <= 0) {
-      AppSnackBar.info(title: "Info", message: "No balance to collect.");
-      return;
-    }
-
-    Get.to(CollectPaymentTip(controller: this));
+    // We allow navigation even if balance is 0 or negative to finalize the rental return.
+    Get.to(() => CollectPaymentTip(controller: this));
   }
 
   void goToCustomerDetails() {

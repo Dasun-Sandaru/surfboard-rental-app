@@ -268,6 +268,86 @@ class RentalService {
     }
   }
 
+  Future<void> updateSecurityDeposit({
+    required String shopId,
+    required String rentalId,
+    required double refundedAmount,
+  }) async {
+    try {
+      log('Updating security deposit refund for rental: $rentalId', name: logName);
+      final rentalRef = _shopRef(shopId).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      await rentalRef.update({
+        '${FirestoreFields.securityDeposit}.refunded': refundedAmount,
+      });
+
+      log('Security deposit refund updated to $refundedAmount', name: logName);
+    } catch (e) {
+      log('Error updating security deposit: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> addLateFeeCharge({
+    required String shopId,
+    required String rentalId,
+    required double amount,
+    required String handledBy,
+  }) async {
+    try {
+      log(
+        'Adding late fee charge of $amount to rental: $rentalId',
+        name: logName,
+      );
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      // Create a unique ID for the payment record
+      final paymentRef = rentalRef.collection(FirestoreCollections.payments).doc();
+
+      // Transaction to ensure atomicity
+      await _db.runTransaction((transaction) async {
+        // 1. Update Rental amountExpected
+        transaction.update(rentalRef, {
+          FirestoreFields.amountExpected: FieldValue.increment(amount),
+        });
+
+        // 2. Create Payment Record (for ledger audit)
+        transaction.set(paymentRef, {
+          FirestoreFields.rentalId: rentalId,
+          FirestoreFields.amount: amount,
+          FirestoreFields.category: PaymentCategory.lateFee.name,
+          FirestoreFields.method: PaymentMethod.cash.name, // Charge placeholder
+          FirestoreFields.handledBy: handledBy,
+          FirestoreFields.timestamp: FieldValue.serverTimestamp(),
+          FirestoreFields.note: "Automated Late Fee Calculation",
+        });
+
+        // 3. Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_payment,
+          description: "Applied late fee of $amount for rental $rentalId",
+          entityId: paymentRef.id,
+          entityType: 'Payment',
+          metadata: {
+            'rentalId': rentalId,
+            'amount': amount,
+            'category': 'lateFee',
+          },
+          transaction: transaction,
+        );
+      });
+
+      log('Late fee charge added to rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error adding late fee charge: $e', name: logName);
+      rethrow;
+    }
+  }
+
+
   Future<void> addDamageCharge({
     required String shopId,
     required String rentalId,
