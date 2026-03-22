@@ -8,10 +8,25 @@ import '../controllers/rental_payment_controller.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 
-class CollectPaymentTip extends StatelessWidget {
+class CollectPaymentTip extends StatefulWidget {
   final RentalPaymentController controller;
 
   const CollectPaymentTip({super.key, required this.controller});
+
+  @override
+  State<CollectPaymentTip> createState() => _CollectPaymentTipState();
+}
+
+class _CollectPaymentTipState extends State<CollectPaymentTip> {
+  final ValueNotifier<bool> _isProcessing = ValueNotifier(false);
+
+  RentalPaymentController get controller => widget.controller;
+
+  @override
+  void dispose() {
+    _isProcessing.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +35,8 @@ class CollectPaymentTip extends StatelessWidget {
 
     return Obx(() {
       final rental = controller.rental.value;
-      if (rental == null) return const Center(child: CircularProgressIndicator());
+      if (rental == null)
+        return const Center(child: CircularProgressIndicator());
 
       final double balance = controller.totalAmount;
       final double deposit = controller.depositHeld;
@@ -148,7 +164,9 @@ class CollectPaymentTip extends StatelessWidget {
                           netCollect >= 0 ? "To Collect" : "To Refund",
                           "\$${netCollect.abs().toStringAsFixed(2)}",
                           isTotal: true,
-                          color: netCollect >= 0 ? colorScheme.primary : Colors.orange,
+                          color: netCollect >= 0
+                              ? colorScheme.primary
+                              : Colors.orange,
                         ),
                       ],
                     ],
@@ -166,9 +184,8 @@ class CollectPaymentTip extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: (statusColors?.warning ?? Colors.orange).withValues(
-                        alpha: 0.3,
-                      ),
+                      color: (statusColors?.warning ?? Colors.orange)
+                          .withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -221,24 +238,42 @@ class CollectPaymentTip extends StatelessWidget {
                     ),
                     SizedBox(width: 12.w),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: _processPayment,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          padding: EdgeInsets.symmetric(vertical: 14.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          balance > 0 ? "collect_payment".tr : "complete".tr,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: _isProcessing,
+                        builder: (context, isProcessing, _) {
+                          return ElevatedButton(
+                            onPressed: isProcessing ? null : _processPayment,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              disabledBackgroundColor: colorScheme.primary
+                                  .withValues(alpha: 0.5),
+                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: isProcessing
+                                ? SizedBox(
+                                    height: 20.w,
+                                    width: 20.w,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: colorScheme.onPrimary,
+                                    ),
+                                  )
+                                : Text(
+                                    balance > 0
+                                        ? "collect_payment".tr
+                                        : "complete".tr,
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -307,33 +342,29 @@ class CollectPaymentTip extends StatelessWidget {
   }
 
   Future<void> _processPayment() async {
+    if (_isProcessing.value) return; // Prevent double-tap
+    _isProcessing.value = true;
+
     try {
       final double totalBalance = controller.totalBalance;
       final double deposit = controller.depositHeld;
       final double netCash = controller.netCashToCollect;
 
       // Fetch Staff name
-      final staffUser = await controller.userService.getUser(controller.userService.currentUid ?? "");
+      final staffUser = await controller.userService.getUser(
+        controller.userService.currentUid ?? "",
+      );
       final staffName = staffUser?.name ?? 'Staff';
 
-      // 1. Apply Security Deposit to Balance (Credit - increases amountPaid)
-      // If the customer owes money and we have a deposit, we "utilize" the deposit first.
-      final double depositApplied = totalBalance > 0 ? (totalBalance < deposit ? totalBalance : deposit) : 0.0;
-      
-      if (depositApplied > 0) {
-        await controller.paymentService.addPayment(
-          shopId: controller.shopId,
-          rentalId: controller.rentalId,
-          category: PaymentCategory.partialPayment,
-          amount: depositApplied,
-          handledBy: staffName,
-          method: PaymentMethod.cash,
-          note: "Security deposit applied to rental balance",
-        );
-      }
+      // Calculate how much of the deposit covers the balance
+      final double depositApplied = totalBalance > 0
+          ? (totalBalance < deposit ? totalBalance : deposit)
+          : 0.0;
 
-      // 2. Record the actual cash collection (Credit - increases amountPaid)
-      // We use 'partialPayment' for fresh income results.
+      // Calculate the refund (remaining deposit after covering balance)
+      final double refundAmount = (deposit - totalBalance).clamp(0.0, deposit);
+
+      // 1. Record ONLY actual cash collection (real money changing hands)
       if (netCash > 0) {
         await controller.paymentService.addPayment(
           shopId: controller.shopId,
@@ -342,16 +373,12 @@ class CollectPaymentTip extends StatelessWidget {
           amount: netCash,
           handledBy: staffName,
           method: PaymentMethod.cash,
-          note: "Final settlement cash collection",
+          note: "Cash collected at settlement",
         );
       }
 
-      // 3. Handle Security Deposit Refund Recording
-      // This is purely for auditing the ledger history.
-      final double refundAmount = (deposit - totalBalance).clamp(0.0, deposit);
-      
+      // 2. Record refund if deposit exceeds the balance (real money handed back)
       if (refundAmount > 0) {
-        // Record the actual refund in the ledger (Audit entry)
         await controller.paymentService.addPayment(
           shopId: controller.shopId,
           rentalId: controller.rentalId,
@@ -359,25 +386,29 @@ class CollectPaymentTip extends StatelessWidget {
           amount: refundAmount,
           handledBy: staffName,
           method: PaymentMethod.cash,
-          note: "Security deposit refund",
+          note: "Deposit held: \$${deposit.toStringAsFixed(2)}, "
+              "Applied to balance: \$${depositApplied.toStringAsFixed(2)}, "
+              "Refunded: \$${refundAmount.toStringAsFixed(2)}",
         );
       }
 
-      // Update the metadata for the deposit in the rental document
-      if (deposit > 0) {
-        await controller.rentalService.updateSecurityDeposit(
-          shopId: controller.shopId,
-          rentalId: controller.rentalId,
-          refundedAmount: refundAmount,
-        );
-      }
+      // 3. Settle the rental balance directly
+      // This applies the deposit towards amountPaid without creating a fake payment entry.
+      // depositApplied is an internal transfer, not new cash, so we just update the rental fields.
+      await controller.rentalService.settleRentalBalance(
+        shopId: controller.shopId,
+        rentalId: controller.rentalId,
+        depositApplied: depositApplied,
+        refundedAmount: refundAmount,
+      );
 
-      // 3. Determine inventory status based on damage
+      // 4. Determine inventory status based on damage
       final bool hasDamage = controller.damageFee > 0;
-      final InventoryStatus inventoryStatus =
-          hasDamage ? InventoryStatus.damaged : InventoryStatus.available;
+      final InventoryStatus inventoryStatus = hasDamage
+          ? InventoryStatus.damaged
+          : InventoryStatus.available;
 
-      // 4. Finalize Return (Updates Rental Status)
+      // 5. Finalize Return (Updates Rental Status)
       if (controller.rental.value?.itemId != null) {
         await controller.rentalService.finalizeReturn(
           shopId: controller.shopId,
@@ -388,9 +419,7 @@ class CollectPaymentTip extends StatelessWidget {
         );
       }
 
-      // 5. Success & Navigation
-      // We navigate back to the home or rentals screen and then show the snackbar
-      // to avoid 'disposed snackbar' assertion errors during multiple pops.
+      // 6. Success & Navigation
       Get.offAllNamed(Routes.ADMIN_HOME);
 
       AppSnackBar.success(
@@ -400,10 +429,8 @@ class CollectPaymentTip extends StatelessWidget {
             : "Rental concluded successfully",
       );
     } catch (e) {
+      _isProcessing.value = false;
       AppSnackBar.error(title: "Error", message: "Payment failed: $e");
     }
   }
-
-
-
 }

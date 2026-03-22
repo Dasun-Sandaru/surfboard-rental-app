@@ -112,16 +112,14 @@ class AgreementController extends GetxController {
     /// -----------------------
     if (rentalData.rentType == RentType.hourly) {
       int hours = difference.inHours;
-
-      // Minimum 1 hour
-      if (hours == 0) {
-        hours = 1;
-      }
-
       final int remainingMinutes = difference.inMinutes % 60;
 
-      // Add extra hour only if grace period exceeded
-      if (remainingMinutes > hourlyGracePeriod.value) {
+      if (hours == 0) {
+        // Less than 1 hour — charge minimum 1 hour, no grace check needed
+        hours = 1;
+      } else if (remainingMinutes > hourlyGracePeriod.value) {
+        // Only add an extra hour if there are leftover minutes beyond full hours
+        // that exceed the grace period
         hours += 1;
       }
 
@@ -132,17 +130,14 @@ class AgreementController extends GetxController {
     /// -----------------------
     else {
       int days = difference.inDays;
+      final remainingMinutes = difference.inMinutes % (24 * 60);
 
-      // Minimum 1 day
       if (days == 0) {
+        // Less than 1 day — charge minimum 1 day, no grace check needed
         days = 1;
-      }
-
-      // Calculate remaining time after full days
-      final remainingDuration = difference - Duration(days: days);
-
-      // Any extra time exceeding daily grace period counts as another day
-      if (remainingDuration.inMinutes > dailyGracePeriod.value) {
+      } else if (remainingMinutes > dailyGracePeriod.value) {
+        // Only add an extra day for leftover time beyond full days
+        // that exceeds the daily grace period
         days += 1;
       }
 
@@ -180,15 +175,14 @@ class AgreementController extends GetxController {
     final int hours = difference.inHours;
     final int minutes = difference.inMinutes % 60;
 
-    // Use grace period logic: only round up if minutes exceed the grace period
+    // Use consistent logic with suggestedPrice
     int displayHours = hours;
-    if (minutes > hourlyGracePeriod.value) {
-      displayHours++;
-    }
-    
-    // Ensure minimum 1 hour if any duration exists
-    if (displayHours == 0 && difference.inMinutes > 0) {
+    if (hours == 0) {
+      // Less than 1 hour — display minimum 1 hour
       displayHours = 1;
+    } else if (minutes > hourlyGracePeriod.value) {
+      // Only round up for leftover minutes beyond full hours
+      displayHours++;
     }
 
     final days = displayHours ~/ 24;

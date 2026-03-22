@@ -29,11 +29,19 @@ class UserDetailController extends GetxController {
 
       shopId = await _userService.getShopIdFromStorage() ?? '0000';
 
+      String? uid;
       if (args is UserModel) {
         user.value = args;
+        uid = args.uid;
       } else if (args is String) {
-        // Fetch user from database if only UID is passed
-        final fetchedUser = await _userService.getUser(args);
+        uid = args;
+      } else if (args is Map && args.containsKey('userId')) {
+        uid = args['userId'];
+      }
+
+      if (uid != null && user.value == null) {
+        // Fetch user from database if only UID is passed or found in map
+        final fetchedUser = await _userService.getUser(uid);
         if (fetchedUser != null) {
           user.value = fetchedUser;
         } else {

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../../../models/damage_photo_model.dart';
 import '../../../models/damage_report_model.dart';
@@ -6,10 +7,15 @@ import '../../../services/damage_report_service.dart';
 import '../../../services/payment_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/rental_model.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/user_service.dart';
 
 class RentalDetailController extends GetxController {
-  final RentalModel rental = Get.arguments;
+  final Rxn<RentalModel> rental = Rxn<RentalModel>();
+  final RxBool isLoading = true.obs;
 
+  final RentalService _rentalService = Get.find();
+  final UserService _userService = Get.find();
   final PaymentService _paymentService = Get.find();
   final DamageReportService _damageReportService = Get.find();
 
@@ -19,24 +25,69 @@ class RentalDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (rental.id != null) {
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    final args = Get.arguments;
+    if (args is RentalModel) {
+      rental.value = args;
+      isLoading.value = false;
+      _bindStreams();
+    } else if (args is String) {
+      await _fetchRental(args);
+    } else {
+      isLoading.value = false;
+      Get.snackbar('Error', 'Invalid navigation arguments');
+    }
+  }
+
+  Future<void> _fetchRental(String rentalId) async {
+    try {
+      isLoading.value = true;
+      final shopId = await _userService.getShopIdFromStorage();
+      if (shopId == null) {
+        Get.snackbar('Error', 'Shop ID not found');
+        return;
+      }
+
+      final doc = await _rentalService.getRentalOnce(shopId, rentalId);
+      if (doc.exists) {
+        rental.value = RentalModel.fromSnapshot(
+          doc as DocumentSnapshot<Map<String, dynamic>>,
+        );
+        _bindStreams();
+      } else {
+        Get.snackbar('Error', 'Rental not found');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load rental details: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _bindStreams() {
+    final currentRental = rental.value;
+    if (currentRental != null && currentRental.id != null) {
       payments.bindStream(
-        _paymentService.paymentStream(rental.shopId, rental.id!),
+        _paymentService.paymentStream(currentRental.shopId, currentRental.id!),
       );
       damageReports.bindStream(
         _damageReportService.getDamageReports(
-          shopId: rental.shopId,
-          rentalId: rental.id!,
+          shopId: currentRental.shopId,
+          rentalId: currentRental.id!,
         ),
       );
     }
   }
 
   Stream<List<DamagePhotoModel>> getDamagePhotos(String damageId) {
-    if (rental.id == null) return Stream.value([]);
+    final currentRental = rental.value;
+    if (currentRental == null || currentRental.id == null) return Stream.value([]);
     return _damageReportService.getDamagePhotos(
-      shopId: rental.shopId,
-      rentalId: rental.id!,
+      shopId: currentRental.shopId,
+      rentalId: currentRental.id!,
       damageId: damageId,
     );
   }

@@ -311,27 +311,26 @@ class NewRentalController extends GetxController {
         int hours = difference.inHours;
         final int minutes = difference.inMinutes % 60;
 
-        // Grace period logic
-        if (minutes > hourlyGrace) {
+        if (hours == 0) {
+          // Less than 1 hour — charge minimum 1 hour, no grace check needed
+          hours = 1;
+        } else if (minutes > hourlyGrace) {
+          // Only add an extra hour for leftover minutes beyond full hours
           hours++;
         }
-
-        // Minimum 1 hour
-        if (hours == 0) hours = 1;
 
         total = (hours * hourlyRate).toDouble();
       } else {
         int days = difference.inDays;
-        int remainingMinutes = difference.inMinutes % (24 * 60);
+        final int remainingMinutes = difference.inMinutes % (24 * 60);
 
-        // Daily Grace Logic: if remaining time exceeds grace period (in minutes), charge extra day
-        // Note: dailyGracePeriodHours is in hours.
-        if (remainingMinutes > (dailyGraceHours * 60)) {
+        if (days == 0) {
+          // Less than 1 day — charge minimum 1 day, no grace check needed
+          days = 1;
+        } else if (remainingMinutes > (dailyGraceHours * 60)) {
+          // Only add an extra day for leftover time beyond full days
           days++;
         }
-
-        // Minimum 1 day
-        if (days == 0) days = 1;
 
         total = (days * dailyRate).toDouble();
       }

@@ -304,22 +304,49 @@ class RentalService {
     }
   }
 
-  Future<void> updateSecurityDeposit({
+  /// Settles the rental balance by applying the security deposit directly
+  /// to the rental's amountPaid field. This is NOT recorded as a payment
+  /// entry because no new cash is changing hands — it's an internal transfer.
+  Future<void> settleRentalBalance({
     required String shopId,
     required String rentalId,
+    required double depositApplied,
     required double refundedAmount,
   }) async {
     try {
-      log('Updating security deposit refund for rental: $rentalId', name: logName);
+      log('Settling rental balance: $rentalId (depositApplied: $depositApplied, refunded: $refundedAmount)', name: logName);
       final rentalRef = _shopRef(shopId).collection(FirestoreCollections.rentals).doc(rentalId);
 
-      await rentalRef.update({
-        '${FirestoreFields.securityDeposit}.refunded': refundedAmount,
+      await _db.runTransaction((transaction) async {
+        final rentalSnap = await transaction.get(rentalRef);
+        if (!rentalSnap.exists) throw Exception("Rental not found!");
+
+        final data = rentalSnap.data() as Map<String, dynamic>;
+        final currentAmountPaid = (data[FirestoreFields.amountPaid] as num? ?? 0.0).toDouble();
+        final amountExpected = (data[FirestoreFields.amountExpected] as num? ?? 0.0).toDouble();
+
+        final newAmountPaid = currentAmountPaid + depositApplied;
+
+        // Determine payment status
+        PaymentStatus newStatus;
+        if (newAmountPaid >= amountExpected && amountExpected > 0) {
+          newStatus = PaymentStatus.paid;
+        } else if (newAmountPaid > 0) {
+          newStatus = PaymentStatus.partial;
+        } else {
+          newStatus = PaymentStatus.unpaid;
+        }
+
+        transaction.update(rentalRef, {
+          FirestoreFields.amountPaid: newAmountPaid,
+          FirestoreFields.paymentStatus: newStatus.name,
+          '${FirestoreFields.securityDeposit}.refunded': refundedAmount,
+        });
       });
 
-      log('Security deposit refund updated to $refundedAmount', name: logName);
+      log('Rental balance settled for: $rentalId', name: logName);
     } catch (e) {
-      log('Error updating security deposit: $e', name: logName);
+      log('Error settling rental balance: $e', name: logName);
       rethrow;
     }
   }

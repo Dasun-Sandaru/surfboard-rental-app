@@ -16,38 +16,56 @@ class RentalDetailView extends GetView<RentalDetailController> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final rental = controller.rental;
 
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        backgroundColor: colorScheme.surface,
-        appBar: AppBar(
-          title: Text(
-            'rental_details'.tr,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
-          ),
-          centerTitle: true,
+    return Obx(() {
+      final rental = controller.rental.value;
+      final isLoading = controller.isLoading.value;
+
+      if (isLoading) {
+        return Scaffold(
           backgroundColor: colorScheme.surface,
-          scrolledUnderElevation: 0,
-          bottom: TabBar(
-            labelColor: colorScheme.primary,
-            unselectedLabelColor: colorScheme.onSurfaceVariant,
-            indicatorColor: colorScheme.primary,
-            dividerColor: Colors.transparent,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            padding: EdgeInsets.zero,
-            labelPadding: EdgeInsets.symmetric(horizontal: 16.w),
-            tabs: [
-              Tab(text: "overview".tr),
-              Tab(text: "financials".tr),
-              Tab(text: "damages".tr),
-              Tab(text: "documents".tr),
-            ],
+          body: const Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      if (rental == null) {
+        return Scaffold(
+          backgroundColor: colorScheme.surface,
+          appBar: AppBar(title: Text('error'.tr)),
+          body: Center(child: Text('rental_not_found'.tr)),
+        );
+      }
+
+      return DefaultTabController(
+        length: 4,
+        child: Scaffold(
+          backgroundColor: colorScheme.surface,
+          appBar: AppBar(
+            title: Text(
+              'rental_details'.tr,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+            ),
+            centerTitle: true,
+            backgroundColor: colorScheme.surface,
+            scrolledUnderElevation: 0,
+            bottom: TabBar(
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: colorScheme.onSurfaceVariant,
+              indicatorColor: colorScheme.primary,
+              dividerColor: Colors.transparent,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              padding: EdgeInsets.zero,
+              labelPadding: EdgeInsets.symmetric(horizontal: 16.w),
+              tabs: [
+                Tab(text: "overview".tr),
+                Tab(text: "financials".tr),
+                Tab(text: "damages".tr),
+                Tab(text: "documents".tr),
+              ],
+            ),
           ),
-        ),
-        body: TabBarView(
+          body: TabBarView(
           children: [
             // ---------------- TAB 1: OVERVIEW ----------------
             SingleChildScrollView(
@@ -278,6 +296,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
         ),
       ),
     );
+    });
   }
 
   Widget _buildDocumentCard(
@@ -383,22 +402,26 @@ class RentalDetailView extends GetView<RentalDetailController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                payment.category.toString().split('.').last.capitalizeFirst!,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
-              ),
-              Text(
-                _formatDate(payment.timestamp),
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 11.sp,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  payment.category.toString().split('.').last.capitalizeFirst!,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
                 ),
-              ),
-            ],
+                Text(
+                  _formatDate(payment.timestamp),
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 11.sp,
+                  ),
+                ),
+                Text(payment.note ?? "", style: TextStyle(fontSize: 11.sp)),
+              ],
+            ),
           ),
+          SizedBox(width: 8.w),
           Text(
             "+ ${AFormatter.formatCurrency(payment.amount)}",
             style: TextStyle(
@@ -687,7 +710,9 @@ class RentalDetailView extends GetView<RentalDetailController> {
   }
 
   String _formatDate(DateTime date) {
-    return AFormatter.formatDateWithFormat(date,
-        outputFormat: 'MMM dd, yyyy - hh:mm a');
+    return AFormatter.formatDateWithFormat(
+      date,
+      outputFormat: 'MMM dd, yyyy - hh:mm a',
+    );
   }
 }
