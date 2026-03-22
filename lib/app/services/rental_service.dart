@@ -128,7 +128,8 @@ class RentalService {
         final paymentCollectionRef = rentalRef.collection(FirestoreCollections.payments);
         
         // 1. Rental Charge (Debit)
-        final rentalFee = rentalData.amountExpected - rentalData.securityDeposit.amount;
+        // amountExpected now only represents the base rental fee liability.
+        final rentalFee = rentalData.amountExpected;
         if (rentalFee > 0) {
           final p = PaymentModel(
             rentalId: rentalId,
@@ -142,16 +143,18 @@ class RentalService {
           transaction.set(paymentCollectionRef.doc(), p.toMap());
         }
 
-        // 2. Security Deposit Charge (Debit)
-        if (rentalData.securityDeposit.amount > 0) {
+        // 2. Initial Security Deposit Payment (Credit)
+        // This acts as the sole record of the deposit being handed over. We don't create a
+        // 'charge' for it because it's tracked separately from the main rental liability.
+        if (rentalData.securityDeposit.paid > 0) {
           final p = PaymentModel(
             rentalId: rentalId,
-            amount: rentalData.securityDeposit.amount,
+            amount: rentalData.securityDeposit.paid,
             category: PaymentCategory.deposit,
             method: PaymentMethod.cash,
-            handledBy: 'System',
+            handledBy: rentalData.cachedStaffName ?? 'System',
             timestamp: DateTime.now(),
-            note: 'Security deposit requirement',
+            note: 'Initial security deposit collected',
           );
           transaction.set(paymentCollectionRef.doc(), p.toMap());
         }

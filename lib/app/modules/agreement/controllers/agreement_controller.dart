@@ -478,10 +478,10 @@ class AgreementController extends GetxController {
         rentType: initRentalModel.value!.rentType,
         paymentStatus: PaymentStatus.unpaid,
         rate: rentalPrice,
-        // amountExpected represents the total bill (Rental Fee + Deposit)
-        amountExpected: rentalPrice + deposit,
-        // We assume the deposit is paid upfront when creating the rental
-        amountPaid: deposit,
+        // amountExpected represents the base rental fee
+        amountExpected: rentalPrice,
+        // Rent is initially unpaid (Deposit is track separately)
+        amountPaid: 0.0,
         securityDeposit: SecurityDepositModel(
           enabled: requireDeposit.value,
           amount: deposit,

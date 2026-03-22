@@ -3,6 +3,7 @@ import '../../../../utils/common/app_snack_bar.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/rental_payment_controller.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
@@ -307,30 +308,63 @@ class CollectPaymentTip extends StatelessWidget {
 
   Future<void> _processPayment() async {
     try {
-      final double balance = controller.totalAmount;
+      final double totalBalance = controller.totalBalance;
       final double deposit = controller.depositHeld;
+      final double netCash = controller.netCashToCollect;
 
-      // 1. Record Payment for the remaining balance (if any)
-      if (balance > 0) {
+      // Fetch Staff name
+      final staffUser = await controller.userService.getUser(controller.userService.currentUid ?? "");
+      final staffName = staffUser?.name ?? 'Staff';
+
+      // 1. Apply Security Deposit to Balance (Credit - increases amountPaid)
+      // If the customer owes money and we have a deposit, we "utilize" the deposit first.
+      final double depositApplied = totalBalance > 0 ? (totalBalance < deposit ? totalBalance : deposit) : 0.0;
+      
+      if (depositApplied > 0) {
         await controller.paymentService.addPayment(
           shopId: controller.shopId,
           rentalId: controller.rentalId,
-          category: PaymentCategory.rental,
-          amount: balance,
-          handledBy: controller.userService.currentUser?.uid ?? 'Staff',
-          method: PaymentMethod.cash, // Or 'deposit_used' if we had that method
+          category: PaymentCategory.partialPayment,
+          amount: depositApplied,
+          handledBy: staffName,
+          method: PaymentMethod.cash,
+          note: "Security deposit applied to rental balance",
         );
       }
 
-      // 2. Handle Security Deposit Refund or Usage
+      // 2. Record the actual cash collection (Credit - increases amountPaid)
+      // We use 'partialPayment' for fresh income results.
+      if (netCash > 0) {
+        await controller.paymentService.addPayment(
+          shopId: controller.shopId,
+          rentalId: controller.rentalId,
+          category: PaymentCategory.partialPayment,
+          amount: netCash,
+          handledBy: staffName,
+          method: PaymentMethod.cash,
+          note: "Final settlement cash collection",
+        );
+      }
+
+      // 3. Handle Security Deposit Refund Recording
+      // This is purely for auditing the ledger history.
+      final double refundAmount = (deposit - totalBalance).clamp(0.0, deposit);
+      
+      if (refundAmount > 0) {
+        // Record the actual refund in the ledger (Audit entry)
+        await controller.paymentService.addPayment(
+          shopId: controller.shopId,
+          rentalId: controller.rentalId,
+          category: PaymentCategory.refund,
+          amount: refundAmount,
+          handledBy: staffName,
+          method: PaymentMethod.cash,
+          note: "Security deposit refund",
+        );
+      }
+
+      // Update the metadata for the deposit in the rental document
       if (deposit > 0) {
-        // Amount refunded to customer = Deposit - whatever was used to cover balance
-        // If balance > deposit, then 0 is refunded (used all deposit).
-        // If balance < deposit, we use balance from deposit and refund rest?
-        // Wait, if balance is 10 and deposit is 50, we refund 40.
-        // If balance is 100 and deposit is 50, we refund 0.
-        final double refundAmount = (deposit - balance).clamp(0, deposit);
-        
         await controller.rentalService.updateSecurityDeposit(
           shopId: controller.shopId,
           rentalId: controller.rentalId,
@@ -355,17 +389,21 @@ class CollectPaymentTip extends StatelessWidget {
       }
 
       // 5. Success & Navigation
+      // We navigate back to the home or rentals screen and then show the snackbar
+      // to avoid 'disposed snackbar' assertion errors during multiple pops.
+      Get.offAllNamed(Routes.ADMIN_HOME);
+
       AppSnackBar.success(
         title: "Success",
-        message: balance > 0
+        message: totalBalance > 0
             ? "Payment collected & Finalized"
             : "Rental concluded successfully",
       );
-
-      Get.back(); // Close Payment Tip Overlay
-      Get.back(); // Close Rental Payment Main Screen
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Payment failed: $e");
     }
   }
+
+
+
 }

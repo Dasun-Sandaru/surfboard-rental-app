@@ -46,10 +46,10 @@ class PaymentService {
 
       // Determine if this is a Charge (debit) or a Payment (credit)
       // Usually, fees and rent are charges. Partial payments and refunds are credits.
+      // NOTE: Security deposits are handled separately and shouldn't inflate the "Rental Liability".
       final bool isCharge = category == PaymentCategory.rental || 
                            category == PaymentCategory.damageFee || 
-                           category == PaymentCategory.lateFee || 
-                           category == PaymentCategory.deposit;
+                           category == PaymentCategory.lateFee;
 
       final payment = PaymentModel(
         id: paymentDocRef.id,
@@ -71,18 +71,19 @@ class PaymentService {
 
         // 2. Update Totals
         if (isCharge) {
-          // Increment Expected Amount (Debit)
+          // Increment Expected Amount (Debit) - only for Rent/Damage/Late fees
           transaction.update(rentalDocRef, {
             FirestoreFields.amountExpected: FieldValue.increment(amount),
           });
-        } else {
-          // Increment Paid Amount (Credit)
+        } else if (category == PaymentCategory.partialPayment) {
+          // Record Payment (Credit) - only partial payments affect status
           final currentAmountPaid = (rentalSnap.data() as Map<String, dynamic>)[FirestoreFields.amountPaid] as num? ?? 0.0;
           final amountExpected = (rentalSnap.data() as Map<String, dynamic>)[FirestoreFields.amountExpected] as num? ?? 0.0;
-          final newAmountPaid = currentAmountPaid + amount;
+          
+          final double newAmountPaid = (currentAmountPaid + amount).toDouble();
 
           PaymentStatus newStatus;
-          if (newAmountPaid >= amountExpected) {
+          if (newAmountPaid >= amountExpected && amountExpected > 0) {
             newStatus = PaymentStatus.paid;
           } else if (newAmountPaid > 0) {
             newStatus = PaymentStatus.partial;
@@ -94,6 +95,9 @@ class PaymentService {
             FirestoreFields.amountPaid: newAmountPaid,
             FirestoreFields.paymentStatus: newStatus.name,
           });
+        } else if (category == PaymentCategory.refund || category == PaymentCategory.deposit) {
+          // For Refunds and Deposits, we just record the ledger entry and don't touch Rental totals.
+          // This ensures that giving back a deposit doesn't make the rental "Unpaid".
         }
 
         // 3. Write Payment Record

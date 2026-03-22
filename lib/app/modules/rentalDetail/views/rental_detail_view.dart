@@ -80,7 +80,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                       _buildInfoRow(
                         context,
                         "rental_id".tr,
-                        "#${rental.id?.substring(0, 8) ?? '---'}",
+                        "#${rental.id ?? '---'}",
                         icon: Iconsax.hashtag,
                       ),
                     ],
@@ -687,6 +687,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
   }
 
   String _formatDate(DateTime date) {
-    return AFormatter.formatDate(date);
+    return AFormatter.formatDateWithFormat(date,
+        outputFormat: 'MMM dd, yyyy - hh:mm a');
   }
 }
