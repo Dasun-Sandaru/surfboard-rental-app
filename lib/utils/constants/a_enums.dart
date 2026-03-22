@@ -31,7 +31,7 @@ enum PaymentCategory {
   deposit(LedgerSide.debit),
   lateFee(LedgerSide.debit),
   damageFee(LedgerSide.debit),
-  partialPayment(LedgerSide.debit),
+  partialPayment(LedgerSide.credit),
   refund(LedgerSide.credit);
 
   final LedgerSide side;

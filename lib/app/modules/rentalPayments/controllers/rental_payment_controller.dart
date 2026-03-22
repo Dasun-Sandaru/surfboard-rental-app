@@ -28,12 +28,21 @@ class RentalPaymentController extends GetxController {
       rental.value?.customerId ??
       "Customer";
 
-  double get damageFeeValue => payments
+  double get damageFee => payments
       .where((p) => p.category == PaymentCategory.damageFee)
       .fold(0.0, (sum, p) => sum + p.amount);
 
-  double get lateFeeValue => payments
+  double get lateFee => payments
       .where((p) => p.category == PaymentCategory.lateFee)
+      .fold(0.0, (sum, p) => sum + p.amount);
+
+  // Base rental is based on the initial ledger entry
+  double get rentalFee => payments
+      .where((p) => p.category == PaymentCategory.rental)
+      .fold(0.0, (sum, p) => sum + p.amount);
+
+  double get depositAmount => payments
+      .where((p) => p.category == PaymentCategory.deposit)
       .fold(0.0, (sum, p) => sum + p.amount);
 
   double get totalBalance =>
@@ -42,12 +51,6 @@ class RentalPaymentController extends GetxController {
   // -- Getters (Computed) --
   double get totalExpected => rental.value?.amountExpected ?? 0.0;
   double get totalPaid => rental.value?.amountPaid ?? 0.0;
-
-  double get damageFee => damageFeeValue;
-  double get lateFee => lateFeeValue;
-
-  // Base rental is what's left after subtracting fees from total expected
-  double get rentalFee => totalExpected - damageFee - lateFee;
 
   double get depositHeld {
     final deposit = rental.value?.securityDeposit;

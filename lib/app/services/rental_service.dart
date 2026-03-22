@@ -1,12 +1,13 @@
 import 'dart:developer';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/rental_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
 import 'activity_log_service.dart';
 
+import '../models/rental_model.dart';
+import '../models/payment_model.dart';
 import '../../utils/constants/a_enums.dart';
 
 class RentalService {
@@ -122,6 +123,38 @@ class RentalService {
           FirestoreFields.rentalsCount: FieldValue.increment(1),
           FirestoreFields.lastRentalDate: FieldValue.serverTimestamp(),
         });
+
+        // --- LEDGER ENTRIES ---
+        final paymentCollectionRef = rentalRef.collection(FirestoreCollections.payments);
+        
+        // 1. Rental Charge (Debit)
+        final rentalFee = rentalData.amountExpected - rentalData.securityDeposit.amount;
+        if (rentalFee > 0) {
+          final p = PaymentModel(
+            rentalId: rentalId,
+            amount: rentalFee,
+            category: PaymentCategory.rental,
+            method: PaymentMethod.cash,
+            handledBy: 'System',
+            timestamp: DateTime.now(),
+            note: 'Base rental fee',
+          );
+          transaction.set(paymentCollectionRef.doc(), p.toMap());
+        }
+
+        // 2. Security Deposit Charge (Debit)
+        if (rentalData.securityDeposit.amount > 0) {
+          final p = PaymentModel(
+            rentalId: rentalId,
+            amount: rentalData.securityDeposit.amount,
+            category: PaymentCategory.deposit,
+            method: PaymentMethod.cash,
+            handledBy: 'System',
+            timestamp: DateTime.now(),
+            note: 'Security deposit requirement',
+          );
+          transaction.set(paymentCollectionRef.doc(), p.toMap());
+        }
 
         // Log Activity
         await _activityLogService.logActivity(
@@ -352,17 +385,45 @@ class RentalService {
     required String shopId,
     required String rentalId,
     required double amount,
+    required String damageType,
+    String? handledBy,
   }) async {
     try {
-      log(
-        'Adding damage charge of $amount to rental: $rentalId',
-        name: logName,
-      );
-      final rentalRef = _shopRef(
-        shopId,
-      ).collection(FirestoreCollections.rentals).doc(rentalId);
-      await rentalRef.update({
-        FirestoreFields.amountExpected: FieldValue.increment(amount),
+      log('Adding $damageType charge of $amount to rental: $rentalId', name: logName);
+      final rentalRef = _shopRef(shopId).collection(FirestoreCollections.rentals).doc(rentalId);
+      final paymentRef = rentalRef.collection(FirestoreCollections.payments).doc();
+
+      await _db.runTransaction((transaction) async {
+        // 1. Increment Expected Amount
+        transaction.update(rentalRef, {
+          FirestoreFields.amountExpected: FieldValue.increment(amount),
+        });
+
+        // 2. Create Ledger Entry
+        final p = PaymentModel(
+          rentalId: rentalId,
+          amount: amount,
+          category: PaymentCategory.damageFee,
+          method: PaymentMethod.cash,
+          handledBy: handledBy ?? 'System',
+          timestamp: DateTime.now(),
+          note: 'Damage charge: $damageType',
+        );
+        transaction.set(paymentRef, p.toMap());
+
+        // 3. Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.report_damage,
+          description: "Applied $damageType charge of $amount",
+          entityId: rentalId,
+          entityType: 'Rental',
+          metadata: {
+            'amount': amount,
+            'type': damageType,
+          },
+          transaction: transaction,
+        );
       });
       log('Damage charge added to rental: $rentalId', name: logName);
     } catch (e) {

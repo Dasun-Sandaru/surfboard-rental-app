@@ -134,6 +134,16 @@ class RentalPaymentView extends StatelessWidget {
                           ),
 
                           SizedBox(height: 16.h),
+
+                          _buildFeeRow(
+                            context,
+                            "security_deposit".tr, // Or similar label
+                            controller.depositAmount,
+                            Iconsax.shield_tick,
+                            colorScheme.onSurfaceVariant,
+                          ),
+
+                          SizedBox(height: 16.h),
                           Divider(color: colorScheme.outline),
                           SizedBox(height: 16.h),
 

@@ -12,7 +12,6 @@ import '../../../services/damage_fee_service.dart';
 import '../../../services/damage_report_service.dart';
 import '../../../services/user_service.dart';
 import '../../../services/rental_service.dart';
-import '../../../models/payment_model.dart';
 
 class DamageReportController extends GetxController {
   final DamageFeeService _damageFeeService = DamageFeeService();
@@ -186,29 +185,15 @@ class DamageReportController extends GetxController {
           report: report,
         );
 
-        // 4. Create Payment Record (Charge)
+        // 4. Update Rental Ledger (Amount Expected & Payment Record)
+        // We call addDamageCharge which now handles both the increment and the payment doc creation
         final userId = _userService.currentUser?.uid ?? 'Unknown';
-        final paymentModel = PaymentModel(
-          rentalId: rentalId!,
-          amount: fee.feeAmount,
-          category: PaymentCategory.damageFee,
-          method: PaymentMethod.cash, // Defaulting to cash for charge record
-          handledBy: userId,
-          timestamp: DateTime.now(),
-          note: "Damage Fee: ${fee.damageType}",
-        );
-
-        await _damageReportService.createPayment(
-          shopId: shopId,
-          rentalId: rentalId!,
-          payment: paymentModel,
-        );
-
-        // 5. Update Rental Ledger (Amount Expected)
         await _rentalService.addDamageCharge(
           shopId: shopId,
           rentalId: rentalId!,
           amount: fee.feeAmount,
+          damageType: fee.damageType,
+          handledBy: userId,
         );
 
         // Upload photos if any

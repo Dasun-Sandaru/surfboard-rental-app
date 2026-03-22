@@ -30,7 +30,7 @@ class PaymentService {
     ).collection(FirestoreCollections.payments);
   }
 
-  // ---------------- ADD PAYMENT (TRANSACTION) ----------------
+  // ---------------- ADD LEDGER ENTRY (CHARGE OR PAYMENT) ----------------
   Future<void> addPayment({
     required String shopId,
     required String rentalId,
@@ -43,6 +43,13 @@ class PaymentService {
     try {
       final rentalDocRef = _rentalRef(shopId, rentalId);
       final paymentDocRef = _paymentCollectionRef(shopId, rentalId).doc();
+
+      // Determine if this is a Charge (debit) or a Payment (credit)
+      // Usually, fees and rent are charges. Partial payments and refunds are credits.
+      final bool isCharge = category == PaymentCategory.rental || 
+                           category == PaymentCategory.damageFee || 
+                           category == PaymentCategory.lateFee || 
+                           category == PaymentCategory.deposit;
 
       final payment = PaymentModel(
         id: paymentDocRef.id,
@@ -62,44 +69,41 @@ class PaymentService {
           throw Exception("Rental not found!");
         }
 
-        // 2. Calculate New Totals
-        final currentAmountPaid =
-            (rentalSnap.data()
-                    as Map<String, dynamic>)[FirestoreFields.amountPaid]
-                as num? ??
-            0.0;
-        final amountExpected =
-            (rentalSnap.data()
-                    as Map<String, dynamic>)[FirestoreFields.amountExpected]
-                as num? ??
-            0.0;
-
-        final newAmountPaid = currentAmountPaid + amount;
-
-        // 3. Determine New Status
-        PaymentStatus newStatus;
-        if (newAmountPaid >= amountExpected) {
-          newStatus = PaymentStatus.paid; // Or overpaid
-        } else if (newAmountPaid > 0) {
-          newStatus = PaymentStatus.partial;
+        // 2. Update Totals
+        if (isCharge) {
+          // Increment Expected Amount (Debit)
+          transaction.update(rentalDocRef, {
+            FirestoreFields.amountExpected: FieldValue.increment(amount),
+          });
         } else {
-          newStatus = PaymentStatus.unpaid;
+          // Increment Paid Amount (Credit)
+          final currentAmountPaid = (rentalSnap.data() as Map<String, dynamic>)[FirestoreFields.amountPaid] as num? ?? 0.0;
+          final amountExpected = (rentalSnap.data() as Map<String, dynamic>)[FirestoreFields.amountExpected] as num? ?? 0.0;
+          final newAmountPaid = currentAmountPaid + amount;
+
+          PaymentStatus newStatus;
+          if (newAmountPaid >= amountExpected) {
+            newStatus = PaymentStatus.paid;
+          } else if (newAmountPaid > 0) {
+            newStatus = PaymentStatus.partial;
+          } else {
+            newStatus = PaymentStatus.unpaid;
+          }
+
+          transaction.update(rentalDocRef, {
+            FirestoreFields.amountPaid: newAmountPaid,
+            FirestoreFields.paymentStatus: newStatus.name,
+          });
         }
 
-        // 4. Write Payment
+        // 3. Write Payment Record
         transaction.set(paymentDocRef, payment.toMap());
 
-        // 5. Update Rental
-        transaction.update(rentalDocRef, {
-          FirestoreFields.amountPaid: newAmountPaid,
-          FirestoreFields.paymentStatus: newStatus.name,
-        });
-
-        // 6. Log Activity
+        // 4. Log Activity
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_payment,
-          description: "Added payment of $amount for rental $rentalId",
+          description: "${isCharge ? 'Applied charge' : 'Recorded payment'} of $amount ($category)",
           entityId: paymentDocRef.id,
           entityType: 'Payment',
           metadata: {
@@ -111,9 +115,9 @@ class PaymentService {
         );
       });
 
-      log("Payment added: ${category.name} | $amount", name: logName);
+      log("Ledger entry added: ${category.name} | $amount", name: logName);
     } catch (e) {
-      log("Add payment failed: $e", name: logName);
+      log("Add ledger entry failed: $e", name: logName);
       rethrow;
     }
   }

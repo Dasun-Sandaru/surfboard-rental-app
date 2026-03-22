@@ -461,6 +461,7 @@ class AgreementController extends GetxController {
         rentalData.dueTime.minute,
       );
 
+      final rentalPrice = double.tryParse(rentalPriceController.text) ?? 0.0;
       final deposit = requireDeposit.value
           ? (double.tryParse(depositController.text) ?? 0.0)
           : 0.0;
@@ -476,13 +477,15 @@ class AgreementController extends GetxController {
         status: RentalStatus.active,
         rentType: initRentalModel.value!.rentType,
         paymentStatus: PaymentStatus.unpaid,
-        rate: double.tryParse(rentalPriceController.text) ?? 0.0,
-        amountExpected: double.tryParse(rentalPriceController.text) ?? 0.0,
-        amountPaid: 0.0,
+        rate: rentalPrice,
+        // amountExpected represents the total bill (Rental Fee + Deposit)
+        amountExpected: rentalPrice + deposit,
+        // We assume the deposit is paid upfront when creating the rental
+        amountPaid: deposit,
         securityDeposit: SecurityDepositModel(
           enabled: requireDeposit.value,
           amount: deposit,
-          paid: requireDeposit.value ? deposit : 0.0,
+          paid: deposit,
           refunded: 0.0,
         ),
         agreementLink: null,
@@ -498,19 +501,6 @@ class AgreementController extends GetxController {
         newRental,
         generatedPdfData.value!,
       );
-
-      // Create Payment Record for Security Deposit if paid
-      if (requireDeposit.value && deposit > 0) {
-        await _paymentService.addPayment(
-          shopId: shopId,
-          rentalId: rentalId,
-          category: PaymentCategory.deposit,
-          amount: deposit,
-          handledBy: staffName,
-          method: PaymentMethod.cash, // Defaulting to cash for now
-          note: "Initial Security Deposit",
-        );
-      }
 
       AppSnackBar.success(
         title: "Success",
