@@ -172,6 +172,32 @@ class RentalService {
           },
           transaction: transaction,
         );
+
+        // Send Email via Firebase Trigger Email Extension
+        final customerEmail = customerSnap.data()?.containsKey(FirestoreFields.email) == true 
+            ? customerSnap.get(FirestoreFields.email) 
+            : null;
+        final customerFirstName = customerSnap.data()?.containsKey(FirestoreFields.firstName) == true 
+            ? customerSnap.get(FirestoreFields.firstName) 
+            : 'Customer';
+
+        if (customerEmail != null && customerEmail.toString().isNotEmpty) {
+          final mailRef = _db.collection(FirestoreCollections.mail).doc();
+          transaction.set(mailRef, {
+            'to': customerEmail,
+            'message': {
+              'subject': 'Your Surfboard Rental Agreement',
+              'html': '''
+                <h3>Hello $customerFirstName,</h3>
+                <p>Thank you for renting with us!</p>
+                <p>You can view and download your rental agreement using the link below:</p>
+                <p><a href="$agreementLink">View Rental Agreement</a></p>
+                <br>
+                <p>Best regards,<br>The Surfboard Rental Team</p>
+              '''
+            }
+          });
+        }
       });
 
       log('Rental created successfully: $rentalId', name: logName);
