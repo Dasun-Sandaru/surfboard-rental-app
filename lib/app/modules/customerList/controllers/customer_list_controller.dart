@@ -104,7 +104,7 @@ class CustomerListController extends GetxController {
   void addCustomer() async {
     // Navigate to add customer screen and wait
     await Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: {'isEdit': false});
-    
+
     // Refresh list if a new customer was added
     pagingController.refresh();
   }

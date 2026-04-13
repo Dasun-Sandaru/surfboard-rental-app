@@ -102,10 +102,10 @@ class RentalCalculator {
     );
 
     // 2. Calculate Overdue Fee (using a simple flat penalty per extra day/hour if returned late)
-    // To match user's scenarios, if they keep it an extra day, they pay the actualBaseRent for 2 days 
+    // To match user's scenarios, if they keep it an extra day, they pay the actualBaseRent for 2 days
     // PLUS an overdue fee penalty. We'll use the dailyRate as a flat penalty for each overdue day.
     double overdueFee = 0.0;
-    
+
     // Check if overdue by comparing actual return and expected return + grace
     Duration allowedDuration;
     if (rental.rentType == RentType.hourly) {
@@ -117,11 +117,15 @@ class RentalCalculator {
           .add(Duration(hours: dailyGraceHours))
           .difference(rental.startTime);
     }
-    
-    final Duration actualDuration = actualReturnTime.difference(rental.startTime);
-    
+
+    final Duration actualDuration = actualReturnTime.difference(
+      rental.startTime,
+    );
+
     if (actualDuration > allowedDuration) {
-      final Duration overdueDuration = actualReturnTime.difference(rental.expectedReturnTime);
+      final Duration overdueDuration = actualReturnTime.difference(
+        rental.expectedReturnTime,
+      );
       if (rental.rentType == RentType.daily) {
         int overdueDays = overdueDuration.inDays;
         int remainingMinutes = overdueDuration.inMinutes % (24 * 60);
@@ -129,7 +133,9 @@ class RentalCalculator {
           overdueDays++;
         }
         if (overdueDays > 0) {
-           overdueFee = overdueDays * dailyRate; // penalty is 1x daily rate per overdue day
+          overdueFee =
+              overdueDays *
+              dailyRate; // penalty is 1x daily rate per overdue day
         }
       } else {
         int overdueHours = overdueDuration.inHours;
@@ -138,7 +144,7 @@ class RentalCalculator {
           overdueHours++;
         }
         if (overdueHours > 0) {
-           overdueFee = overdueHours * hourlyRate;
+          overdueFee = overdueHours * hourlyRate;
         }
       }
     }
@@ -151,26 +157,30 @@ class RentalCalculator {
 
     // 5. Calculate Owed (Assuming amountExpected was paid upfront)
     final double outstanding = totalCharges - rental.amountPaid;
-    
+
     // 6. Deposit Handling
     double depositUsed = 0.0;
     final double depositAvailable = rental.securityDeposit.amount;
 
     double remainingOutstanding = outstanding;
     if (remainingOutstanding > 0 && depositAvailable > 0) {
-      depositUsed = remainingOutstanding > depositAvailable 
-          ? depositAvailable 
+      depositUsed = remainingOutstanding > depositAvailable
+          ? depositAvailable
           : remainingOutstanding;
       remainingOutstanding -= depositUsed;
     }
 
     final double depositRefund = depositAvailable - depositUsed;
-    
+
     // If outstanding is negative, it means we owe them a refund on rent (rare, but handled by clamping to 0 if we don't do prorated refunds)
-    final double balanceDue = remainingOutstanding > 0 ? remainingOutstanding : 0.0;
+    final double balanceDue = remainingOutstanding > 0
+        ? remainingOutstanding
+        : 0.0;
 
     // 7. Inventory Status
-    final InventoryStatus newStatus = hasDamage ? InventoryStatus.damaged : InventoryStatus.available;
+    final InventoryStatus newStatus = hasDamage
+        ? InventoryStatus.damaged
+        : InventoryStatus.available;
 
     return RentalReturnResult(
       baseRent: actualBaseRent,

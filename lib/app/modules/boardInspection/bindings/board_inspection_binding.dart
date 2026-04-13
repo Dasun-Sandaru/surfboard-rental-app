@@ -5,8 +5,6 @@ import '../controllers/board_inspection_controller.dart';
 class BoardInspectionBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<BoardInspectionController>(
-      () => BoardInspectionController(),
-    );
+    Get.lazyPut<BoardInspectionController>(() => BoardInspectionController());
   }
 }

@@ -253,14 +253,12 @@ class PdfService {
           ),
         pw.SizedBox(height: 10),
         _buildSubHeader("DAMAGE PRICE GUIDE"),
-        ...fees
-            .map(
-              (fee) => _buildDetailRow(
-                "${fee.damageType}:",
-                "R\$ ${fee.feeAmount.toStringAsFixed(2)}",
-              ),
-            )
-            ,
+        ...fees.map(
+          (fee) => _buildDetailRow(
+            "${fee.damageType}:",
+            "R\$ ${fee.feeAmount.toStringAsFixed(2)}",
+          ),
+        ),
         pw.SizedBox(height: 5),
         pw.Text(
           "Prices are estimates. Final charges depend on repair or replacement cost.",

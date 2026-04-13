@@ -142,7 +142,10 @@ class CustomerListView extends GetView<CustomerListController> {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () async {
-        final result = await Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
+        final result = await Get.toNamed(
+          Routes.CUSTOMER_DETAILS,
+          arguments: customer,
+        );
         // If we returning from details, and an edit happened, refresh list
         // Note: Details screen returns the updated model when edited
         if (result != null) {

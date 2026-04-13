@@ -136,18 +136,30 @@ void main() {
               logScenario('   - Start Time   : $start');
               logScenario('   - Expected Due : $due');
               logScenario('   - Actual Return: $actualReturn');
-              logScenario('   - Upfront Paid : $upfrontPaid LKR ($upfrontName)');
+              logScenario(
+                '   - Upfront Paid : $upfrontPaid LKR ($upfrontName)',
+              );
               logScenario('   - Deposit Cash : $depositAmount LKR');
               logScenario('\n[CALCULATED RESULTS]');
               logScenario('   - Base Rent           : ${result.baseRent} LKR');
-              logScenario('   - Overdue Penalty Fee : ${result.overdueFee} LKR');
+              logScenario(
+                '   - Overdue Penalty Fee : ${result.overdueFee} LKR',
+              );
               logScenario('   - Damage Fee Applied  : ${result.damageFee} LKR');
               logScenario('   ----------------------------------------');
-              logScenario('   >> TOTAL CHARGES      : ${result.totalCharges} LKR');
+              logScenario(
+                '   >> TOTAL CHARGES      : ${result.totalCharges} LKR',
+              );
               logScenario('   ----------------------------------------');
-              logScenario('   - Deposit Used        : ${result.depositUsed} LKR');
-              logScenario('   - Refund to Customer  : ${result.depositRefund} LKR');
-              logScenario('   >> FINAL BALANCE DUE  : ${result.balanceDue} LKR');
+              logScenario(
+                '   - Deposit Used        : ${result.depositUsed} LKR',
+              );
+              logScenario(
+                '   - Refund to Customer  : ${result.depositRefund} LKR',
+              );
+              logScenario(
+                '   >> FINAL BALANCE DUE  : ${result.balanceDue} LKR',
+              );
               logScenario('\n[SYSTEM IMPACT]');
               logScenario(
                 '   - Inventory Status    : ${result.newInventoryStatus.name.toUpperCase()}',

@@ -386,7 +386,8 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
           amount: refundAmount,
           handledBy: staffName,
           method: PaymentMethod.cash,
-          note: "Deposit held: \$${deposit.toStringAsFixed(2)}, "
+          note:
+              "Deposit held: \$${deposit.toStringAsFixed(2)}, "
               "Applied to balance: \$${depositApplied.toStringAsFixed(2)}, "
               "Refunded: \$${refundAmount.toStringAsFixed(2)}",
         );

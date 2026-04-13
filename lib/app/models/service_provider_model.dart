@@ -31,7 +31,9 @@ class ServiceProvider {
       return null;
     }
 
-    final acf = json['acf'] is Map ? json['acf'] as Map<String, dynamic> : <String, dynamic>{};
+    final acf = json['acf'] is Map
+        ? json['acf'] as Map<String, dynamic>
+        : <String, dynamic>{};
 
     return ServiceProvider(
       id: json['id'] as int? ?? 0,

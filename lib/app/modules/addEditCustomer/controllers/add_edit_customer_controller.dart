@@ -88,9 +88,9 @@ class AddEditCustomerController extends GetxController {
           currentCustomer.value!.id!,
           customer,
         );
-        
+
         Get.back(result: customer); // Close screen FIRST
-        
+
         AppSnackBar.success(
           title: 'Customer Updated',
           message: 'Customer has been updated successfully.',
@@ -98,9 +98,9 @@ class AddEditCustomerController extends GetxController {
       } else {
         // Add new customer
         await _customerService.addCustomer(shopId!, customer);
-        
+
         Get.back(); // Close screen FIRST
-        
+
         AppSnackBar.success(
           title: 'Customer Added',
           message: 'Customer has been added successfully.',

@@ -73,7 +73,10 @@ class AdminHomeController extends GetxController {
 
     // 1. Active Rentals Stream
     activeRentals.bindStream(
-      _rentalService.streamRentalCountByStatus(shopId!, RentalStatus.active.name),
+      _rentalService.streamRentalCountByStatus(
+        shopId!,
+        RentalStatus.active.name,
+      ),
     );
 
     // 2. Boards Available Stream

@@ -13,8 +13,9 @@ class ConnectivityService extends GetxService {
   void onInit() {
     super.onInit();
     _initConnectivity();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      _updateConnectionStatus,
+    );
   }
 
   Future<void> _initConnectivity() async {
@@ -54,7 +55,9 @@ class ConnectivityService extends GetxService {
       icon: const Icon(Iconsax.wifi_square, color: Colors.white),
       backgroundColor: Colors.red,
       isDismissible: false,
-      duration: const Duration(days: 1), // Persistent until dismissed manually or restored
+      duration: const Duration(
+        days: 1,
+      ), // Persistent until dismissed manually or restored
       snackPosition: SnackPosition.BOTTOM,
       margin: const EdgeInsets.all(10),
       borderRadius: 10,

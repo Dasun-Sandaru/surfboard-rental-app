@@ -125,8 +125,10 @@ class RentalService {
         });
 
         // --- LEDGER ENTRIES ---
-        final paymentCollectionRef = rentalRef.collection(FirestoreCollections.payments);
-        
+        final paymentCollectionRef = rentalRef.collection(
+          FirestoreCollections.payments,
+        );
+
         // 1. Rental Charge (Debit)
         // amountExpected now only represents the base rental fee liability.
         final rentalFee = rentalData.amountExpected;
@@ -174,11 +176,13 @@ class RentalService {
         );
 
         // Send Email via Firebase Trigger Email Extension
-        final customerEmail = customerSnap.data()?.containsKey(FirestoreFields.email) == true 
-            ? customerSnap.get(FirestoreFields.email) 
+        final customerEmail =
+            customerSnap.data()?.containsKey(FirestoreFields.email) == true
+            ? customerSnap.get(FirestoreFields.email)
             : null;
-        final customerFirstName = customerSnap.data()?.containsKey(FirestoreFields.firstName) == true 
-            ? customerSnap.get(FirestoreFields.firstName) 
+        final customerFirstName =
+            customerSnap.data()?.containsKey(FirestoreFields.firstName) == true
+            ? customerSnap.get(FirestoreFields.firstName)
             : 'Customer';
 
         if (customerEmail != null && customerEmail.toString().isNotEmpty) {
@@ -187,15 +191,16 @@ class RentalService {
             'to': customerEmail,
             'message': {
               'subject': 'Your Surfboard Rental Agreement',
-              'html': '''
+              'html':
+                  '''
                 <h3>Hello $customerFirstName,</h3>
                 <p>Thank you for renting with us!</p>
                 <p>You can view and download your rental agreement using the link below:</p>
                 <p><a href="$agreementLink">View Rental Agreement</a></p>
                 <br>
                 <p>Best regards,<br>The Surfboard Rental Team</p>
-              '''
-            }
+              ''',
+            },
           });
         }
       });
@@ -340,16 +345,23 @@ class RentalService {
     required double refundedAmount,
   }) async {
     try {
-      log('Settling rental balance: $rentalId (depositApplied: $depositApplied, refunded: $refundedAmount)', name: logName);
-      final rentalRef = _shopRef(shopId).collection(FirestoreCollections.rentals).doc(rentalId);
+      log(
+        'Settling rental balance: $rentalId (depositApplied: $depositApplied, refunded: $refundedAmount)',
+        name: logName,
+      );
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
 
       await _db.runTransaction((transaction) async {
         final rentalSnap = await transaction.get(rentalRef);
         if (!rentalSnap.exists) throw Exception("Rental not found!");
 
         final data = rentalSnap.data() as Map<String, dynamic>;
-        final currentAmountPaid = (data[FirestoreFields.amountPaid] as num? ?? 0.0).toDouble();
-        final amountExpected = (data[FirestoreFields.amountExpected] as num? ?? 0.0).toDouble();
+        final currentAmountPaid =
+            (data[FirestoreFields.amountPaid] as num? ?? 0.0).toDouble();
+        final amountExpected =
+            (data[FirestoreFields.amountExpected] as num? ?? 0.0).toDouble();
 
         final newAmountPaid = currentAmountPaid + depositApplied;
 
@@ -393,7 +405,9 @@ class RentalService {
       ).collection(FirestoreCollections.rentals).doc(rentalId);
 
       // Create a unique ID for the payment record
-      final paymentRef = rentalRef.collection(FirestoreCollections.payments).doc();
+      final paymentRef = rentalRef
+          .collection(FirestoreCollections.payments)
+          .doc();
 
       // Transaction to ensure atomicity
       await _db.runTransaction((transaction) async {
@@ -436,7 +450,6 @@ class RentalService {
     }
   }
 
-
   Future<void> addDamageCharge({
     required String shopId,
     required String rentalId,
@@ -445,9 +458,16 @@ class RentalService {
     String? handledBy,
   }) async {
     try {
-      log('Adding $damageType charge of $amount to rental: $rentalId', name: logName);
-      final rentalRef = _shopRef(shopId).collection(FirestoreCollections.rentals).doc(rentalId);
-      final paymentRef = rentalRef.collection(FirestoreCollections.payments).doc();
+      log(
+        'Adding $damageType charge of $amount to rental: $rentalId',
+        name: logName,
+      );
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+      final paymentRef = rentalRef
+          .collection(FirestoreCollections.payments)
+          .doc();
 
       await _db.runTransaction((transaction) async {
         // 1. Increment Expected Amount
@@ -474,10 +494,7 @@ class RentalService {
           description: "Applied $damageType charge of $amount",
           entityId: rentalId,
           entityType: 'Rental',
-          metadata: {
-            'amount': amount,
-            'type': damageType,
-          },
+          metadata: {'amount': amount, 'type': damageType},
           transaction: transaction,
         );
       });

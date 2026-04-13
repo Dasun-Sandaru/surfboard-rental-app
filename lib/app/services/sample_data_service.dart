@@ -708,17 +708,15 @@ class SampleDataService {
   }
 }
 
-
-
 // Users (Root)
 // Shops (Root)
-  // Activity Logs (Sub)
-  // Customers (Sub)
-  // Inventory (Sub)
-    // Damage Fees (Nested Sub)
-  // Members (Sub)
-  // Rentals (Sub)
-    // Damage Reports (Nested Sub)
-      // Photos (Nested Nested Sub)
-    // Payments (Nested Sub)
-  // Agreement Templates (Sub)
+// Activity Logs (Sub)
+// Customers (Sub)
+// Inventory (Sub)
+// Damage Fees (Nested Sub)
+// Members (Sub)
+// Rentals (Sub)
+// Damage Reports (Nested Sub)
+// Photos (Nested Nested Sub)
+// Payments (Nested Sub)
+// Agreement Templates (Sub)

@@ -28,7 +28,6 @@ class StepReview extends GetView<AgreementController> {
       }
 
       return SingleChildScrollView(
-        
         padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

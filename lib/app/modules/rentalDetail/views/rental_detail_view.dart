@@ -66,236 +66,239 @@ class RentalDetailView extends GetView<RentalDetailController> {
             ),
           ),
           body: TabBarView(
-          children: [
-            // ---------------- TAB 1: OVERVIEW ----------------
-            SingleChildScrollView(
-              padding: EdgeInsets.all(ASizes.defaultPadding),
-              child: Column(
-                children: [
-                  _buildStatusCard(context, rental),
-                  SizedBox(height: 16.h),
-                  _buildSection(
-                    context,
-                    title: "rental_info".tr,
-                    icon: Iconsax.box,
-                    children: [
-                      _buildInfoRow(
-                        context,
-                        "item".tr,
-                        rental.cachedItemName ?? "unknown".tr,
-                        icon: Iconsax.code_circle,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "rent_type".tr,
-                        rental.rentType
-                            .toString()
-                            .split('.')
-                            .last
-                            .capitalizeFirst!,
-                        icon: Iconsax.timer_1,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "rental_id".tr,
-                        "#${rental.id ?? '---'}",
-                        icon: Iconsax.hashtag,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildSection(
-                    context,
-                    title: "people".tr,
-                    icon: Iconsax.people,
-                    children: [
-                      _buildInfoRow(
-                        context,
-                        "customer".tr,
-                        rental.cachedCustomerName ?? "unknown".tr,
-                        icon: Iconsax.user,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "staff_member".tr,
-                        rental.cachedStaffName ?? "Unknown",
-                        icon: Iconsax.personalcard,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildSection(
-                    context,
-                    title: "timings".tr,
-                    icon: Iconsax.calendar,
-                    children: [
-                      _buildInfoRow(
-                        context,
-                        "start_time".tr,
-                        _formatDate(rental.startTime),
-                        icon: Iconsax.calendar_add,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "expected_return".tr,
-                        _formatDate(rental.expectedReturnTime),
-                        icon: Iconsax.calendar_edit,
-                      ),
-                      if (rental.actualReturnTime != null)
+            children: [
+              // ---------------- TAB 1: OVERVIEW ----------------
+              SingleChildScrollView(
+                padding: EdgeInsets.all(ASizes.defaultPadding),
+                child: Column(
+                  children: [
+                    _buildStatusCard(context, rental),
+                    SizedBox(height: 16.h),
+                    _buildSection(
+                      context,
+                      title: "rental_info".tr,
+                      icon: Iconsax.box,
+                      children: [
                         _buildInfoRow(
                           context,
-                          "actual_return".tr,
-                          _formatDate(rental.actualReturnTime!),
-                          icon: Iconsax.calendar_tick,
-                          valueColor:
-                              rental.actualReturnTime!.isAfter(
-                                rental.expectedReturnTime,
-                              )
-                              ? Colors.red
-                              : Colors.green,
+                          "item".tr,
+                          rental.cachedItemName ?? "unknown".tr,
+                          icon: Iconsax.code_circle,
                         ),
-                      if (rental.overdueTime != null)
                         _buildInfoRow(
                           context,
-                          "overdue_duration".tr,
-                          rental.overdueTime!,
-                          icon: Iconsax.clock,
-                          valueColor: Colors.red,
+                          "rent_type".tr,
+                          rental.rentType
+                              .toString()
+                              .split('.')
+                              .last
+                              .capitalizeFirst!,
+                          icon: Iconsax.timer_1,
                         ),
-                    ],
-                  ),
-                  SizedBox(height: 32.h),
-                ],
-              ),
-            ),
-
-            // ---------------- TAB 2: FINANCIALS ----------------
-            SingleChildScrollView(
-              padding: EdgeInsets.all(ASizes.defaultPadding),
-              child: Column(
-                children: [
-                  _buildSection(
-                    context,
-                    title: "financials".tr,
-                    icon: Iconsax.money_3,
-                    children: [
-                      _buildInfoRow(
-                        context,
-                        "rate".tr,
-                        "${AFormatter.formatCurrency(rental.rate)}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hourly'.tr : 'daily'.tr}",
-                        icon: Iconsax.tag,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "total_expected".tr,
-                        AFormatter.formatCurrency(rental.amountExpected),
-                        icon: Iconsax.money_tick,
-                        isBold: true,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "amount_paid".tr,
-                        AFormatter.formatCurrency(rental.amountPaid),
-                        icon: Iconsax.wallet_2,
-                        valueColor: rental.paymentStatus == PaymentStatus.paid
-                            ? Colors.green
-                            : colorScheme.primary,
-                      ),
-                      Divider(),
-                      _buildInfoRow(
-                        context,
-                        "security_deposit".tr,
-                        AFormatter.formatCurrency(
-                          rental.securityDeposit.amount,
+                        _buildInfoRow(
+                          context,
+                          "rental_id".tr,
+                          "#${rental.id ?? '---'}",
+                          icon: Iconsax.hashtag,
                         ),
-                        icon: Iconsax.shield_tick,
-                      ),
-                      _buildInfoRow(
-                        context,
-                        "deposit_status".tr,
-                        rental.securityDeposit.refunded > 0
-                            ? "refunded".tr
-                            : (rental.securityDeposit.paid > 0
-                                  ? "held".tr
-                                  : "not_paid".tr),
-                        icon: Iconsax.info_circle,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  Obx(() {
-                    if (controller.payments.isEmpty) {
-                      return _buildEmptyState(
-                        context,
-                        "no_payments".tr,
-                        Iconsax.receipt_item,
-                      );
-                    }
-                    return _buildSection(
-                      context,
-                      title: "payment_history".tr,
-                      icon: Iconsax.receipt,
-                      children: controller.payments
-                          .map((payment) => _buildPaymentRow(context, payment))
-                          .toList(),
-                    );
-                  }),
-                  SizedBox(height: 32.h),
-                ],
-              ),
-            ),
-
-            // ---------------- TAB 3: DAMAGES ----------------
-            SingleChildScrollView(
-              padding: EdgeInsets.all(ASizes.defaultPadding),
-              child: Obx(() {
-                if (controller.damageReports.isEmpty) {
-                  return Container(
-                    margin: EdgeInsets.only(top: 50.h),
-                    child: _buildEmptyState(
-                      context,
-                      "no_damages".tr,
-                      Iconsax.shield_tick,
+                      ],
                     ),
-                  );
-                }
-                return Column(
-                  children: controller.damageReports
-                      .map((report) => _buildDamageRow(context, report))
-                      .toList(),
-                );
-              }),
-            ),
-
-            // ---------------- TAB 4: DOCUMENTS ----------------
-            SingleChildScrollView(
-              padding: EdgeInsets.all(ASizes.defaultPadding),
-              child: Column(
-                children: [
-                  _buildDocumentCard(
-                    context,
-                    title: "rental_agreement".tr,
-                    subtitle: "signed_agreement_msg".tr,
-                    icon: Iconsax.document_text,
-                    onTap: () => controller.openDocument(rental.agreementLink),
-                    isAvailable: rental.agreementLink != null,
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildDocumentCard(
-                    context,
-                    title: "invoice".tr,
-                    subtitle: "rental_invoice_msg".tr,
-                    icon: Iconsax.receipt_2,
-                    onTap: () => controller.openDocument(rental.invoiceLink),
-                    isAvailable: rental.invoiceLink != null,
-                  ),
-                ],
+                    SizedBox(height: 16.h),
+                    _buildSection(
+                      context,
+                      title: "people".tr,
+                      icon: Iconsax.people,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          "customer".tr,
+                          rental.cachedCustomerName ?? "unknown".tr,
+                          icon: Iconsax.user,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          "staff_member".tr,
+                          rental.cachedStaffName ?? "Unknown",
+                          icon: Iconsax.personalcard,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildSection(
+                      context,
+                      title: "timings".tr,
+                      icon: Iconsax.calendar,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          "start_time".tr,
+                          _formatDate(rental.startTime),
+                          icon: Iconsax.calendar_add,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          "expected_return".tr,
+                          _formatDate(rental.expectedReturnTime),
+                          icon: Iconsax.calendar_edit,
+                        ),
+                        if (rental.actualReturnTime != null)
+                          _buildInfoRow(
+                            context,
+                            "actual_return".tr,
+                            _formatDate(rental.actualReturnTime!),
+                            icon: Iconsax.calendar_tick,
+                            valueColor:
+                                rental.actualReturnTime!.isAfter(
+                                  rental.expectedReturnTime,
+                                )
+                                ? Colors.red
+                                : Colors.green,
+                          ),
+                        if (rental.overdueTime != null)
+                          _buildInfoRow(
+                            context,
+                            "overdue_duration".tr,
+                            rental.overdueTime!,
+                            icon: Iconsax.clock,
+                            valueColor: Colors.red,
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 32.h),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              // ---------------- TAB 2: FINANCIALS ----------------
+              SingleChildScrollView(
+                padding: EdgeInsets.all(ASizes.defaultPadding),
+                child: Column(
+                  children: [
+                    _buildSection(
+                      context,
+                      title: "financials".tr,
+                      icon: Iconsax.money_3,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          "rate".tr,
+                          "${AFormatter.formatCurrency(rental.rate)}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hourly'.tr : 'daily'.tr}",
+                          icon: Iconsax.tag,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          "total_expected".tr,
+                          AFormatter.formatCurrency(rental.amountExpected),
+                          icon: Iconsax.money_tick,
+                          isBold: true,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          "amount_paid".tr,
+                          AFormatter.formatCurrency(rental.amountPaid),
+                          icon: Iconsax.wallet_2,
+                          valueColor: rental.paymentStatus == PaymentStatus.paid
+                              ? Colors.green
+                              : colorScheme.primary,
+                        ),
+                        Divider(),
+                        _buildInfoRow(
+                          context,
+                          "security_deposit".tr,
+                          AFormatter.formatCurrency(
+                            rental.securityDeposit.amount,
+                          ),
+                          icon: Iconsax.shield_tick,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          "deposit_status".tr,
+                          rental.securityDeposit.refunded > 0
+                              ? "refunded".tr
+                              : (rental.securityDeposit.paid > 0
+                                    ? "held".tr
+                                    : "not_paid".tr),
+                          icon: Iconsax.info_circle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    Obx(() {
+                      if (controller.payments.isEmpty) {
+                        return _buildEmptyState(
+                          context,
+                          "no_payments".tr,
+                          Iconsax.receipt_item,
+                        );
+                      }
+                      return _buildSection(
+                        context,
+                        title: "payment_history".tr,
+                        icon: Iconsax.receipt,
+                        children: controller.payments
+                            .map(
+                              (payment) => _buildPaymentRow(context, payment),
+                            )
+                            .toList(),
+                      );
+                    }),
+                    SizedBox(height: 32.h),
+                  ],
+                ),
+              ),
+
+              // ---------------- TAB 3: DAMAGES ----------------
+              SingleChildScrollView(
+                padding: EdgeInsets.all(ASizes.defaultPadding),
+                child: Obx(() {
+                  if (controller.damageReports.isEmpty) {
+                    return Container(
+                      margin: EdgeInsets.only(top: 50.h),
+                      child: _buildEmptyState(
+                        context,
+                        "no_damages".tr,
+                        Iconsax.shield_tick,
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: controller.damageReports
+                        .map((report) => _buildDamageRow(context, report))
+                        .toList(),
+                  );
+                }),
+              ),
+
+              // ---------------- TAB 4: DOCUMENTS ----------------
+              SingleChildScrollView(
+                padding: EdgeInsets.all(ASizes.defaultPadding),
+                child: Column(
+                  children: [
+                    _buildDocumentCard(
+                      context,
+                      title: "rental_agreement".tr,
+                      subtitle: "signed_agreement_msg".tr,
+                      icon: Iconsax.document_text,
+                      onTap: () =>
+                          controller.openDocument(rental.agreementLink),
+                      isAvailable: rental.agreementLink != null,
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildDocumentCard(
+                      context,
+                      title: "invoice".tr,
+                      subtitle: "rental_invoice_msg".tr,
+                      icon: Iconsax.receipt_2,
+                      onTap: () => controller.openDocument(rental.invoiceLink),
+                      isAvailable: rental.invoiceLink != null,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
     });
   }
 
@@ -408,7 +411,10 @@ class RentalDetailView extends GetView<RentalDetailController> {
               children: [
                 Text(
                   payment.category.toString().split('.').last.capitalizeFirst!,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.sp,
+                  ),
                 ),
                 Text(
                   _formatDate(payment.timestamp),

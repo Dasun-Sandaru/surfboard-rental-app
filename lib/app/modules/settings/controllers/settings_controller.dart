@@ -529,16 +529,20 @@ class SettingsController extends GetxController {
     DateTime dueDateTime;
 
     if (simRentType.value == RentType.hourly) {
-      dueDateTime = startDateTime.add(Duration(
-        hours: simDurationHours.value,
-        minutes: simDurationMinutes.value,
-      ));
+      dueDateTime = startDateTime.add(
+        Duration(
+          hours: simDurationHours.value,
+          minutes: simDurationMinutes.value,
+        ),
+      );
     } else {
-      dueDateTime = startDateTime.add(Duration(
-        days: simDurationDays.value,
-        hours: simDurationHours.value,
-        minutes: simDurationMinutes.value,
-      ));
+      dueDateTime = startDateTime.add(
+        Duration(
+          days: simDurationDays.value,
+          hours: simDurationHours.value,
+          minutes: simDurationMinutes.value,
+        ),
+      );
     }
 
     final tax = double.tryParse(taxRateController.text.trim()) ?? 0.0;

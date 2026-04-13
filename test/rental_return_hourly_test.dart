@@ -58,10 +58,22 @@ void main() {
     final due = DateTime(2026, 1, 1, 12, 0);
 
     final Map<String, DateTime> timeScenarios = {
-      'Before Due Time (Early)': DateTime(2026, 1, 1, 11, 0),       // 1 hour early
-      'Exact Due Time (On-Time)': DateTime(2026, 1, 1, 12, 0),      // exactly 2 hours
-      'Within Grace Period': DateTime(2026, 1, 1, 12, 10),          // 10 mins late (inside 15min max)
-      'Overdue (1 Hour Late)': DateTime(2026, 1, 1, 13, 0),         // 1 hour late
+      'Before Due Time (Early)': DateTime(2026, 1, 1, 11, 0), // 1 hour early
+      'Exact Due Time (On-Time)': DateTime(
+        2026,
+        1,
+        1,
+        12,
+        0,
+      ), // exactly 2 hours
+      'Within Grace Period': DateTime(
+        2026,
+        1,
+        1,
+        12,
+        10,
+      ), // 10 mins late (inside 15min max)
+      'Overdue (1 Hour Late)': DateTime(2026, 1, 1, 13, 0), // 1 hour late
     };
 
     final Map<String, double> damageScenarios = {
@@ -138,18 +150,30 @@ void main() {
               logScenario('   - Start Time   : $start');
               logScenario('   - Expected Due : $due');
               logScenario('   - Actual Return: $actualReturn');
-              logScenario('   - Upfront Paid : $upfrontPaid LKR ($upfrontName)');
+              logScenario(
+                '   - Upfront Paid : $upfrontPaid LKR ($upfrontName)',
+              );
               logScenario('   - Deposit Cash : $depositAmount LKR');
               logScenario('\n[CALCULATED RESULTS]');
               logScenario('   - Base Rent           : ${result.baseRent} LKR');
-              logScenario('   - Overdue Penalty Fee : ${result.overdueFee} LKR');
+              logScenario(
+                '   - Overdue Penalty Fee : ${result.overdueFee} LKR',
+              );
               logScenario('   - Damage Fee Applied  : ${result.damageFee} LKR');
               logScenario('   ----------------------------------------');
-              logScenario('   >> TOTAL CHARGES      : ${result.totalCharges} LKR');
+              logScenario(
+                '   >> TOTAL CHARGES      : ${result.totalCharges} LKR',
+              );
               logScenario('   ----------------------------------------');
-              logScenario('   - Deposit Used        : ${result.depositUsed} LKR');
-              logScenario('   - Refund to Customer  : ${result.depositRefund} LKR');
-              logScenario('   >> FINAL BALANCE DUE  : ${result.balanceDue} LKR');
+              logScenario(
+                '   - Deposit Used        : ${result.depositUsed} LKR',
+              );
+              logScenario(
+                '   - Refund to Customer  : ${result.depositRefund} LKR',
+              );
+              logScenario(
+                '   >> FINAL BALANCE DUE  : ${result.balanceDue} LKR',
+              );
               logScenario('\n[SYSTEM IMPACT]');
               logScenario(
                 '   - Inventory Status    : ${result.newInventoryStatus.name.toUpperCase()}',
@@ -160,20 +184,24 @@ void main() {
 
               // Wait, for 'Before Due Time (Early)', difference is 1 hour
               if (timeName == 'Before Due Time (Early)') {
-                 expect(
-                   result.baseRent,
-                   100,
-                   reason: 'Actual duration billed as exactly 1 hour',
-                 );
-                 expect(result.overdueFee, 0, reason: 'No overdue penalty');
-                 expect(result.totalCharges, 100 + damageFee);
+                expect(
+                  result.baseRent,
+                  100,
+                  reason: 'Actual duration billed as exactly 1 hour',
+                );
+                expect(result.overdueFee, 0, reason: 'No overdue penalty');
+                expect(result.totalCharges, 100 + damageFee);
               } else if (timeName == 'Overdue (1 Hour Late)') {
                 expect(
                   result.baseRent,
                   300,
                   reason: 'Actual duration stretched to 3 hours total',
                 );
-                expect(result.overdueFee, 100, reason: '1 hour late penalty added on top');
+                expect(
+                  result.overdueFee,
+                  100,
+                  reason: '1 hour late penalty added on top',
+                );
                 expect(result.totalCharges, 300 + 100 + damageFee);
               } else {
                 // On-Time or Grace Period
@@ -200,7 +228,8 @@ void main() {
                     : outstandingBalance;
               }
               double expectedRefund = depositAmount - expectedUsedDeposit;
-              double expectedBalanceDue = outstandingBalance > expectedUsedDeposit
+              double expectedBalanceDue =
+                  outstandingBalance > expectedUsedDeposit
                   ? outstandingBalance - expectedUsedDeposit
                   : 0.0;
 

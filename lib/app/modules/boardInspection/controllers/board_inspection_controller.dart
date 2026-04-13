@@ -35,7 +35,7 @@ class BoardInspectionController extends GetxController {
   Timer? _timer;
   final RxString timeLabel = "Time Remaining".obs;
   final RxString timeRemaining = "00:00:00".obs;
-  final Rx<Color> timeColor = Colors.white.obs;
+  final Rx<Color> timeColor = Rx<Color>(Colors.white);
 
   @override
   void onInit() {

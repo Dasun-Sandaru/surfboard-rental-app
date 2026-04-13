@@ -20,10 +20,11 @@ class IsTextFieldRequired extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           text: fieldName,
-          style: fieldNameStyle ??
-              Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.normal,
-                  ),
+          style:
+              fieldNameStyle ??
+              Theme.of(
+                context,
+              ).textTheme.labelSmall!.copyWith(fontWeight: FontWeight.normal),
           children: [
             if (isTextFieldRequired) // Conditionally show the asterisk
               TextSpan(

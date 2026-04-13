@@ -47,9 +47,10 @@ class PaymentService {
       // Determine if this is a Charge (debit) or a Payment (credit)
       // Usually, fees and rent are charges. Partial payments and refunds are credits.
       // NOTE: Security deposits are handled separately and shouldn't inflate the "Rental Liability".
-      final bool isCharge = category == PaymentCategory.rental || 
-                           category == PaymentCategory.damageFee || 
-                           category == PaymentCategory.lateFee;
+      final bool isCharge =
+          category == PaymentCategory.rental ||
+          category == PaymentCategory.damageFee ||
+          category == PaymentCategory.lateFee;
 
       final payment = PaymentModel(
         id: paymentDocRef.id,
@@ -77,9 +78,17 @@ class PaymentService {
           });
         } else if (category == PaymentCategory.partialPayment) {
           // Record Payment (Credit) - only partial payments affect status
-          final currentAmountPaid = (rentalSnap.data() as Map<String, dynamic>)[FirestoreFields.amountPaid] as num? ?? 0.0;
-          final amountExpected = (rentalSnap.data() as Map<String, dynamic>)[FirestoreFields.amountExpected] as num? ?? 0.0;
-          
+          final currentAmountPaid =
+              (rentalSnap.data()
+                      as Map<String, dynamic>)[FirestoreFields.amountPaid]
+                  as num? ??
+              0.0;
+          final amountExpected =
+              (rentalSnap.data()
+                      as Map<String, dynamic>)[FirestoreFields.amountExpected]
+                  as num? ??
+              0.0;
+
           final double newAmountPaid = (currentAmountPaid + amount).toDouble();
 
           PaymentStatus newStatus;
@@ -95,7 +104,8 @@ class PaymentService {
             FirestoreFields.amountPaid: newAmountPaid,
             FirestoreFields.paymentStatus: newStatus.name,
           });
-        } else if (category == PaymentCategory.refund || category == PaymentCategory.deposit) {
+        } else if (category == PaymentCategory.refund ||
+            category == PaymentCategory.deposit) {
           // For Refunds and Deposits, we just record the ledger entry and don't touch Rental totals.
           // This ensures that giving back a deposit doesn't make the rental "Unpaid".
         }
@@ -107,7 +117,8 @@ class PaymentService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_payment,
-          description: "${isCharge ? 'Applied charge' : 'Recorded payment'} of $amount ($category)",
+          description:
+              "${isCharge ? 'Applied charge' : 'Recorded payment'} of $amount ($category)",
           entityId: paymentDocRef.id,
           entityType: 'Payment',
           metadata: {

@@ -10,7 +10,7 @@ class AuthGateController extends GetxController {
   late final bool isInactive;
 
   // -- UI Variables --
-  final Rx<Color> mainColor = Colors.grey.obs;
+  final Rx<Color> mainColor = Rx<Color>(Colors.grey);
   late final IconData mainIcon;
   late final String title;
   late final String description;
