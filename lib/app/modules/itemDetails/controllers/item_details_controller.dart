@@ -169,16 +169,45 @@ class ItemDetailsController extends GetxController {
       await _inventoryService.updateInventoryStatus(
         shopId: shopId!,
         itemId: itemId,
-        status: 'repair',
+        status: InventoryStatus.available.name,
       );
 
       log('Item marked as repair: $itemId', name: _logName);
       AppSnackBar.success(title: 'Success', message: 'Item marked as repair');
+      await _loadItemDetails();
     } catch (e) {
       log('Error marking as repair: $e', name: _logName);
       AppSnackBar.error(
         title: 'Repair Error',
         message: 'Failed to mark as repair: $e',
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> markAsRepaired() async {
+    try {
+      if (shopId == null) {
+        throw Exception('Shop ID not available');
+      }
+      log('Marking item as repaired: $itemId', name: _logName);
+      isLoading.value = true;
+
+      await _inventoryService.updateInventoryStatus(
+        shopId: shopId!,
+        itemId: itemId,
+        status: InventoryStatus.available.name,
+      );
+
+      log('Item marked as repaired: $itemId', name: _logName);
+      AppSnackBar.success(title: 'Success', message: 'Item marked as repaired');
+      await _loadItemDetails();
+    } catch (e) {
+      log('Error marking as repaired: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'Repair Error',
+        message: 'Failed to mark as repaired: $e',
       );
     } finally {
       isLoading.value = false;

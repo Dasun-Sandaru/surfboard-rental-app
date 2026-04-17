@@ -232,6 +232,53 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                 }),
               ],
 
+              // Mark as Repaired Button
+              if (item.status == InventoryStatus.repair) ...[
+                Obx(() {
+                  final canEdit =
+                      _configService.staffAccessRules['inventory_edit'] ??
+                      false;
+                  if (!canEdit) return const SizedBox.shrink();
+
+                  return Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: controller.markAsRepaired,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  statusColors?.success ?? Colors.green,
+                              foregroundColor: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Iconsax.tick_circle, size: 20.w),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "mark_repaired".tr,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+
               // View Damage Fees Button
               Obx(() {
                 final canViewFees =

@@ -241,6 +241,7 @@ class AppTranslations extends Translations {
       'damage_fee_rule': 'Damage Fee Rule',
       'created_at': 'Created At',
       'mark_repair': 'Mark as Repair',
+      'mark_repaired': 'Mark as Repaired',
       'view_damage_fees': 'View Damage Fees',
       // Rental Details
       'rental_details': 'Rental details',
@@ -549,6 +550,7 @@ class AppTranslations extends Translations {
       'damage_fee_rule': 'හානි ගාස්තු නීතිය',
       'created_at': 'සාදන ලද්දේ',
       'mark_repair': 'අලුත්වැඩියා කිරීමට ලකුණු කරන්න',
+      'mark_repaired': 'අලුත්වැඩියා කර ඇත ලෙස ලකුණු කරන්න',
       'view_damage_fees': 'හානි ගාස්තු බලන්න',
       // Rental Details
       'rental_details': 'කුලී විස්තර',

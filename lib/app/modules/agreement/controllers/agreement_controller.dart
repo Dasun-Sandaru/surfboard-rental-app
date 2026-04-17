@@ -205,6 +205,7 @@ class AgreementController extends GetxController {
     super.onInit();
     if (Get.arguments != null && Get.arguments is InitRentalModel) {
       initRentalModel.value = Get.arguments as InitRentalModel;
+
       _loadShopConfig();
     }
     // Listeners to invalidate generated agreement on data change
@@ -471,7 +472,11 @@ class AgreementController extends GetxController {
         status: RentalStatus.active,
         rentType: initRentalModel.value!.rentType,
         paymentStatus: PaymentStatus.unpaid,
-        rate: rentalPrice,
+        rate:
+            (initRentalModel.value!.rentType == RentType.hourly
+                    ? board!.rentalRateHour
+                    : board!.rentalRateDay)
+                .toDouble(),
         // amountExpected represents the base rental fee
         amountExpected: rentalPrice,
         // Rent is initially unpaid (Deposit is track separately)
@@ -489,6 +494,8 @@ class AgreementController extends GetxController {
         cachedStaffName: staffName,
         createdAt: DateTime.now(),
       );
+
+      log(newRental.toMap().toString());
 
       final rentalId = await _rentalService.createRental(
         shopId,
