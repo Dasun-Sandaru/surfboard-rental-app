@@ -170,7 +170,7 @@ class RentalConfigView extends GetView<SettingsController> {
                               initialItem: controller.simRentType.value,
                               onChanged: (val) {
                                 if (val != null) {
-                                  controller.simRentType.value = val;
+                                  controller.resetSimulator(val);
                                 }
                               },
 
@@ -328,6 +328,7 @@ class RentalConfigView extends GetView<SettingsController> {
         ),
         SizedBox(height: 4.h),
         TextFormField(
+          key: ValueKey('${label}_${value.value}'),
           initialValue: value.value.toString(),
           keyboardType: TextInputType.number,
           validator: (val) => AValidator.validateNumber(val, label),

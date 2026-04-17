@@ -98,6 +98,14 @@ class SettingsController extends GetxController {
   final RxInt simDurationMinutes = 0.obs;
   final RxDouble simulatedPrice = 0.0.obs;
 
+  void resetSimulator(RentType type) {
+    simRentType.value = type;
+    simDurationDays.value = 0;
+    simDurationHours.value = type == RentType.hourly ? 1 : 0;
+    simDurationMinutes.value = 0;
+    simulatedPrice.value = 0.0;
+  }
+
   // -- Date & Time Configuration --
   final RxString dateFormat = 'dd/MM/yyyy'.obs;
   final List<String> availableDateFormats = [
