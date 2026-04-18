@@ -4,6 +4,7 @@ import '../../../models/payment_model.dart';
 import '../../../models/rental_model.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../routes/app_pages.dart';
+import '../../../services/customer_service.dart';
 import '../../../services/payment_service.dart';
 import '../../../services/rental_service.dart';
 import '../../../services/user_service.dart';
@@ -13,6 +14,7 @@ class RentalPaymentController extends GetxController {
   final PaymentService paymentService = Get.find<PaymentService>();
   final RentalService rentalService = RentalService();
   final UserService userService = Get.find<UserService>();
+  final CustomerService customerService = CustomerService();
 
   // -- Data --
   final Rx<RentalModel?> rental = Rx<RentalModel?>(null);
@@ -88,6 +90,30 @@ class RentalPaymentController extends GetxController {
   Future<void> collectPayment() async {
     // We allow navigation even if balance is 0 or negative to finalize the rental return.
     Get.to(() => CollectPaymentTip(controller: this));
+  }
+
+  Future<void> submitRating(double rating, String comment) async {
+    try {
+      final customerId = rental.value?.customerId;
+      if (customerId == null || shopId.isEmpty) return;
+
+      // 1. Update Customer's overall rating
+      await customerService.rateCustomer(
+        shopId: shopId,
+        customerId: customerId,
+        rating: rating,
+      );
+
+      // 2. Save rating in the specific rental
+      await rentalService.saveCustomerRating(
+        shopId: shopId,
+        rentalId: rentalId,
+        rating: rating,
+        comment: comment,
+      );
+    } catch (e) {
+      AppSnackBar.error(title: "Rating Failed", message: e.toString());
+    }
   }
 
   void goToCustomerDetails() {

@@ -42,6 +42,10 @@ class RentalModel {
   final String? cachedItemName;
   final String? cachedStaffName;
 
+  // Rating
+  final double? customerRating;
+  final String? customerRatingComment;
+
   // Meta
   final DateTime createdAt;
 
@@ -67,6 +71,8 @@ class RentalModel {
     this.cachedCustomerName,
     this.cachedItemName,
     this.cachedStaffName,
+    this.customerRating,
+    this.customerRatingComment,
     required this.createdAt,
   });
 
@@ -122,6 +128,8 @@ class RentalModel {
       cachedCustomerName: data[FirestoreFields.cachedCustomerName],
       cachedItemName: data[FirestoreFields.cachedItemName],
       cachedStaffName: data[FirestoreFields.cachedStaffName],
+      customerRating: (data[FirestoreFields.customerRating] as num?)?.toDouble(),
+      customerRatingComment: data[FirestoreFields.customerRatingComment],
       createdAt: (data[FirestoreFields.createdAt] as Timestamp).toDate(),
     );
   }
@@ -160,6 +168,8 @@ class RentalModel {
       FirestoreFields.cachedCustomerName: cachedCustomerName,
       FirestoreFields.cachedItemName: cachedItemName,
       FirestoreFields.cachedStaffName: cachedStaffName,
+      FirestoreFields.customerRating: customerRating,
+      FirestoreFields.customerRatingComment: customerRatingComment,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
       FirestoreFields.itemNameLowercase: cachedItemName?.toLowerCase() ?? '',
       FirestoreFields.customerNameLowercase:

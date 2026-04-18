@@ -24,6 +24,8 @@ class FirestoreFields {
   static const imageUrl = 'image_url';
   static const rentalsCount = 'rentals_count';
   static const lastRentalDate = 'last_rental_date';
+  static const rating = 'rating';
+  static const ratingCount = 'rating_count';
 
   // Inventory
   static const type = 'type';
@@ -62,6 +64,8 @@ class FirestoreFields {
   static const nameLowercase = 'name_lowercase';
   static const itemNameLowercase = 'itemName_lowercase';
   static const customerNameLowercase = 'customerName_lowercase';
+  static const customerRating = 'customer_rating';
+  static const customerRatingComment = 'customer_rating_comment';
 
   // Payment
   static const rentalId = 'rentalId';

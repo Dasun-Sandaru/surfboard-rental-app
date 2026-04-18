@@ -15,6 +15,8 @@ class CustomerModel {
   // Rental Statistics
   final int rentalsCount;
   final DateTime? lastRentalDate;
+  final double rating;
+  final int ratingCount;
 
   const CustomerModel({
     this.id,
@@ -28,10 +30,15 @@ class CustomerModel {
     this.imageUrl,
     this.rentalsCount = 0,
     this.lastRentalDate,
+    this.rating = 0.0,
+    this.ratingCount = 0,
   });
 
   /// Full name helper
   String get fullName => '$firstName $lastName'.trim();
+
+  /// Average Rating
+  double get averageRating => ratingCount > 0 ? rating / ratingCount : 0.0;
 
   factory CustomerModel.fromJson(Map<String, dynamic> json) {
     return CustomerModel(
@@ -50,6 +57,8 @@ class CustomerModel {
       lastRentalDate: json[FirestoreFields.lastRentalDate] is Timestamp
           ? (json[FirestoreFields.lastRentalDate] as Timestamp).toDate()
           : null,
+      rating: (json[FirestoreFields.rating] as num?)?.toDouble() ?? 0.0,
+      ratingCount: (json[FirestoreFields.ratingCount] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -73,6 +82,8 @@ class CustomerModel {
       lastRentalDate: data[FirestoreFields.lastRentalDate] is Timestamp
           ? (data[FirestoreFields.lastRentalDate] as Timestamp).toDate()
           : null,
+      rating: (data[FirestoreFields.rating] as num?)?.toDouble() ?? 0.0,
+      ratingCount: (data[FirestoreFields.ratingCount] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -94,6 +105,8 @@ class CustomerModel {
       FirestoreFields.lastRentalDate: lastRentalDate != null
           ? Timestamp.fromDate(lastRentalDate!)
           : null,
+      FirestoreFields.rating: rating,
+      FirestoreFields.ratingCount: ratingCount,
     };
   }
 
@@ -110,6 +123,8 @@ class CustomerModel {
     String? imageUrl,
     int? rentalsCount,
     DateTime? lastRentalDate,
+    double? rating,
+    int? ratingCount,
   }) {
     return CustomerModel(
       id: id ?? this.id,
@@ -123,6 +138,8 @@ class CustomerModel {
       imageUrl: imageUrl ?? this.imageUrl,
       rentalsCount: rentalsCount ?? this.rentalsCount,
       lastRentalDate: lastRentalDate ?? this.lastRentalDate,
+      rating: rating ?? this.rating,
+      ratingCount: ratingCount ?? this.ratingCount,
     );
   }
 }

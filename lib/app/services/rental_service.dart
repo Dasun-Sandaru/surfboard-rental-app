@@ -630,4 +630,31 @@ class RentalService {
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
   }
+
+  // ---------------------------------------------------------------------------
+  // SAVE CUSTOMER RATING IN RENTAL
+  // ---------------------------------------------------------------------------
+  Future<void> saveCustomerRating({
+    required String shopId,
+    required String rentalId,
+    required double rating,
+    required String comment,
+  }) async {
+    try {
+      log('Saving customer rating in rental: $rentalId', name: logName);
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      await rentalRef.update({
+        FirestoreFields.customerRating: rating,
+        FirestoreFields.customerRatingComment: comment,
+      });
+
+      log('Customer rating saved in rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error saving customer rating in rental: $e', name: logName);
+      rethrow;
+    }
+  }
 }

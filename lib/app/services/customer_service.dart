@@ -243,4 +243,30 @@ class CustomerService {
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
   }
+
+  // ---------------------------------------------------------------------------
+  // RATE CUSTOMER
+  // ---------------------------------------------------------------------------
+  Future<void> rateCustomer({
+    required String shopId,
+    required String customerId,
+    required double rating,
+  }) async {
+    try {
+      log('Rating customer: $customerId with $rating', name: logName);
+      final customerRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.customers).doc(customerId);
+
+      await customerRef.update({
+        FirestoreFields.rating: FieldValue.increment(rating),
+        FirestoreFields.ratingCount: FieldValue.increment(1),
+      });
+
+      log('Customer rated successfully: $customerId', name: logName);
+    } catch (e) {
+      log('Error rating customer: $e', name: logName);
+      rethrow;
+    }
+  }
 }

@@ -141,6 +141,33 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         ),
         SizedBox(height: 4.h),
 
+        // Rating Stars
+        if (customer.ratingCount > 0) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ...List.generate(5, (index) {
+                final isFilled = index < customer.averageRating.round();
+                return Icon(
+                  isFilled ? Iconsax.star5 : Iconsax.star,
+                  color: isFilled ? Colors.amber : colorScheme.outline,
+                  size: 16.w,
+                );
+              }),
+              SizedBox(width: 8.w),
+              Text(
+                "${customer.averageRating.toStringAsFixed(1)} (${customer.ratingCount})",
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+        ],
+
         // ID Badge
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),

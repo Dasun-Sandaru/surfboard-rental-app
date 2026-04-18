@@ -7,6 +7,7 @@ import '../../../routes/app_pages.dart';
 import '../controllers/rental_payment_controller.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
+import 'customer_rating_dialog.dart';
 
 class CollectPaymentTip extends StatefulWidget {
   final RentalPaymentController controller;
@@ -420,7 +421,19 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
         );
       }
 
-      // 6. Success & Navigation
+      // 6. Show Rating Dialog
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => CustomerRatingDialog(
+          customerName: controller.customerName,
+          onSubmit: (rating, comment) {
+            controller.submitRating(rating, comment);
+          },
+        ),
+      );
+
+      // 7. Success & Navigation
       Get.offAllNamed(Routes.ADMIN_HOME);
 
       AppSnackBar.success(
