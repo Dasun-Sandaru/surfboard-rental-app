@@ -175,13 +175,13 @@ class AlertDetailsView extends StatelessWidget {
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: id);
         break;
       case 'Customer':
-        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: {'customerId': id});
+        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: id);
         break;
       case 'Inventory':
         Get.toNamed(Routes.ITEM_DETAILS, arguments: id);
         break;
       case 'User':
-        Get.toNamed(Routes.USER_DETAIL, arguments: {'userId': id});
+        Get.toNamed(Routes.USER_DETAIL, arguments: id);
         break;
       case 'Payment':
         // We might not have a dedicated payment detail view yet,

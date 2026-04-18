@@ -47,7 +47,7 @@ class InventoryService {
         final sizeValue =
             int.tryParse(sizeFeet) ?? 0; // feet as integer for comparison
         if (isLessThan) {
-          query = query.where(FirestoreFields.sizeFeet, isLessThan: sizeValue);
+          query = query.where(FirestoreFields.sizeFeet, isLessThanOrEqualTo: sizeValue);
         } else {
           query = query.where(
             FirestoreFields.sizeFeet,
@@ -61,7 +61,7 @@ class InventoryService {
         if (isLessThan) {
           query = query.where(
             FirestoreFields.sizeInches,
-            isLessThan: sizeValue,
+            isLessThanOrEqualTo: sizeValue,
           );
         } else {
           query = query.where(
