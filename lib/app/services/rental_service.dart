@@ -9,6 +9,9 @@ import 'activity_log_service.dart';
 import '../models/rental_model.dart';
 import '../models/payment_model.dart';
 import '../../utils/constants/a_enums.dart';
+import '../../utils/helper/invoice_generator.dart';
+import '../models/customer_model.dart';
+import '../models/shop_model.dart';
 
 class RentalService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -46,6 +49,36 @@ class RentalService {
       return publicUrl;
     } catch (e) {
       log('Error uploading agreement PDF: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<String> _uploadInvoicePdf(
+    String shopId,
+    String rentalId,
+    Uint8List pdfData,
+  ) async {
+    try {
+      log('Uploading invoice PDF for rental: $rentalId', name: logName);
+
+      final filePath = 'shops/$shopId/rentals/$rentalId/invoice.pdf';
+
+      await supabase.storage
+          .from('invoices')
+          .uploadBinary(
+            filePath,
+            pdfData,
+            fileOptions: const FileOptions(contentType: 'application/pdf'),
+          );
+
+      final String publicUrl = supabase.storage
+          .from('invoices')
+          .getPublicUrl(filePath);
+
+      log('Invoice PDF uploaded: $publicUrl', name: logName);
+      return publicUrl;
+    } catch (e) {
+      log('Error uploading invoice PDF: $e', name: logName);
       rethrow;
     }
   }
@@ -286,31 +319,75 @@ class RentalService {
     try {
       log('Finalizing return for rental: $rentalId', name: logName);
 
-      final rentalRef = _shopRef(
-        shopId,
-      ).collection(FirestoreCollections.rentals).doc(rentalId);
-      final inventoryRef = _shopRef(
-        shopId,
-      ).collection(FirestoreCollections.inventory).doc(itemId);
+      final shopRef = _shopRef(shopId);
+      final rentalRef = shopRef
+          .collection(FirestoreCollections.rentals)
+          .doc(rentalId);
+      final inventoryRef = shopRef
+          .collection(FirestoreCollections.inventory)
+          .doc(itemId);
 
-      // Moved from Batch to Transaction to support Logging within the same atomic operation
+      // 1. Fetch data for Invoice Generation (Only on final completion)
+      String? invoiceLink;
+
+      if (status == RentalStatus.completed) {
+        final shopSnap =
+            await shopRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+        final rentalSnap = await rentalRef.get();
+
+        if (!shopSnap.exists || !rentalSnap.exists) {
+          throw Exception("Shop or Rental data missing for invoice generation");
+        }
+
+        final shop = ShopModel.fromSnapshot(shopSnap);
+        final rental = RentalModel.fromSnapshot(rentalSnap);
+
+        final customerSnap = await shopRef
+            .collection(FirestoreCollections.customers)
+            .doc(rental.customerId)
+            .get();
+        if (!customerSnap.exists) {
+          throw Exception("Customer data missing for invoice generation");
+        }
+        final customer = CustomerModel.fromSnapshot(customerSnap);
+
+        final paymentsQuery = await rentalRef
+            .collection(FirestoreCollections.payments)
+            .get();
+        final payments = paymentsQuery.docs
+            .map((d) => PaymentModel.fromSnapshot(d))
+            .toList();
+
+        // 2. Generate PDF
+        final pdfData = await InvoiceGenerator.generateInvoice(
+          shop: shop,
+          customer: customer,
+          rental: rental,
+          payments: payments,
+        );
+
+        // 3. Upload PDF
+        invoiceLink = await _uploadInvoicePdf(shopId, rentalId, pdfData);
+      }
+
+      // 4. Transaction to update statuses and add invoiceLink
       await _db.runTransaction((transaction) async {
-        // Optional: Check if already returned?
-        // final rentalSnap = await transaction.get(rentalRef);
+        final currentRentalSnap = await transaction.get(rentalRef);
+        final hasActualReturnTime =
+            currentRentalSnap.data()?[FirestoreFields.actualReturnTime] != null;
 
-        // Update rental status
         transaction.update(rentalRef, {
           FirestoreFields.status: status.toString().split('.').last,
-          FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+          if (!hasActualReturnTime)
+            FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+          if (invoiceLink != null) FirestoreFields.invoiceLink: invoiceLink,
           if (overdueTime != null) FirestoreFields.overdueTime: overdueTime,
         });
 
-        // Update inventory item status based on damage
         transaction.update(inventoryRef, {
           FirestoreFields.status: inventoryStatus.toString().split('.').last,
         });
 
-        // Log Activity
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.return_rental,
@@ -320,6 +397,7 @@ class RentalService {
           metadata: {
             'itemId': itemId,
             'inventoryStatus': inventoryStatus.toString().split('.').last,
+            'invoiceLink': invoiceLink,
           },
           transaction: transaction,
         );
