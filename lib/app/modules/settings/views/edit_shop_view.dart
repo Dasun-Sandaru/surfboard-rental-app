@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../data/firestore/firestore_fields.dart';
 import '../../../../utils/constants/a_sizes.dart';
 
@@ -143,6 +144,55 @@ class EditShopView extends GetView<SettingsController> {
                   icon: Iconsax.call,
                   enabled: canEdit,
                   validator: (value) => AValidator.validatePhoneNumber(value),
+                ),
+
+                SizedBox(height: 20.h),
+
+                /// Shop Email
+                _buildLabel(context, "Shop Sender Email (For Invoices)"),
+                SizedBox(height: 8.h),
+                _buildTextField(
+                  context,
+                  controller: controller.shopEmailController,
+                  hintText: "Enter shop email",
+                  icon: Iconsax.sms,
+                  enabled: canEdit,
+                  inputType: TextInputType.emailAddress,
+                  validator: (value) => AValidator.validateEmail(value),
+                ),
+
+                SizedBox(height: 20.h),
+
+                /// Resend API Key
+                _buildLabel(context, "Resend API Key (Email Service)"),
+                SizedBox(height: 8.h),
+                _buildTextField(
+                  context,
+                  controller: controller.resendApiKeyController,
+                  hintText: "Enter Resend API Key (Optional)",
+                  icon: Iconsax.key,
+                  enabled: canEdit,
+                  // Optional field, no strict validation required unless they want to send emails
+                ),
+                SizedBox(height: 8.h),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final url = Uri.parse('https://resend.com/');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                    child: Text(
+                      "To get an API key, create a free account at resend.com, verify your domain, and generate an API key in the dashboard.",
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 12.sp,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
                 ),
 
                 SizedBox(height: 40.h),

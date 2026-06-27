@@ -54,6 +54,8 @@ class SettingsController extends GetxController {
   final shopNameController = TextEditingController();
   final shopLocationController = TextEditingController();
   final shopContactController = TextEditingController();
+  final shopEmailController = TextEditingController();
+  final resendApiKeyController = TextEditingController();
 
   // -- Text Controller for Dialogs (Inventory) --
   final textInputController = TextEditingController();
@@ -348,6 +350,8 @@ class SettingsController extends GetxController {
         FirestoreFields.id: shopDoc.id,
         FirestoreFields.contactNumber:
             shopData[FirestoreFields.contactNumber] ?? 'No Contact Number',
+        FirestoreFields.shopEmail: shopData[FirestoreFields.shopEmail] ?? '',
+        FirestoreFields.resendApiKey: shopData[FirestoreFields.resendApiKey] ?? '',
       };
 
       currency.value = shopData[FirestoreFields.currency] ?? 'USD';
@@ -469,6 +473,10 @@ class SettingsController extends GetxController {
         shopProfile.value[FirestoreFields.location] ?? '';
     shopContactController.text =
         shopProfile.value[FirestoreFields.contactNumber] ?? '';
+    shopEmailController.text =
+        shopProfile.value[FirestoreFields.shopEmail] ?? '';
+    resendApiKeyController.text =
+        shopProfile.value[FirestoreFields.resendApiKey] ?? '';
 
     // Navigate to Edit Shop View
     Get.to(() => EditShopView());
@@ -478,6 +486,8 @@ class SettingsController extends GetxController {
     final newName = shopNameController.text.trim();
     final newLocation = shopLocationController.text.trim();
     final newContactNumber = shopContactController.text.trim();
+    final newEmail = shopEmailController.text.trim();
+    final newApiKey = resendApiKeyController.text.trim();
 
     final canEdit = staffAccessRules['settings_edit_shop'] ?? false;
     if (!canEdit) {
@@ -496,12 +506,13 @@ class SettingsController extends GetxController {
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId != null) {
-        await _shopService.updateShop(
-          shopId: shopId,
-          name: newName,
-          location: newLocation,
-          contactNumber: newContactNumber,
-        );
+        await _shopService.updateShopFields(shopId, {
+          FirestoreFields.businessName: newName,
+          FirestoreFields.location: newLocation,
+          FirestoreFields.contactNumber: newContactNumber,
+          FirestoreFields.shopEmail: newEmail,
+          FirestoreFields.resendApiKey: newApiKey,
+        });
 
         Get.back();
         _loadData();

@@ -11,6 +11,7 @@ import '../services/shop_service.dart';
 import '../services/user_service.dart';
 import '../services/connectivity_service.dart';
 import '../services/notification_sync_service.dart';
+import '../services/email_service.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -26,5 +27,6 @@ class InitialBinding extends Bindings {
     Get.put(ConfigService(), permanent: true);
     Get.put(ConnectivityService(), permanent: true);
     Get.put(NotificationSyncService(), permanent: true);
+    Get.put(EmailService(), permanent: true);
   }
 }

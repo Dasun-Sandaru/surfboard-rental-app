@@ -15,6 +15,9 @@ class ShopModel {
   final double defaultHourlyRate;
   final bool isTaxEnabled;
   final double taxRate;
+  
+  final String? shopEmail;
+  final String? resendApiKey;
 
   const ShopModel({
     this.id,
@@ -28,6 +31,8 @@ class ShopModel {
     this.defaultHourlyRate = 0.0,
     this.isTaxEnabled = false,
     this.taxRate = 0.0,
+    this.shopEmail,
+    this.resendApiKey,
   });
 
   // Factory constructor to create a ShopModel from a Firestore document
@@ -47,6 +52,8 @@ class ShopModel {
           (data[FirestoreFields.defaultHourlyRate] as num?)?.toDouble() ?? 0.0,
       isTaxEnabled: data[FirestoreFields.isTaxEnabled] ?? false,
       taxRate: (data[FirestoreFields.taxRate] as num?)?.toDouble() ?? 0.0,
+      shopEmail: data[FirestoreFields.shopEmail],
+      resendApiKey: data[FirestoreFields.resendApiKey],
     );
   }
 
@@ -62,6 +69,8 @@ class ShopModel {
       FirestoreFields.defaultHourlyRate: defaultHourlyRate,
       FirestoreFields.isTaxEnabled: isTaxEnabled,
       FirestoreFields.taxRate: taxRate,
+      if (shopEmail != null) FirestoreFields.shopEmail: shopEmail,
+      if (resendApiKey != null) FirestoreFields.resendApiKey: resendApiKey,
     };
   }
 
@@ -78,6 +87,8 @@ class ShopModel {
     double? defaultHourlyRate,
     bool? isTaxEnabled,
     double? taxRate,
+    String? shopEmail,
+    String? resendApiKey,
   }) {
     return ShopModel(
       id: id ?? this.id,
@@ -91,6 +102,8 @@ class ShopModel {
       defaultHourlyRate: defaultHourlyRate ?? this.defaultHourlyRate,
       isTaxEnabled: isTaxEnabled ?? this.isTaxEnabled,
       taxRate: taxRate ?? this.taxRate,
+      shopEmail: shopEmail ?? this.shopEmail,
+      resendApiKey: resendApiKey ?? this.resendApiKey,
     );
   }
 }

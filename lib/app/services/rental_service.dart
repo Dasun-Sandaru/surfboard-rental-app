@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
+import 'package:get/get.dart';
 import 'activity_log_service.dart';
+import 'email_service.dart';
 
 import '../models/rental_model.dart';
 import '../models/payment_model.dart';
@@ -207,36 +209,6 @@ class RentalService {
           },
           transaction: transaction,
         );
-
-        // Send Email via Firebase Trigger Email Extension
-        final customerEmail =
-            customerSnap.data()?.containsKey(FirestoreFields.email) == true
-            ? customerSnap.get(FirestoreFields.email)
-            : null;
-        final customerFirstName =
-            customerSnap.data()?.containsKey(FirestoreFields.firstName) == true
-            ? customerSnap.get(FirestoreFields.firstName)
-            : 'Customer';
-
-        if (customerEmail != null && customerEmail.toString().isNotEmpty) {
-          final mailRef = _db.collection(FirestoreCollections.mail).doc();
-          transaction.set(mailRef, {
-            'to': customerEmail,
-            'message': {
-              'subject': 'Your Surfboard Rental Agreement',
-              'html':
-                  '''
-                <h3>Hello $customerFirstName,</h3>
-                <p>Thank you for renting with us!</p>
-                <p>You can view and download your rental agreement using the link below:</p>
-                <p><a href="$agreementLink">View Rental Agreement</a></p>
-                <br>
-                <p>Best regards,<br>The Surfboard Rental Team</p>
-              ''',
-            },
-          });
-        }
-
         // --- NOTIFICATION TRIGGER ---
         final triggerRef = _shopRef(shopId).collection('notification_triggers').doc(rentalId);
         transaction.set(triggerRef, {
@@ -250,6 +222,26 @@ class RentalService {
       });
 
       log('Rental created successfully: $rentalId', name: logName);
+
+      // --- SEND EMAIL VIA RESEND ---
+      final customerSnap = await _db.collection(FirestoreCollections.customers).doc(rentalData.customerId).get();
+      final customerEmail = customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
+      final customerFirstName = customerSnap.data()?[FirestoreFields.firstName]?.toString() ?? 'Customer';
+
+      if (customerEmail.isNotEmpty) {
+        try {
+          final emailService = Get.find<EmailService>();
+          await emailService.sendAgreementEmail(
+            shopId: shopId,
+            customerEmail: customerEmail,
+            customerName: customerFirstName,
+            agreementLink: agreementLink,
+          );
+        } catch (e) {
+          log('Error sending agreement email: $e', name: logName);
+        }
+      }
+
       return rentalId;
     } catch (e) {
       log('Error creating rental: $e', name: logName);
@@ -430,6 +422,38 @@ class RentalService {
         'Return finalized for rental: $rentalId (Transaction Committed)',
         name: logName,
       );
+
+      // --- SEND INVOICE EMAIL VIA RESEND ---
+      if (status == RentalStatus.completed && invoiceLink != null) {
+        try {
+          final shopSnap = await shopRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+          final rentalSnap = await rentalRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+          final customerId = rentalSnap.data()?[FirestoreFields.customerId] as String?;
+          if (customerId != null) {
+            final customerSnap = await shopRef.collection(FirestoreCollections.customers).doc(customerId).get() as DocumentSnapshot<Map<String, dynamic>>;
+          
+            final customerEmail = customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
+            final customerFirstName = customerSnap.data()?[FirestoreFields.firstName]?.toString() ?? 'Customer';
+            final totalAmount = (rentalSnap.data()?[FirestoreFields.amountPaid] as num?)?.toDouble() ?? 0.0;
+            final currency = shopSnap.data()?[FirestoreFields.currency]?.toString() ?? 'LKR';
+
+            if (customerEmail.isNotEmpty) {
+              final emailService = Get.find<EmailService>();
+              await emailService.sendInvoiceEmail(
+                shopId: shopId,
+                customerEmail: customerEmail,
+                customerName: customerFirstName,
+                invoiceLink: invoiceLink,
+                totalAmount: totalAmount,
+                currency: currency,
+              );
+            }
+          }
+        } catch (e) {
+          log('Error sending invoice email: $e', name: logName);
+        }
+      }
+
     } catch (e) {
       log('Error finalizing return: $e', name: logName);
       rethrow;
