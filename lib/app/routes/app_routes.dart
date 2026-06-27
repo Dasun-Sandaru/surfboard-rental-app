@@ -44,6 +44,7 @@ abstract class Routes {
   static const DAMAGES_PENDING = _Paths.DAMAGES_PENDING;
   static const RENTAL_PRICING_LOGIC = _Paths.RENTAL_PRICING_LOGIC;
   static const RENTAL_CONFIG = _Paths.RENTAL_CONFIG;
+  static const REPORTS = _Paths.REPORTS;
 }
 
 abstract class _Paths {
@@ -87,4 +88,5 @@ abstract class _Paths {
   static const DAMAGES_PENDING = '/damages-pending';
   static const RENTAL_PRICING_LOGIC = '/rental-pricing-logic';
   static const RENTAL_CONFIG = '/rental-config';
+  static const REPORTS = '/reports';
 }
