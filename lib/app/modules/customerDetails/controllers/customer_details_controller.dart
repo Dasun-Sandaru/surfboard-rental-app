@@ -3,6 +3,11 @@ import '../../../../utils/common/app_snack_bar.dart';
 import '../../../models/customer_model.dart';
 import '../../../services/customer_service.dart';
 import '../../../services/user_service.dart';
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../data/firestore/firestore_collections.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../models/rental_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../routes/app_pages.dart';
@@ -55,33 +60,39 @@ class CustomerDetailsController extends GetxController {
       Get.back();
     } finally {
       isLoading.value = false;
+      if (customer.value != null) {
+        _loadRentals();
+      }
     }
   }
 
-  // Dummy History Data
-  final history = <Map<String, dynamic>>[
-    {
-      "date": "15 Aug 2024",
-      "items": "Firewire Longboard (9'0\")",
-      "duration": "2 Days",
-      "cost": "\$40.00",
-      "status": "returned_label", // Status for color coding
-    },
-    {
-      "date": "01 Aug 2024",
-      "items": "Channel Islands Fish (6'2\")",
-      "duration": "1 Day",
-      "cost": "\$25.00",
-      "status": "late_return",
-    },
-    {
-      "date": "20 Jul 2024",
-      "items": "Soft Top (8'0\")",
-      "duration": "4 Hours",
-      "cost": "5.00",
-      "status": "returned_label",
-    },
-  ].obs;
+  final RxList<RentalModel> recentRentals = <RentalModel>[].obs;
+  final RxBool isLoadingRentals = false.obs;
+
+  Future<void> _loadRentals() async {
+    if (customer.value == null || shopId == null) return;
+
+    try {
+      isLoadingRentals.value = true;
+      final db = FirebaseFirestore.instance;
+      final snapshot = await db
+          .collection(FirestoreCollections.shops)
+          .doc(shopId)
+          .collection(FirestoreCollections.rentals)
+          .where(FirestoreFields.customerId, isEqualTo: customer.value!.id)
+          .orderBy(FirestoreFields.createdAt, descending: true)
+          .limit(3)
+          .get();
+
+      recentRentals.value = snapshot.docs
+          .map((doc) => RentalModel.fromSnapshot(doc))
+          .toList();
+    } catch (e) {
+      log('Error loading customer rentals: $e');
+    } finally {
+      isLoadingRentals.value = false;
+    }
+  }
 
   void editCustomer() async {
     if (customer.value == null) return;
