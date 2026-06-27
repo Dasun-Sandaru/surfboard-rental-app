@@ -3,6 +3,14 @@ import 'package:get/get.dart';
 import '../../../models/user_model.dart';
 import '../../../services/user_service.dart';
 import '../../../../utils/common/app_snack_bar.dart';
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../../../data/firestore/firestore_collections.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../models/activity_log_model.dart';
+import '../../../models/rental_model.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../widgets/user_qr_code_dialog.dart';
 
 class UserDetailController extends GetxController {
@@ -13,6 +21,11 @@ class UserDetailController extends GetxController {
 
   final RxBool isActive = true.obs;
   final RxBool isVerified = false.obs;
+
+  final RxInt totalRentals = 0.obs;
+  final RxDouble totalRevenue = 0.0.obs;
+  final RxList<ActivityLogModel> recentActivities = <ActivityLogModel>[].obs;
+  final RxBool isLoadingStats = false.obs;
 
   String shopId = '0000';
 
@@ -55,9 +68,52 @@ class UserDetailController extends GetxController {
       if (user.value != null) {
         isActive.value = user.value!.isActive;
         isVerified.value = user.value!.isVerified;
+        _loadPerformanceStats(user.value!.uid);
       }
     } catch (e) {
       AppSnackBar.error(title: 'Error', message: 'Failed to load user: $e');
+    }
+  }
+
+  Future<void> _loadPerformanceStats(String uid) async {
+    isLoadingStats.value = true;
+    try {
+      final db = FirebaseFirestore.instance;
+      
+      final logsSnapshot = await db
+          .collection(FirestoreCollections.shops)
+          .doc(shopId)
+          .collection(FirestoreCollections.activityLogs)
+          .where(FirestoreFields.actorId, isEqualTo: uid)
+          .orderBy(FirestoreFields.timestamp, descending: true)
+          .get();
+
+      int count = 0;
+      double revenue = 0.0;
+      List<ActivityLogModel> recent = [];
+
+      for (var doc in logsSnapshot.docs) {
+        final logModel = ActivityLogModel.fromSnapshot(doc);
+        
+        if (logModel.activityType == ActivityType.create_rental) {
+          count++;
+          if (logModel.metadata != null && logModel.metadata!['amountExpected'] != null) {
+            revenue += (logModel.metadata!['amountExpected'] as num).toDouble();
+          }
+        }
+        
+        if (recent.length < 3) {
+          recent.add(logModel);
+        }
+      }
+
+      totalRentals.value = count;
+      totalRevenue.value = revenue;
+      recentActivities.value = recent;
+    } catch (e) {
+      log('Error loading performance stats: $e');
+    } finally {
+      isLoadingStats.value = false;
     }
   }
 
