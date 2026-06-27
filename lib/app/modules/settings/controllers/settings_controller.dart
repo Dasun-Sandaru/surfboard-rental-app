@@ -117,21 +117,63 @@ class SettingsController extends GetxController {
   ];
 
   final RxString timeZone = 'UTC'.obs;
-  // A simplified list of major timezones.
+  // Valid IANA timezone identifiers compatible with the `timezone` package.
   final List<String> availableTimeZones = [
     'UTC',
-    'Asia/Colombo',
-    'Asia/Dubai',
+    // Americas
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'America/Anchorage',
+    'America/Sao_Paulo',
+    'America/Argentina/Buenos_Aires',
+    'America/Mexico_City',
+    'America/Bogota',
+    'America/Lima',
+    'America/Toronto',
+    'America/Vancouver',
+    // Europe
     'Europe/London',
     'Europe/Paris',
     'Europe/Berlin',
-    'America/New_York',
-    'America/Los_Angeles',
-    'America/Chicago',
-    'Australia/Sydney',
-    'Pacific/Honolulu',
+    'Europe/Rome',
+    'Europe/Madrid',
+    'Europe/Lisbon',
+    'Europe/Amsterdam',
+    'Europe/Moscow',
+    'Europe/Istanbul',
+    'Europe/Athens',
+    // Asia
+    'Asia/Colombo',
+    'Asia/Kolkata',
+    'Asia/Dubai',
     'Asia/Tokyo',
     'Asia/Singapore',
+    'Asia/Hong_Kong',
+    'Asia/Shanghai',
+    'Asia/Seoul',
+    'Asia/Bangkok',
+    'Asia/Jakarta',
+    'Asia/Kuala_Lumpur',
+    'Asia/Manila',
+    'Asia/Karachi',
+    'Asia/Dhaka',
+    // Africa
+    'Africa/Johannesburg',
+    'Africa/Cairo',
+    'Africa/Nairobi',
+    'Africa/Lagos',
+    'Africa/Casablanca',
+    // Oceania
+    'Australia/Sydney',
+    'Australia/Melbourne',
+    'Australia/Perth',
+    'Australia/Brisbane',
+    'Pacific/Auckland',
+    'Pacific/Fiji',
+    'Pacific/Honolulu',
+    'Pacific/Guam',
   ];
 
   // -- Access Control --

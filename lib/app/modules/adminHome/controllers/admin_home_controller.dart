@@ -12,6 +12,7 @@ import '../../../../data/firestore/firestore_fields.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/notification_sync_service.dart';
 
 class AdminHomeController extends GetxController {
   final selectedIndex = 0.obs;
@@ -63,6 +64,9 @@ class AdminHomeController extends GetxController {
   Future<void> _setShopId() async {
     shopId = await _userService.getShopId();
     log('shopId: $shopId');
+    if (shopId != null) {
+      Get.find<NotificationSyncService>().startSync();
+    }
   }
 
   /// Setup Real-Time Dashboard Stats

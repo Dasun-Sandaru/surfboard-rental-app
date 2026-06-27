@@ -236,6 +236,17 @@ class RentalService {
             },
           });
         }
+
+        // --- NOTIFICATION TRIGGER ---
+        final triggerRef = _shopRef(shopId).collection('notification_triggers').doc(rentalId);
+        transaction.set(triggerRef, {
+          'rentalId': rentalId,
+          'shopId': shopId,
+          'expectedReturnTime': Timestamp.fromDate(rentalData.expectedReturnTime),
+          'status': 'pending',
+          'title': 'Rental Return Due',
+          'body': 'Rental for ${rentalData.cachedItemName ?? "Item"} is due.',
+        });
       });
 
       log('Rental created successfully: $rentalId', name: logName);
@@ -282,7 +293,10 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
 
+      final triggerRef = _shopRef(shopId).collection('notification_triggers').doc(rentalId);
+
       await docRef.delete();
+      await triggerRef.delete();
 
       log('Rental deleted: $rentalId', name: logName);
     } catch (e) {
@@ -401,6 +415,15 @@ class RentalService {
           },
           transaction: transaction,
         );
+
+        // --- CANCEL NOTIFICATION TRIGGER ---
+        final triggerRef = shopRef.collection('notification_triggers').doc(rentalId);
+        final triggerSnap = await transaction.get(triggerRef);
+        if (triggerSnap.exists) {
+          transaction.update(triggerRef, {
+            'status': 'completed',
+          });
+        }
       });
 
       log(

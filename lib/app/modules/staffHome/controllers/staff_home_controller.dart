@@ -8,6 +8,7 @@ import '../../../services/inventory_service.dart';
 import '../../../services/customer_service.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/notification_sync_service.dart';
 
 class StaffHomeController extends GetxController {
   final selectedIndex = 0.obs;
@@ -52,6 +53,9 @@ class StaffHomeController extends GetxController {
   Future<void> _setShopId() async {
     shopId = await _userService.getShopId();
     log('shopId: $shopId');
+    if (shopId != null) {
+      Get.find<NotificationSyncService>().startSync();
+    }
   }
 
   /// Setup Real-Time Dashboard Stats
