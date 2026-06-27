@@ -433,7 +433,7 @@ class UserDetailView extends GetView<UserDetailController> {
             child: _buildStatCard(
               context,
               "revenue".tr,
-              "\$${controller.totalRevenue.value.toStringAsFixed(2)}",
+              AFormatter.formatCurrency(controller.totalRevenue.value),
               Iconsax.money,
             ),
           ),

@@ -6,6 +6,7 @@ import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/damage_report_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class DamageReportView extends StatelessWidget {
   const DamageReportView({super.key});
@@ -125,7 +126,7 @@ class DamageReportView extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    "\$${feeAmount.toStringAsFixed(2)}",
+                                    AFormatter.formatCurrency(feeAmount),
                                     style: TextStyle(
                                       color: colorScheme.onSurface,
                                       fontSize: 14.sp,
@@ -339,7 +340,7 @@ class DamageReportView extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "\$${controller.totalFee.toStringAsFixed(2)}",
+                            AFormatter.formatCurrency(controller.totalFee),
                             style: TextStyle(
                               color: colorScheme.primary,
                               fontSize: 18.sp,

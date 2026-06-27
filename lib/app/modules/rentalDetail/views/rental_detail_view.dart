@@ -132,20 +132,20 @@ class RentalDetailView extends GetView<RentalDetailController> {
                         _buildInfoRow(
                           context,
                           "start_time".tr,
-                          _formatDate(rental.startTime),
+                          _formatDate(rental.startTime, rental),
                           icon: Iconsax.calendar_add,
                         ),
                         _buildInfoRow(
                           context,
                           "expected_return".tr,
-                          _formatDate(rental.expectedReturnTime),
+                          _formatDate(rental.expectedReturnTime, rental),
                           icon: Iconsax.calendar_edit,
                         ),
                         if (rental.actualReturnTime != null)
                           _buildInfoRow(
                             context,
                             "actual_return".tr,
-                            _formatDate(rental.actualReturnTime!),
+                            _formatDate(rental.actualReturnTime!, rental),
                             icon: Iconsax.calendar_tick,
                             valueColor:
                                 rental.actualReturnTime!.isAfter(
@@ -182,20 +182,20 @@ class RentalDetailView extends GetView<RentalDetailController> {
                         _buildInfoRow(
                           context,
                           "rate".tr,
-                          "${AFormatter.formatCurrency(rental.rate)}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hourly'.tr : 'daily'.tr}",
+                          "${AFormatter.formatCurrency(rental.rate, currencyCodeOverride: rental.currency)}/ ${rental.rentType.toString().split('.').last == 'hourly' ? 'hourly'.tr : 'daily'.tr}",
                           icon: Iconsax.tag,
                         ),
                         _buildInfoRow(
                           context,
                           "total_expected".tr,
-                          AFormatter.formatCurrency(rental.amountExpected),
+                          AFormatter.formatCurrency(rental.amountExpected, currencyCodeOverride: rental.currency),
                           icon: Iconsax.money_tick,
                           isBold: true,
                         ),
                         _buildInfoRow(
                           context,
                           "amount_paid".tr,
-                          AFormatter.formatCurrency(rental.amountPaid),
+                          AFormatter.formatCurrency(rental.amountPaid, currencyCodeOverride: rental.currency),
                           icon: Iconsax.wallet_2,
                           valueColor: rental.paymentStatus == PaymentStatus.paid
                               ? Colors.green
@@ -207,6 +207,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                           "security_deposit".tr,
                           AFormatter.formatCurrency(
                             rental.securityDeposit.amount,
+                            currencyCodeOverride: rental.currency,
                           ),
                           icon: Iconsax.shield_tick,
                         ),
@@ -237,7 +238,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                         icon: Iconsax.receipt,
                         children: controller.payments
                             .map(
-                              (payment) => _buildPaymentRow(context, payment),
+                              (payment) => _buildPaymentRow(context, payment, rental),
                             )
                             .toList(),
                       );
@@ -263,7 +264,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                   }
                   return Column(
                     children: controller.damageReports
-                        .map((report) => _buildDamageRow(context, report))
+                        .map((report) => _buildDamageRow(context, report, rental))
                         .toList(),
                   );
                 }),
@@ -392,7 +393,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
     );
   }
 
-  Widget _buildPaymentRow(BuildContext context, PaymentModel payment) {
+  Widget _buildPaymentRow(BuildContext context, PaymentModel payment, dynamic rental) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
@@ -417,7 +418,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                   ),
                 ),
                 Text(
-                  _formatDate(payment.timestamp),
+                  _formatDate(payment.timestamp, rental),
                   style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 11.sp,
@@ -429,7 +430,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
           ),
           SizedBox(width: 8.w),
           Text(
-            "+ ${AFormatter.formatCurrency(payment.amount)}",
+            "+ ${AFormatter.formatCurrency(payment.amount, currencyCodeOverride: rental.currency)}",
             style: TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -441,7 +442,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
     );
   }
 
-  Widget _buildDamageRow(BuildContext context, DamageReportModel report) {
+  Widget _buildDamageRow(BuildContext context, DamageReportModel report, dynamic rental) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
@@ -540,7 +541,7 @@ class RentalDetailView extends GetView<RentalDetailController> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    "${"cost".tr}: ${AFormatter.formatCurrency(report.finalCost)}",
+                    "${"cost".tr}: ${AFormatter.formatCurrency(report.finalCost, currencyCodeOverride: rental.currency)}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
@@ -715,10 +716,11 @@ class RentalDetailView extends GetView<RentalDetailController> {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, dynamic rental) {
+    String dateFormat = rental.dateFormat ?? 'MMM dd, yyyy';
     return AFormatter.formatDateWithFormat(
       date,
-      outputFormat: 'MMM dd, yyyy - hh:mm a',
+      outputFormat: '$dateFormat - hh:mm a',
     );
   }
 }

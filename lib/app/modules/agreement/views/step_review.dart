@@ -7,6 +7,7 @@ import '../../../../utils/theme/app_material_theme.dart';
 import '../../../models/init_rental_model.dart';
 import '../../signature/views/signature_view.dart';
 import '../controllers/agreement_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class StepReview extends GetView<AgreementController> {
   const StepReview({super.key});
@@ -116,27 +117,27 @@ class StepReview extends GetView<AgreementController> {
       _buildSummaryRow(
         context,
         "Rental Price",
-        "\$${rentalPrice.toStringAsFixed(2)}",
+        AFormatter.formatCurrency(rentalPrice),
         valueColor: colorScheme.primary,
       ),
       if (controller.requireDeposit.value)
         _buildSummaryRow(
           context,
           "Security Deposit",
-          "\$${deposit.toStringAsFixed(2)}",
+          AFormatter.formatCurrency(deposit),
           valueColor: statusColors?.warning ?? Colors.orange,
         ),
       _buildSummaryRow(
         context,
         "Max Damage Liability",
-        "\$${totalDamageFees.toStringAsFixed(2)}",
+        AFormatter.formatCurrency(totalDamageFees),
         valueColor: statusColors?.error ?? Colors.red,
       ),
       Divider(color: colorScheme.outline, height: 24.h),
       _buildSummaryRow(
         context,
         "Total Due Today",
-        "\$${grandTotal.toStringAsFixed(2)}",
+        AFormatter.formatCurrency(grandTotal),
         isBold: true,
         valueColor: colorScheme.onSurface,
       ),
@@ -176,7 +177,7 @@ class StepReview extends GetView<AgreementController> {
                       (fee) => _buildSummaryRow(
                         context,
                         fee.damageType,
-                        "\$${fee.feeAmount.toStringAsFixed(2)}",
+                        AFormatter.formatCurrency(fee.feeAmount),
                         valueColor: statusColors?.error ?? Colors.red,
                       ),
                     )

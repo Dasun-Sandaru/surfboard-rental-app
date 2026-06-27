@@ -6,7 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
-
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/settings_controller.dart';
 
 class RentalPricingLogicView extends GetView<SettingsController> {
@@ -394,7 +394,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
               ),
               Obx(
                 () => Text(
-                  "${controller.currency.value} ${controller.simulatedPrice.value.toStringAsFixed(2)}",
+                  AFormatter.formatCurrency(controller.simulatedPrice.value),
                   style: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,

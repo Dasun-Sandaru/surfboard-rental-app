@@ -8,6 +8,7 @@ import '../controllers/rental_payment_controller.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import 'customer_rating_dialog.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class CollectPaymentTip extends StatefulWidget {
   final RentalPaymentController controller;
@@ -113,14 +114,14 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
                       _buildDetailRow(
                         context,
                         "rentals".tr,
-                        "\$${controller.rentalFee.toStringAsFixed(2)}",
+                        AFormatter.formatCurrency(controller.rentalFee, currencyCodeOverride: rental.currency),
                       ),
                       if (controller.lateFee > 0) ...[
                         SizedBox(height: 8.h),
                         _buildDetailRow(
                           context,
                           "late_fee".tr,
-                          "\$${controller.lateFee.toStringAsFixed(2)}",
+                          AFormatter.formatCurrency(controller.lateFee, currencyCodeOverride: rental.currency),
                           color: statusColors?.warning,
                         ),
                       ],
@@ -129,7 +130,7 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
                         _buildDetailRow(
                           context,
                           "damage_fee".tr,
-                          "\$${controller.damageFee.toStringAsFixed(2)}",
+                          AFormatter.formatCurrency(controller.damageFee, currencyCodeOverride: rental.currency),
                           color: statusColors?.error,
                         ),
                       ],
@@ -138,7 +139,7 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
                         _buildDetailRow(
                           context,
                           "amount_paid".tr,
-                          "-\$${controller.totalPaid.toStringAsFixed(2)}",
+                          "-${AFormatter.formatCurrency(controller.totalPaid, currencyCodeOverride: rental.currency)}",
                           color: Colors.green,
                         ),
                       ],
@@ -148,7 +149,7 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
                       _buildDetailRow(
                         context,
                         "total_due".tr,
-                        "\$${balance.toStringAsFixed(2)}",
+                        AFormatter.formatCurrency(balance, currencyCodeOverride: rental.currency),
                         isTotal: true,
                       ),
                       if (deposit > 0) ...[
@@ -156,14 +157,14 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
                         _buildDetailRow(
                           context,
                           "${"security_deposit".tr} (${"held".tr})",
-                          "-\$${deposit.toStringAsFixed(2)}",
+                          "-${AFormatter.formatCurrency(deposit, currencyCodeOverride: rental.currency)}",
                           color: colorScheme.secondary,
                         ),
                         SizedBox(height: 12.h),
                         _buildDetailRow(
                           context,
                           netCollect >= 0 ? "To Collect" : "To Refund",
-                          "\$${netCollect.abs().toStringAsFixed(2)}",
+                          AFormatter.formatCurrency(netCollect.abs(), currencyCodeOverride: rental.currency),
                           isTotal: true,
                           color: netCollect >= 0
                               ? colorScheme.primary
@@ -200,7 +201,7 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
                       SizedBox(width: 12.w),
                       Expanded(
                         child: Text(
-                          _getTipMessage(balance, deposit, netCollect),
+                          _getTipMessage(balance, deposit, netCollect, rental.currency),
                           style: TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 13.sp,
@@ -287,20 +288,20 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
     });
   }
 
-  String _getTipMessage(double balance, double deposit, double netCollect) {
+  String _getTipMessage(double balance, double deposit, double netCollect, String? currency) {
     if (deposit > 0) {
       if (netCollect > 0) {
-        return "Keep the full \$${deposit.toStringAsFixed(2)} deposit and collect an additional \$${netCollect.toStringAsFixed(2)} in cash.";
+        return "Keep the full ${AFormatter.formatCurrency(deposit, currencyCodeOverride: currency)} deposit and collect an additional ${AFormatter.formatCurrency(netCollect, currencyCodeOverride: currency)} in cash.";
       } else if (netCollect < 0) {
-        return "Apply \$${balance.toStringAsFixed(2)} from the deposit to cover the balance, and refund the remaining \$${netCollect.abs().toStringAsFixed(2)} to the customer.";
+        return "Apply ${AFormatter.formatCurrency(balance, currencyCodeOverride: currency)} from the deposit to cover the balance, and refund the remaining ${AFormatter.formatCurrency(netCollect.abs(), currencyCodeOverride: currency)} to the customer.";
       } else {
-        return "The security deposit of \$${deposit.toStringAsFixed(2)} exactly covers the remaining balance. No additional payment needed.";
+        return "The security deposit of ${AFormatter.formatCurrency(deposit, currencyCodeOverride: currency)} exactly covers the remaining balance. No additional payment needed.";
       }
     } else {
       if (balance > 0) {
-        return "Collect \$${balance.toStringAsFixed(2)} in cash from the customer.";
+        return "Collect ${AFormatter.formatCurrency(balance, currencyCodeOverride: currency)} in cash from the customer.";
       } else if (balance < 0) {
-        return "Refund \$${balance.abs().toStringAsFixed(2)} to the customer.";
+        return "Refund ${AFormatter.formatCurrency(balance.abs(), currencyCodeOverride: currency)} to the customer.";
       } else {
         return "All payments are settled. No additional collection required.";
       }
@@ -388,9 +389,9 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
           handledBy: staffName,
           method: PaymentMethod.cash,
           note:
-              "Deposit held: \$${deposit.toStringAsFixed(2)}, "
-              "Applied to balance: \$${depositApplied.toStringAsFixed(2)}, "
-              "Refunded: \$${refundAmount.toStringAsFixed(2)}",
+              "Deposit held: ${AFormatter.formatCurrency(deposit)}, "
+              "Applied to balance: ${AFormatter.formatCurrency(depositApplied)}, "
+              "Refunded: ${AFormatter.formatCurrency(refundAmount)}",
         );
       }
 

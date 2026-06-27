@@ -6,8 +6,9 @@ import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
-import '../../../routes/app_pages.dart';
 import '../../../../utils/theme/app_material_theme.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/board_inspection_controller.dart';
 
 class BoardInspectionView extends StatelessWidget {
@@ -146,17 +147,17 @@ class BoardInspectionView extends StatelessWidget {
                         _buildDetailRow(
                           context,
                           "Start Time",
-                          rental.startTime.toString(),
+                          AFormatter.formatDateWithFormat(rental.startTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
                         ),
                         _buildDetailRow(
                           context,
                           "Expected Return",
-                          rental.expectedReturnTime.toString(),
+                          AFormatter.formatDateWithFormat(rental.expectedReturnTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
                         ),
                         _buildDetailRow(
                           context,
                           "Rate",
-                          "\$${rental.rate}/hr",
+                          "${AFormatter.formatCurrency(rental.rate, currencyCodeOverride: rental.currency)}/hr",
                           isLast: true,
                         ),
                       ],
@@ -179,20 +180,20 @@ class BoardInspectionView extends StatelessWidget {
                             _buildHighlightRow(
                               context,
                               "Security Deposit",
-                              "\$${rental.securityDeposit.amount.toStringAsFixed(2)}",
+                              AFormatter.formatCurrency(rental.securityDeposit.amount, currencyCodeOverride: rental.currency),
                               Iconsax.lock,
                               statusColors?.warning ?? Colors.orange,
                             ),
                             Divider(color: colorScheme.outline, height: 24.h),
-                            _buildHighlightRow(
+                            Obx(() => _buildHighlightRow(
                               context,
                               "Balance Due",
-                              "\$${controller.balanceDue.toStringAsFixed(2)}",
+                              AFormatter.formatCurrency(controller.balanceDue, currencyCodeOverride: rental.currency),
                               Iconsax.money_tick,
                               controller.balanceDue > 0
                                   ? colorScheme.error
                                   : (statusColors?.success ?? Colors.green),
-                            ),
+                            )),
                           ],
                         ),
                       ],

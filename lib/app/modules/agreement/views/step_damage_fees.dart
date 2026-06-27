@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/agreement_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class StepDamageFees extends GetView<AgreementController> {
   const StepDamageFees({super.key});
@@ -123,7 +124,7 @@ class StepDamageFees extends GetView<AgreementController> {
                                   ),
                                 ),
                                 Text(
-                                  "\$${fee.feeAmount.toStringAsFixed(2)}",
+                                  AFormatter.formatCurrency(fee.feeAmount),
                                   style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontSize: 14.sp,
@@ -189,7 +190,7 @@ class StepDamageFees extends GetView<AgreementController> {
                     ),
                   ),
                   Text(
-                    "\$${total.toStringAsFixed(2)}",
+                    AFormatter.formatCurrency(total),
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontSize: 18.sp,

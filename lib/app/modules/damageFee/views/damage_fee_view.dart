@@ -8,6 +8,7 @@ import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/damage_fee_controller.dart';
 import '../../../../app/services/config_service.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class DamageFeeView extends GetView<DamageFeeController> {
   DamageFeeView({super.key});
@@ -164,7 +165,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  "\$${rule.feeAmount.toStringAsFixed(2)}",
+                  AFormatter.formatCurrency(rule.feeAmount),
                   style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 14.sp,

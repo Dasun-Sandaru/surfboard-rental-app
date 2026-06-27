@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import '../controllers/agreement_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class StepPricing extends GetView<AgreementController> {
   const StepPricing({super.key});
@@ -192,7 +193,7 @@ class StepPricing extends GetView<AgreementController> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              "\$${item.rentalRateHour}",
+                              AFormatter.formatCurrency(item.rentalRateHour),
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 14.sp,
@@ -213,7 +214,7 @@ class StepPricing extends GetView<AgreementController> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              "\$${item.rentalRateDay}",
+                              AFormatter.formatCurrency(item.rentalRateDay),
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 14.sp,
@@ -268,7 +269,7 @@ class StepPricing extends GetView<AgreementController> {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                "\$$suggestedPriceString",
+                                AFormatter.formatCurrency(controller.suggestedPrice),
                                 style: TextStyle(
                                   color: colorScheme.primary,
                                   fontSize: 16.sp,
@@ -403,7 +404,7 @@ class StepPricing extends GetView<AgreementController> {
           ),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant),
-            prefixText: "\$ ",
+            prefixText: "${AFormatter.currencySymbol()} ",
             prefixStyle: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,

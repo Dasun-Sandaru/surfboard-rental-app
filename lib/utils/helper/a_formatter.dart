@@ -9,15 +9,24 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../../app/services/config_service.dart';
 
 class AFormatter {
-  static String formatDate(DateTime? date, {String? sdate}) {
+  static String formatDate(
+    DateTime? date, {
+    String? sdate,
+    String? dateFormatOverride,
+  }) {
     String format = 'yyyy-MM-dd'; // Fallback
-    if (Get.isRegistered<ConfigService>()) {
+    if (dateFormatOverride != null && dateFormatOverride.isNotEmpty) {
+      format = dateFormatOverride;
+    } else if (Get.isRegistered<ConfigService>()) {
       format = Get.find<ConfigService>().dateFormat.value;
     }
     return formatDateWithFormat(date, sdate: sdate, outputFormat: format);
   }
 
-  static String formatCurrency(dynamic amount) {
+  static String formatCurrency(
+    dynamic amount, {
+    String? currencyCodeOverride,
+  }) {
     double priceDouble = 0.0;
     if (amount is String) {
       priceDouble = double.tryParse(amount) ?? 0.0;
@@ -26,7 +35,9 @@ class AFormatter {
     }
 
     String currencyCode = 'USD';
-    if (Get.isRegistered<ConfigService>()) {
+    if (currencyCodeOverride != null && currencyCodeOverride.isNotEmpty) {
+      currencyCode = currencyCodeOverride;
+    } else if (Get.isRegistered<ConfigService>()) {
       currencyCode = Get.find<ConfigService>().currency.value;
     }
 
@@ -38,6 +49,16 @@ class AFormatter {
       name: currencyCode,
       symbol: '$symbol ', // Add space after symbol
     ).format(priceDouble);
+  }
+
+  static String currencySymbol({String? currencyCodeOverride}) {
+    String currencyCode = 'USD';
+    if (currencyCodeOverride != null && currencyCodeOverride.isNotEmpty) {
+      currencyCode = currencyCodeOverride;
+    } else if (Get.isRegistered<ConfigService>()) {
+      currencyCode = Get.find<ConfigService>().currency.value;
+    }
+    return NumberFormat.simpleCurrency(name: currencyCode).currencySymbol;
   }
 
   static String formatPhoneNumber(String phonenumber) {

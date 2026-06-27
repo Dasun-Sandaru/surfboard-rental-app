@@ -18,12 +18,13 @@ class InvoiceGenerator {
   }) async {
     final pdf = pw.Document();
 
-    final currency = shop.currency;
+    final currency = rental.currency ?? shop.currency;
     final formatter = NumberFormat.currency(
       symbol: '$currency ',
       decimalDigits: 2,
     );
-    final dateFormat = DateFormat('MMM dd, yyyy - hh:mm a');
+    final formatStr = rental.dateFormat ?? 'MMM dd, yyyy';
+    final dateFormat = DateFormat('$formatStr - hh:mm a');
 
     // Calculate totals
     double totalCharges = 0.0;

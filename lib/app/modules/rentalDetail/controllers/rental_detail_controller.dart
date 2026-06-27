@@ -101,7 +101,7 @@ class RentalDetailController extends GetxController {
 
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     } else {
       Get.snackbar('Error', 'Could not open document.');
     }

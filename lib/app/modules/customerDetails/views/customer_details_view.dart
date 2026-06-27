@@ -12,6 +12,7 @@ import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/customer_details_controller.dart';
 import '../../../../app/services/config_service.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class CustomerDetailsView extends GetView<CustomerDetailsController> {
   CustomerDetailsView({super.key});
@@ -487,7 +488,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            "$durationStr • \$${rental.amountExpected.toStringAsFixed(2)}",
+                            "$durationStr • ${AFormatter.formatCurrency(rental.amountExpected, currencyCodeOverride: rental.currency)}",
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontSize: 12.sp,

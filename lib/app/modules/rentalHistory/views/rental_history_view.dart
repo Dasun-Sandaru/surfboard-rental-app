@@ -324,18 +324,18 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                     children: [
                       _buildTimeBadge(
                         context,
-                        "${'start_label'.tr}: ${AFormatter.formatDate(rental.startTime)}",
+                        "${'start_label'.tr}: ${_formatDate(rental.startTime, rental)}",
                       ),
                       SizedBox(width: 8.w),
                       if (rental.actualReturnTime != null)
                         _buildTimeBadge(
                           context,
-                          "${'returned_label'.tr}: ${AFormatter.formatDate(rental.actualReturnTime)}",
+                          "${'returned_label'.tr}: ${_formatDate(rental.actualReturnTime!, rental)}",
                         )
                       else
                         _buildTimeBadge(
                           context,
-                          "${'due_label'.tr}: ${AFormatter.formatDate(rental.expectedReturnTime)}",
+                          "${'due_label'.tr}: ${_formatDate(rental.expectedReturnTime, rental)}",
                         ),
                     ],
                   ),
@@ -416,6 +416,11 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
         fontSize: 12.sp,
       ),
     );
+  }
+
+  String _formatDate(DateTime date, dynamic rental) {
+    String format = rental?.dateFormat ?? 'yyyy-MM-dd';
+    return AFormatter.formatDateWithFormat(date, outputFormat: format);
   }
 
   Widget _buildEmptyState(BuildContext context) {

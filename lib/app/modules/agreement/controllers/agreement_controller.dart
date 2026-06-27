@@ -22,6 +22,7 @@ import '../../../models/inventory_model.dart';
 import '../../../models/init_rental_model.dart';
 import '../../../models/security_deposit_model.dart';
 import '../../../models/shop_model.dart';
+import '../../../services/config_service.dart';
 import '../../../services/damage_fee_service.dart';
 import '../../../services/payment_service.dart';
 import '../../../services/user_service.dart';
@@ -461,6 +462,8 @@ class AgreementController extends GetxController {
           ? (double.tryParse(depositController.text) ?? 0.0)
           : 0.0;
 
+      final configService = Get.find<ConfigService>();
+
       final newRental = RentalModel(
         shopId: shopId,
         customerId: customerId,
@@ -492,6 +495,9 @@ class AgreementController extends GetxController {
         cachedCustomerName: "${customer!.firstName} ${customer!.lastName}",
         cachedItemName: board!.name,
         cachedStaffName: staffName,
+        currency: configService.currency.value,
+        dateFormat: configService.dateFormat.value,
+        timeZone: configService.timeZone.value,
         createdAt: DateTime.now(),
       );
 
