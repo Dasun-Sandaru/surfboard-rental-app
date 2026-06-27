@@ -103,8 +103,10 @@ class FirestoreFields {
   static const currency = 'currency';
   static const dateFormat = 'date_format';
   static const timeZone = 'time_zone';
+  static const emailjsServiceId = 'emailjs_service_id';
+  static const emailjsTemplateId = 'emailjs_template_id';
+  static const emailjsPublicKey = 'emailjs_public_key';
   static const shopEmail = 'shop_email';
-  static const resendApiKey = 'resend_api_key';
 
   // Activity Log
   static const activityType = 'activity_type';
