@@ -112,6 +112,7 @@ class AppPages {
       name: _Paths.SHOP_SETUP,
       page: () => const ShopSetupView(),
       binding: ShopSetupBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'shop_setup')],
     ),
     GetPage(
       name: _Paths.HOME,
@@ -188,25 +189,27 @@ class AppPages {
       name: _Paths.USER_DETAIL,
       page: () => const UserDetailView(),
       binding: UserDetailBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'manage_users')],
     ),
     GetPage(
       name: _Paths.INVENTORY,
       page: () => InventoryListView(),
       binding: InventoryBinding(),
-      middlewares: [AccessControlMiddleware(routeKey: 'inventory')],
+      middlewares: [AccessControlMiddleware(routeKey: 'inventory_view')],
     ),
     GetPage(
       name: _Paths.AVAILABLE_INVENTORY,
       page: () => const AvailableInventoryView(),
       binding: AvailableInventoryBinding(),
       middlewares: [
-        AccessControlMiddleware(routeKey: 'inventory'),
+        AccessControlMiddleware(routeKey: 'inventory_view'),
       ], // Using same permission as inventory
     ),
     GetPage(
       name: _Paths.ADD_INVENTORY,
       page: () => const AddInventoryView(),
       binding: AddInventoryBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'inventory_add')],
     ),
     GetPage(
       name: _Paths.DAMAGES_PENDING,
@@ -218,28 +221,31 @@ class AppPages {
       name: _Paths.SETTINGS,
       page: () => const SettingsView(),
       binding: SettingsBinding(),
-      middlewares: [AccessControlMiddleware(routeKey: 'settings')],
+      middlewares: [AccessControlMiddleware(routeKey: 'settings_view_shop')],
     ),
     GetPage(
       name: _Paths.ITEM_DETAILS,
       page: () => ItemDetailsView(),
       binding: ItemDetailsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'inventory_view')],
     ),
     GetPage(
       name: _Paths.CUSTOMER_LIST,
       page: () => CustomerListView(),
       binding: CustomerListBinding(),
-      middlewares: [AccessControlMiddleware(routeKey: 'customers')],
+      middlewares: [AccessControlMiddleware(routeKey: 'customers_view')],
     ),
     GetPage(
       name: _Paths.ADD_EDIT_CUSTOMER,
       page: () => const AddEditCustomerView(),
       binding: AddEditCustomerBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'customers_add')],
     ),
     GetPage(
       name: _Paths.CUSTOMER_DETAILS,
       page: () => CustomerDetailsView(),
       binding: CustomerDetailsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'customers_view')],
     ),
     GetPage(
       name: _Paths.DAMAGE_FEE,
@@ -274,6 +280,7 @@ class AppPages {
       name: _Paths.RENTAL_DETAIL,
       page: () => const RentalDetailView(),
       binding: RentalDetailBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'rentals')],
     ),
     GetPage(
       name: _Paths.BOARD_INSPECTION,
@@ -328,11 +335,13 @@ class AppPages {
       name: _Paths.REPORTS,
       page: () => const ReportsView(),
       binding: ReportsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'reports')],
     ),
     GetPage(
       name: _Paths.SCHEDULED_NOTIFICATIONS,
       page: () => const ScheduledNotificationsView(),
       binding: ScheduledNotificationsBinding(),
+      middlewares: [AccessControlMiddleware(routeKey: 'alerts')],
     ),
   ];
 }

@@ -20,6 +20,7 @@ class SettingsView extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AAppBar(
+        showbackArrow: true,
         centerTitle: true,
         title: Text(
           "settings_title".tr,
@@ -74,15 +75,17 @@ class SettingsView extends StatelessWidget {
                     if (canViewShop && canEditInventoryConfig)
                       _buildDivider(context),
 
-                    _buildSettingsTile(
-                      context,
-                      icon: Iconsax.box,
-                      title: "inventory_config".tr, // "Inventory Configuration"
-                      subtitle: "inventory_config_sub".tr,
-                      onTap: controller.navigateToInventorySettings,
-                      trailingIcon: Iconsax.arrow_right_3,
-                      iconColor: colorScheme.primary,
-                    ),
+                    if (canEditInventoryConfig)
+                      _buildSettingsTile(
+                        context,
+                        icon: Iconsax.box,
+                        title:
+                            "inventory_config".tr, // "Inventory Configuration"
+                        subtitle: "inventory_config_sub".tr,
+                        onTap: controller.navigateToInventorySettings,
+                        trailingIcon: Iconsax.arrow_right_3,
+                        iconColor: colorScheme.primary,
+                      ),
                   ],
                 ),
               );
@@ -264,7 +267,7 @@ class SettingsView extends StatelessWidget {
                     context,
                     icon: Iconsax.notification,
                     title: "notifications".tr,
-                    onTap: () {},
+                    onTap: () => Get.toNamed(Routes.SCHEDULED_NOTIFICATIONS),
                   ),
                   _buildDivider(context),
                   Obx(

@@ -8,24 +8,31 @@ import '../routes/app_pages.dart';
 class AccessControlMiddleware extends GetMiddleware {
   final String routeKey;
 
+  /// Routes that guests (unauthenticated users) are allowed to access.
+  /// e.g. QR Scanner is used during Sign Up to scan shop codes.
+  static const List<String> _guestAllowedRoutes = ['qr_scanner'];
+
   AccessControlMiddleware({required this.routeKey});
 
   @override
   RouteSettings? redirect(String? route) {
     try {
-      // 1. Check User Role
-      // Admins usually bypass this, but let's check dynamic rules primarily for staff.
-      // If you want strict rules even for admins, remove this check.
-      // Assuming this middleware is mainly for limiting STAFF access.
       final authController = Get.find<AuthController>();
+
+      // 1. Guest Check — only allow specific routes for unauthenticated users
       if (authController.firebaseUser.value == null) {
-        return null; // Guests allowed (e.g. scanning shop code on Sign Up)
-      }
-      if (authController.currentUserRole.value == UserRole.admin) {
-        return null; // Admins allowed everywhere
+        if (_guestAllowedRoutes.contains(routeKey)) {
+          return null; // Allow guest access for whitelisted routes
+        }
+        return const RouteSettings(name: Routes.SIGN_IN);
       }
 
-      // 2. Check Dynamic Config Rule
+      // 2. Admin Bypass — admins have full access
+      if (authController.currentUserRole.value == UserRole.admin) {
+        return null;
+      }
+
+      // 3. Staff Access — check dynamic config rules
       if (Get.isRegistered<ConfigService>()) {
         final configService = Get.find<ConfigService>();
         final accessRules = configService.staffAccessRules;
@@ -33,15 +40,14 @@ class AccessControlMiddleware extends GetMiddleware {
         // If rule exists and is FALSE, block access
         if (accessRules.containsKey(routeKey) &&
             accessRules[routeKey] == false) {
-          // Block access
           return const RouteSettings(name: Routes.STAFF_HOME);
         }
       }
 
       return null; // Access granted
     } catch (e) {
-      // Fallback
-      return null;
+      // Fail-closed: redirect to sign-in on error
+      return const RouteSettings(name: Routes.SIGN_IN);
     }
   }
 }

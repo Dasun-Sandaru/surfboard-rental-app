@@ -32,6 +32,7 @@ class ConfigService extends GetxService {
     'payments',
     'damage_fee',
     'reports',
+    'manage_users',
     'settings_view_shop',
     'settings_edit_shop',
     'settings_edit_currency',

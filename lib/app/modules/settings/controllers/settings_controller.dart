@@ -213,6 +213,9 @@ class SettingsController extends GetxController {
     'damage_fee': true, // Might want to restrict
     'reports': false,
 
+    // User Management
+    'manage_users': false,
+
     // Settings & Configuration
     'settings_view_shop': true,
     'settings_edit_shop': false,
@@ -246,6 +249,8 @@ class SettingsController extends GetxController {
     'payments': 'Payments & Transactions',
     'damage_fee': 'Damage Fee Configuration',
     'reports': 'Reports & Analytics',
+
+    'manage_users': 'Manage Users',
 
     'settings_view_shop': 'View Shop Details',
     'settings_edit_shop': 'Edit Shop Details',
@@ -294,7 +299,7 @@ class SettingsController extends GetxController {
     },
     {
       'title': 'analytics_group', // "Analytics"
-      'keys': ['reports'],
+      'keys': ['reports', 'manage_users'],
     },
     {
       'title': 'configuration_group', // "Configuration"
@@ -522,6 +527,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> saveRentalConfig() async {
+    if (!hasPermission('settings_edit_rental_logic')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to edit rental configuration",
+      );
+      return;
+    }
     if (!rentalConfigFormKey.currentState!.validate()) {
       return;
     }
@@ -658,6 +670,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> updateCurrency(String newCurrency) async {
+    if (!hasPermission('settings_edit_currency')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to change currency",
+      );
+      return;
+    }
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId == null) return;
@@ -715,6 +734,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> updateDateFormat(String newFormat) async {
+    if (!hasPermission('settings_edit_date_format')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to change date format",
+      );
+      return;
+    }
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId == null) return;
@@ -779,6 +805,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> updateTimeZone(String newTimeZone) async {
+    if (!hasPermission('settings_edit_timezone')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to change time zone",
+      );
+      return;
+    }
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId == null) return;
@@ -898,6 +931,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> toggleAccess(String key, bool value) async {
+    if (!hasPermission('settings_manage_access')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to manage access rules",
+      );
+      return;
+    }
     staffAccessRules[key] = value;
 
     // Save to Firestore
