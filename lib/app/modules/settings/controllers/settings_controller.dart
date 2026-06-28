@@ -9,6 +9,7 @@ import '../../../../data/firestore/firestore_fields.dart';
 import '../../../../utils/constants/a_enums.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
+import '../../../../utils/common/a_app_dialogs.dart';
 import '../views/inventory_config_view.dart';
 import '../views/edit_profile_view.dart';
 import '../views/edit_shop_view.dart';
@@ -838,18 +839,9 @@ class SettingsController extends GetxController {
   }
 
   void logout() {
-    Get.defaultDialog(
-      title: "logout".tr,
-      middleText: "logout_confirm_msg".tr,
-      textConfirm: "yes".tr,
-      textCancel: "no".tr,
-      confirmTextColor: Colors.white,
-      onConfirm: () async {
-        Get.back(); // Close dialog
-        await _authService.signOut();
-        // AuthController will handle the redirection to SIGN_IN or SPLASH based on state
-      },
-    );
+    showLogoutFromAppDialog(() async {
+      await _authService.signOut();
+    });
   }
 
   // Generic function to add item to a list
@@ -885,16 +877,14 @@ class SettingsController extends GetxController {
 
   // Generic function to remove item
   void removeItem(dynamic item, RxList<dynamic> list) {
-    Get.defaultDialog(
+    showAppConfirmation(
+      context: Get.context!,
       title: "remove_item".tr,
-      middleText: "delete_confirm_msg".tr,
-      textConfirm: "delete".tr,
-      textCancel: "cancel".tr,
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+      message: "delete_confirm_msg".tr,
+      confirmText: "delete".tr,
+      cancelText: "cancel".tr,
       onConfirm: () {
         list.remove(item);
-        Get.back();
       },
     );
   }

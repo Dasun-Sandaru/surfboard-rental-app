@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/common/a_app_dialogs.dart';
 import '../controllers/scheduled_notifications_controller.dart';
 
 class ScheduledNotificationsView extends GetView<ScheduledNotificationsController> {
@@ -29,16 +30,14 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
           IconButton(
             icon: Icon(Iconsax.trash, color: colorScheme.error),
             onPressed: () {
-              Get.defaultDialog(
+              showAppConfirmation(
+                context: context,
                 title: 'Cancel All',
-                middleText: 'Are you sure you want to cancel all scheduled notifications?',
-                textConfirm: 'Yes',
-                textCancel: 'No',
-                confirmTextColor: colorScheme.onError,
-                buttonColor: colorScheme.error,
+                message: 'Are you sure you want to cancel all scheduled notifications?',
+                confirmText: 'Yes',
+                cancelText: 'No',
                 onConfirm: () {
                   controller.cancelAllNotifications();
-                  Get.back();
                 },
               );
             },
@@ -169,16 +168,14 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                       constraints: const BoxConstraints(),
                       padding: EdgeInsets.zero,
                       onPressed: () {
-                        Get.defaultDialog(
+                        showAppConfirmation(
+                          context: context,
                           title: 'Cancel Notification',
-                          middleText: 'Are you sure you want to cancel this notification?',
-                          textConfirm: 'Yes',
-                          textCancel: 'No',
-                          confirmTextColor: colorScheme.onError,
-                          buttonColor: colorScheme.error,
+                          message: 'Are you sure you want to cancel this notification?',
+                          confirmText: 'Yes',
+                          cancelText: 'No',
                           onConfirm: () {
                             controller.cancelNotification(req.id);
-                            Get.back();
                           },
                         );
                       },

@@ -49,11 +49,17 @@ class LocalNotificationService {
       await flutterLocalNotificationsPlugin.initialize(
         settings: initializationSettings,
         onDidReceiveNotificationResponse: (details) {
-          log("Notification Tapped: ${details.payload}", name: 'LocalNotification');
+          log(
+            "Notification Tapped: ${details.payload}",
+            name: 'LocalNotification',
+          );
           final payload = details.payload;
           if (payload != null && payload.startsWith('rental:')) {
             final rentalId = payload.substring('rental:'.length);
-            log("Navigating to rental detail: $rentalId", name: 'LocalNotification');
+            log(
+              "Navigating to rental detail: $rentalId",
+              name: 'LocalNotification',
+            );
             Get.toNamed('/rental-detail', arguments: rentalId);
           }
         },
@@ -75,8 +81,10 @@ class LocalNotificationService {
       log("Resolved shop timezone: $shopTimeZone", name: 'LocalNotification');
       return location;
     } catch (e) {
-      log("Warning: Could not resolve shop timezone, falling back to UTC: $e",
-          name: 'LocalNotification');
+      log(
+        "Warning: Could not resolve shop timezone, falling back to UTC: $e",
+        name: 'LocalNotification',
+      );
       return tz.getLocation('UTC');
     }
   }
@@ -100,16 +108,18 @@ class LocalNotificationService {
         await androidPlugin.requestNotificationsPermission();
 
         // For Android 12+ (SCHEDULE_EXACT_ALARM)
-        final exactAlarmGranted =
-            await androidPlugin.requestExactAlarmsPermission();
+        final exactAlarmGranted = await androidPlugin
+            .requestExactAlarmsPermission();
         log(
           "Exact alarm permission granted: $exactAlarmGranted",
           name: 'LocalNotification',
         );
       }
     } catch (e) {
-      log("Error requesting notification permissions: $e",
-          name: 'LocalNotification');
+      log(
+        "Error requesting notification permissions: $e",
+        name: 'LocalNotification',
+      );
     }
   }
 
@@ -136,18 +146,12 @@ class LocalNotificationService {
         "DEBUG: Input=$scheduledDate (isUtc=${scheduledDate.isUtc})",
         name: 'LocalNotification',
       );
-      log(
-        "DEBUG: UTC=$utcDate",
-        name: 'LocalNotification',
-      );
+      log("DEBUG: UTC=$utcDate", name: 'LocalNotification');
       log(
         "DEBUG: TZ scheduled=$tzScheduledDate (zone=${shopLocation.name})",
         name: 'LocalNotification',
       );
-      log(
-        "DEBUG: TZ now=$tzNow",
-        name: 'LocalNotification',
-      );
+      log("DEBUG: TZ now=$tzNow", name: 'LocalNotification');
 
       if (tzScheduledDate.isBefore(tzNow)) {
         log("Skipping past notification (ID: $id, was for: $tzScheduledDate)");
@@ -181,7 +185,7 @@ class LocalNotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         payload: payload ?? tzScheduledDate.toIso8601String(),
       );
-      
+
       // Save scheduled time for the UI to display
       final storage = GetStorage();
       storage.write('notif_time_$id', scheduledDate.toIso8601String());
@@ -212,7 +216,8 @@ class LocalNotificationService {
 
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
     try {
-      return await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      return await flutterLocalNotificationsPlugin
+          .pendingNotificationRequests();
     } catch (e) {
       log("Error fetching pending notifications: $e");
       return [];
@@ -244,9 +249,15 @@ class LocalNotificationService {
           ),
         ),
       );
-      log("Immediate notification sent successfully", name: 'LocalNotification');
+      log(
+        "Immediate notification sent successfully",
+        name: 'LocalNotification',
+      );
     } catch (e) {
-      log("Error sending immediate notification: $e", name: 'LocalNotification');
+      log(
+        "Error sending immediate notification: $e",
+        name: 'LocalNotification',
+      );
     }
   }
 
@@ -260,7 +271,10 @@ class LocalNotificationService {
         return await androidPlugin.canScheduleExactNotifications() ?? false;
       }
     } catch (e) {
-      log("Error checking exact alarm permission: $e", name: 'LocalNotification');
+      log(
+        "Error checking exact alarm permission: $e",
+        name: 'LocalNotification',
+      );
     }
     return false;
   }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../models/user_model.dart';
 import '../../../services/user_service.dart';
 import '../../../../utils/common/app_snack_bar.dart';
+import '../../../../utils/common/a_app_dialogs.dart';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -166,14 +167,14 @@ class UserDetailController extends GetxController {
   }
 
   void deleteUser() {
-    Get.defaultDialog(
+    showAppConfirmation(
+      context: Get.context!,
       title: "Delete User",
-      middleText: "Are you sure? This action cannot be undone.",
-      textConfirm: "Delete",
-      confirmTextColor: Get.theme.scaffoldBackgroundColor,
+      message: "Are you sure? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
       onConfirm: () {
         // Delete logic
-        Get.back(); // Close dialog
         Get.back(); // Go back to list
       },
     );
