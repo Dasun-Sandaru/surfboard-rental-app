@@ -18,6 +18,9 @@ class AccessControlMiddleware extends GetMiddleware {
       // If you want strict rules even for admins, remove this check.
       // Assuming this middleware is mainly for limiting STAFF access.
       final authController = Get.find<AuthController>();
+      if (authController.firebaseUser.value == null) {
+        return null; // Guests allowed (e.g. scanning shop code on Sign Up)
+      }
       if (authController.currentUserRole.value == UserRole.admin) {
         return null; // Admins allowed everywhere
       }

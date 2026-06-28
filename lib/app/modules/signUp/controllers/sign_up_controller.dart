@@ -115,7 +115,10 @@ class SignUpController extends GetxController {
 
   Future<void> scanShopCode() async {
     try {
-      final result = await Get.toNamed(Routes.QR_SCANNER);
+      final result = await Get.toNamed(
+        Routes.QR_SCANNER,
+        arguments: {'returnResult': true},
+      );
       if (result != null && result is String) {
         shopCodeController.text = result;
       }
