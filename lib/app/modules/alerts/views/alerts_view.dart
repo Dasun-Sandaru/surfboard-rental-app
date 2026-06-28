@@ -33,6 +33,12 @@ class AlertsView extends GetView<AlertsController> {
             fontWeight: FontWeight.w600,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => Get.toNamed('/scheduled-notifications'),
+            icon: Icon(Iconsax.notification_bing, color: colorScheme.primary),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => controller.refreshLogs(),

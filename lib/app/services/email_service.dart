@@ -93,6 +93,10 @@ class EmailService extends GetxService {
     }
 
     try {
+      log('====================================', name: 'EmailJS');
+      log('SENDING EMAIL TO: $customerEmail', name: 'EmailJS');
+      log('TEMPLATE TYPE: ${templateParams['type']}', name: 'EmailJS');
+
       final response = await http.post(
         Uri.parse(_emailJsUrl),
         headers: {
@@ -108,12 +112,16 @@ class EmailService extends GetxService {
       );
 
       if (response.statusCode == 200) {
-        log('EmailService: Successfully sent EmailJS email to $customerEmail');
+        log('SUCCESS: Email sent to $customerEmail', name: 'EmailJS');
+        log('====================================', name: 'EmailJS');
       } else {
-        log('EmailService: Failed to send EmailJS email to $customerEmail. Status: ${response.statusCode}, Body: ${response.body}');
+        log('FAILED to send email. Status: ${response.statusCode}', name: 'EmailJS');
+        log('Response Body: ${response.body}', name: 'EmailJS');
+        log('====================================', name: 'EmailJS');
       }
     } catch (e) {
-      log('EmailService: Exception while sending EmailJS email: $e');
+      log('EXCEPTION while sending email: $e', name: 'EmailJS');
+      log('====================================', name: 'EmailJS');
     }
   }
 

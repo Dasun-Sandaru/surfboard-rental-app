@@ -1,8 +1,9 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:get/get.dart';
 import 'config_service.dart';
 
 class LocalNotificationService {
@@ -132,9 +133,15 @@ class LocalNotificationService {
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: tzScheduledDate.toIso8601String(),
       );
+      
+      // Save local device time to avoid Firebase reads, so the UI can just show it
+      final storage = GetStorage();
+      storage.write('notif_time_$id', scheduledDate.toIso8601String());
+
       log(
-        "Scheduled Notification ID: $id for $tzScheduledDate (TZ: ${tz.local.name})",
+        "Scheduled Notification ID: $id for ${scheduledDate.toLocal()} (TZ: Device Local)",
       );
     } catch (e) {
       log("Error scheduling notification: $e");
@@ -143,11 +150,25 @@ class LocalNotificationService {
 
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id: id);
+    GetStorage().remove('notif_time_$id');
     log("Cancelled notification ID: $id");
   }
 
   Future<void> cancelAllNotifications() async {
+    final pending = await getPendingNotifications();
+    for (var req in pending) {
+      GetStorage().remove('notif_time_${req.id}');
+    }
     await _flutterLocalNotificationsPlugin.cancelAll();
     log("Cancelled all notifications");
+  }
+
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    try {
+      return await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+    } catch (e) {
+      log("Error fetching pending notifications: $e");
+      return [];
+    }
   }
 }

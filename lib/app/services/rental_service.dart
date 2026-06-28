@@ -381,6 +381,9 @@ class RentalService {
         final currentRentalSnap = await transaction.get(rentalRef);
         final hasActualReturnTime =
             currentRentalSnap.data()?[FirestoreFields.actualReturnTime] != null;
+            
+        final triggerRef = shopRef.collection('notification_triggers').doc(rentalId);
+        final triggerSnap = await transaction.get(triggerRef);
 
         transaction.update(rentalRef, {
           FirestoreFields.status: status.toString().split('.').last,
@@ -409,8 +412,6 @@ class RentalService {
         );
 
         // --- CANCEL NOTIFICATION TRIGGER ---
-        final triggerRef = shopRef.collection('notification_triggers').doc(rentalId);
-        final triggerSnap = await transaction.get(triggerRef);
         if (triggerSnap.exists) {
           transaction.update(triggerRef, {
             'status': 'completed',

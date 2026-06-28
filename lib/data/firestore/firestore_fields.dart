@@ -79,7 +79,7 @@ class FirestoreFields {
   static const feeAmount = 'fee_amount';
   static const description = 'description';
   static const activeStatus = 'active_status';
-  static const damageType = 'damage_type';
+  static const damageType = 'damageType';
   static const damageId = 'damageId';
   static const photoUrl = 'photoUrl';
   static const reportedAt = 'reportedAt';
