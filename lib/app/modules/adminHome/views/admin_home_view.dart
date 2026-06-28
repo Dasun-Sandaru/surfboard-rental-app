@@ -8,6 +8,7 @@ import '../../../../utils/constants/a_image_strings.dart';
 
 import '../../alerts/views/alerts_view.dart';
 import '../controllers/admin_home_controller.dart';
+import '../../../services/local_notification_service.dart';
 
 class AdminHomeView extends GetView<AdminHomeController> {
   const AdminHomeView({super.key});
@@ -31,6 +32,45 @@ class AdminHomeView extends GetView<AdminHomeController> {
         ),
       ),
       bottomNavigationBar: _buildBottomNav(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final service = LocalNotificationService();
+          
+          // Step 1: Check & request permissions
+          await service.requestPermissions();
+          
+          // Step 2: Check exact alarm capability
+          final canScheduleExact = await service.canScheduleExactAlarms();
+          
+          debugPrint('========== NOTIFICATION DIAGNOSTIC ==========');
+          debugPrint('Can schedule exact alarms: $canScheduleExact');
+          debugPrint('=============================================');
+          
+          // Step 3: Show IMMEDIATE notification to verify basics work
+          await service.showImmediateNotification(
+            id: 888888,
+            title: 'Immediate Test',
+            body: 'If you see this, basic notifications work! Exact alarm: $canScheduleExact',
+          );
+          
+          // Step 4: Schedule one for 1 minute from now
+          final now = DateTime.now();
+          final scheduleTime = now.add(const Duration(minutes: 1));
+          await service.scheduleNotification(
+            id: 999999,
+            title: 'Scheduled Test',
+            body: 'This was scheduled at ${now.hour}:${now.minute.toString().padLeft(2, '0')}. Fired 1 min later!',
+            scheduledDate: scheduleTime,
+          );
+          
+          Get.snackbar(
+            'Diagnostic Done',
+            'Exact alarm: $canScheduleExact\nImmediate: sent now\nScheduled: ${scheduleTime.hour}:${scheduleTime.minute.toString().padLeft(2, '0')}',
+            duration: const Duration(seconds: 5),
+          );
+        },
+        child: const Icon(Icons.notifications_active),
+      ),
     );
   }
 

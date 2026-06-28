@@ -12,34 +12,20 @@ class LocalNotificationService {
   factory LocalNotificationService() => _instance;
   LocalNotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
+  bool _timezonesInitialized = false;
 
   Future<void> init() async {
     if (_isInitialized) return;
 
     try {
-      // Initialize all timezone database entries
-      tz.initializeTimeZones();
-
-      // Use the shop's configured timezone from ConfigService as the source of truth.
-      // This ensures all staff devices schedule alarms at the correct shop-local time,
-      // regardless of the device's own timezone setting.
-      final configService = Get.find<ConfigService>();
-      final shopTimeZone = configService.timeZone.value;
-
-      try {
-        tz.setLocalLocation(tz.getLocation(shopTimeZone));
-        log("Timezone set to shop config: $shopTimeZone");
-      } catch (_) {
-        // Fallback: if the admin-configured timezone string is invalid,
-        // default to UTC so we never crash.
-        tz.setLocalLocation(tz.getLocation('UTC'));
-        log(
-          "Warning: Invalid shop timezone '$shopTimeZone', falling back to UTC",
-        );
+      // Initialize timezone database once
+      if (!_timezonesInitialized) {
+        tz.initializeTimeZones();
+        _timezonesInitialized = true;
       }
 
       // Android Initialization
@@ -60,7 +46,7 @@ class LocalNotificationService {
             iOS: initializationSettingsDarwin,
           );
 
-      await _flutterLocalNotificationsPlugin.initialize(
+      await flutterLocalNotificationsPlugin.initialize(
         settings: initializationSettings,
         onDidReceiveNotificationResponse: (details) {
           log("Notification Tapped: ${details.payload}");
@@ -74,23 +60,50 @@ class LocalNotificationService {
     }
   }
 
+  /// Resolves the shop timezone at call-time (not init-time) to avoid race conditions
+  tz.Location _resolveShopTimezone() {
+    try {
+      final configService = Get.find<ConfigService>();
+      final shopTimeZone = configService.timeZone.value;
+      final location = tz.getLocation(shopTimeZone);
+      log("Resolved shop timezone: $shopTimeZone", name: 'LocalNotification');
+      return location;
+    } catch (e) {
+      log("Warning: Could not resolve shop timezone, falling back to UTC: $e",
+          name: 'LocalNotification');
+      return tz.getLocation('UTC');
+    }
+  }
+
   Future<void> requestPermissions() async {
     try {
       // For iOS
-      await _flutterLocalNotificationsPlugin
+      await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin
           >()
           ?.requestPermissions(alert: true, badge: true, sound: true);
 
-      // For Android 13+
-      await _flutterLocalNotificationsPlugin
+      // For Android 13+ (POST_NOTIFICATIONS)
+      final androidPlugin = flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestNotificationsPermission();
+          >();
+
+      if (androidPlugin != null) {
+        await androidPlugin.requestNotificationsPermission();
+
+        // For Android 12+ (SCHEDULE_EXACT_ALARM)
+        final exactAlarmGranted =
+            await androidPlugin.requestExactAlarmsPermission();
+        log(
+          "Exact alarm permission granted: $exactAlarmGranted",
+          name: 'LocalNotification',
+        );
+      }
     } catch (e) {
-      log("Error requesting notification permissions: $e");
+      log("Error requesting notification permissions: $e",
+          name: 'LocalNotification');
     }
   }
 
@@ -101,19 +114,40 @@ class LocalNotificationService {
     required DateTime scheduledDate,
   }) async {
     try {
-      // Convert the UTC DateTime from Firestore into the shop's timezone.
-      // tz.local is set to the shop's configured timezone during init().
+      // Resolve timezone at schedule-time to avoid init race condition
+      final shopLocation = _resolveShopTimezone();
+
+      // Always convert to UTC first, then to shop timezone
+      final utcDate = scheduledDate.toUtc();
       final tz.TZDateTime tzScheduledDate = tz.TZDateTime.from(
-        scheduledDate,
-        tz.local,
+        utcDate,
+        shopLocation,
+      );
+      final tzNow = tz.TZDateTime.now(shopLocation);
+
+      log(
+        "DEBUG: Input=$scheduledDate (isUtc=${scheduledDate.isUtc})",
+        name: 'LocalNotification',
+      );
+      log(
+        "DEBUG: UTC=$utcDate",
+        name: 'LocalNotification',
+      );
+      log(
+        "DEBUG: TZ scheduled=$tzScheduledDate (zone=${shopLocation.name})",
+        name: 'LocalNotification',
+      );
+      log(
+        "DEBUG: TZ now=$tzNow",
+        name: 'LocalNotification',
       );
 
-      if (tzScheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
+      if (tzScheduledDate.isBefore(tzNow)) {
         log("Skipping past notification (ID: $id, was for: $tzScheduledDate)");
         return;
       }
 
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
+      await flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
         title: title,
         body: body,
@@ -136,20 +170,21 @@ class LocalNotificationService {
         payload: tzScheduledDate.toIso8601String(),
       );
       
-      // Save local device time to avoid Firebase reads, so the UI can just show it
+      // Save scheduled time for the UI to display
       final storage = GetStorage();
       storage.write('notif_time_$id', scheduledDate.toIso8601String());
 
       log(
-        "Scheduled Notification ID: $id for ${scheduledDate.toLocal()} (TZ: Device Local)",
+        "SUCCESS: Scheduled ID=$id for $tzScheduledDate (${shopLocation.name})",
+        name: 'LocalNotification',
       );
     } catch (e) {
-      log("Error scheduling notification: $e");
+      log("Error scheduling notification: $e", name: 'LocalNotification');
     }
   }
 
   Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id: id);
+    await flutterLocalNotificationsPlugin.cancel(id: id);
     GetStorage().remove('notif_time_$id');
     log("Cancelled notification ID: $id");
   }
@@ -159,16 +194,62 @@ class LocalNotificationService {
     for (var req in pending) {
       GetStorage().remove('notif_time_${req.id}');
     }
-    await _flutterLocalNotificationsPlugin.cancelAll();
+    await flutterLocalNotificationsPlugin.cancelAll();
     log("Cancelled all notifications");
   }
 
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
     try {
-      return await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      return await flutterLocalNotificationsPlugin.pendingNotificationRequests();
     } catch (e) {
       log("Error fetching pending notifications: $e");
       return [];
     }
+  }
+
+  Future<void> showImmediateNotification({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await flutterLocalNotificationsPlugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'rental_alerts',
+            'Rental Alerts',
+            channelDescription: 'Notifications for rental due times',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+      );
+      log("Immediate notification sent successfully", name: 'LocalNotification');
+    } catch (e) {
+      log("Error sending immediate notification: $e", name: 'LocalNotification');
+    }
+  }
+
+  Future<bool> canScheduleExactAlarms() async {
+    try {
+      final androidPlugin = flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      if (androidPlugin != null) {
+        return await androidPlugin.canScheduleExactNotifications() ?? false;
+      }
+    } catch (e) {
+      log("Error checking exact alarm permission: $e", name: 'LocalNotification');
+    }
+    return false;
   }
 }
