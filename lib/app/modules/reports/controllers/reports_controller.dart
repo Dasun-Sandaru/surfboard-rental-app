@@ -51,14 +51,45 @@ class ReportsController extends GetxController {
   List<String> get availableStatuses {
     switch (selectedReportType.value) {
       case ReportType.inventory:
-        return ['All', 'available', 'rented', 'maintenance'];
+        return ['All', 'available', 'rented', 'repair', 'retired', 'damaged'];
       case ReportType.rentals:
-        return ['All', 'active', 'completed', 'cancelled'];
+        return ['All', 'active', 'overdue', 'item_returned', 'mark_as_damaged', 'completed', 'cancelled'];
       case ReportType.damages:
-        return ['All', 'pending', 'paid'];
+        return ['All', 'reported', 'approved', 'charged', 'resolved'];
       case ReportType.customers:
         return ['All'];
     }
+  }
+
+  String getStatusDescription(String status) {
+    if (status == 'All') return 'Show all records';
+    
+    if (selectedReportType.value == ReportType.rentals) {
+      switch (status) {
+        case 'active': return 'Currently rented out';
+        case 'overdue': return 'Passed expected return time';
+        case 'item_returned': return 'Returned, pending inspection';
+        case 'mark_as_damaged': return 'Damaged, pending report';
+        case 'completed': return 'Fully settled & completed';
+        case 'cancelled': return 'Rental cancelled';
+      }
+    } else if (selectedReportType.value == ReportType.inventory) {
+      switch (status) {
+        case 'available': return 'Ready for rent';
+        case 'rented': return 'Currently rented out';
+        case 'repair': return 'Under maintenance';
+        case 'retired': return 'No longer in use';
+        case 'damaged': return 'Broken, pending repair';
+      }
+    } else if (selectedReportType.value == ReportType.damages) {
+      switch (status) {
+        case 'reported': return 'New damage reported';
+        case 'approved': return 'Cost approved';
+        case 'charged': return 'Payment charged/due';
+        case 'resolved': return 'Fully resolved';
+      }
+    }
+    return '';
   }
 
   void changeReportType(ReportType type) {
@@ -127,20 +158,25 @@ class ReportsController extends GetxController {
     
     if (startDate.value != null && endDate.value != null) {
       query = query
-        .where('created_at', isGreaterThanOrEqualTo: startDate.value)
-        .where('created_at', isLessThanOrEqualTo: endDate.value);
+        .where(FirestoreFields.createdAt, isGreaterThanOrEqualTo: startDate.value)
+        .where(FirestoreFields.createdAt, isLessThanOrEqualTo: endDate.value);
     }
     
     // Limit to 500 for safety in a report
-    final snap = await query.orderBy('created_at', descending: true).limit(500).get();
+    final snap = await query.orderBy(FirestoreFields.createdAt, descending: true).limit(500).get();
     
     for (var doc in snap.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      final createdAt = data['created_at'] as Timestamp?;
+      final createdAt = data[FirestoreFields.createdAt] as Timestamp?;
+      
+      final firstName = data[FirestoreFields.firstName] ?? '';
+      final lastName = data[FirestoreFields.lastName] ?? '';
+      final fullName = '$firstName $lastName'.trim();
+      
       reportResults.add({
-        'Name': data['name'] ?? '-',
-        'Phone': data['phone'] ?? '-',
-        'Email': data['email'] ?? '-',
+        'Name': fullName.isEmpty ? '-' : fullName,
+        'Phone': data[FirestoreFields.phone] ?? '-',
+        'Email': data[FirestoreFields.email] ?? '-',
         'Created': createdAt != null ? DateFormat('MMM d, yyyy').format(createdAt.toDate()) : '-',
       });
     }
@@ -152,18 +188,22 @@ class ReportsController extends GetxController {
     Query query = shopDoc.collection(FirestoreCollections.inventory);
     
     if (selectedStatus.value != 'All') {
-      query = query.where('status', isEqualTo: selectedStatus.value);
+      query = query.where(FirestoreFields.status, isEqualTo: selectedStatus.value);
     }
     
     final snap = await query.limit(500).get();
     
     for (var doc in snap.docs) {
       final data = doc.data() as Map<String, dynamic>;
+      
+      final type = data[FirestoreFields.type] ?? '-';
+      final itemName = data['name'] ?? '-';
+      
       reportResults.add({
-        'Item': data['name'] ?? '-',
-        'Category': data['category'] ?? '-',
-        'Status': (data['status'] ?? '-').toString().toUpperCase(),
-        'Rate': '${shop.currency} ${data['rate_per_day'] ?? 0}/day',
+        'Item': itemName,
+        'Category': type,
+        'Status': (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
+        'Rate': '${shop.currency}${data[FirestoreFields.rentalRateHour] ?? 0}/hr | ${shop.currency}${data[FirestoreFields.rentalRateDay] ?? 0}/day',
       });
     }
   }
@@ -174,58 +214,74 @@ class ReportsController extends GetxController {
     Query query = shopDoc.collection(FirestoreCollections.rentals);
     
     if (selectedStatus.value != 'All') {
-      query = query.where('status', isEqualTo: selectedStatus.value);
+      query = query.where(FirestoreFields.status, isEqualTo: selectedStatus.value);
     }
     
     if (startDate.value != null && endDate.value != null) {
       query = query
-        .where('start_date', isGreaterThanOrEqualTo: startDate.value)
-        .where('start_date', isLessThanOrEqualTo: endDate.value);
+        .where(FirestoreFields.startTime, isGreaterThanOrEqualTo: startDate.value)
+        .where(FirestoreFields.startTime, isLessThanOrEqualTo: endDate.value);
     }
     
-    final snap = await query.orderBy('start_date', descending: true).limit(500).get();
+    final snap = await query.orderBy(FirestoreFields.startTime, descending: true).limit(500).get();
     
     for (var doc in snap.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      final start = data['start_date'] as Timestamp?;
-      final end = data['end_date'] as Timestamp?;
+      final start = data[FirestoreFields.startTime] as Timestamp?;
+      final expectedEnd = data[FirestoreFields.expectedReturnTime] as Timestamp?;
+      final actualEnd = data[FirestoreFields.actualReturnTime] as Timestamp?;
+      
+      final end = actualEnd ?? expectedEnd;
+      
+      final amountPaid = data[FirestoreFields.amountPaid] ?? 0;
+      final amountExpected = data[FirestoreFields.amountExpected] ?? 0;
+      final total = amountPaid > 0 ? amountPaid : amountExpected;
       
       reportResults.add({
-        'Customer': data['customer_name'] ?? '-',
+        'Customer': data[FirestoreFields.cachedCustomerName] ?? '-',
         'Start Date': start != null ? DateFormat('MMM d, yyyy').format(start.toDate()) : '-',
         'End Date': end != null ? DateFormat('MMM d, yyyy').format(end.toDate()) : '-',
-        'Status': (data['status'] ?? '-').toString().toUpperCase(),
-        'Total': '${shop.currency} ${data['total_amount'] ?? 0}',
+        'Status': (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
+        'Total': '${shop.currency} $total',
       });
     }
   }
 
   Future<void> _fetchDamages(DocumentReference shopDoc) async {
-    reportColumns.value = ['Item', 'Customer', 'Date', 'Status', 'Fee'];
-    Query query = shopDoc.collection(FirestoreCollections.damageReports);
+    reportColumns.value = ['Type', 'Item ID', 'Date', 'Status', 'Cost'];
+    
+    // Since damage_reports is a subcollection of rentals, we use collectionGroup
+    Query query = FirebaseFirestore.instance.collectionGroup(FirestoreCollections.damageReports);
     
     if (selectedStatus.value != 'All') {
-      query = query.where('status', isEqualTo: selectedStatus.value);
+      query = query.where(FirestoreFields.status, isEqualTo: selectedStatus.value);
     }
     
     if (startDate.value != null && endDate.value != null) {
       query = query
-        .where('date_reported', isGreaterThanOrEqualTo: startDate.value)
-        .where('date_reported', isLessThanOrEqualTo: endDate.value);
+        .where(FirestoreFields.reportedAt, isGreaterThanOrEqualTo: startDate.value)
+        .where(FirestoreFields.reportedAt, isLessThanOrEqualTo: endDate.value);
     }
     
-    final snap = await query.orderBy('date_reported', descending: true).limit(500).get();
+    final snap = await query.orderBy(FirestoreFields.reportedAt, descending: true).limit(500).get();
     
     for (var doc in snap.docs) {
+      // Filter out damages from other shops
+      if (!doc.reference.path.contains('shops/${shopDoc.id}/')) continue;
+      
       final data = doc.data() as Map<String, dynamic>;
-      final date = data['date_reported'] as Timestamp?;
+      final date = data[FirestoreFields.reportedAt] as Timestamp?;
+      
+      final estimated = data[FirestoreFields.estimatedCost] ?? 0;
+      final finalCost = data[FirestoreFields.finalCost] ?? 0;
+      final cost = finalCost > 0 ? finalCost : estimated;
       
       reportResults.add({
-        'Item': data['item_name'] ?? '-',
-        'Customer': data['customer_name'] ?? '-',
+        'Type': (data[FirestoreFields.damageType] ?? '-').toString().replaceAll('_', ' ').capitalizeFirst,
+        'Item ID': data[FirestoreFields.itemId] ?? '-',
         'Date': date != null ? DateFormat('MMM d, yyyy').format(date.toDate()) : '-',
-        'Status': (data['status'] ?? '-').toString().toUpperCase(),
-        'Fee': '${shop.currency} ${data['fee_amount'] ?? 0}',
+        'Status': (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
+        'Cost': '${shop.currency} $cost',
       });
     }
   }

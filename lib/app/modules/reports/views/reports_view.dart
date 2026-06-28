@@ -1,10 +1,11 @@
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-
 import '../controllers/reports_controller.dart';
+import '../../../../utils/common/a_app_bar.dart';
 
 class ReportsView extends GetView<ReportsController> {
   const ReportsView({super.key});
@@ -15,14 +16,22 @@ class ReportsView extends GetView<ReportsController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Reports Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+      appBar: AAppBar(
+        showbackArrow: true,
         centerTitle: true,
+        title: Text(
+          'Reports Dashboard',
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         actions: [
           Obx(() {
             if (controller.reportResults.isNotEmpty) {
               return Container(
-                margin: EdgeInsets.only(right: 16.w),
+                margin: EdgeInsets.only(right: 8.w),
                 decoration: BoxDecoration(
                   color: colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
@@ -86,116 +95,130 @@ class ReportsView extends GetView<ReportsController> {
           SizedBox(height: 16.h),
           
           // Report Type Selector
-          Obx(() => DropdownButtonFormField<ReportType>(
-            value: controller.selectedReportType.value,
-            icon: const Icon(Iconsax.arrow_bottom),
-            decoration: InputDecoration(
-              labelText: 'Select Report Type',
-              filled: true,
-              fillColor: colorScheme.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-            ),
-            items: ReportType.values.map((type) {
-              return DropdownMenuItem(
-                value: type,
-                child: Text(
-                  type.name.capitalizeFirst ?? '',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              );
-            }).toList(),
+          // Report Type Selector
+          Obx(() => CustomDropdown<ReportType>(
+            hintText: 'Select Report Type',
+            items: ReportType.values,
+            initialItem: controller.selectedReportType.value,
             onChanged: (val) {
               if (val != null) controller.changeReportType(val);
+            },
+            decoration: CustomDropdownDecoration(
+              closedFillColor: colorScheme.surface,
+              expandedFillColor: colorScheme.surface,
+              closedBorder: Border.all(color: colorScheme.outlineVariant, width: 0.5),
+              closedBorderRadius: BorderRadius.circular(12.r),
+            ),
+            headerBuilder: (context, type, _) {
+              return Text(
+                type.name.capitalizeFirst ?? '',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              );
+            },
+            listItemBuilder: (context, type, isSelected, _) {
+              return Text(
+                type.name.capitalizeFirst ?? '',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              );
             },
           )),
           
           SizedBox(height: 12.h),
           
-          Row(
-            children: [
-              // Date Range Picker
-              Expanded(
-                flex: 2,
-                child: Obx(() {
-                  final start = controller.startDate.value;
-                  final end = controller.endDate.value;
-                  final hasDates = start != null && end != null;
-                  final dateText = hasDates 
-                    ? '${DateFormat('MMM d').format(start)} - ${DateFormat('MMM d').format(end)}' 
-                    : 'Select Dates';
-                    
-                  return InkWell(
-                    onTap: () => controller.pickDateRange(context),
-                    borderRadius: BorderRadius.circular(12.r),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12.r),
+          // Date Range Picker
+          Obx(() {
+            final start = controller.startDate.value;
+            final end = controller.endDate.value;
+            final hasDates = start != null && end != null;
+            final dateText = hasDates 
+              ? '${DateFormat('MMM d').format(start)} - ${DateFormat('MMM d').format(end)}' 
+              : 'Select Dates';
+              
+            return InkWell(
+              onTap: () => controller.pickDateRange(context),
+              borderRadius: BorderRadius.circular(12.r),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: colorScheme.outlineVariant, width: 0.5),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Iconsax.calendar_1, size: 18.sp, color: colorScheme.primary),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        dateText,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: hasDates ? FontWeight.bold : FontWeight.normal,
+                          color: hasDates ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      child: Row(
-                        children: [
-                          Icon(Iconsax.calendar_1, size: 18.sp, color: colorScheme.primary),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: Text(
-                              dateText,
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                fontWeight: hasDates ? FontWeight.bold : FontWeight.normal,
-                                color: hasDates ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+          
+          // Status Dropdown
+          Obx(() {
+            final statuses = controller.availableStatuses;
+            if (statuses.length <= 1) return const SizedBox.shrink();
+            
+            return Padding(
+              padding: EdgeInsets.only(top: 12.h),
+              child: CustomDropdown<String>(
+                hintText: 'Status',
+                items: statuses,
+                initialItem: controller.selectedStatus.value,
+                onChanged: (val) {
+                  if (val != null) controller.selectedStatus.value = val;
+                },
+                decoration: CustomDropdownDecoration(
+                  closedFillColor: colorScheme.surface,
+                  expandedFillColor: colorScheme.surface,
+                  closedBorder: Border.all(color: colorScheme.outlineVariant, width: 0.5),
+                  closedBorderRadius: BorderRadius.circular(12.r),
+                  closedShadow: [],
+                  expandedShadow: [],
+                ),
+                headerBuilder: (context, status, _) {
+                  return Text(status.replaceAll('_', ' ').capitalizeFirst ?? '');
+                },
+                listItemBuilder: (context, status, isSelected, _) {
+                  final description = controller.getStatusDescription(status);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        status.replaceAll('_', ' ').capitalizeFirst ?? '',
+                        style: TextStyle(
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      if (description.isNotEmpty) ...[
+                        SizedBox(height: 2.h),
+                        Text(
+                          description,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      ],
+                    ],
                   );
-                }),
+                },
               ),
-              
-              SizedBox(width: 12.w),
-              
-              // Status Dropdown
-              Expanded(
-                flex: 1,
-                child: Obx(() {
-                  final statuses = controller.availableStatuses;
-                  if (statuses.length == 1) return const SizedBox.shrink();
-                  
-                  return DropdownButtonFormField<String>(
-                    value: controller.selectedStatus.value,
-                    isExpanded: true,
-                    icon: const Icon(Iconsax.arrow_bottom, size: 16),
-                    decoration: InputDecoration(
-                      labelText: 'Status',
-                      filled: true,
-                      fillColor: colorScheme.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
-                    ),
-                    items: statuses.map((status) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(status.capitalizeFirst ?? ''),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) controller.selectedStatus.value = val;
-                    },
-                  );
-                }),
-              ),
-            ],
-          ),
+            );
+          }),
           
           SizedBox(height: 20.h),
           

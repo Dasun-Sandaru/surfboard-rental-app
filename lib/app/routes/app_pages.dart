@@ -58,6 +58,8 @@ import '../modules/rentalDetail/bindings/rental_detail_binding.dart';
 import '../modules/rentalDetail/views/rental_detail_view.dart';
 import '../modules/rentalHistory/bindings/rental_history_binding.dart';
 import '../modules/rentalHistory/views/rental_history_view.dart';
+import '../modules/scheduledNotifications/bindings/scheduled_notifications_binding.dart';
+import '../modules/scheduledNotifications/views/scheduled_notifications_view.dart';
 import '../modules/rentalPayments/bindings/rental_payment_binding.dart';
 import '../modules/rentalPayments/views/rental_payment_view.dart';
 import '../modules/rentals/bindings/rentals_binding.dart';
@@ -326,6 +328,11 @@ class AppPages {
       name: _Paths.REPORTS,
       page: () => const ReportsView(),
       binding: ReportsBinding(),
+    ),
+    GetPage(
+      name: _Paths.SCHEDULED_NOTIFICATIONS,
+      page: () => const ScheduledNotificationsView(),
+      binding: ScheduledNotificationsBinding(),
     ),
   ];
 }

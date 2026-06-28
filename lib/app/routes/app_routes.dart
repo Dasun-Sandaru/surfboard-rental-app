@@ -45,6 +45,7 @@ abstract class Routes {
   static const RENTAL_PRICING_LOGIC = _Paths.RENTAL_PRICING_LOGIC;
   static const RENTAL_CONFIG = _Paths.RENTAL_CONFIG;
   static const REPORTS = _Paths.REPORTS;
+  static const SCHEDULED_NOTIFICATIONS = _Paths.SCHEDULED_NOTIFICATIONS;
 }
 
 abstract class _Paths {
@@ -89,4 +90,5 @@ abstract class _Paths {
   static const RENTAL_PRICING_LOGIC = '/rental-pricing-logic';
   static const RENTAL_CONFIG = '/rental-config';
   static const REPORTS = '/reports';
+  static const SCHEDULED_NOTIFICATIONS = '/scheduled-notifications';
 }
