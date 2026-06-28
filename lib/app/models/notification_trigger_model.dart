@@ -8,6 +8,8 @@ class NotificationTriggerModel {
   final String status;
   final String title;
   final String body;
+  final String customerName;
+  final String itemName;
 
   NotificationTriggerModel({
     required this.id,
@@ -17,6 +19,8 @@ class NotificationTriggerModel {
     required this.status,
     required this.title,
     required this.body,
+    required this.customerName,
+    required this.itemName,
   });
 
   factory NotificationTriggerModel.fromSnapshot(
@@ -34,6 +38,8 @@ class NotificationTriggerModel {
       status: data['status'] ?? 'pending',
       title: data['title'] ?? '',
       body: data['body'] ?? '',
+      customerName: data['customerName'] ?? '',
+      itemName: data['itemName'] ?? '',
     );
   }
 
@@ -45,6 +51,8 @@ class NotificationTriggerModel {
       'status': status,
       'title': title,
       'body': body,
+      'customerName': customerName,
+      'itemName': itemName,
     };
   }
 }

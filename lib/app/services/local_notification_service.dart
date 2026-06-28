@@ -49,7 +49,13 @@ class LocalNotificationService {
       await flutterLocalNotificationsPlugin.initialize(
         settings: initializationSettings,
         onDidReceiveNotificationResponse: (details) {
-          log("Notification Tapped: ${details.payload}");
+          log("Notification Tapped: ${details.payload}", name: 'LocalNotification');
+          final payload = details.payload;
+          if (payload != null && payload.startsWith('rental:')) {
+            final rentalId = payload.substring('rental:'.length);
+            log("Navigating to rental detail: $rentalId", name: 'LocalNotification');
+            Get.toNamed('/rental-detail', arguments: rentalId);
+          }
         },
       );
 
@@ -112,6 +118,7 @@ class LocalNotificationService {
     required String title,
     required String body,
     required DateTime scheduledDate,
+    String? payload,
   }) async {
     try {
       // Resolve timezone at schedule-time to avoid init race condition
@@ -152,22 +159,27 @@ class LocalNotificationService {
         title: title,
         body: body,
         scheduledDate: tzScheduledDate,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'rental_alerts',
             'Rental Alerts',
             channelDescription: 'Notifications for rental due times',
             importance: Importance.max,
             priority: Priority.high,
+            styleInformation: BigTextStyleInformation(
+              body,
+              contentTitle: title,
+              summaryText: 'Rental Alert',
+            ),
           ),
-          iOS: DarwinNotificationDetails(
+          iOS: const DarwinNotificationDetails(
             presentAlert: true,
             presentBadge: true,
             presentSound: true,
           ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        payload: tzScheduledDate.toIso8601String(),
+        payload: payload ?? tzScheduledDate.toIso8601String(),
       );
       
       // Save scheduled time for the UI to display

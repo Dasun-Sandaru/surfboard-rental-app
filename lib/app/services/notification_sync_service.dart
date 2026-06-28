@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../models/notification_trigger_model.dart';
 import 'local_notification_service.dart';
@@ -74,13 +75,22 @@ class NotificationSyncService extends GetxService {
     // Exact due time
     final int exactId = trigger.rentalId.hashCode ^ 1;
 
+    final timeStr = DateFormat('hh:mm a').format(trigger.expectedReturnTime.toLocal());
+    final dateStr = DateFormat('dd MMM yyyy').format(trigger.expectedReturnTime.toLocal());
+
     // Schedule exact due time notification
     if (trigger.expectedReturnTime.isAfter(now)) {
+      final overdueBody = "Rental for '${trigger.itemName.isNotEmpty ? trigger.itemName : 'Surfboard'}' is now overdue!\n\n"
+          "• Customer: ${trigger.customerName.isNotEmpty ? trigger.customerName : 'N/A'}\n"
+          "• Expected Return: $dateStr at $timeStr\n\n"
+          "Tap this alert to view rental details.";
+
       _localNotificationService.scheduleNotification(
         id: exactId,
-        title: "Overdue Rental",
-        body: trigger.body.isNotEmpty ? trigger.body : "Rental ${trigger.rentalId} is now overdue!",
+        title: "🚨 Rental Return Overdue",
+        body: overdueBody,
         scheduledDate: trigger.expectedReturnTime,
+        payload: "rental:${trigger.rentalId}",
       );
     }
 
@@ -88,13 +98,17 @@ class NotificationSyncService extends GetxService {
     final warningTime =
         trigger.expectedReturnTime.subtract(const Duration(minutes: 5));
     if (warningTime.isAfter(now)) {
+      final warningBody = "Rental for '${trigger.itemName.isNotEmpty ? trigger.itemName : 'Surfboard'}' is due in 5 minutes.\n\n"
+          "• Customer: ${trigger.customerName.isNotEmpty ? trigger.customerName : 'N/A'}\n"
+          "• Expected Return: $dateStr at $timeStr\n\n"
+          "Tap this alert to view rental details.";
+
       _localNotificationService.scheduleNotification(
         id: warningId,
-        title: "Upcoming Return",
-        body: trigger.title.isNotEmpty
-            ? trigger.title
-            : "Rental ${trigger.rentalId} is due in 5 minutes.",
+        title: "⚠️ Upcoming Return Warning",
+        body: warningBody,
         scheduledDate: warningTime,
+        payload: "rental:${trigger.rentalId}",
       );
     }
   }

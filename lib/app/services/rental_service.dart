@@ -218,13 +218,15 @@ class RentalService {
           'status': 'pending',
           'title': 'Rental Return Due',
           'body': 'Rental for ${rentalData.cachedItemName ?? "Item"} is due.',
+          'customerName': rentalData.cachedCustomerName ?? '',
+          'itemName': rentalData.cachedItemName ?? '',
         });
       });
 
       log('Rental created successfully: $rentalId', name: logName);
 
       // --- SEND EMAIL VIA RESEND ---
-      final customerSnap = await _db.collection(FirestoreCollections.customers).doc(rentalData.customerId).get();
+      final customerSnap = await _shopRef(shopId).collection(FirestoreCollections.customers).doc(rentalData.customerId).get();
       final customerEmail = customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
       final customerFirstName = customerSnap.data()?[FirestoreFields.firstName]?.toString() ?? 'Customer';
 

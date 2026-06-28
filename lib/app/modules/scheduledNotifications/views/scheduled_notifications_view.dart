@@ -55,7 +55,7 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Iconsax.notification_bing, size: 48.sp, color: colorScheme.outline),
+                Icon(Icons.notifications_active, size: 48.sp, color: colorScheme.outline),
                 SizedBox(height: 16.h),
                 Text(
                   'No scheduled notifications',

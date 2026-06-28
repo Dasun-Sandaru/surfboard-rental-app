@@ -36,7 +36,7 @@ class AlertsView extends GetView<AlertsController> {
         actions: [
           IconButton(
             onPressed: () => Get.toNamed('/scheduled-notifications'),
-            icon: Icon(Iconsax.notification_bing, color: colorScheme.primary),
+            icon: Icon(Icons.notifications_active, color: colorScheme.primary),
           ),
         ],
       ),
