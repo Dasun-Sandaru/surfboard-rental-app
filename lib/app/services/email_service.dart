@@ -11,7 +11,8 @@ class EmailService extends GetxService {
   final ShopService _shopService = Get.find<ShopService>();
 
   /// Base URL for the EmailJS API
-  static const String _emailJsUrl = 'https://api.emailjs.com/api/v1.0/email/send';
+  static const String _emailJsUrl =
+      'https://api.emailjs.com/api/v1.0/email/send';
 
   /// Sends the Agreement Email upon rental creation.
   Future<void> sendAgreementEmail({
@@ -24,7 +25,9 @@ class EmailService extends GetxService {
     if (shop == null) return;
 
     if (customerEmail.isEmpty) {
-      log('EmailService: No customer email provided. Skipping agreement email.');
+      log(
+        'EmailService: No customer email provided. Skipping agreement email.',
+      );
       return;
     }
 
@@ -100,7 +103,8 @@ class EmailService extends GetxService {
       final response = await http.post(
         Uri.parse(_emailJsUrl),
         headers: {
-          'origin': 'http://localhost', // EmailJS requires origin or content-type
+          'origin':
+              'http://localhost', // EmailJS requires origin or content-type
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -115,7 +119,10 @@ class EmailService extends GetxService {
         log('SUCCESS: Email sent to $customerEmail', name: 'EmailJS');
         log('====================================', name: 'EmailJS');
       } else {
-        log('FAILED to send email. Status: ${response.statusCode}', name: 'EmailJS');
+        log(
+          'FAILED to send email. Status: ${response.statusCode}',
+          name: 'EmailJS',
+        );
         log('Response Body: ${response.body}', name: 'EmailJS');
         log('====================================', name: 'EmailJS');
       }
@@ -130,7 +137,9 @@ class EmailService extends GetxService {
     try {
       final doc = await _shopService.getShop(shopId);
       if (doc.exists) {
-        return ShopModel.fromSnapshot(doc as DocumentSnapshot<Map<String, dynamic>>);
+        return ShopModel.fromSnapshot(
+          doc as DocumentSnapshot<Map<String, dynamic>>,
+        );
       }
     } catch (e) {
       log("EmailService: Failed to fetch shop model: $e");
