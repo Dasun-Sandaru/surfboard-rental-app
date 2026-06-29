@@ -65,7 +65,7 @@ class _CustomerRatingDialogState extends State<CustomerRatingDialog> {
             ),
             SizedBox(height: 16.h),
             Text(
-              "Rate Customer",
+              "rate_customer".tr,
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class _CustomerRatingDialogState extends State<CustomerRatingDialog> {
             ),
             SizedBox(height: 8.h),
             Text(
-              "How was your experience with ${widget.customerName}?",
+              "rate_customer_desc".trParams({'customer': widget.customerName}),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
@@ -104,7 +104,7 @@ class _CustomerRatingDialogState extends State<CustomerRatingDialog> {
               controller: _commentController,
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: "Add a note about the customer (optional)",
+                hintText: "add_note_optional".tr,
                 hintStyle: TextStyle(fontSize: 13.sp),
                 filled: true,
                 fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
@@ -124,7 +124,7 @@ class _CustomerRatingDialogState extends State<CustomerRatingDialog> {
                   child: TextButton(
                     onPressed: () => Get.back(),
                     child: Text(
-                      "Skip",
+                      "skip".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
@@ -147,8 +147,8 @@ class _CustomerRatingDialogState extends State<CustomerRatingDialog> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      "Submit",
+                    child:  Text(
+                      "submit".tr,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

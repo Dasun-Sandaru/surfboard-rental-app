@@ -200,12 +200,13 @@ class RentalService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.create_rental,
-          description: "Created rental for ${rentalData.customerId}",
+          description: 'log_rental_created',
           entityId: rentalId,
           entityType: 'Rental',
           metadata: {
             'amountExpected': rentalData.amountExpected,
             'items': rentalData.itemId,
+            'customerId': rentalData.customerId,
           },
           transaction: transaction,
         );
@@ -402,13 +403,14 @@ class RentalService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.return_rental,
-          description: "Returned rental $rentalId",
+          description: 'log_rental_returned',
           entityId: rentalId,
           entityType: 'Rental',
           metadata: {
             'itemId': itemId,
             'inventoryStatus': inventoryStatus.toString().split('.').last,
             'invoiceLink': invoiceLink,
+            'rentalId': rentalId,
           },
           transaction: transaction,
         );
@@ -559,7 +561,7 @@ class RentalService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_payment,
-          description: "Applied late fee of $amount for rental $rentalId",
+          description: 'log_applied_late_fee',
           entityId: paymentRef.id,
           entityType: 'Payment',
           metadata: {
@@ -619,7 +621,7 @@ class RentalService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.report_damage,
-          description: "Applied $damageType charge of $amount",
+          description: 'log_applied_damage_charge',
           entityId: rentalId,
           entityType: 'Rental',
           metadata: {'amount': amount, 'type': damageType},

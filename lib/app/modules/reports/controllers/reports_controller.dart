@@ -294,7 +294,15 @@ class ReportsController extends GetxController {
     }
 
     try {
-      final doc = pw.Document();
+      final fontRegular = await PdfGoogleFonts.notoSansSinhalaRegular();
+      final fontBold = await PdfGoogleFonts.notoSansSinhalaBold();
+
+      final doc = pw.Document(
+        theme: pw.ThemeData.withFont(
+          base: fontRegular,
+          bold: fontBold,
+        ),
+      );
       
       // Determine title
       String reportTitle = "Report";

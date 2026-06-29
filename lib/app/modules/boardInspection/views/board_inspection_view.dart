@@ -27,7 +27,7 @@ class BoardInspectionView extends StatelessWidget {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Inspection & Return",
+          "inspection_and_return".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -53,7 +53,7 @@ class BoardInspectionView extends StatelessWidget {
         if (rental == null) {
           return Center(
             child: Text(
-              'No rental data found.',
+              'no_rental_data_found'.tr,
               style: TextStyle(color: colorScheme.onSurface),
             ),
           );
@@ -92,7 +92,7 @@ class BoardInspectionView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              controller.timeLabel.value,
+                              controller.timeLabel.value.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 16.sp,
@@ -119,17 +119,17 @@ class BoardInspectionView extends StatelessWidget {
                     /// 3. Rental Details (From Model)
                     _buildSectionCard(
                       context,
-                      title: "Rental Details",
+                      title: "rental_details".tr,
                       children: [
                         _buildDetailRow(
                           context,
-                          "Rental ID",
+                          "rental_id".tr,
                           rental.id ?? "N/A",
                         ),
                         Obx(
                           () => _buildDetailRow(
                             context,
-                            "Customer",
+                            "customer".tr,
                             controller.customerName,
                             onTap: controller.goToCustomerDetails,
                             valueColor: colorScheme.primary,
@@ -138,7 +138,7 @@ class BoardInspectionView extends StatelessWidget {
                         Obx(
                           () => _buildDetailRow(
                             context,
-                            "Item",
+                            "item".tr,
                             controller.boardName,
                             onTap: controller.goToItemDetails,
                             valueColor: colorScheme.primary,
@@ -146,17 +146,17 @@ class BoardInspectionView extends StatelessWidget {
                         ),
                         _buildDetailRow(
                           context,
-                          "Start Time",
+                          "start_time".tr,
                           AFormatter.formatDateWithFormat(rental.startTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
                         ),
                         _buildDetailRow(
                           context,
-                          "Expected Return",
+                          "expected_return".tr,
                           AFormatter.formatDateWithFormat(rental.expectedReturnTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
                         ),
                         _buildDetailRow(
                           context,
-                          "Rate",
+                          "rate".tr,
                           "${AFormatter.formatCurrency(rental.rate, currencyCodeOverride: rental.currency)}/hr",
                           isLast: true,
                         ),
@@ -168,7 +168,7 @@ class BoardInspectionView extends StatelessWidget {
                     /// 2. Payment Info
                     _buildSectionCard(
                       context,
-                      title: "Payment Info",
+                      title: "payment_info".tr,
                       navigateTo: Routes.PAYMENTS,
                       arguments: {
                         'rentalId': rental.id,
@@ -179,7 +179,7 @@ class BoardInspectionView extends StatelessWidget {
                           children: [
                             _buildHighlightRow(
                               context,
-                              "Security Deposit",
+                              "security_deposit".tr,
                               AFormatter.formatCurrency(rental.securityDeposit.amount, currencyCodeOverride: rental.currency),
                               Iconsax.lock,
                               statusColors?.warning ?? Colors.orange,
@@ -187,7 +187,7 @@ class BoardInspectionView extends StatelessWidget {
                             Divider(color: colorScheme.outline, height: 24.h),
                             Obx(() => _buildHighlightRow(
                               context,
-                              "Balance Due",
+                              "balance_due".tr,
                               AFormatter.formatCurrency(controller.balanceDue, currencyCodeOverride: rental.currency),
                               Iconsax.money_tick,
                               controller.balanceDue > 0
@@ -236,7 +236,7 @@ class BoardInspectionView extends StatelessWidget {
                               elevation: 0,
                             ),
                             child: Text(
-                              "Report Damage",
+                              "report_damage".tr,
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
@@ -263,7 +263,7 @@ class BoardInspectionView extends StatelessWidget {
                             elevation: 4,
                           ),
                           child: Text(
-                            "Confirm Return",
+                            "confirm_return".tr,
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
@@ -320,7 +320,7 @@ class BoardInspectionView extends StatelessWidget {
                 InkWell(
                   onTap: () => Get.toNamed(navigateTo, arguments: arguments),
                   child: Text(
-                    'View Details',
+                    'view_details'.tr,
                     style: TextStyle(color: colorScheme.primary),
                   ),
                 ),

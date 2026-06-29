@@ -33,7 +33,7 @@ class BoardInspectionController extends GetxController {
 
   // For the real-time countdown timer
   Timer? _timer;
-  final RxString timeLabel = "Time Remaining".obs;
+  final RxString timeLabel = "time_remaining".obs;
   final RxString timeRemaining = "00:00:00".obs;
   final Rx<Color> timeColor = Rx<Color>(Colors.white);
 
@@ -154,7 +154,7 @@ class BoardInspectionController extends GetxController {
     double calculatedLateFee = 0;
 
     // 1. Check if overdue
-    if (timeLabel.value == "Overdue") {
+    if (timeLabel.value == "overdue") {
       final now = DateTime.now();
       final difference = r.expectedReturnTime.difference(now).abs();
 
@@ -218,12 +218,12 @@ class BoardInspectionController extends GetxController {
 
     if (difference.isNegative) {
       // Overdue
-      timeLabel.value = "Overdue";
+      timeLabel.value = "overdue";
       timeColor.value = colorScheme.error;
       timeRemaining.value = _formatDuration(difference.abs());
     } else {
       // Time Remaining
-      timeLabel.value = "Time Remaining";
+      timeLabel.value = "time_remaining";
       timeColor.value = statusColors?.success ?? Colors.green;
       timeRemaining.value = _formatDuration(difference);
     }
@@ -280,7 +280,7 @@ class BoardInspectionController extends GetxController {
 
       // Only save overdue time if it's actually overdue
       String? overdueString;
-      if (timeLabel.value == "Overdue") {
+      if (timeLabel.value == "overdue") {
         overdueString = timeRemaining.value;
       }
 

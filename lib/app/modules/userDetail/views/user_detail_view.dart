@@ -552,7 +552,14 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
     final month = DateFormat('MMM').format(date);
     final time = DateFormat('hh:mm a').format(date);
 
-    String title = logModel.description;
+    Map<String, String> stringMetadata = {};
+    if (logModel.metadata != null) {
+      logModel.metadata!.forEach((key, value) {
+        stringMetadata[key] = value.toString();
+      });
+    }
+
+    String title = logModel.description.trParams(stringMetadata);
     String badgeText = "activity_label".tr;
     Color badgeColor = colorScheme.primary.withValues(alpha: 0.1);
     Color badgeTextColor = colorScheme.primary;

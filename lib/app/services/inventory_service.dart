@@ -167,10 +167,12 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_inventory,
-          description:
-              "Added inventory item: ${data[FirestoreFields.name] ?? 'Unknown'}",
+          description: 'log_add_inventory',
           entityId: docRef.id,
           entityType: 'Inventory',
+          metadata: {
+            'itemName': data[FirestoreFields.name] ?? 'Unknown',
+          },
           transaction: transaction,
         );
       });
@@ -209,9 +211,12 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.update_inventory,
-          description: "Updated inventory item details: $itemId",
+          description: 'log_update_inventory',
           entityId: itemId,
           entityType: 'Inventory',
+          metadata: {
+            'itemId': itemId,
+          },
           transaction: transaction,
         );
       });
@@ -243,9 +248,12 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.delete_inventory,
-          description: "Deleted inventory item: $itemId",
+          description: 'log_delete_inventory',
           entityId: itemId,
           entityType: 'Inventory',
+          metadata: {
+            'itemId': itemId,
+          },
           transaction: transaction,
         );
       });
@@ -281,7 +289,7 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.update_inventory,
-          description: "Updated inventory status to $status",
+          description: 'log_update_inventory_status',
           entityId: itemId,
           entityType: 'Inventory',
           metadata: {'status': status},

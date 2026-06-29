@@ -39,10 +39,12 @@ class CustomerService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_customer,
-          description:
-              "Added customer ${customerData.firstName} ${customerData.lastName}",
+          description: 'log_add_customer',
           entityId: docRef.id,
           entityType: 'Customer',
+          metadata: {
+            'customerName': '${customerData.firstName} ${customerData.lastName}',
+          },
           transaction: transaction,
         );
       });
@@ -131,9 +133,12 @@ class CustomerService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.undefined, // or delete_customer if enum exists
-          description: "Deleted customer $customerId",
+          description: 'log_delete_customer',
           entityId: customerId,
           entityType: 'Customer',
+          metadata: {
+            'customerId': customerId,
+          },
           transaction: transaction,
         );
       });

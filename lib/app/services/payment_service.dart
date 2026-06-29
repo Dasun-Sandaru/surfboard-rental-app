@@ -117,8 +117,7 @@ class PaymentService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_payment,
-          description:
-              "${isCharge ? 'Applied charge' : 'Recorded payment'} of $amount ($category)",
+          description: isCharge ? 'log_applied_charge' : 'log_recorded_payment',
           entityId: paymentDocRef.id,
           entityType: 'Payment',
           metadata: {
@@ -242,7 +241,7 @@ class PaymentService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.delete_payment,
-          description: "Deleted payment $paymentId ($amountToReverse)",
+          description: 'log_delete_payment',
           entityId: paymentId,
           entityType: 'Payment',
           metadata: {'rentalId': rentalId, 'amountReversed': amountToReverse},
