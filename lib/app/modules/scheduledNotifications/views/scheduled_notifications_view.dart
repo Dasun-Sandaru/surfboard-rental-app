@@ -19,7 +19,7 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
       appBar: AAppBar(
         showbackArrow: true,
         title: Text(
-          'Scheduled Notifications',
+          'scheduled_notifications'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -32,10 +32,10 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
             onPressed: () {
               showAppConfirmation(
                 context: context,
-                title: 'Cancel All',
-                message: 'Are you sure you want to cancel all scheduled notifications?',
-                confirmText: 'Yes',
-                cancelText: 'No',
+                title: 'cancel_all'.tr,
+                message: 'cancel_all_notifications_confirm'.tr,
+                confirmText: 'yes'.tr,
+                cancelText: 'no'.tr,
                 onConfirm: () {
                   controller.cancelAllNotifications();
                 },
@@ -57,7 +57,7 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                 Icon(Icons.notifications_active, size: 48.sp, color: colorScheme.outline),
                 SizedBox(height: 16.h),
                 Text(
-                  'No scheduled notifications',
+                  'no_scheduled_notifications'.tr,
                   style: TextStyle(
                     fontSize: 16.sp,
                     color: colorScheme.onSurfaceVariant,
@@ -105,7 +105,7 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                             children: [
                               Expanded(
                                 child: Text(
-                                  req.title ?? 'No Title',
+                                  req.title ?? 'no_title'.tr,
                                   style: TextStyle(
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w600,
@@ -114,7 +114,7 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                                 ),
                               ),
                               Text(
-                                'ID: ${req.id}',
+                                '${'id'.tr}: ${req.id}',
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   color: colorScheme.primary,
@@ -124,8 +124,8 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                             ],
                           ),
                           SizedBox(height: 4.h),
-                          Text(
-                            req.body ?? 'No Body',
+                           Text(
+                            req.body ?? 'no_body'.tr,
                             style: TextStyle(
                               fontSize: 13.sp,
                               color: colorScheme.onSurfaceVariant,
@@ -149,7 +149,7 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                                       return DateFormat('MMM d, y, h:mm a').format(payloadDate);
                                     }
                                   } catch (_) {}
-                                  return 'Unknown Time';
+                                  return 'unknown_time'.tr;
                                 }(),
                                 style: TextStyle(
                                   fontSize: 12.sp,
@@ -170,10 +170,10 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
                       onPressed: () {
                         showAppConfirmation(
                           context: context,
-                          title: 'Cancel Notification',
-                          message: 'Are you sure you want to cancel this notification?',
-                          confirmText: 'Yes',
-                          cancelText: 'No',
+                          title: 'cancel_notification'.tr,
+                          message: 'cancel_notification_confirm'.tr,
+                          confirmText: 'yes'.tr,
+                          cancelText: 'no'.tr,
                           onConfirm: () {
                             controller.cancelNotification(req.id);
                           },

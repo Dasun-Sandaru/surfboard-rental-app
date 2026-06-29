@@ -23,7 +23,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
         title: Text(
-          "Rental Pricing Logic",
+          'rental_pricing'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -35,7 +35,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                 TextButton(
                   onPressed: controller.saveRentalConfig,
                   child: Text(
-                    "Save",
+                    'save'.tr,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -54,15 +54,15 @@ class RentalPricingLogicView extends GetView<SettingsController> {
             children: [
               _buildExplanationCard(
                 context,
-                title: "Hourly Grace Period",
+                title: 'hourly_grace_period_title'.tr,
                 description:
-                    "The grace period allowed after an hour has passed before charging for the next hour.",
+                    'hourly_grace_description'.tr,
                 example:
-                    "Example: If set to 15 minutes.\nRent Start: 10:00 AM\nReturn: 11:14 AM -> Charged for 1 Hour\nReturn: 11:16 AM -> Charged for 2 Hours",
+                    'hourly_grace_example'.tr,
                 child: _buildTextField(
                   context,
                   controller: controller.hourlyGracePeriodController,
-                  label: "Minutes",
+                  label: 'minutes'.tr,
                   hintText: "e.g. 15",
                   icon: Iconsax.clock,
                   inputType: TextInputType.number,
@@ -72,15 +72,15 @@ class RentalPricingLogicView extends GetView<SettingsController> {
               SizedBox(height: 16.h),
               _buildExplanationCard(
                 context,
-                title: "Daily Grace Period",
+                title: 'daily_grace_period_title'.tr,
                 description:
-                    "The grace period allowed after a 24-hour cycle before charging for the next day.",
+                    'daily_grace_description'.tr,
                 example:
-                    "Example: If set to 1 hour.\nRent Start: Today 10:00 AM\nReturn: Tomorrow 11:00 AM -> Charged for 1 Day\nReturn: Tomorrow 11:01 AM -> Charged for 2 Days",
+                    'daily_grace_example'.tr,
                 child: _buildTextField(
                   context,
                   controller: controller.dailyGracePeriodController,
-                  label: "Hours",
+                  label: 'hours'.tr,
                   hintText: "e.g. 1",
                   icon: Iconsax.clock,
                   inputType: TextInputType.number,
@@ -90,16 +90,16 @@ class RentalPricingLogicView extends GetView<SettingsController> {
               SizedBox(height: 16.h),
               _buildExplanationCard(
                 context,
-                title: "Tax Configuration",
-                description: "Apply a percentage tax to the final rental total.",
+                title: 'tax_config'.tr,
+                description: 'tax_description'.tr,
                 example:
-                    "Example: If rate = 10% and Total = \$100\nFinal Amount = \$110",
+                    'tax_example'.tr,
                 child: Column(
                   children: [
                     Obx(
                       () => SwitchListTile(
                         title: Text(
-                          "Enable Tax",
+                          'enable_tax_label'.tr,
                           style: TextStyle(
                             color: colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
@@ -120,7 +120,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                               child: _buildTextField(
                                 context,
                                 controller: controller.taxRateController,
-                                label: "Tax Rate (%)",
+                                label: 'tax_rate'.tr,
                                 hintText: "e.g. 5.0",
                                 icon: Iconsax.percentage_square,
                                 inputType: TextInputType.numberWithOptions(
@@ -276,7 +276,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Pricing Simulator",
+            'pricing_simulator'.tr,
             style: TextStyle(
               color: colorScheme.primary,
               fontSize: 16.sp,
@@ -291,7 +291,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
               Expanded(
                 child: Obx(
                   () => CustomDropdown<RentType>(
-                    hintText: 'Select Type',
+                    hintText: 'select_type'.tr,
                     items: RentType.values,
                     initialItem: controller.simRentType.value,
                     onChanged: (val) {
@@ -329,7 +329,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: Text("Test"),
+                child: Text('test'.tr),
               ),
             ],
           ),
@@ -343,7 +343,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   Expanded(
                     child: _buildSimulatorInput(
                       context,
-                      label: "Days",
+                      label: 'days'.tr,
                       value: controller.simDurationDays,
                     ),
                   ),
@@ -351,7 +351,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   Expanded(
                     child: _buildSimulatorInput(
                       context,
-                      label: "Hours",
+                      label: 'hours'.tr,
                       value: controller.simDurationHours,
                     ),
                   ),
@@ -359,7 +359,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   Expanded(
                     child: _buildSimulatorInput(
                       context,
-                      label: "Minutes",
+                      label: 'minutes'.tr,
                       value: controller.simDurationMinutes,
                     ),
                   ),
@@ -371,7 +371,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   Expanded(
                     child: _buildSimulatorInput(
                       context,
-                      label: "Hours",
+                      label: 'hours'.tr,
                       value: controller.simDurationHours,
                     ),
                   ),
@@ -379,7 +379,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   Expanded(
                     child: _buildSimulatorInput(
                       context,
-                      label: "Minutes",
+                      label: 'minutes'.tr,
                       value: controller.simDurationMinutes,
                     ),
                   ),
@@ -397,7 +397,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Estimated Total:",
+                'estimated_total'.tr,
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,

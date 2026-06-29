@@ -58,7 +58,11 @@ class AuthController extends GetxController {
         _authService.signOut();
         return;
       }
-      rethrow;
+      // For network errors or other exceptions, we don't rethrow.
+      // This prevents the app from getting stuck and allows it to proceed
+      // using the cached user state.
+    } catch (e) {
+      // Catch any other exceptions to ensure smooth routing
     }
 
     final isVerified = user.emailVerified;

@@ -105,13 +105,9 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                 _buildDetailRow(context, "item_id".tr, item.id),
                 _buildDetailRow(
                   context,
-                  "name".tr,
+                  "board_name".tr,
                   item.name,
-                ), // Added 'name' key? Ah I added 'full_name' and 'enter_name'. I should use 'shop_details_sub' which has 'Name'. Or just 'Name'. I'll add 'name': 'Name' to app_translations if missing. I have 'enter_name'. I'll use 'full_name' or just 'Name'. I'll use 'name' and add it if missing, or use 'full_name' as a fallback? 'full_name' is "Full Name". "Name" is just "Name".
-                // I'll check if 'name' key exists previously. I saw 'shop_details_sub': 'Name, Location...'.
-                // I'll use "name" key and add it to app_translations in next batch if needed. Actually 'name' is very common.
-                // I will add 'name': 'Name' now to app_translations in next step.
-                // For now in this file I'll use "name".tr.
+                ),
                 _buildDetailRow(context, "brand".tr, item.brand),
                 _buildDetailRow(context, "color".tr, item.color),
                 _buildDetailRow(context, "type".tr, item.type),

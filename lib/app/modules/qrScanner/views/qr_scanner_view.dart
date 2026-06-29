@@ -92,7 +92,7 @@ class QrScannerView extends GetView<QrScannerController> {
             child: Column(
               children: [
                 Text(
-                  'Scan QR Code',
+                  'scan_qr_code'.tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24.sp,
@@ -101,7 +101,7 @@ class QrScannerView extends GetView<QrScannerController> {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Align QR code within the frame',
+                  'align_qr_frame'.tr,
                   style: TextStyle(color: Colors.white70, fontSize: 14.sp),
                 ),
               ],
@@ -147,7 +147,7 @@ class QrScannerView extends GetView<QrScannerController> {
 
                           // Title
                           Text(
-                            'QR Code Scanned',
+                            'qr_code_scanned'.tr,
                             style: TextStyle(
                               color: colorScheme.onSurface,
                               fontSize: 18.sp,
@@ -209,7 +209,7 @@ class QrScannerView extends GetView<QrScannerController> {
                                     ),
                                   ),
                                   child: Text(
-                                    'Scan Again',
+                                    'scan_again'.tr,
                                     style: TextStyle(
                                       color: colorScheme.onSurface,
                                       fontSize: 16.sp,
@@ -239,7 +239,7 @@ class QrScannerView extends GetView<QrScannerController> {
                                     elevation: 0,
                                   ),
                                   child: Text(
-                                    'Use Value',
+                                    'use_value'.tr,
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,

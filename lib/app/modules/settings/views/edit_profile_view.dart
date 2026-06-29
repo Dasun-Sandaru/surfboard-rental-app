@@ -26,7 +26,7 @@ class EditProfileView extends GetView<SettingsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Edit Profile",
+          'edit_profile'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -118,24 +118,24 @@ class EditProfileView extends GetView<SettingsController> {
               SizedBox(height: 40.h),
 
               /// 2. Input Fields
-              _buildLabel(context, "Full Name"),
+              _buildLabel(context, 'full_name'.tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
                 controller: controller.nameController,
-                hintText: "Enter your full name",
+                hintText: 'enter_full_name'.tr,
                 icon: Iconsax.user,
-                validator: (value) => AValidator.validateText(value, 'Name'),
+                validator: (value) => AValidator.validateText(value, 'full_name'.tr),
               ),
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Phone Number"),
+              _buildLabel(context, 'phone_number'.tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
                 controller: controller.phoneController,
-                hintText: "Enter phone number",
+                hintText: 'enter_phone'.tr,
                 icon: Iconsax.call,
                 inputType: TextInputType.phone,
                 validator: (value) => AValidator.validatePhoneNumber(value),
@@ -143,12 +143,12 @@ class EditProfileView extends GetView<SettingsController> {
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Email Address"),
+              _buildLabel(context, 'email_address'.tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
                 controller: controller.emailController,
-                hintText: "Enter email address",
+                hintText: 'enter_email'.tr,
                 icon: Iconsax.sms,
                 inputType: TextInputType.emailAddress,
                 enabled: false, // Emails are often non-editable
@@ -176,7 +176,7 @@ class EditProfileView extends GetView<SettingsController> {
                     shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                   ),
                   child: Text(
-                    "Save Changes",
+                    'save_changes'.tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,

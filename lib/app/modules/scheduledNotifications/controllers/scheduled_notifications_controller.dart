@@ -26,7 +26,7 @@ class ScheduledNotificationsController extends GetxController {
       log("Notifications : ${notifications.length}");
       pendingNotifications.assignAll(notifications);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch scheduled notifications');
+      Get.snackbar('error'.tr, 'failed_to_fetch_notifications'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -44,12 +44,12 @@ class ScheduledNotificationsController extends GetxController {
   Future<void> cancelNotification(int id) async {
     await _notificationService.cancelNotification(id);
     fetchPendingNotifications();
-    Get.snackbar('Success', 'Notification $id cancelled');
+    Get.snackbar('success'.tr, '${'notification_cancelled'.tr} $id');
   }
 
   Future<void> cancelAllNotifications() async {
     await _notificationService.cancelAllNotifications();
     fetchPendingNotifications();
-    Get.snackbar('Success', 'All notifications cancelled');
+    Get.snackbar('success'.tr, 'all_notifications_cancelled'.tr);
   }
 }

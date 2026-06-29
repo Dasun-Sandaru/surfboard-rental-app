@@ -363,7 +363,7 @@ class InventoryListView extends StatelessWidget {
         return Obx(() {
           final isSelected = controller.selectedSurfboardTypes.contains(type);
           return FilterChip(
-            label: Text(type.name),
+            label: Text(type.name.tr),
             selected: isSelected,
             onSelected: (_) => controller.toggleSurfboardType(type),
           );
@@ -383,7 +383,7 @@ class InventoryListView extends StatelessWidget {
         return Obx(() {
           final isSelected = controller.selectedStatuses.contains(status);
           return FilterChip(
-            label: Text(status.name),
+            label: Text(status.name.tr),
             selected: isSelected,
             onSelected: (_) => controller.toggleStatus(status),
           );
@@ -519,7 +519,7 @@ class InventoryListView extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    item.status.name.toUpperCase(),
+                    item.status.name.tr.toUpperCase(),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 12.sp,

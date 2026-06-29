@@ -3,8 +3,7 @@ import 'package:get/get.dart';
 class AValidator {
   static String? validateText(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      // return 'field_required'.trParams({'field': fieldName});
-      return '$fieldName is required';
+      return '$fieldName ${'is_required'.tr}';
     }
 
     return null;

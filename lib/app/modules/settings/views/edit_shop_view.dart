@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../data/firestore/firestore_fields.dart';
 import '../../../../utils/constants/a_sizes.dart';
 
@@ -27,7 +26,7 @@ class EditShopView extends GetView<SettingsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Edit Shop Details",
+          'edit_shop_details'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -89,7 +88,7 @@ class EditShopView extends GetView<SettingsController> {
                           ),
                           SizedBox(height: 12.h),
                           SelectableText(
-                            'ID: $shopId',
+                            '${'id'.tr}: $shopId',
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontSize: 12.sp,
@@ -105,42 +104,42 @@ class EditShopView extends GetView<SettingsController> {
                 SizedBox(height: 40.h),
 
                 /// Shop Name
-                _buildLabel(context, "Shop Name"),
+                _buildLabel(context, 'shop_name'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopNameController,
-                  hintText: "Enter shop name",
+                  hintText: 'enter_shop_name'.tr,
                   icon: Iconsax.shop,
                   enabled: canEdit,
                   validator: (value) =>
-                      AValidator.validateText(value, 'Shop Name'),
+                      AValidator.validateText(value, 'shop_name'.tr),
                 ),
 
                 SizedBox(height: 20.h),
 
                 /// Location
-                _buildLabel(context, "Location"),
+                _buildLabel(context, 'location'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopLocationController,
-                  hintText: "Enter shop location",
+                  hintText: 'enter_location'.tr,
                   icon: Iconsax.location,
                   enabled: canEdit,
                   validator: (value) =>
-                      AValidator.validateText(value, 'Location'),
+                      AValidator.validateText(value, 'location'.tr),
                 ),
 
                 SizedBox(height: 20.h),
 
                 /// Shop Contact Number
-                _buildLabel(context, "Shop Contact Number"),
+                _buildLabel(context, 'shop_contact_number'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopContactController,
-                  hintText: "Enter shop contact number",
+                  hintText: 'enter_shop_contact'.tr,
                   icon: Iconsax.call,
                   enabled: canEdit,
                   validator: (value) => AValidator.validatePhoneNumber(value),
@@ -149,12 +148,12 @@ class EditShopView extends GetView<SettingsController> {
                 SizedBox(height: 20.h),
 
                 /// Shop Email (For Reply-To)
-                _buildLabel(context, "Shop Reply-To Email"),
+                _buildLabel(context, 'shop_reply_to_email'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopEmailController,
-                  hintText: "Enter shop email",
+                  hintText: 'enter_shop_email'.tr,
                   icon: Iconsax.sms,
                   enabled: canEdit,
                   inputType: TextInputType.emailAddress,
@@ -184,7 +183,7 @@ class EditShopView extends GetView<SettingsController> {
                         shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                       ),
                       child: Text(
-                        "Save Changes",
+                        'save_changes'.tr,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,

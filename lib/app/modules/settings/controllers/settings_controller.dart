@@ -229,38 +229,38 @@ class SettingsController extends GetxController {
   }.obs;
 
   final Map<String, String> accessRouteLabels = {
-    'new_rental': 'New Rental',
-    'rentals': 'Active Rentals',
-    'rental_history': 'Rental History',
-    'alerts': 'Alerts & Notifications',
-    'qr_scanner': 'QR Scanner',
+    'new_rental': 'new_rental',
+    'rentals': 'active_rentals',
+    'rental_history': 'rental_history',
+    'alerts': 'alerts_notifications',
+    'qr_scanner': 'qr_scanner',
 
-    'inventory_view': 'View Inventory',
-    'inventory_view_damage_fees': 'View Damage Fees',
-    'inventory_add': 'Add Items',
-    'inventory_edit': 'Edit Items',
-    'inventory_delete': 'Delete Items',
+    'inventory_view': 'inventory_view',
+    'inventory_view_damage_fees': 'inventory_view_damage_fees',
+    'inventory_add': 'inventory_add',
+    'inventory_edit': 'inventory_edit',
+    'inventory_delete': 'inventory_delete',
 
-    'customers_view': 'View Customers',
-    'customers_add': 'Add Customers',
-    'customers_edit': 'Edit Customers',
-    'customer_contact': 'Contact Customers (Call/Msg/Email)',
+    'customers_view': 'customers_view',
+    'customers_add': 'customers_add',
+    'customers_edit': 'customers_edit',
+    'customer_contact': 'customer_contact',
 
-    'payments': 'Payments & Transactions',
-    'damage_fee': 'Damage Fee Configuration',
-    'reports': 'Reports & Analytics',
+    'payments': 'payments_transactions',
+    'damage_fee': 'damage_fee_config',
+    'reports': 'reports_analytics',
 
-    'manage_users': 'Manage Users',
+    'manage_users': 'manage_users',
 
-    'settings_view_shop': 'View Shop Details',
-    'settings_edit_shop': 'Edit Shop Details',
-    'settings_edit_currency': 'Edit Currency',
-    'settings_edit_date_format': 'Edit Date Format',
-    'settings_edit_timezone': 'Edit Time Zone',
-    'settings_edit_rental_logic': 'Edit Rental Pricing Logic',
-    'settings_manage_access': 'Manage Access Rules',
-    'shop_setup': 'Shop Configuration',
-    'agreement_template': 'Agreement Templates',
+    'settings_view_shop': 'settings_view_shop',
+    'settings_edit_shop': 'settings_edit_shop',
+    'settings_edit_currency': 'settings_edit_currency',
+    'settings_edit_date_format': 'settings_edit_date_format',
+    'settings_edit_timezone': 'settings_edit_timezone',
+    'settings_edit_rental_logic': 'settings_edit_rental_logic',
+    'settings_manage_access': 'settings_manage_access',
+    'shop_setup': 'shop_setup_label',
+    'agreement_template': 'agreement_template_label',
   };
 
   final List<Map<String, dynamic>> accessGroups = [
@@ -285,7 +285,7 @@ class SettingsController extends GetxController {
       ],
     },
     {
-      'title': 'Customer Management',
+      'title': 'customer_management',
       'keys': [
         'customers_view',
         'customers_add',
@@ -444,7 +444,10 @@ class SettingsController extends GetxController {
     final newPhone = phoneController.text.trim();
 
     if (newName.isEmpty) {
-      AppSnackBar.error(title: "Error", message: "Name cannot be empty");
+      AppSnackBar.error(
+        title: "error".tr,
+        message: "name_required".tr,
+      );
       return;
     }
 
@@ -460,12 +463,15 @@ class SettingsController extends GetxController {
         Get.back(); // Close Edit Profile View
         _loadData(); // Refresh data
         AppSnackBar.success(
-          title: "Success",
-          message: "Profile updated successfully",
+          title: "success".tr,
+          message: "profile_updated".tr,
         );
       }
     } catch (e) {
-      AppSnackBar.error(title: "Update Failed", message: e.toString());
+      AppSnackBar.error(
+        title: "update_failed".tr,
+        message: e.toString(),
+      );
     }
   }
 
@@ -493,14 +499,17 @@ class SettingsController extends GetxController {
     final canEdit = staffAccessRules['settings_edit_shop'] ?? false;
     if (!canEdit) {
       AppSnackBar.error(
-        title: "Access Denied",
-        message: "You don't have permission to edit shop details",
+        title: "access_denied".tr,
+        message: "access_denied_msg".tr,
       );
       return;
     }
 
     if (newName.isEmpty) {
-      AppSnackBar.error(title: "Error", message: "Shop Name cannot be empty");
+      AppSnackBar.error(
+        title: "error".tr,
+        message: "shop_name_required".tr,
+      );
       return;
     }
 
@@ -517,20 +526,23 @@ class SettingsController extends GetxController {
         Get.back();
         _loadData();
         AppSnackBar.success(
-          title: "Success",
-          message: "Shop details updated successfully",
+          title: "success".tr,
+          message: "shop_details_updated".tr,
         );
       }
     } catch (e) {
-      AppSnackBar.error(title: "Update Failed", message: e.toString());
+      AppSnackBar.error(
+        title: "update_failed".tr,
+        message: e.toString(),
+      );
     }
   }
 
   Future<void> saveRentalConfig() async {
     if (!hasPermission('settings_edit_rental_logic')) {
       AppSnackBar.error(
-        title: "Access Denied",
-        message: "You don't have permission to edit rental configuration",
+        title: "access_denied".tr,
+        message: "edit_rental_logic_denied".tr,
       );
       return;
     }
@@ -572,13 +584,13 @@ class SettingsController extends GetxController {
       Get.back(); // Close dialog or view
       _loadData();
       AppSnackBar.success(
-        title: "Success",
-        message: "Rental configuration updated",
+        title: "success".tr,
+        message: "rental_config_updated".tr,
       );
     } catch (e) {
       AppSnackBar.error(
-        title: "Error",
-        message: "Failed to save configuration",
+        title: "error".tr,
+        message: "failed_to_save_config".tr,
       );
     }
   }
@@ -933,8 +945,8 @@ class SettingsController extends GetxController {
   Future<void> toggleAccess(String key, bool value) async {
     if (!hasPermission('settings_manage_access')) {
       AppSnackBar.error(
-        title: "Access Denied",
-        message: "You don't have permission to manage access rules",
+        title: "access_denied".tr,
+        message: "manage_access_denied_msg".tr,
       );
       return;
     }
@@ -954,7 +966,10 @@ class SettingsController extends GetxController {
         _configService.updateAccessRules(staffAccessRules);
       }
     } catch (e) {
-      AppSnackBar.error(title: "Error", message: "Failed to save access rule");
+      AppSnackBar.error(
+        title: "error".tr,
+        message: "failed_save_access_rule".tr,
+      );
       // Revert on failure
       staffAccessRules[key] = !value;
     }

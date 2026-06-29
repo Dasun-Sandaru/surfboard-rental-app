@@ -87,7 +87,7 @@ class AccessControlView extends GetView<SettingsController> {
                                     ),
                                   ),
                                   title: Text(
-                                    label,
+                                    label.tr,
                                     style: TextStyle(
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w500,

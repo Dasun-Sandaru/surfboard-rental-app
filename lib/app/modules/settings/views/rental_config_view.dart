@@ -24,7 +24,7 @@ class RentalConfigView extends GetView<SettingsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Rental & Pricing",
+          'rental_pricing_title'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -35,7 +35,7 @@ class RentalConfigView extends GetView<SettingsController> {
           TextButton(
             onPressed: controller.saveRentalConfig,
             child: Text(
-              "Save",
+              'save'.tr,
               style: TextStyle(
                 color: colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -52,62 +52,62 @@ class RentalConfigView extends GetView<SettingsController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader(context, "Default Pricing"),
+              _buildSectionHeader(context, 'default_pricing'.tr),
               SizedBox(height: 12.h),
               _buildTextField(
                 context,
                 controller: controller.defaultHourlyRateController,
-                label: "Default Hourly Rate",
+                label: 'default_hourly_rate'.tr,
                 hintText: "0.00",
                 icon: Iconsax.timer_1,
                 inputType: TextInputType.numberWithOptions(decimal: true),
                 validator: (value) =>
-                    AValidator.validateNumber(value, "Hourly Rate"),
+                    AValidator.validateNumber(value, 'default_hourly_rate'.tr),
               ),
               SizedBox(height: 16.h),
               _buildTextField(
                 context,
                 controller: controller.defaultDailyRateController,
-                label: "Default Daily Rate",
+                label: 'default_daily_rate'.tr,
                 hintText: "0.00",
                 icon: Iconsax.calendar_1,
                 inputType: TextInputType.numberWithOptions(decimal: true),
                 validator: (value) =>
-                    AValidator.validateNumber(value, "Daily Rate"),
+                    AValidator.validateNumber(value, 'default_daily_rate'.tr),
               ),
 
               SizedBox(height: 16.h),
               _buildTextField(
                 context,
                 controller: controller.hourlyGracePeriodController,
-                label: "Hourly Grace Period (Minutes)",
+                label: 'hourly_grace_period'.tr,
                 hintText: "e.g. 15",
                 icon: Iconsax.clock,
                 inputType: TextInputType.number,
                 validator: (value) =>
-                    AValidator.validateNumber(value, "Hourly Grace Period"),
+                    AValidator.validateNumber(value, 'hourly_grace_period'.tr),
               ),
               SizedBox(height: 16.h),
               _buildTextField(
                 context,
                 controller: controller.dailyGracePeriodController,
-                label: "Daily Grace Period (Hours)",
+                label: 'daily_grace_period'.tr,
                 hintText: "e.g. 1",
                 icon: Iconsax.clock,
                 inputType: TextInputType.number,
                 validator: (value) =>
-                    AValidator.validateNumber(value, "Daily Grace Period"),
+                    AValidator.validateNumber(value, 'daily_grace_period'.tr),
               ),
 
               SizedBox(height: 32.h),
-              _buildSectionHeader(context, "Tax & Fees"),
+              _buildSectionHeader(context, 'tax_fees'.tr),
               SizedBox(height: 12.h),
 
               // Tax Toggle
               Obx(
                 () => SwitchListTile(
                   title: Text(
-                    "Enable Tax Calculation",
+                    'enable_tax'.tr,
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   value: controller.isTaxEnabled.value,
@@ -123,21 +123,21 @@ class RentalConfigView extends GetView<SettingsController> {
                     ? _buildTextField(
                         context,
                         controller: controller.taxRateController,
-                        label: "Tax Rate (%)",
+                        label: 'tax_rate'.tr,
                         hintText: "e.g. 5.0",
                         icon: Iconsax.percentage_square,
                         inputType: TextInputType.numberWithOptions(
                           decimal: true,
                         ),
                         validator: (value) =>
-                            AValidator.validateNumber(value, "Tax Rate"),
+                            AValidator.validateNumber(value, 'tax_rate'.tr),
                       )
                     : SizedBox.shrink(),
               ),
 
               SizedBox(height: 32.h),
 
-              _buildSectionHeader(context, "Pricing Simulator"),
+              _buildSectionHeader(context, 'pricing_simulator'.tr),
               SizedBox(height: 12.h),
               Container(
                 padding: EdgeInsets.all(16),
@@ -150,7 +150,7 @@ class RentalConfigView extends GetView<SettingsController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Test your pricing logic before saving:",
+                      'test_pricing_logic'.tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 14.sp,
@@ -165,7 +165,7 @@ class RentalConfigView extends GetView<SettingsController> {
                         Expanded(
                           child: Obx(
                             () => CustomDropdown<RentType>(
-                              hintText: 'Select Type',
+                              hintText: 'select_type'.tr,
                               items: RentType.values,
                               initialItem: controller.simRentType.value,
                               onChanged: (val) {
@@ -187,7 +187,7 @@ class RentalConfigView extends GetView<SettingsController> {
                                     return Text(item.name.capitalizeFirst!);
                                   },
                               headerBuilder: (context, selectedItem, enabled) {
-                                return Text(selectedItem.name.capitalizeFirst!);
+                                  return Text(selectedItem.name.capitalizeFirst!);
                               },
                             ),
                           ),
@@ -212,7 +212,7 @@ class RentalConfigView extends GetView<SettingsController> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Text("Calculate"),
+                          child: Text('calculate'.tr),
                         ),
                       ],
                     ),
@@ -226,7 +226,7 @@ class RentalConfigView extends GetView<SettingsController> {
                             Expanded(
                               child: _buildSimulatorInput(
                                 context,
-                                label: "Days",
+                                label: 'days'.tr,
                                 value: controller.simDurationDays,
                               ),
                             ),
@@ -234,7 +234,7 @@ class RentalConfigView extends GetView<SettingsController> {
                             Expanded(
                               child: _buildSimulatorInput(
                                 context,
-                                label: "Extra Hours",
+                                label: 'extra_hours'.tr,
                                 value: controller.simDurationHours,
                               ),
                             ),
@@ -242,7 +242,7 @@ class RentalConfigView extends GetView<SettingsController> {
                             Expanded(
                               child: _buildSimulatorInput(
                                 context,
-                                label: "Minutes",
+                                label: 'minutes'.tr,
                                 value: controller.simDurationMinutes,
                               ),
                             ),
@@ -254,7 +254,7 @@ class RentalConfigView extends GetView<SettingsController> {
                             Expanded(
                               child: _buildSimulatorInput(
                                 context,
-                                label: "Hours",
+                                label: 'hours'.tr,
                                 value: controller.simDurationHours,
                               ),
                             ),
@@ -262,7 +262,7 @@ class RentalConfigView extends GetView<SettingsController> {
                             Expanded(
                               child: _buildSimulatorInput(
                                 context,
-                                label: "Minutes",
+                                label: 'minutes'.tr,
                                 value: controller.simDurationMinutes,
                               ),
                             ),
@@ -280,7 +280,7 @@ class RentalConfigView extends GetView<SettingsController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Simulated Price:",
+                          'simulated_price'.tr,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w600,
