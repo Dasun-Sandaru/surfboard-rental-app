@@ -27,7 +27,10 @@ class AgreementWizardView extends StatelessWidget {
         centerTitle: true,
         title: Obx(
           () => Text(
-            "Step ${controller.currentStep.value + 1} of 4",
+            'step_x_of_y'.trParams({
+              'x': (controller.currentStep.value + 1).toString(),
+              'y': '4'
+            }),
             style: TextStyle(color: colorScheme.onSurface, fontSize: 16.sp),
           ),
         ),
@@ -37,7 +40,7 @@ class AgreementWizardView extends StatelessWidget {
               controller.previousStep();
             },
             icon: Text(
-              "Previous",
+              'previous'.tr,
               style: TextStyle(color: colorScheme.primary, fontSize: 14.sp),
             ),
           ),
@@ -102,8 +105,8 @@ class AgreementWizardView extends StatelessWidget {
                       }
                       return Text(
                         controller.currentStep.value == 3
-                            ? "Generate Agreement"
-                            : "Continue",
+                            ? 'generate_agreement'.tr
+                            : 'continue'.tr,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -130,7 +133,7 @@ class AgreementWizardView extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            "View PDF",
+                            'view_pdf'.tr,
                             style: TextStyle(
                               color: colorScheme.primary,
                               fontSize: 15.sp,
@@ -161,7 +164,7 @@ class AgreementWizardView extends StatelessWidget {
                               );
                             }
                             return Text(
-                              "Create Rental",
+                              'create_rental'.tr,
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.bold,

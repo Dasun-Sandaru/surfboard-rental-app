@@ -335,7 +335,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         'icon': Iconsax.document_text,
       },
       {
-        'title': 'settings'.tr,
+        'title': 'settings_title'.tr,
         'sub': 'settings_sub'.tr,
         'icon': Iconsax.setting_2,
       },

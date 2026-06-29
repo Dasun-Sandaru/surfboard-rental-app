@@ -62,31 +62,31 @@ class ReportsController extends GetxController {
   }
 
   String getStatusDescription(String status) {
-    if (status == 'All') return 'Show all records';
+    if (status == 'All') return 'desc_show_all'.tr;
     
     if (selectedReportType.value == ReportType.rentals) {
       switch (status) {
-        case 'active': return 'Currently rented out';
-        case 'overdue': return 'Passed expected return time';
-        case 'item_returned': return 'Returned, pending inspection';
-        case 'mark_as_damaged': return 'Damaged, pending report';
-        case 'completed': return 'Fully settled & completed';
-        case 'cancelled': return 'Rental cancelled';
+        case 'active': return 'desc_active_rental'.tr;
+        case 'overdue': return 'desc_overdue_rental'.tr;
+        case 'item_returned': return 'desc_returned_rental'.tr;
+        case 'mark_as_damaged': return 'desc_damaged_rental'.tr;
+        case 'completed': return 'desc_completed_rental'.tr;
+        case 'cancelled': return 'desc_cancelled_rental'.tr;
       }
     } else if (selectedReportType.value == ReportType.inventory) {
       switch (status) {
-        case 'available': return 'Ready for rent';
-        case 'rented': return 'Currently rented out';
-        case 'repair': return 'Under maintenance';
-        case 'retired': return 'No longer in use';
-        case 'damaged': return 'Broken, pending repair';
+        case 'available': return 'desc_available_inv'.tr;
+        case 'rented': return 'desc_rented_inv'.tr;
+        case 'repair': return 'desc_repair_inv'.tr;
+        case 'retired': return 'desc_retired_inv'.tr;
+        case 'damaged': return 'desc_damaged_inv'.tr;
       }
     } else if (selectedReportType.value == ReportType.damages) {
       switch (status) {
-        case 'reported': return 'New damage reported';
-        case 'approved': return 'Cost approved';
-        case 'charged': return 'Payment charged/due';
-        case 'resolved': return 'Fully resolved';
+        case 'reported': return 'desc_reported_dmg'.tr;
+        case 'approved': return 'desc_approved_dmg'.tr;
+        case 'charged': return 'desc_charged_dmg'.tr;
+        case 'resolved': return 'desc_resolved_dmg'.tr;
       }
     }
     return '';
@@ -151,7 +151,7 @@ class ReportsController extends GetxController {
   }
 
   Future<void> _fetchCustomers(DocumentReference shopDoc) async {
-    reportColumns.value = ['Name', 'Phone', 'Email', 'Created'];
+    reportColumns.value = ['name'.tr, 'phone'.tr, 'email'.tr, 'created'.tr];
     
     // Efficient querying: using where for dates
     Query query = shopDoc.collection(FirestoreCollections.customers);
@@ -174,16 +174,16 @@ class ReportsController extends GetxController {
       final fullName = '$firstName $lastName'.trim();
       
       reportResults.add({
-        'Name': fullName.isEmpty ? '-' : fullName,
-        'Phone': data[FirestoreFields.phone] ?? '-',
-        'Email': data[FirestoreFields.email] ?? '-',
-        'Created': createdAt != null ? DateFormat('MMM d, yyyy').format(createdAt.toDate()) : '-',
+        'name'.tr: fullName.isEmpty ? '-' : fullName,
+        'phone'.tr: data[FirestoreFields.phone] ?? '-',
+        'email'.tr: data[FirestoreFields.email] ?? '-',
+        'created'.tr: createdAt != null ? DateFormat('MMM d, yyyy').format(createdAt.toDate()) : '-',
       });
     }
   }
 
   Future<void> _fetchInventory(DocumentReference shopDoc) async {
-    reportColumns.value = ['Item', 'Category', 'Status', 'Rate'];
+    reportColumns.value = ['item'.tr, 'category'.tr, 'status'.tr, 'rate'.tr];
     
     Query query = shopDoc.collection(FirestoreCollections.inventory);
     
@@ -200,16 +200,16 @@ class ReportsController extends GetxController {
       final itemName = data['name'] ?? '-';
       
       reportResults.add({
-        'Item': itemName,
-        'Category': type,
-        'Status': (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
-        'Rate': '${shop.currency}${data[FirestoreFields.rentalRateHour] ?? 0}/hr | ${shop.currency}${data[FirestoreFields.rentalRateDay] ?? 0}/day',
+        'item'.tr: itemName,
+        'category'.tr: type,
+        'status'.tr: (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
+        'rate'.tr: '${shop.currency}${data[FirestoreFields.rentalRateHour] ?? 0}/hr | ${shop.currency}${data[FirestoreFields.rentalRateDay] ?? 0}/day',
       });
     }
   }
 
   Future<void> _fetchRentals(DocumentReference shopDoc) async {
-    reportColumns.value = ['Customer', 'Start Date', 'End Date', 'Status', 'Total'];
+    reportColumns.value = ['customer'.tr, 'start_date'.tr, 'end_date'.tr, 'status'.tr, 'total'.tr];
     
     Query query = shopDoc.collection(FirestoreCollections.rentals);
     
@@ -238,17 +238,17 @@ class ReportsController extends GetxController {
       final total = amountPaid > 0 ? amountPaid : amountExpected;
       
       reportResults.add({
-        'Customer': data[FirestoreFields.cachedCustomerName] ?? '-',
-        'Start Date': start != null ? DateFormat('MMM d, yyyy').format(start.toDate()) : '-',
-        'End Date': end != null ? DateFormat('MMM d, yyyy').format(end.toDate()) : '-',
-        'Status': (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
-        'Total': '${shop.currency} $total',
+        'customer'.tr: data[FirestoreFields.cachedCustomerName] ?? '-',
+        'start_date'.tr: start != null ? DateFormat('MMM d, yyyy').format(start.toDate()) : '-',
+        'end_date'.tr: end != null ? DateFormat('MMM d, yyyy').format(end.toDate()) : '-',
+        'status'.tr: (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
+        'total'.tr: '${shop.currency} $total',
       });
     }
   }
 
   Future<void> _fetchDamages(DocumentReference shopDoc) async {
-    reportColumns.value = ['Type', 'Item ID', 'Date', 'Status', 'Cost'];
+    reportColumns.value = ['type'.tr, 'item_id'.tr, 'date'.tr, 'status'.tr, 'cost'.tr];
     
     // Since damage_reports is a subcollection of rentals, we use collectionGroup
     Query query = FirebaseFirestore.instance.collectionGroup(FirestoreCollections.damageReports);
@@ -277,11 +277,11 @@ class ReportsController extends GetxController {
       final cost = finalCost > 0 ? finalCost : estimated;
       
       reportResults.add({
-        'Type': (data[FirestoreFields.damageType] ?? '-').toString().replaceAll('_', ' ').capitalizeFirst,
-        'Item ID': data[FirestoreFields.itemId] ?? '-',
-        'Date': date != null ? DateFormat('MMM d, yyyy').format(date.toDate()) : '-',
-        'Status': (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
-        'Cost': '${shop.currency} $cost',
+        'type'.tr: (data[FirestoreFields.damageType] ?? '-').toString().replaceAll('_', ' ').capitalizeFirst,
+        'item_id'.tr: data[FirestoreFields.itemId] ?? '-',
+        'date'.tr: date != null ? DateFormat('MMM d, yyyy').format(date.toDate()) : '-',
+        'status'.tr: (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
+        'cost'.tr: '${shop.currency} $cost',
       });
     }
   }

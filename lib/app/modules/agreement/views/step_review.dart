@@ -22,7 +22,7 @@ class StepReview extends GetView<AgreementController> {
       if (rentalData == null) {
         return Center(
           child: Text(
-            "No rental data available.",
+            'no_rental_data_available'.tr,
             style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
         );
@@ -34,7 +34,7 @@ class StepReview extends GetView<AgreementController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Review Agreement",
+              'review_agreement'.tr,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 24.sp,
@@ -43,7 +43,7 @@ class StepReview extends GetView<AgreementController> {
             ),
             SizedBox(height: 8.h),
             Text(
-              "Review details and sign below.",
+              'review_details_sign'.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 16.sp,
@@ -73,31 +73,31 @@ class StepReview extends GetView<AgreementController> {
   Widget _buildCustomerInfo(BuildContext context, InitRentalModel rentalData) {
     final customer = rentalData.customer;
     return _buildSectionCard(context, [
-      _buildSectionHeader(context, "Renter Information"),
+      _buildSectionHeader(context, 'renter_information'.tr),
       _buildSummaryRow(
         context,
-        "Name",
+        'name'.tr,
         "${customer.firstName} ${customer.lastName}",
       ),
-      _buildSummaryRow(context, "Email", customer.email),
+      _buildSummaryRow(context, 'email'.tr, customer.email),
       if (customer.phone.isNotEmpty)
-        _buildSummaryRow(context, "Phone", customer.phone),
+        _buildSummaryRow(context, 'phone'.tr, customer.phone),
     ]);
   }
 
   Widget _buildRentalDetails(BuildContext context, InitRentalModel rentalData) {
     final board = rentalData.items.first;
     return _buildSectionCard(context, [
-      _buildSectionHeader(context, "Rental Details"),
-      _buildSummaryRow(context, "Item", "${board.brand} ${board.name}"),
+      _buildSectionHeader(context, 'rental_details'.tr),
+      _buildSummaryRow(context, 'item'.tr, "${board.brand} ${board.name}"),
       _buildSummaryRow(
         context,
-        "Size",
+        'size'.tr,
         "${board.sizeFeet}' ${board.sizeInches}\"",
       ),
       SizedBox(height: 8.h),
-      _buildSummaryRow(context, "Start Time", rentalData.startDateTimeString),
-      _buildSummaryRow(context, "Due Time", rentalData.dueDateTimeString),
+      _buildSummaryRow(context, 'start_time'.tr, rentalData.startDateTimeString),
+      _buildSummaryRow(context, 'due_time'.tr, rentalData.dueDateTimeString),
     ]);
   }
 
@@ -113,30 +113,30 @@ class StepReview extends GetView<AgreementController> {
     final grandTotal = rentalPrice + deposit;
 
     return _buildSectionCard(context, [
-      _buildSectionHeader(context, "Pricing Summary"),
+      _buildSectionHeader(context, 'pricing_summary'.tr),
       _buildSummaryRow(
         context,
-        "Rental Price",
+        'rental_price'.tr,
         AFormatter.formatCurrency(rentalPrice),
         valueColor: colorScheme.primary,
       ),
       if (controller.requireDeposit.value)
         _buildSummaryRow(
           context,
-          "Security Deposit",
+          'security_deposit'.tr,
           AFormatter.formatCurrency(deposit),
           valueColor: statusColors?.warning ?? Colors.orange,
         ),
       _buildSummaryRow(
         context,
-        "Max Damage Liability",
+        'max_damage_liability'.tr,
         AFormatter.formatCurrency(totalDamageFees),
         valueColor: statusColors?.error ?? Colors.red,
       ),
       Divider(color: colorScheme.outline, height: 24.h),
       _buildSummaryRow(
         context,
-        "Total Due Today",
+        'total_due_today'.tr,
         AFormatter.formatCurrency(grandTotal),
         isBold: true,
         valueColor: colorScheme.onSurface,
@@ -152,7 +152,7 @@ class StepReview extends GetView<AgreementController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Damage Policy Agreement",
+          'damage_policy_agreement'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 16.sp,
@@ -165,7 +165,7 @@ class StepReview extends GetView<AgreementController> {
           selectedFees.isEmpty
               ? [
                   Text(
-                    "No specific damage fees applied. General wear and tear is expected.",
+                    'no_specific_damage_fees'.tr,
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
@@ -193,7 +193,7 @@ class StepReview extends GetView<AgreementController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Customer Signature",
+          'customer_signature'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 16.sp,
@@ -227,7 +227,7 @@ class StepReview extends GetView<AgreementController> {
                 // Show Placeholder
                 return Center(
                   child: Text(
-                    "Tap to Sign",
+                    'tap_to_sign'.tr,
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 18.sp,
@@ -258,7 +258,7 @@ class StepReview extends GetView<AgreementController> {
         ),
         Expanded(
           child: Text(
-            "I agree to the terms and conditions stated above.",
+            'agree_to_terms'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 12.sp,

@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'activity_log_service.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
@@ -348,5 +350,35 @@ class InventoryService {
         .where(FirestoreFields.status, isEqualTo: status)
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
+  }
+
+  // ---------------------------------------------------------------------------
+  // UPLOAD INVENTORY IMAGE TO SUPABASE
+  // ---------------------------------------------------------------------------
+  Future<String> uploadInventoryImageSupabase({
+    required File file,
+    required String shopId,
+    required String itemId,
+  }) async {
+    try {
+      log('Uploading image for item: $itemId', name: logName);
+      final supabase = Supabase.instance.client;
+      const bucketName = 'inventory_images';
+      final ext = file.path.split('.').last;
+      final path = '$shopId/$itemId.$ext';
+
+      await supabase.storage
+          .from(bucketName)
+          .upload(
+            path,
+            file,
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+          );
+      final publicUrl = supabase.storage.from(bucketName).getPublicUrl(path);
+      return publicUrl;
+    } catch (e) {
+      log('Error uploading image to Supabase: $e', name: logName);
+      throw Exception('Failed to upload image: $e');
+    }
   }
 }

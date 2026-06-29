@@ -1,3 +1,4 @@
+
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -46,6 +47,10 @@ class AddInventoryView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// Image Picker
+                    _buildImagePicker(context, controller),
+                    SizedBox(height: 20.h),
+
                     /// Name
                     _buildLabel(context, 'board_name'.tr),
                     SizedBox(height: 8.h),
@@ -442,6 +447,54 @@ class AddInventoryView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImagePicker(BuildContext context, AddInventoryController controller) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: controller.pickImage,
+      child: Obx(() {
+        final localImage = controller.selectedImage.value;
+        final existingUrl = controller.existingImageUrl.value;
+        
+        return Container(
+          height: 200.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colorScheme.outline, style: BorderStyle.solid),
+            image: localImage != null
+                ? DecorationImage(
+                    image: FileImage(localImage),
+                    fit: BoxFit.cover,
+                  )
+                : (existingUrl.isNotEmpty && existingUrl != '000')
+                    ? DecorationImage(
+                        image: NetworkImage(existingUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+          ),
+          child: (localImage == null && (existingUrl.isEmpty || existingUrl == '000'))
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.camera, size: 48.w, color: colorScheme.onSurfaceVariant),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Tap to add image',
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ],
+                )
+              : null,
+        );
+      }),
     );
   }
 }

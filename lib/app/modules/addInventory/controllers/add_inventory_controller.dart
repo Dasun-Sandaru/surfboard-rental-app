@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,6 +40,29 @@ class AddInventoryController extends GetxController {
       'enter_board_details_desc'.tr
           .obs;
   final RxBool isLoading = false.obs;
+  
+  final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxString existingImageUrl = ''.obs;
+
+  // ---------------------------------------------------------------------------
+  // IMAGE PICKER
+  // ---------------------------------------------------------------------------
+  Future<void> pickImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      
+      if (image != null) {
+        selectedImage.value = File(image.path);
+      }
+    } catch (e) {
+      log('Error picking image: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'Failed to pick image: $e',
+      );
+    }
+  }
 
   @override
   void onInit() {
@@ -112,6 +137,7 @@ class AddInventoryController extends GetxController {
       rentalRateDayController.text = data[FirestoreFields.rentalRateDay]
           .toString();
       notesController.text = data[FirestoreFields.note];
+      existingImageUrl.value = data[FirestoreFields.imageUrl] ?? '';
 
       final type = SurfBoardType.values.firstWhereOrNull(
         (e) => e.name == data[FirestoreFields.type],
@@ -186,6 +212,15 @@ class AddInventoryController extends GetxController {
       };
 
       if (mode == InventoryFormMode.edit && itemId != null) {
+        if (selectedImage.value != null) {
+          final url = await _inventoryService.uploadInventoryImageSupabase(
+            file: selectedImage.value!,
+            shopId: shopId!,
+            itemId: itemId!,
+          );
+          data[FirestoreFields.imageUrl] = url;
+        }
+
         await _inventoryService.updateInventoryItem(
           shopId: shopId!,
           itemId: itemId!,
@@ -203,6 +238,20 @@ class AddInventoryController extends GetxController {
           data: data,
         );
         log('Item created successfully: $newItemId', name: _logName);
+
+        if (selectedImage.value != null) {
+          final url = await _inventoryService.uploadInventoryImageSupabase(
+            file: selectedImage.value!,
+            shopId: shopId!,
+            itemId: newItemId,
+          );
+          await _inventoryService.updateInventoryItem(
+            shopId: shopId!,
+            itemId: newItemId,
+            data: {FirestoreFields.imageUrl: url},
+          );
+        }
+
         AppSnackBar.success(
           title: 'success'.tr,
           message: 'item_added_success'.tr,
@@ -247,6 +296,8 @@ class AddInventoryController extends GetxController {
     rentalRateDayController.clear();
     notesController.clear();
     surfboardTypeController.clear();
+    selectedImage.value = null;
+    existingImageUrl.value = '';
 
     boardName.value =
         'enter_board_details_desc'.tr;

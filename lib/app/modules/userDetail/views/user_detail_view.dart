@@ -553,24 +553,24 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
     final time = DateFormat('hh:mm a').format(date);
 
     String title = logModel.description;
-    String badgeText = "Activity";
+    String badgeText = "activity_label".tr;
     Color badgeColor = colorScheme.primary.withValues(alpha: 0.1);
     Color badgeTextColor = colorScheme.primary;
           
     if (logModel.activityType == ActivityType.create_rental) {
-      badgeText = "Rental";
+      badgeText = "rental_label".tr;
       badgeColor = Colors.green.withValues(alpha: 0.15);
       badgeTextColor = Colors.green;
     } else if (logModel.activityType == ActivityType.return_rental) {
-      badgeText = "Returned";
+      badgeText = "returned_label".tr;
       badgeColor = Colors.teal.withValues(alpha: 0.15);
       badgeTextColor = Colors.teal;
     } else if (logModel.activityType == ActivityType.report_damage) {
-      badgeText = "Damage";
+      badgeText = "damage_label".tr;
       badgeColor = Colors.orange.withValues(alpha: 0.15);
       badgeTextColor = Colors.orange;
     } else if (logModel.activityType == ActivityType.add_payment) {
-      badgeText = "Payment";
+      badgeText = "payment".tr;
       badgeColor = Colors.purple.withValues(alpha: 0.15);
       badgeTextColor = Colors.purple;
     }
@@ -723,7 +723,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Entity Type",
+                            "entity_type".tr,
                             style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11.sp),
                           ),
                           Text(
@@ -732,7 +732,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                           ),
                           SizedBox(height: 8.h),
                           Text(
-                            "Entity ID",
+                            "entity_id".tr,
                             style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11.sp),
                           ),
                           Text(
@@ -749,7 +749,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Additional Data",
+                              "additional_data".tr,
                               style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11.sp),
                             ),
                             SizedBox(height: 4.h),

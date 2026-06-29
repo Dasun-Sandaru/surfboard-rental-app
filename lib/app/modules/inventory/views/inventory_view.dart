@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -503,7 +504,40 @@ class InventoryListView extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(width: 80.w, height: 80.w, color: colorScheme.surface),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: item.imageUrl.isNotEmpty && item.imageUrl != '000'
+                  ? CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      width: 80.w,
+                      height: 80.w,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        width: 80.w,
+                        height: 80.w,
+                        color: colorScheme.surface,
+                        child: Center(
+                          child: SizedBox(
+                            width: 24.w,
+                            height: 24.w,
+                            child: const CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 80.w,
+                        height: 80.w,
+                        color: colorScheme.surface,
+                        child: Icon(Iconsax.image, color: colorScheme.onSurfaceVariant),
+                      ),
+                    )
+                  : Container(
+                      width: 80.w,
+                      height: 80.w,
+                      color: colorScheme.surface,
+                      child: Icon(Iconsax.image, color: colorScheme.onSurfaceVariant),
+                    ),
+            ),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(

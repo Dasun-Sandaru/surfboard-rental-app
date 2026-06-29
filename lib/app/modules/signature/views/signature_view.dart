@@ -28,7 +28,7 @@ class SignaturePadView extends StatelessWidget {
             Iconsax.close_circle, // "Close" icon instead of back for modals
         centerTitle: true,
         title: Text(
-          "Customer Signature",
+          'customer_signature'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -41,7 +41,7 @@ class SignaturePadView extends StatelessWidget {
             onPressed: controller.clearSignature,
             icon: Icon(Iconsax.eraser, size: 18.w, color: colorScheme.error),
             label: Text(
-              "Clear",
+              'clear'.tr,
               style: TextStyle(
                 color: colorScheme.error,
                 fontWeight: FontWeight.bold,
@@ -59,7 +59,7 @@ class SignaturePadView extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
             child: Text(
-              "Please sign within the box below to accept the rental agreement.",
+              'sign_within_box'.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
@@ -118,7 +118,7 @@ class SignaturePadView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    "Confirm Signature",
+                    'confirm_signature'.tr,
                     style: TextStyle(
                       color: controller.isEmpty.value
                           ? colorScheme.onSurfaceVariant

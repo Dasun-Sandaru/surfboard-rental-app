@@ -235,7 +235,7 @@ class StaffHomeView extends GetView<StaffHomeController> {
       },
       {'title': 'rentals'.tr, 'sub': 'rentals_sub'.tr, 'icon': Iconsax.receipt},
       {
-        'title': 'settings'.tr,
+        'title': 'settings_title'.tr,
         'sub': 'settings_sub'.tr,
         'icon': Iconsax.setting_2,
       },

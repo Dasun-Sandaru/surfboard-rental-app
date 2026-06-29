@@ -80,14 +80,16 @@ class NotificationSyncService extends GetxService {
 
     // Schedule exact due time notification
     if (trigger.expectedReturnTime.isAfter(now)) {
-      final overdueBody = "Rental for '${trigger.itemName.isNotEmpty ? trigger.itemName : 'Surfboard'}' is now overdue!\n\n"
-          "• Customer: ${trigger.customerName.isNotEmpty ? trigger.customerName : 'N/A'}\n"
-          "• Expected Return: $dateStr at $timeStr\n\n"
-          "Tap this alert to view rental details.";
+      final overdueBody = 'overdue_body'.trParams({
+        'item': trigger.itemName.isNotEmpty ? trigger.itemName : 'Surfboard',
+        'customer': trigger.customerName.isNotEmpty ? trigger.customerName : 'N/A',
+        'date': dateStr,
+        'time': timeStr,
+      });
 
       _localNotificationService.scheduleNotification(
         id: exactId,
-        title: "🚨 Rental Return Overdue",
+        title: 'overdue_title'.tr,
         body: overdueBody,
         scheduledDate: trigger.expectedReturnTime,
         payload: "rental:${trigger.rentalId}",
@@ -98,14 +100,16 @@ class NotificationSyncService extends GetxService {
     final warningTime =
         trigger.expectedReturnTime.subtract(const Duration(minutes: 5));
     if (warningTime.isAfter(now)) {
-      final warningBody = "Rental for '${trigger.itemName.isNotEmpty ? trigger.itemName : 'Surfboard'}' is due in 5 minutes.\n\n"
-          "• Customer: ${trigger.customerName.isNotEmpty ? trigger.customerName : 'N/A'}\n"
-          "• Expected Return: $dateStr at $timeStr\n\n"
-          "Tap this alert to view rental details.";
+      final warningBody = 'warning_body'.trParams({
+        'item': trigger.itemName.isNotEmpty ? trigger.itemName : 'Surfboard',
+        'customer': trigger.customerName.isNotEmpty ? trigger.customerName : 'N/A',
+        'date': dateStr,
+        'time': timeStr,
+      });
 
       _localNotificationService.scheduleNotification(
         id: warningId,
-        title: "⚠️ Upcoming Return Warning",
+        title: 'warning_title'.tr,
         body: warningBody,
         scheduledDate: warningTime,
         payload: "rental:${trigger.rentalId}",

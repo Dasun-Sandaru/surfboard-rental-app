@@ -20,7 +20,7 @@ class ReportsView extends GetView<ReportsController> {
         showbackArrow: true,
         centerTitle: true,
         title: Text(
-          'Reports Dashboard',
+          'reports_dashboard'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -39,7 +39,7 @@ class ReportsView extends GetView<ReportsController> {
                 child: IconButton(
                   icon: Icon(Iconsax.document_download, color: colorScheme.primary),
                   onPressed: controller.exportToPdf,
-                  tooltip: 'Export PDF',
+                  tooltip: 'export_pdf'.tr,
                 ),
               );
             }
@@ -83,7 +83,7 @@ class ReportsView extends GetView<ReportsController> {
               Icon(Iconsax.filter, size: 20.sp, color: colorScheme.primary),
               SizedBox(width: 8.w),
               Text(
-                'Filters',
+                'filters'.tr,
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class ReportsView extends GetView<ReportsController> {
           // Report Type Selector
           // Report Type Selector
           Obx(() => CustomDropdown<ReportType>(
-            hintText: 'Select Report Type',
+            hintText: 'select_report_type'.tr,
             items: ReportType.values,
             initialItem: controller.selectedReportType.value,
             onChanged: (val) {
@@ -111,13 +111,13 @@ class ReportsView extends GetView<ReportsController> {
             ),
             headerBuilder: (context, type, _) {
               return Text(
-                type.name.capitalizeFirst ?? '',
+                type.name.tr,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               );
             },
             listItemBuilder: (context, type, isSelected, _) {
               return Text(
-                type.name.capitalizeFirst ?? '',
+                type.name.tr,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               );
             },
@@ -132,7 +132,7 @@ class ReportsView extends GetView<ReportsController> {
             final hasDates = start != null && end != null;
             final dateText = hasDates 
               ? '${DateFormat('MMM d').format(start)} - ${DateFormat('MMM d').format(end)}' 
-              : 'Select Dates';
+              : 'select_dates'.tr;
               
             return InkWell(
               onTap: () => controller.pickDateRange(context),
@@ -173,7 +173,7 @@ class ReportsView extends GetView<ReportsController> {
             return Padding(
               padding: EdgeInsets.only(top: 12.h),
               child: CustomDropdown<String>(
-                hintText: 'Status',
+                hintText: 'status'.tr,
                 items: statuses,
                 initialItem: controller.selectedStatus.value,
                 onChanged: (val) {
@@ -188,7 +188,7 @@ class ReportsView extends GetView<ReportsController> {
                   expandedShadow: [],
                 ),
                 headerBuilder: (context, status, _) {
-                  return Text(status.replaceAll('_', ' ').capitalizeFirst ?? '');
+                  return Text(status.toLowerCase().tr);
                 },
                 listItemBuilder: (context, status, isSelected, _) {
                   final description = controller.getStatusDescription(status);
@@ -196,7 +196,7 @@ class ReportsView extends GetView<ReportsController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        status.replaceAll('_', ' ').capitalizeFirst ?? '',
+                        status.toLowerCase().tr,
                         style: TextStyle(
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                           color: colorScheme.onSurface,
@@ -244,7 +244,7 @@ class ReportsView extends GetView<ReportsController> {
                       child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : Text(
-                      'Generate Report', 
+                      'generate_report'.tr, 
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                     ),
             )),
@@ -266,7 +266,7 @@ class ReportsView extends GetView<ReportsController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Report Results',
+              'report_results'.tr,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -280,7 +280,7 @@ class ReportsView extends GetView<ReportsController> {
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Text(
-                '${controller.reportResults.length} Records',
+                '${controller.reportResults.length} ${'records'.tr}',
                 style: TextStyle(
                   color: colorScheme.onTertiaryContainer,
                   fontWeight: FontWeight.bold,
@@ -317,12 +317,12 @@ class ReportsView extends GetView<ReportsController> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'Ready to Generate',
+                'ready_to_generate'.tr,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp, color: colorScheme.onSurface),
               ),
               SizedBox(height: 8.h),
               Text(
-                'Select your filters above\nand click Generate Report.',
+                'select_filters_msg'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14.sp),
               ),
