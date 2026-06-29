@@ -122,7 +122,7 @@ class SignInView extends GetView<SignInController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Email
-          _buildLabel(context, 'Email Address'.tr),
+          _buildLabel(context, 'email_address'.tr),
           SizedBox(height: 8.h),
           TextFormField(
             controller: controller.signInEmailController,
@@ -141,7 +141,7 @@ class SignInView extends GetView<SignInController> {
           SizedBox(height: 20.h),
 
           /// Password
-          _buildLabel(context, 'Password'.tr),
+          _buildLabel(context, 'password'.tr),
           SizedBox(height: 8.h),
           Obx(
             () => TextFormField(

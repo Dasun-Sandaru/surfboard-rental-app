@@ -27,7 +27,7 @@ class MaintenanceView extends GetView<ConfigService> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Under Maintenance',
+                'under_maintenance'.tr,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

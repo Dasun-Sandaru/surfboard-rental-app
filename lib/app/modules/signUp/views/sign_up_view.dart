@@ -24,8 +24,8 @@ class SignUpView extends GetView<SignUpController> {
         title: Obx(
           () => Text(
             controller.role.value == UserRole.staff
-                ? 'Join the Team'
-                : 'Setup Shop',
+                ? 'join_the_team'.tr
+                : 'setup_shop'.tr,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
@@ -54,7 +54,7 @@ class SignUpView extends GetView<SignUpController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Create Staff Account",
+              "create_staff_account".tr,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
@@ -63,7 +63,7 @@ class SignUpView extends GetView<SignUpController> {
             ),
             SizedBox(height: 4.h),
             Text(
-              "Fill in your details to get started.",
+              "fill_in_details_desc".tr,
               style: TextStyle(
                 fontSize: 14.sp,
                 color: colorScheme.onSurfaceVariant,
@@ -72,20 +72,20 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 24.h),
 
             /// Name
-            _buildLabel(context, 'Full Name'),
+            _buildLabel(context, 'full_name'.tr),
             SizedBox(height: 8.h),
             _buildTextField(
               context,
               controller: controller.nameController,
               hintText: 'John Doe',
               icon: Iconsax.user,
-              validator: (v) => AValidator.validateText(v, 'Name'),
+              validator: (v) => AValidator.validateText(v, 'full_name'.tr),
             ),
 
             SizedBox(height: 16.h),
 
             /// Email
-            _buildLabel(context, 'Email Address'),
+            _buildLabel(context, 'email_address'.tr),
             SizedBox(height: 8.h),
             _buildTextField(
               context,
@@ -99,7 +99,7 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Phone
-            _buildLabel(context, 'Phone Number'),
+            _buildLabel(context, 'phone_number'.tr),
             SizedBox(height: 8.h),
             _buildTextField(
               context,
@@ -113,14 +113,14 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Shop Code
-            _buildLabel(context, 'Shop Code'),
+            _buildLabel(context, 'shop_code'.tr),
             SizedBox(height: 8.h),
             _buildTextField(
               context,
               controller: controller.shopCodeController,
               hintText: 'SHP-1234',
               icon: Iconsax.shop,
-              validator: (v) => AValidator.validateText(v, 'Shop Code'),
+              validator: (v) => AValidator.validateText(v, 'shop_code'.tr),
               suffix: IconButton(
                 icon: Icon(Iconsax.scan_barcode, color: colorScheme.primary),
                 onPressed: controller.scanShopCode,
@@ -130,7 +130,7 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Password
-            _buildLabel(context, 'Password'),
+            _buildLabel(context, 'password'.tr),
             SizedBox(height: 8.h),
             _buildTextField(
               context,
@@ -144,7 +144,7 @@ class SignUpView extends GetView<SignUpController> {
             SizedBox(height: 16.h),
 
             /// Confirm Password
-            _buildLabel(context, 'Confirm Password'),
+            _buildLabel(context, 'confirm_password'.tr),
             SizedBox(height: 8.h),
             _buildTextField(
               context,
@@ -186,7 +186,7 @@ class SignUpView extends GetView<SignUpController> {
                           ),
                         )
                       : Text(
-                          'Create Account',
+                          'create_account'.tr,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -260,7 +260,7 @@ class SignUpView extends GetView<SignUpController> {
                                   ),
                                 )
                               : Text(
-                                  isLastStep ? 'Complete Setup' : 'Next Step',
+                                  isLastStep ? 'complete_setup'.tr : 'next_step'.tr,
                                   style: TextStyle(
                                     fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
@@ -284,7 +284,7 @@ class SignUpView extends GetView<SignUpController> {
                             ),
                           ),
                           child: Text(
-                            'Back',
+                            'back'.tr,
                             style: TextStyle(color: colorScheme.onSurface),
                           ),
                         ),
@@ -306,7 +306,7 @@ class SignUpView extends GetView<SignUpController> {
             /// Step 1: Shop Details
             Step(
               title: Text(
-                'Shop Information',
+                'shop_information'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16.sp,
@@ -319,27 +319,27 @@ class SignUpView extends GetView<SignUpController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 8.h),
-                    _buildLabel(context, 'Shop Name'),
+                    _buildLabel(context, 'shop_name'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.shopNameController,
                       hintText: 'Aloha Surf Rentals',
                       icon: Iconsax.shop,
-                      validator: (v) => AValidator.validateText(v, 'Shop Name'),
+                      validator: (v) => AValidator.validateText(v, 'shop_name'.tr),
                     ),
                     SizedBox(height: 16.h),
-                    _buildLabel(context, 'Location'),
+                    _buildLabel(context, 'location'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.shopLocationController,
                       hintText: 'Ahangama Beach',
                       icon: Iconsax.location,
-                      validator: (v) => AValidator.validateText(v, 'Location'),
+                      validator: (v) => AValidator.validateText(v, 'location'.tr),
                     ),
                     SizedBox(height: 16.h),
-                    _buildLabel(context, 'Contact Number'),
+                    _buildLabel(context, 'contact_number'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -361,7 +361,7 @@ class SignUpView extends GetView<SignUpController> {
             /// Step 2: Personal Details
             Step(
               title: Text(
-                'Owner Information',
+                'owner_information'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16.sp,
@@ -374,17 +374,17 @@ class SignUpView extends GetView<SignUpController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 8.h),
-                    _buildLabel(context, 'Full Name'),
+                    _buildLabel(context, 'full_name'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.nameController,
                       hintText: 'Your Name',
                       icon: Iconsax.user,
-                      validator: (v) => AValidator.validateText(v, 'Name'),
+                      validator: (v) => AValidator.validateText(v, 'full_name'.tr),
                     ),
                     SizedBox(height: 16.h),
-                    _buildLabel(context, 'Email Address'),
+                    _buildLabel(context, 'email_address'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -395,7 +395,7 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validateEmail(v),
                     ),
                     SizedBox(height: 16.h),
-                    _buildLabel(context, 'Phone Number'),
+                    _buildLabel(context, 'phone_number'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -406,7 +406,7 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validatePhoneNumber(v),
                     ),
                     SizedBox(height: 16.h),
-                    _buildLabel(context, 'Password'),
+                    _buildLabel(context, 'password'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -417,7 +417,7 @@ class SignUpView extends GetView<SignUpController> {
                       validator: (v) => AValidator.validatePassword(v),
                     ),
                     SizedBox(height: 16.h),
-                    _buildLabel(context, 'Confirm Password'),
+                    _buildLabel(context, 'confirm_password'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,

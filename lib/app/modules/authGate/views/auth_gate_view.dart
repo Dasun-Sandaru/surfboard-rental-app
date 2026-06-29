@@ -47,7 +47,7 @@ class AuthGateView extends GetView<AuthGateController> {
 
             /// Title
             Text(
-              controller.title,
+              controller.title.tr,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 24.sp,
@@ -60,7 +60,7 @@ class AuthGateView extends GetView<AuthGateController> {
 
             /// Description
             Text(
-              controller.description,
+              controller.description.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
@@ -81,9 +81,9 @@ class AuthGateView extends GetView<AuthGateController> {
                     // Open Email or Phone logic
                   },
                   icon: Icon(Iconsax.message, color: colorScheme.onPrimary),
-                  label: const Text(
-                    "Contact Administrator",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Text(
+                    "contact_administrator".tr,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
@@ -112,7 +112,7 @@ class AuthGateView extends GetView<AuthGateController> {
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                 ),
                 child: Text(
-                  "Sign Out",
+                  "sign_out".tr,
                   style: TextStyle(
                     color: colorScheme.error,
                     fontWeight: FontWeight.w600,

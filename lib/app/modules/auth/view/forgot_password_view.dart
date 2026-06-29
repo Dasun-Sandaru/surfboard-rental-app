@@ -42,7 +42,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    "Enter your email and we will send you a link to reset your password.",
+                    "forgot_password_desc".tr,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       height: 1.5,
@@ -51,7 +51,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                   SizedBox(height: 32.h),
 
                   /// Email Input
-                  _buildLabel(context, 'Email Address'),
+                  _buildLabel(context, 'email_address'.tr),
                   SizedBox(height: 8.h),
                   TextFormField(
                     controller: controller.emailController,
@@ -120,7 +120,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                                 ),
                               )
                             : Text(
-                                "Send Reset Link",
+                                "send_reset_link".tr,
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
@@ -148,7 +148,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                                 padding: EdgeInsets.symmetric(vertical: 14.h),
                               ),
                               child: Text(
-                                "Back to Login",
+                                "back_to_login".tr,
                                 style: TextStyle(
                                   color: colorScheme.primary,
                                   fontWeight: FontWeight.w600,

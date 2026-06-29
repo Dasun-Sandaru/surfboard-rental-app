@@ -223,8 +223,8 @@ void showYesNoAppDialog(String title, String message, {Color? buttonColor}) {
     context: Get.context!,
     title: title,
     message: message,
-    confirmText: 'YES',
-    cancelText: 'NO',
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
     onConfirm: () {},
     buttonColor: buttonColor,
   );
@@ -241,8 +241,8 @@ void showYesNoRoutineAppDialog(
     context: Get.context!,
     title: title,
     message: message,
-    confirmText: 'YES',
-    cancelText: 'NO',
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
     onConfirm: () => onYes?.call(),
     onCancel: onNo,
     buttonColor: buttonColor,
@@ -348,10 +348,10 @@ Future<bool> showAppExitDialog() async {
 void showLogoutFromAppDialog(void Function()? onPressed) {
   _showCustomConfirmationDialog(
     context: Get.context!,
-    title: 'Confirmation',
-    message: 'Are you sure you want to logout?',
-    confirmText: 'YES',
-    cancelText: 'NO',
+    title: 'confirmation'.tr,
+    message: 'logout_confirm_msg'.tr,
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
     onConfirm: () => onPressed?.call(),
     barrierDismissible: false,
   );
@@ -361,10 +361,10 @@ void showDeleteWarningDialog(VoidCallback? onYes) {
   final context = Get.context;
   _showCustomConfirmationDialog(
     context: context ?? Get.context!,
-    title: 'Delete',
-    message: 'Are you sure you want to delete this item?',
-    confirmText: 'YES',
-    cancelText: 'NO',
+    title: 'delete'.tr,
+    message: 'delete_confirm_msg'.tr,
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
     onConfirm: () => onYes?.call(),
     buttonColor: context != null ? Theme.of(context).colorScheme.error : null,
   );
@@ -550,17 +550,12 @@ void showCongratulationsDialog(BuildContext context) {
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Image.network(
-        //   'https://i.ibb.co/680r20H/congratulations-illustration.png',
-        //   height: 150,
-        //   fit: BoxFit.contain,
-        // ),
         SizedBox(height: 20.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Congratulations',
+              'congratulations'.tr,
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -573,7 +568,7 @@ void showCongratulationsDialog(BuildContext context) {
         SizedBox(height: ASizes.smallPadding),
 
         Text(
-          'Your account is ready to use',
+          'account_ready'.tr,
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
@@ -592,7 +587,7 @@ void showCongratulationsDialog(BuildContext context) {
               ),
             ),
             child: Text(
-              'Back to Home',
+              'back_to_home'.tr,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium!.copyWith(color: Colors.white),

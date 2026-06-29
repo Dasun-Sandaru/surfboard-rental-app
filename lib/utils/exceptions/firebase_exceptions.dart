@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 class AppFirebaseException {
   final FirebaseException _exception;
@@ -8,50 +9,50 @@ class AppFirebaseException {
   String get message {
     switch (_exception.code) {
       case 'unknown':
-        return 'An unknown Firebase error occurred. Please try again.';
+        return 'fb_unknown'.tr;
       case 'invalid-custom-token':
-        return 'The custom token format is incorrect. Please check your token.';
+        return 'fb_invalid_custom_token'.tr;
       case 'custom-token-mismatch':
-        return 'The custom token corresponds to a different audience.';
+        return 'fb_custom_token_mismatch'.tr;
       case 'user-disabled':
-        return 'The user account has been disabled.';
+        return 'fb_user_disabled'.tr;
       case 'user-not-found':
-        return 'No user found for the given email or UID.';
+        return 'fb_user_not_found'.tr;
       case 'invalid-email':
-        return 'The email address is not valid.';
+        return 'fb_invalid_email'.tr;
       case 'email-already-in-use':
-        return 'The email address is already in use by another account.';
+        return 'fb_email_already_in_use'.tr;
       case 'wrong-password':
-        return 'Incorrect password. Please try again.';
+        return 'fb_wrong_password'.tr;
       case 'weak-password':
-        return 'The password is too weak. Please choose a stronger password.';
+        return 'fb_weak_password'.tr;
       case 'provider-already-linked':
-        return 'The account is already linked with another provider.';
+        return 'fb_provider_already_linked'.tr;
       case 'needs-recent-login':
-        return 'This operation is sensitive and requires recent authentication. Please sign in again.';
+        return 'fb_needs_recent_login'.tr;
       case 'operation-not-allowed':
-        return 'This operation is not allowed. Please contact support.';
+        return 'fb_operation_not_allowed'.tr;
       case 'invalid-credential':
-        return 'The credential provided is malformed or has expired.';
+        return 'fb_invalid_credential'.tr;
       case 'account-exists-with-different-credential':
-        return 'An account already exists with the same email address but different sign-in credentials.';
+        return 'fb_account_exists_with_different_credential'.tr;
       // Firestore Exceptions
       case 'cancelled':
-        return 'The operation was cancelled.';
+        return 'fb_cancelled'.tr;
       case 'not-found':
-        return 'The requested document was not found.';
+        return 'fb_not_found'.tr;
       case 'permission-denied':
-        return 'You do not have permission to perform this operation.';
+        return 'fb_permission_denied'.tr;
       case 'resource-exhausted':
-        return 'The project has exhausted its quota. Please check your Firebase project plan.';
+        return 'fb_resource_exhausted'.tr;
       case 'unauthenticated':
-        return 'You are unauthenticated. Please sign in to continue.';
+        return 'fb_unauthenticated'.tr;
       case 'unavailable':
-        return 'The service is currently unavailable. Please try again later.';
+        return 'fb_unavailable'.tr;
       case 'deadline-exceeded':
-        return 'The deadline for the operation has been exceeded. Please try again.';
+        return 'fb_deadline_exceeded'.tr;
       default:
-        return 'An unexpected Firebase error occurred. Please try again.';
+        return 'fb_unexpected'.tr;
     }
   }
 }

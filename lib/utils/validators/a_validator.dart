@@ -83,19 +83,16 @@ class AValidator {
 
   static String? validateNumber(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      // return 'field_required'.trParams({'field': fieldName});
-      return '$fieldName is required';
+      return 'field_required'.trParams({'field': fieldName});
     }
 
     final number = num.tryParse(value);
     if (number == null) {
-      // return 'invalid_number'.trParams({'field': fieldName});
-      return '$fieldName must be a valid number';
+      return 'invalid_number'.trParams({'field': fieldName});
     }
 
     if (number < 0) {
-      // return 'number_positive'.trParams({'field': fieldName});
-      return '$fieldName must be a positive number';
+      return 'number_positive'.trParams({'field': fieldName});
     }
 
     return null;
@@ -103,19 +100,16 @@ class AValidator {
 
   static String? validateAmount(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      // return 'field_required'.trParams({'field': fieldName});
-      return '$fieldName is required';
+      return 'field_required'.trParams({'field': fieldName});
     }
 
     final amount = double.tryParse(value);
     if (amount == null) {
-      // return 'invalid_amount'.trParams({'field': fieldName});
-      return '$fieldName must be a valid amount';
+      return 'invalid_amount'.trParams({'field': fieldName});
     }
 
     if (amount < 0) {
-      // return 'amount_positive'.trParams({'field': fieldName});
-      return '$fieldName must be a positive amount';
+      return 'amount_positive'.trParams({'field': fieldName});
     }
 
     return null;

@@ -43,7 +43,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
               SizedBox(height: 32.h),
 
               Text(
-                'Verify your email address',
+                'verify_email_title'.tr,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
@@ -52,7 +52,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
               ),
               SizedBox(height: 16.h),
               Text(
-                'We have sent a verification link to your email address. Please check your inbox and click the link to activate your account.',
+                'verify_email_desc'.tr,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   height: 1.5,
@@ -77,7 +77,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Back to Login',
+                    'back_to_login'.tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -102,7 +102,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                   ),
                   child: Text(
-                    'Resend Email',
+                    'resend_email'.tr,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -130,7 +130,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                     ),
                     SizedBox(height: 12.h),
                     Text(
-                      "Waiting for verification...",
+                      "waiting_for_verification".tr,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 12.sp,
