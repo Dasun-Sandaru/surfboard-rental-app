@@ -15,6 +15,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final canEdit = controller.hasPermission('settings_edit_rental_logic');
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -29,19 +30,21 @@ class RentalPricingLogicView extends GetView<SettingsController> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: controller.saveRentalConfig,
-            child: Text(
-              "Save",
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 16.sp,
-              ),
-            ),
-          ),
-        ],
+        actions: canEdit
+            ? [
+                TextButton(
+                  onPressed: controller.saveRentalConfig,
+                  child: Text(
+                    "Save",
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(ASizes.defaultPadding),
@@ -63,6 +66,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   hintText: "e.g. 15",
                   icon: Iconsax.clock,
                   inputType: TextInputType.number,
+                  enabled: canEdit,
                 ),
               ),
               SizedBox(height: 16.h),
@@ -80,6 +84,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                   hintText: "e.g. 1",
                   icon: Iconsax.clock,
                   inputType: TextInputType.number,
+                  enabled: canEdit,
                 ),
               ),
               SizedBox(height: 16.h),
@@ -101,7 +106,9 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                           ),
                         ),
                         value: controller.isTaxEnabled.value,
-                        onChanged: (val) => controller.isTaxEnabled.value = val,
+                        onChanged: canEdit
+                            ? (val) => controller.isTaxEnabled.value = val
+                            : null,
                         activeColor: colorScheme.primary,
                         contentPadding: EdgeInsets.zero,
                       ),
@@ -109,18 +116,19 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                     Obx(
                       () => controller.isTaxEnabled.value
                           ? Padding(
-                            padding: EdgeInsets.only(top: 8.h),
-                            child: _buildTextField(
-                              context,
-                              controller: controller.taxRateController,
-                              label: "Tax Rate (%)",
-                              hintText: "e.g. 5.0",
-                              icon: Iconsax.percentage_square,
-                              inputType: TextInputType.numberWithOptions(
-                                decimal: true,
+                              padding: EdgeInsets.only(top: 8.h),
+                              child: _buildTextField(
+                                context,
+                                controller: controller.taxRateController,
+                                label: "Tax Rate (%)",
+                                hintText: "e.g. 5.0",
+                                icon: Iconsax.percentage_square,
+                                inputType: TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
+                                enabled: canEdit,
                               ),
-                            ),
-                          )
+                            )
                           : const SizedBox.shrink(),
                     ),
                   ],
@@ -214,6 +222,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
     required String hintText,
     required IconData icon,
     TextInputType inputType = TextInputType.text,
+    bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
@@ -231,7 +240,10 @@ class RentalPricingLogicView extends GetView<SettingsController> {
         TextFormField(
           controller: controller,
           keyboardType: inputType,
-          style: TextStyle(color: colorScheme.onSurface),
+          enabled: enabled,
+          style: TextStyle(
+            color: enabled ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+          ),
           decoration: InputDecoration(
             hintText: hintText,
             prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant),

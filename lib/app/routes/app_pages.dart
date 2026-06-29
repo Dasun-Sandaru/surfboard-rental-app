@@ -221,7 +221,11 @@ class AppPages {
       name: _Paths.SETTINGS,
       page: () => const SettingsView(),
       binding: SettingsBinding(),
-      middlewares: [AccessControlMiddleware(routeKey: 'settings_view_shop')],
+      middlewares: [
+        MaintenanceMiddleware(),
+        OnboardingMiddleware(),
+        AuthMiddleware(),
+      ],
     ),
     GetPage(
       name: _Paths.ITEM_DETAILS,
@@ -319,9 +323,6 @@ class AppPages {
       name: _Paths.RENTAL_PRICING_LOGIC,
       page: () => const RentalPricingLogicView(),
       binding: SettingsBinding(), // Re-use SettingsBinding
-      middlewares: [
-        AccessControlMiddleware(routeKey: 'settings_edit_rental_logic'),
-      ],
     ),
     GetPage(
       name: _Paths.RENTAL_CONFIG,

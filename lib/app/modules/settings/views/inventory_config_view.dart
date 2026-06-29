@@ -14,6 +14,7 @@ class InventoryConfigView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<SettingsController>();
     final colorScheme = Theme.of(context).colorScheme;
+    final canEdit = controller.hasPermission('shop_setup');
 
     return DefaultTabController(
       length: 2,
@@ -42,9 +43,8 @@ class InventoryConfigView extends StatelessWidget {
             _buildListManager(
               context,
               items: controller.brands,
-              onAdd: () => controller.addItem("Brand", controller.brands),
-              onRemove: (item) =>
-                  controller.removeItem(item, controller.brands),
+              onAdd: canEdit ? () => controller.addItem("Brand", controller.brands) : null,
+              onRemove: canEdit ? (item) => controller.removeItem(item, controller.brands) : null,
             ),
 
             /// 2. Board Types Tab

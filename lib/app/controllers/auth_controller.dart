@@ -8,6 +8,7 @@ import '../../utils/storage/app_storage.dart';
 import '../routes/app_pages.dart';
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
+import '../services/config_service.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = Get.find();
@@ -26,16 +27,25 @@ class AuthController extends GetxController {
     firebaseUser.bindStream(_authService.authStateChanges);
 
     // Listen to Auth Changes
-    ever(firebaseUser, _handleAuthChanged);
+    ever(firebaseUser, handleAuthChanged);
   }
 
   final Rx<UserRole?> currentUserRole = Rx<UserRole?>(null);
 
   /// CENTRAL AUTH ROUTING
-  Future<void> _handleAuthChanged(User? user) async {
+  Future<void> handleAuthChanged(User? user) async {
     _userSub?.cancel();
 
     if (user == null) {
+      currentUserRole.value = null;
+      await _storage.removeData('shop_id');
+      if (Get.isRegistered<ConfigService>()) {
+        final configService = Get.find<ConfigService>();
+        configService.staffAccessRules.clear();
+        configService.currency.value = 'USD';
+        configService.dateFormat.value = 'dd/MM/yyyy';
+        configService.timeZone.value = 'UTC';
+      }
       Get.offAllNamed(Routes.SIGN_IN);
       return;
     }
@@ -67,6 +77,22 @@ class AuthController extends GetxController {
 
       // Save shopId Locally
       await _storage.saveData('shop_id', shopId);
+
+      // Load shop config immediately after saving shopId
+      if (Get.isRegistered<ConfigService>()) {
+        await Get.find<ConfigService>().loadShopConfig();
+      }
+
+      // Check user active and verification status
+      if (!userModel.isActive) {
+        Get.offAllNamed(Routes.AUTH_GATE, arguments: {'gate': 'not-active'});
+        return;
+      }
+
+      if (!userModel.isVerified) {
+        Get.offAllNamed(Routes.AUTH_GATE, arguments: {'gate': 'not-verified'});
+        return;
+      }
 
       if (role == UserRole.admin) {
         Get.offAllNamed(Routes.ADMIN_HOME);

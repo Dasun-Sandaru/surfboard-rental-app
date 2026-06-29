@@ -61,6 +61,8 @@ class AccessControlView extends GetView<SettingsController> {
                         ),
                         child: Column(
                           children: keys.map((key) {
+                            final canEdit =
+                                controller.hasPermission('settings_manage_access');
                             final isAllowed =
                                 controller.staffAccessRules[key] ?? false;
                             final label =
@@ -93,12 +95,16 @@ class AccessControlView extends GetView<SettingsController> {
                                   ),
                                   trailing: Switch(
                                     value: isAllowed,
-                                    onChanged: (val) =>
-                                        controller.toggleAccess(key, val),
+                                    onChanged: canEdit
+                                        ? (val) =>
+                                            controller.toggleAccess(key, val)
+                                        : null,
                                     activeThumbColor: colorScheme.primary,
                                   ),
-                                  onTap: () =>
-                                      controller.toggleAccess(key, !isAllowed),
+                                  onTap: canEdit
+                                      ? () =>
+                                          controller.toggleAccess(key, !isAllowed)
+                                      : null,
                                 ),
                                 if (!isLast)
                                   Divider(

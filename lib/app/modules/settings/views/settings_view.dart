@@ -40,58 +40,48 @@ class SettingsView extends StatelessWidget {
             SizedBox(height: 24.h),
 
             /// 2. Shop Management Section
-            _buildSectionHeader(context, "shop_management".tr),
-            SizedBox(height: 8.h),
-
-            // Shop Details & Inventory Config
             Obx(() {
-              final canViewShop = controller.hasPermission(
-                'settings_view_shop',
-              );
-              final canEditInventoryConfig = controller.hasPermission(
-                'shop_setup',
-              );
+              final hasViewShop = controller.hasPermission('settings_view_shop');
+              final hasShopSetup = controller.hasPermission('shop_setup');
+              if (!hasViewShop && !hasShopSetup) return const SizedBox.shrink();
 
-              if (!canViewShop && !canEditInventoryConfig) {
-                return const SizedBox.shrink();
-              }
-
-              return Container(
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    if (canViewShop)
-                      _buildSettingsTile(
-                        context,
-                        icon: Iconsax.shop,
-                        title: "shop_details".tr,
-                        subtitle: "shop_details_sub".tr,
-                        onTap: controller.editShopDetails,
-                      ),
-
-                    if (canViewShop && canEditInventoryConfig)
-                      _buildDivider(context),
-
-                    if (canEditInventoryConfig)
-                      _buildSettingsTile(
-                        context,
-                        icon: Iconsax.box,
-                        title:
-                            "inventory_config".tr, // "Inventory Configuration"
-                        subtitle: "inventory_config_sub".tr,
-                        onTap: controller.navigateToInventorySettings,
-                        trailingIcon: Iconsax.arrow_right_3,
-                        iconColor: colorScheme.primary,
-                      ),
-                  ],
-                ),
+              return Column(
+                children: [
+                  _buildSectionHeader(context, "shop_management".tr),
+                  SizedBox(height: 8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        if (hasViewShop)
+                          _buildSettingsTile(
+                            context,
+                            icon: Iconsax.shop,
+                            title: "shop_details".tr,
+                            subtitle: "shop_details_sub".tr,
+                            onTap: controller.editShopDetails,
+                          ),
+                        if (hasViewShop && hasShopSetup) _buildDivider(context),
+                        if (hasShopSetup)
+                          _buildSettingsTile(
+                            context,
+                            icon: Iconsax.box,
+                            title: "inventory_config".tr, // "Inventory Configuration"
+                            subtitle: "inventory_config_sub".tr,
+                            onTap: controller.navigateToInventorySettings,
+                            trailingIcon: Iconsax.arrow_right_3,
+                            iconColor: colorScheme.primary,
+                          ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+                ],
               );
             }),
-
-            SizedBox(height: 24.h),
 
             // Configurations (Currency, Date, TZ, Rental Logic)
             Obx(() {
@@ -104,69 +94,65 @@ class SettingsView extends StatelessWidget {
               final canEditTimeZone = controller.hasPermission(
                 'settings_edit_timezone',
               );
-              final canEditRentalLogic = controller.hasPermission(
-                'settings_edit_rental_logic',
-              );
 
               final List<Widget> items = [];
 
-              if (canEditCurrency) {
-                items.add(
-                  Obx(
-                    () => _buildSettingsTile(
-                      context,
-                      icon: Iconsax.money,
-                      title: "currency".tr,
-                      subtitle: controller.currency.value,
-                      onTap: controller.showCurrencyPicker,
-                      trailingIcon: Iconsax.arrow_right_3,
-                      iconColor: Colors.green,
-                    ),
+              // Currency
+              items.add(
+                Obx(
+                  () => _buildSettingsTile(
+                    context,
+                    icon: Iconsax.money,
+                    title: "currency".tr,
+                    subtitle: controller.currency.value,
+                    onTap: canEditCurrency ? controller.showCurrencyPicker : null,
+                    trailingIcon: canEditCurrency ? Iconsax.arrow_right_3 : null,
+                    trailing: canEditCurrency ? null : const SizedBox.shrink(),
+                    iconColor: Colors.green,
                   ),
-                );
-                items.add(_buildDivider(context));
-              }
+                ),
+              );
+              items.add(_buildDivider(context));
 
-              if (canEditDate) {
-                items.add(
-                  Obx(
-                    () => _buildSettingsTile(
-                      context,
-                      icon: Iconsax.calendar_1,
-                      title: "date_format".tr,
-                      subtitle: controller.dateFormat.value,
-                      onTap: controller.showDateFormatPicker,
-                      trailingIcon: Iconsax.arrow_right_3,
-                      iconColor: Colors.purple,
-                    ),
+              // Date Format
+              items.add(
+                Obx(
+                  () => _buildSettingsTile(
+                    context,
+                    icon: Iconsax.calendar_1,
+                    title: "date_format".tr,
+                    subtitle: controller.dateFormat.value,
+                    onTap: canEditDate ? controller.showDateFormatPicker : null,
+                    trailingIcon: canEditDate ? Iconsax.arrow_right_3 : null,
+                    trailing: canEditDate ? null : const SizedBox.shrink(),
+                    iconColor: Colors.purple,
                   ),
-                );
-                items.add(_buildDivider(context));
-              }
+                ),
+              );
+              items.add(_buildDivider(context));
 
-              if (canEditTimeZone) {
-                items.add(
-                  Obx(
-                    () => _buildSettingsTile(
-                      context,
-                      icon: Iconsax.clock,
-                      title: "time_zone".tr,
-                      subtitle: controller.timeZone.value,
-                      onTap: controller.showTimeZonePicker,
-                      trailingIcon: Iconsax.arrow_right_3,
-                      iconColor: Colors.blue,
-                    ),
+              // Time Zone
+              items.add(
+                Obx(
+                  () => _buildSettingsTile(
+                    context,
+                    icon: Iconsax.clock,
+                    title: "time_zone".tr,
+                    subtitle: controller.timeZone.value,
+                    onTap: canEditTimeZone ? controller.showTimeZonePicker : null,
+                    trailingIcon: canEditTimeZone ? Iconsax.arrow_right_3 : null,
+                    trailing: canEditTimeZone ? null : const SizedBox.shrink(),
+                    iconColor: Colors.blue,
                   ),
-                );
-                items.add(_buildDivider(context));
-              }
+                ),
+              );
+              items.add(_buildDivider(context));
 
-              // Rental Pricing - Admin gets full config, Staff gets pricing logic only
+              // Rental Pricing - Admin gets full config, Staff gets pricing logic only (view-only if no permission)
               final isAdmin =
                   controller.userProfile.value[FirestoreFields.role] == 'admin';
 
               if (isAdmin) {
-                // Admin gets full Rental Config View
                 items.add(
                   _buildSettingsTile(
                     context,
@@ -178,8 +164,7 @@ class SettingsView extends StatelessWidget {
                     iconColor: Colors.orange,
                   ),
                 );
-              } else if (canEditRentalLogic) {
-                // Staff with permission gets Rental Pricing Logic View
+              } else {
                 items.add(
                   _buildSettingsTile(
                     context,
@@ -193,20 +178,6 @@ class SettingsView extends StatelessWidget {
                 );
               }
 
-              if (items.isEmpty) return const SizedBox.shrink();
-              if (items.last is Divider) {
-                items
-                    .removeLast(); // Logic to remove last divider if present isn't straightforward with generic Widgets, but assuming layout for now.
-              }
-
-              // Remove the last divider manually if the last item added was a divider
-              if (items.isNotEmpty && items.last is Divider) {
-                // Wait, can't verify runtime type easily if it's wrapped.
-                // I'll just rely on the fact that I add a divider AFTER each item.
-                // So removing the last one is correct.
-                items.removeLast();
-              }
-
               return Container(
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainer,
@@ -218,17 +189,10 @@ class SettingsView extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
-            /// 2.5 Access Control Section (Admin Only)
+            /// 2.5 Access Control Section
             Obx(() {
-              final isOwnerAdmin =
-                  controller.userProfile.value[FirestoreFields.role] == 'admin';
-              final canManageAccess = controller.hasPermission(
-                'settings_manage_access',
-              );
-
-              if (!isOwnerAdmin || !canManageAccess) {
-                return const SizedBox.shrink();
-              }
+              final hasManageAccess = controller.hasPermission('settings_manage_access');
+              if (!hasManageAccess) return const SizedBox.shrink();
 
               return Column(
                 children: [
@@ -247,11 +211,10 @@ class SettingsView extends StatelessWidget {
                       trailingIcon: Iconsax.arrow_right_3,
                     ),
                   ),
+                  SizedBox(height: 24.h),
                 ],
               );
             }),
-
-            SizedBox(height: 24.h),
 
             /// 3. App Settings Section
             _buildSectionHeader(context, "app_settings".tr),
@@ -263,13 +226,22 @@ class SettingsView extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildSettingsTile(
-                    context,
-                    icon: Iconsax.notification,
-                    title: "notifications".tr,
-                    onTap: () => Get.toNamed(Routes.SCHEDULED_NOTIFICATIONS),
-                  ),
-                  _buildDivider(context),
+                  Obx(() {
+                    final hasAlerts = controller.hasPermission('alerts');
+                    if (!hasAlerts) return const SizedBox.shrink();
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildSettingsTile(
+                          context,
+                          icon: Iconsax.notification,
+                          title: "notifications".tr,
+                          onTap: () => Get.toNamed(Routes.SCHEDULED_NOTIFICATIONS),
+                        ),
+                        _buildDivider(context),
+                      ],
+                    );
+                  }),
                   Obx(
                     () => _buildSettingsTile(
                       context,
