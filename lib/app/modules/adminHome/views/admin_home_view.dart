@@ -203,25 +203,51 @@ class AdminHomeView extends GetView<AdminHomeController> {
           ),
         ),
 
-        // Profile Pic
-        InkWell(
-          onTap: () {
-            Get.toNamed(Routes.QR_SCANNER);
-          },
-          child: Container(
-            height: 40.w,
-            width: 40.w,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainer,
-              shape: BoxShape.circle,
-              border: Border.all(color: colorScheme.outline),
+        // Action Buttons Row
+        Row(
+          children: [
+            // Analytics Button
+            InkWell(
+              onTap: () {
+                Get.toNamed(Routes.ANALYTICS);
+              },
+              child: Container(
+                height: 40.w,
+                width: 40.w,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colorScheme.outline),
+                ),
+                child: Icon(
+                  Iconsax.chart_21,
+                  color: colorScheme.onSurface,
+                  size: 20.sp,
+                ),
+              ),
             ),
-            child: Icon(
-              Iconsax.scan_barcode,
-              color: colorScheme.onSurface,
-              size: 20.sp,
+            SizedBox(width: 12.w),
+            // Barcode Scanner Button
+            InkWell(
+              onTap: () {
+                Get.toNamed(Routes.QR_SCANNER);
+              },
+              child: Container(
+                height: 40.w,
+                width: 40.w,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colorScheme.outline),
+                ),
+                child: Icon(
+                  Iconsax.scan_barcode,
+                  color: colorScheme.onSurface,
+                  size: 20.sp,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );

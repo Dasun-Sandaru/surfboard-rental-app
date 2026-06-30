@@ -12,6 +12,8 @@ import '../modules/addInventory/bindings/add_inventory_binding.dart';
 import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
 import '../modules/adminHome/views/admin_home_view.dart';
+import '../modules/analytics/bindings/analytics_binding.dart';
+import '../modules/analytics/views/analytics_view.dart';
 import '../modules/agreement/bindings/agreement_binding.dart';
 import '../modules/agreement/views/agreement_wizard_view.dart';
 import '../modules/agreementTemplate/bindings/agreement_template_binding.dart';
@@ -337,6 +339,14 @@ class AppPages {
       page: () => const ReportsView(),
       binding: ReportsBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'reports')],
+    ),
+    GetPage(
+      name: _Paths.ANALYTICS,
+      page: () => const AnalyticsView(),
+      binding: AnalyticsBinding(),
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'reports'), // Same permission key as reports
+      ],
     ),
     GetPage(
       name: _Paths.SCHEDULED_NOTIFICATIONS,
