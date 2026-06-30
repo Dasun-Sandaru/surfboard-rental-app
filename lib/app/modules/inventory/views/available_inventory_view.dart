@@ -403,7 +403,7 @@ class AvailableInventoryView extends GetView<AvailableInventoryController> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    item.status.name.toUpperCase(),
+                    item.status.name.tr.toUpperCase(),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 12.sp,
