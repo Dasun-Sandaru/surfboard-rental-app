@@ -24,7 +24,6 @@ import '../../../models/security_deposit_model.dart';
 import '../../../models/shop_model.dart';
 import '../../../services/config_service.dart';
 import '../../../services/damage_fee_service.dart';
-import '../../../services/payment_service.dart';
 import '../../../services/user_service.dart';
 
 class AgreementController extends GetxController {
@@ -34,7 +33,6 @@ class AgreementController extends GetxController {
   final PdfService _pdfService = PdfService();
   final ShopService _shopService = ShopService();
   final RentalService _rentalService = RentalService();
-  final PaymentService _paymentService = PaymentService();
 
   // -- Agreement Data --
   final Rxn<InitRentalModel> initRentalModel = Rxn<InitRentalModel>();

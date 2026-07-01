@@ -36,7 +36,6 @@ class NewRentalController extends GetxController {
 
   void selectCustomer() async {
     // Navigate to Customer List in 'selection mode'
-    // You need to update your CustomerListView to handle arguments for selection
     final result = await Get.toNamed(
       Routes.CUSTOMER_LIST,
       arguments: {'selectMode': true},

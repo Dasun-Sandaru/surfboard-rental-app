@@ -11,9 +11,6 @@ import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
 
 import '../../../../utils/theme/app_material_theme.dart';
-
-import '../../../../utils/theme/app_material_theme.dart';
-
 import '../../../models/activity_log_model.dart';
 import '../../../models/user_model.dart';
 import '../controllers/user_detail_controller.dart';
@@ -483,7 +480,6 @@ class UserDetailView extends GetView<UserDetailController> {
 
   Widget _buildHistoryList(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final statusColors = Theme.of(context).extension<StatusColors>();
 
     return Obx(() {
       if (controller.isLoadingStats.value) {
@@ -547,7 +543,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
     final colorScheme = Theme.of(context).colorScheme;
     final logModel = widget.logModel;
     final date = logModel.timestamp;
-          
+
     final day = DateFormat('dd').format(date);
     final month = DateFormat('MMM').format(date);
     final time = DateFormat('hh:mm a').format(date);
@@ -563,7 +559,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
     String badgeText = "activity_label".tr;
     Color badgeColor = colorScheme.primary.withValues(alpha: 0.1);
     Color badgeTextColor = colorScheme.primary;
-          
+
     if (logModel.activityType == ActivityType.create_rental) {
       badgeText = "rental_label".tr;
       badgeColor = Colors.green.withValues(alpha: 0.15);
@@ -585,9 +581,11 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
     String amountStr = "";
     if (logModel.metadata != null) {
       if (logModel.metadata!.containsKey('amountExpected')) {
-        amountStr = " • \$${(logModel.metadata!['amountExpected'] as num).toStringAsFixed(2)}";
+        amountStr =
+            " • \$${(logModel.metadata!['amountExpected'] as num).toStringAsFixed(2)}";
       } else if (logModel.metadata!.containsKey('amount')) {
-        amountStr = " • \$${(logModel.metadata!['amount'] as num).toStringAsFixed(2)}";
+        amountStr =
+            " • \$${(logModel.metadata!['amount'] as num).toStringAsFixed(2)}";
       }
     }
 
@@ -645,7 +643,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                     ),
                   ),
                   SizedBox(width: 16.w),
-                  
+
                   // Details
                   Expanded(
                     child: Column(
@@ -659,7 +657,9 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: _isExpanded ? 3 : 1,
-                          overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                          overflow: _isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 6.h),
                         Row(
@@ -683,15 +683,18 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                       ],
                     ),
                   ),
-                  
+
                   SizedBox(width: 12.w),
-                  
+
                   // Badge & Chevron
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 6.h,
+                        ),
                         decoration: BoxDecoration(
                           color: badgeColor,
                           borderRadius: BorderRadius.circular(20),
@@ -715,13 +718,16 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                   ),
                 ],
               ),
-              
+
               // Expanded Content
               if (_isExpanded) ...[
                 SizedBox(height: 16.h),
-                Divider(color: colorScheme.outline.withValues(alpha: 0.5), height: 1),
+                Divider(
+                  color: colorScheme.outline.withValues(alpha: 0.5),
+                  height: 1,
+                ),
                 SizedBox(height: 12.h),
-                
+
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -731,25 +737,42 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                         children: [
                           Text(
                             "entity_type".tr,
-                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11.sp),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11.sp,
+                            ),
                           ),
                           Text(
                             logModel.entityType,
-                            style: TextStyle(color: colorScheme.onSurface, fontSize: 13.sp, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           SizedBox(height: 8.h),
                           Text(
                             "entity_id".tr,
-                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11.sp),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11.sp,
+                            ),
                           ),
                           Text(
-                            logModel.entityId.length > 8 ? "...${logModel.entityId.substring(logModel.entityId.length - 8)}" : logModel.entityId,
-                            style: TextStyle(color: colorScheme.onSurface, fontSize: 13.sp, fontWeight: FontWeight.w500),
+                            logModel.entityId.length > 8
+                                ? "...${logModel.entityId.substring(logModel.entityId.length - 8)}"
+                                : logModel.entityId,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    if (logModel.metadata != null && logModel.metadata!.isNotEmpty)
+                    if (logModel.metadata != null &&
+                        logModel.metadata!.isNotEmpty)
                       Expanded(
                         flex: 2,
                         child: Column(
@@ -757,7 +780,10 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                           children: [
                             Text(
                               "additional_data".tr,
-                              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11.sp),
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 11.sp,
+                              ),
                             ),
                             SizedBox(height: 4.h),
                             ...logModel.metadata!.entries.map((e) {
@@ -768,12 +794,19 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                                   children: [
                                     Text(
                                       "${e.key}: ",
-                                      style: TextStyle(color: colorScheme.primary, fontSize: 12.sp, fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                     Expanded(
                                       child: Text(
                                         "${e.value}",
-                                        style: TextStyle(color: colorScheme.onSurface, fontSize: 12.sp),
+                                        style: TextStyle(
+                                          color: colorScheme.onSurface,
+                                          fontSize: 12.sp,
+                                        ),
                                       ),
                                     ),
                                   ],

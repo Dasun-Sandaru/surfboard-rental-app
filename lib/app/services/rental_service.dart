@@ -211,11 +211,15 @@ class RentalService {
           transaction: transaction,
         );
         // --- NOTIFICATION TRIGGER ---
-        final triggerRef = _shopRef(shopId).collection('notification_triggers').doc(rentalId);
+        final triggerRef = _shopRef(
+          shopId,
+        ).collection('notification_triggers').doc(rentalId);
         transaction.set(triggerRef, {
           'rentalId': rentalId,
           'shopId': shopId,
-          'expectedReturnTime': Timestamp.fromDate(rentalData.expectedReturnTime),
+          'expectedReturnTime': Timestamp.fromDate(
+            rentalData.expectedReturnTime,
+          ),
           'status': 'pending',
           'title': 'Rental Return Due',
           'body': 'Rental for ${rentalData.cachedItemName ?? "Item"} is due.',
@@ -226,10 +230,16 @@ class RentalService {
 
       log('Rental created successfully: $rentalId', name: logName);
 
-      // --- SEND EMAIL VIA RESEND ---
-      final customerSnap = await _shopRef(shopId).collection(FirestoreCollections.customers).doc(rentalData.customerId).get();
-      final customerEmail = customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
-      final customerFirstName = customerSnap.data()?[FirestoreFields.firstName]?.toString() ?? 'Customer';
+      // --- SEND EMAIL VIA EmailJS ---
+      final customerSnap = await _shopRef(shopId)
+          .collection(FirestoreCollections.customers)
+          .doc(rentalData.customerId)
+          .get();
+      final customerEmail =
+          customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
+      final customerFirstName =
+          customerSnap.data()?[FirestoreFields.firstName]?.toString() ??
+          'Customer';
 
       if (customerEmail.isNotEmpty) {
         try {
@@ -288,7 +298,9 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
 
-      final triggerRef = _shopRef(shopId).collection('notification_triggers').doc(rentalId);
+      final triggerRef = _shopRef(
+        shopId,
+      ).collection('notification_triggers').doc(rentalId);
 
       await docRef.delete();
       await triggerRef.delete();
@@ -384,8 +396,10 @@ class RentalService {
         final currentRentalSnap = await transaction.get(rentalRef);
         final hasActualReturnTime =
             currentRentalSnap.data()?[FirestoreFields.actualReturnTime] != null;
-            
-        final triggerRef = shopRef.collection('notification_triggers').doc(rentalId);
+
+        final triggerRef = shopRef
+            .collection('notification_triggers')
+            .doc(rentalId);
         final triggerSnap = await transaction.get(triggerRef);
 
         transaction.update(rentalRef, {
@@ -417,9 +431,7 @@ class RentalService {
 
         // --- CANCEL NOTIFICATION TRIGGER ---
         if (triggerSnap.exists) {
-          transaction.update(triggerRef, {
-            'status': 'completed',
-          });
+          transaction.update(triggerRef, {'status': 'completed'});
         }
       });
 
@@ -428,19 +440,31 @@ class RentalService {
         name: logName,
       );
 
-      // --- SEND INVOICE EMAIL VIA RESEND ---
+      // --- SEND INVOICE EMAIL VIA EmailJS ---
       if (status == RentalStatus.completed && invoiceLink != null) {
         try {
-          final shopSnap = await shopRef.get() as DocumentSnapshot<Map<String, dynamic>>;
-          final rentalSnap = await rentalRef.get() as DocumentSnapshot<Map<String, dynamic>>;
-          final customerId = rentalSnap.data()?[FirestoreFields.customerId] as String?;
+          final shopSnap =
+              await shopRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+          final rentalSnap = await rentalRef.get();
+          final customerId =
+              rentalSnap.data()?[FirestoreFields.customerId] as String?;
           if (customerId != null) {
-            final customerSnap = await shopRef.collection(FirestoreCollections.customers).doc(customerId).get() as DocumentSnapshot<Map<String, dynamic>>;
-          
-            final customerEmail = customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
-            final customerFirstName = customerSnap.data()?[FirestoreFields.firstName]?.toString() ?? 'Customer';
-            final totalAmount = (rentalSnap.data()?[FirestoreFields.amountPaid] as num?)?.toDouble() ?? 0.0;
-            final currency = shopSnap.data()?[FirestoreFields.currency]?.toString() ?? 'LKR';
+            final customerSnap = await shopRef
+                .collection(FirestoreCollections.customers)
+                .doc(customerId)
+                .get();
+
+            final customerEmail =
+                customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
+            final customerFirstName =
+                customerSnap.data()?[FirestoreFields.firstName]?.toString() ??
+                'Customer';
+            final totalAmount =
+                (rentalSnap.data()?[FirestoreFields.amountPaid] as num?)
+                    ?.toDouble() ??
+                0.0;
+            final currency =
+                shopSnap.data()?[FirestoreFields.currency]?.toString() ?? 'LKR';
 
             if (customerEmail.isNotEmpty) {
               final emailService = Get.find<EmailService>();
@@ -458,7 +482,6 @@ class RentalService {
           log('Error sending invoice email: $e', name: logName);
         }
       }
-
     } catch (e) {
       log('Error finalizing return: $e', name: logName);
       rethrow;
@@ -699,15 +722,6 @@ class RentalService {
 
       if (searchTerm != null && searchTerm.isNotEmpty) {
         final searchLower = searchTerm.toLowerCase();
-        // Since Firestore can't do OR queries with range filters effectively across different fields,
-        // we'll prioritize Item Name search here, or we'd need a composite field if both are needed at once.
-        // For now, let's allow searching by item name or customer name by checking both if possible,
-        // but typically prefix search is best on one field.
-        // I will implement search by item name lowercase as the primary search field for "active rentals"
-        // or optimize it to check either if we can.
-        // Actually, for multiple fields, we might need a combined lowercase field or search twice.
-        // Let's settle for searching by itemName_lowercase for now as board identity is primary.
-
         query = query
             .where(
               FirestoreFields.itemNameLowercase,

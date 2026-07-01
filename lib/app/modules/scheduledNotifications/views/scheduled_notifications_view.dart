@@ -76,7 +76,6 @@ class ScheduledNotificationsView extends GetView<ScheduledNotificationsControlle
             separatorBuilder: (context, index) => SizedBox(height: 12.h),
             itemBuilder: (context, index) {
               final req = controller.pendingNotifications[index];
-              print("title ${req.title } \n body${req.body } \n payload ${req.payload }" );
               return Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(

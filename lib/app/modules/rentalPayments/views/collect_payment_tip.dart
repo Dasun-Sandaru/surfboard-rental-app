@@ -37,8 +37,9 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
 
     return Obx(() {
       final rental = controller.rental.value;
-      if (rental == null)
+      if (rental == null) {
         return const Center(child: CircularProgressIndicator());
+      }
 
       final double balance = controller.totalAmount;
       final double deposit = controller.depositHeld;
@@ -421,6 +422,8 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
           inventoryStatus: inventoryStatus,
         );
       }
+
+      if (!mounted) return;
 
       // 6. Show Rating Dialog
       await showDialog(

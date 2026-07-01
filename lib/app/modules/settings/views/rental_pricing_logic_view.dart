@@ -109,7 +109,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
                         onChanged: canEdit
                             ? (val) => controller.isTaxEnabled.value = val
                             : null,
-                        activeColor: colorScheme.primary,
+                        activeThumbColor: colorScheme.primary,
                         contentPadding: EdgeInsets.zero,
                       ),
                     ),

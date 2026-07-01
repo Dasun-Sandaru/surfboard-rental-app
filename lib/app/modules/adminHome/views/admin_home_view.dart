@@ -8,7 +8,6 @@ import '../../../../utils/constants/a_image_strings.dart';
 
 import '../../alerts/views/alerts_view.dart';
 import '../controllers/admin_home_controller.dart';
-import '../../../services/local_notification_service.dart';
 
 class AdminHomeView extends GetView<AdminHomeController> {
   const AdminHomeView({super.key});

@@ -84,8 +84,9 @@ class RentalDetailController extends GetxController {
 
   Stream<List<DamagePhotoModel>> getDamagePhotos(String damageId) {
     final currentRental = rental.value;
-    if (currentRental == null || currentRental.id == null)
+    if (currentRental == null || currentRental.id == null) {
       return Stream.value([]);
+    }
     return _damageReportService.getDamagePhotos(
       shopId: currentRental.shopId,
       rentalId: currentRental.id!,

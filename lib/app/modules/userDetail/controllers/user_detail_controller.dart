@@ -10,7 +10,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../data/firestore/firestore_collections.dart';
 import '../../../../data/firestore/firestore_fields.dart';
 import '../../../models/activity_log_model.dart';
-import '../../../models/rental_model.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../widgets/user_qr_code_dialog.dart';
 
