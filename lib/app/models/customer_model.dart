@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/firestore/firestore_fields.dart';
+import '../../utils/helper/encryption_helper.dart';
 
 class CustomerModel {
   final String? id;
@@ -46,7 +47,7 @@ class CustomerModel {
       firstName: json[FirestoreFields.firstName] ?? '',
       lastName: json[FirestoreFields.lastName] ?? '',
       phone: json[FirestoreFields.phone] ?? '',
-      nic: json[FirestoreFields.nic] ?? '',
+      nic: EncryptionHelper.decryptString(json[FirestoreFields.nic] ?? ''),
       email: json[FirestoreFields.email] ?? '',
       notes: json[FirestoreFields.notes] ?? '',
       createdAt: json[FirestoreFields.createdAt] is Timestamp
@@ -71,7 +72,7 @@ class CustomerModel {
       firstName: data[FirestoreFields.firstName] ?? '',
       lastName: data[FirestoreFields.lastName] ?? '',
       phone: data[FirestoreFields.phone] ?? '',
-      nic: data[FirestoreFields.nic] ?? '',
+      nic: EncryptionHelper.decryptString(data[FirestoreFields.nic] ?? ''),
       email: data[FirestoreFields.email] ?? '',
       notes: data[FirestoreFields.notes] ?? '',
       createdAt: data[FirestoreFields.createdAt] is Timestamp
@@ -93,7 +94,7 @@ class CustomerModel {
       FirestoreFields.firstName: firstName,
       FirestoreFields.lastName: lastName,
       FirestoreFields.phone: phone,
-      FirestoreFields.nic: nic,
+      FirestoreFields.nic: EncryptionHelper.encryptString(nic),
       FirestoreFields.email: email,
       FirestoreFields.notes: notes,
       FirestoreFields.createdAt: createdAt != null
