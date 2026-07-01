@@ -209,7 +209,7 @@ class ReportsController extends GetxController {
   }
 
   Future<void> _fetchRentals(DocumentReference shopDoc) async {
-    reportColumns.value = ['customer'.tr, 'start_date'.tr, 'end_date'.tr, 'status'.tr, 'total'.tr];
+    reportColumns.value = ['customer'.tr, 'start_date_time'.tr, 'end_date_time'.tr, 'status'.tr, 'total'.tr];
     
     Query query = shopDoc.collection(FirestoreCollections.rentals);
     
@@ -239,8 +239,8 @@ class ReportsController extends GetxController {
       
       reportResults.add({
         'customer'.tr: data[FirestoreFields.cachedCustomerName] ?? '-',
-        'start_date'.tr: start != null ? DateFormat('MMM d, yyyy').format(start.toDate()) : '-',
-        'end_date'.tr: end != null ? DateFormat('MMM d, yyyy').format(end.toDate()) : '-',
+        'start_date_time'.tr: start != null ? DateFormat('MMM d, yyyy, h:mm a').format(start.toDate()) : '-',
+        'end_date_time'.tr: end != null ? DateFormat('MMM d, yyyy, h:mm a').format(end.toDate()) : '-',
         'status'.tr: (data[FirestoreFields.status] ?? '-').toString().toUpperCase(),
         'total'.tr: '${shop.currency} $total',
       });
