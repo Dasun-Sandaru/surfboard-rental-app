@@ -8,6 +8,7 @@ import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/storage/app_storage.dart';
 import '../../../models/inventory_model.dart';
 import '../../../models/rental_model.dart';
+import '../../../services/firestore_usage_service.dart';
 
 class AnalyticsController extends GetxController {
   final isLoading = false.obs;
@@ -66,6 +67,8 @@ class AnalyticsController extends GetxController {
           .collection(FirestoreCollections.rentals)
           .get();
 
+      FirestoreUsageService.to.trackQuerySnapshot(rentalsSnapshot);
+
       final allRentals = rentalsSnapshot.docs
           .map((doc) => RentalModel.fromSnapshot(doc))
           .toList();
@@ -76,6 +79,8 @@ class AnalyticsController extends GetxController {
           .doc(shopId)
           .collection(FirestoreCollections.inventory)
           .get();
+
+      FirestoreUsageService.to.trackQuerySnapshot(inventorySnapshot);
 
       final allInventory = inventorySnapshot.docs
           .map((doc) => InventoryModel.fromSnapshot(doc))

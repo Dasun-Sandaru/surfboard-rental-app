@@ -47,6 +47,7 @@ abstract class Routes {
   static const REPORTS = _Paths.REPORTS;
   static const SCHEDULED_NOTIFICATIONS = _Paths.SCHEDULED_NOTIFICATIONS;
   static const ANALYTICS = _Paths.ANALYTICS;
+  static const BILLING = _Paths.BILLING;
 }
 
 abstract class _Paths {
@@ -93,4 +94,5 @@ abstract class _Paths {
   static const REPORTS = '/reports';
   static const SCHEDULED_NOTIFICATIONS = '/scheduled-notifications';
   static const ANALYTICS = '/analytics';
+  static const BILLING = '/billing';
 }

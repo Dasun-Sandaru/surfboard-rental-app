@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
+import 'firestore_usage_service.dart';
 
 class ShopService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -39,6 +40,7 @@ class ShopService {
       });
 
       await batch.commit();
+      FirestoreUsageService.to.trackWrite(1);
       log('Shop created: ${shopRef.id}', name: logName);
       return shopRef.id;
     } catch (e) {
@@ -50,10 +52,11 @@ class ShopService {
   // ---------------------------------------------------------------------------
   // GET SHOP DETAILS ONCE
   // ---------------------------------------------------------------------------
-  Future<DocumentSnapshot> getShop(String shopId) {
+  Future<DocumentSnapshot> getShop(String shopId) async {
     try {
-      log('Fetching shop details once for: $shopId', name: logName);
-      return _shopRef(shopId).get();
+      final doc = await _shopRef(shopId).get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
+      return doc;
     } catch (e) {
       log('Error fetching shop details: $e', name: logName);
       rethrow;
@@ -79,6 +82,7 @@ class ShopService {
       }
 
       await _shopRef(shopId).update(data);
+      FirestoreUsageService.to.trackWrite(1);
       log('Shop details updated for: $shopId', name: logName);
     } catch (e) {
       log('Error updating shop details: $e', name: logName);
@@ -96,6 +100,7 @@ class ShopService {
     try {
       log('Updating shop fields for: $shopId', name: logName);
       await _shopRef(shopId).update(data);
+      FirestoreUsageService.to.trackWrite(1);
       log('Shop fields updated for: $shopId', name: logName);
     } catch (e) {
       log('Error updating shop fields: $e', name: logName);
@@ -108,10 +113,12 @@ class ShopService {
   // ---------------------------------------------------------------------------
   Stream<QuerySnapshot> getShopMembers(String shopId) {
     try {
-      log('Getting shop members stream for: $shopId', name: logName);
       return _shopRef(
         shopId,
-      ).collection('members').snapshots(); // Constant for 'members' ??
+      ).collection('members').snapshots().map((snapshot) {
+        FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+        return snapshot;
+      });
     } catch (e) {
       log('Error creating shop members stream: $e', name: logName);
       rethrow;
@@ -123,8 +130,9 @@ class ShopService {
   // ---------------------------------------------------------------------------
   Future<QuerySnapshot> getShopMembersOnce(String shopId) async {
     try {
-      log('Fetching shop members once for: $shopId', name: logName);
-      return await _shopRef(shopId).collection('members').get();
+      final snapshot = await _shopRef(shopId).collection('members').get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot;
     } catch (e) {
       log('Error fetching shop members: $e', name: logName);
       rethrow;
@@ -145,6 +153,7 @@ class ShopService {
         FirestoreFields.role: role,
         'added_at': FieldValue.serverTimestamp(),
       });
+      FirestoreUsageService.to.trackWrite(1);
       log('Member added to shop: $userId', name: logName);
     } catch (e) {
       log('Error adding member: $e', name: logName);
@@ -162,6 +171,7 @@ class ShopService {
     try {
       log('Removing member from shop: $shopId, userId: $userId', name: logName);
       await _shopRef(shopId).collection('members').doc(userId).delete();
+      FirestoreUsageService.to.trackDelete(1);
       log('Member removed from shop: $userId', name: logName);
     } catch (e) {
       log('Error removing member: $e', name: logName);

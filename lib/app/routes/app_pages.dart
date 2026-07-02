@@ -8,6 +8,8 @@ import '../middleware/onboarding_middleware.dart';
 import '../middleware/role_middleware.dart';
 import '../modules/addEditCustomer/bindings/add_edit_customer_binding.dart';
 import '../modules/addEditCustomer/views/add_edit_customer_view.dart';
+import '../modules/billing/bindings/billing_binding.dart';
+import '../modules/billing/views/billing_view.dart';
 import '../modules/addInventory/bindings/add_inventory_binding.dart';
 import '../modules/addInventory/views/add_inventory_view.dart';
 import '../modules/adminHome/bindings/admin_home_binding.dart';
@@ -353,6 +355,14 @@ class AppPages {
       page: () => const ScheduledNotificationsView(),
       binding: ScheduledNotificationsBinding(),
       middlewares: [AccessControlMiddleware(routeKey: 'alerts')],
+    ),
+    GetPage(
+      name: _Paths.BILLING,
+      page: () => const BillingView(),
+      binding: BillingBinding(),
+      middlewares: [
+        AccessControlMiddleware(routeKey: 'shop_setup'), // Reuse shop_setup for Admin-only access
+      ],
     ),
   ];
 }

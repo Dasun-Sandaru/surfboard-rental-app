@@ -7,6 +7,7 @@ import '../../../../utils/common/a_app_dialogs.dart';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../services/firestore_usage_service.dart';
 import '../../../../data/firestore/firestore_collections.dart';
 import '../../../../data/firestore/firestore_fields.dart';
 import '../../../models/activity_log_model.dart';
@@ -87,6 +88,8 @@ class UserDetailController extends GetxController {
           .where(FirestoreFields.actorId, isEqualTo: uid)
           .orderBy(FirestoreFields.timestamp, descending: true)
           .get();
+
+      FirestoreUsageService.to.trackQuerySnapshot(logsSnapshot);
 
       int count = 0;
       double revenue = 0.0;

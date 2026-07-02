@@ -6,6 +6,7 @@ import 'activity_log_service.dart';
 import '../../utils/constants/a_enums.dart';
 
 import '../models/customer_model.dart';
+import 'firestore_usage_service.dart';
 
 class CustomerService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -49,6 +50,7 @@ class CustomerService {
         );
       });
 
+      FirestoreUsageService.to.trackWrite(2);
       log('Customer created: ${docRef.id}', name: logName);
       return docRef.id;
     } catch (e) {
@@ -65,7 +67,10 @@ class CustomerService {
       log('Getting customers stream for shop: $shopId', name: logName);
       return _shopRef(
         shopId,
-      ).collection(FirestoreCollections.customers).snapshots();
+      ).collection(FirestoreCollections.customers).snapshots().map((snapshot) {
+        FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+        return snapshot;
+      });
     } catch (e) {
       log('Error creating customers stream: $e', name: logName);
       rethrow;
@@ -81,9 +86,11 @@ class CustomerService {
   ) async {
     try {
       log('Fetching customer: $customerId', name: logName);
-      return await _shopRef(
+      final doc = await _shopRef(
         shopId,
       ).collection(FirestoreCollections.customers).doc(customerId).get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
+      return doc;
     } catch (e) {
       log('Error fetching customer: $e', name: logName);
       rethrow;
@@ -108,6 +115,7 @@ class CustomerService {
         FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
       });
 
+      FirestoreUsageService.to.trackWrite(1);
       log('Customer updated: $customerId', name: logName);
     } catch (e) {
       log('Error updating customer: $e', name: logName);
@@ -143,6 +151,8 @@ class CustomerService {
         );
       });
 
+      FirestoreUsageService.to.trackDelete(1);
+      FirestoreUsageService.to.trackWrite(1);
       log('Customer deleted: $customerId', name: logName);
     } catch (e) {
       log('Error deleting customer: $e', name: logName);
@@ -159,6 +169,7 @@ class CustomerService {
       final aggregateQuery = await _shopRef(
         shopId,
       ).collection(FirestoreCollections.customers).count().get();
+      FirestoreUsageService.to.trackRead(1);
       return aggregateQuery.count ?? 0;
     } catch (e) {
       log('Error counting customers: $e', name: logName);
@@ -197,7 +208,9 @@ class CustomerService {
         }
       }
 
-      return await query.get();
+      final snapshot = await query.get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot;
     } catch (e) {
       log('Error fetching customers page: $e', name: logName);
       rethrow;
@@ -234,6 +247,7 @@ class CustomerService {
       }
 
       await customerRef.update(updateData);
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Customer rental stats updated: $customerId', name: logName);
     } catch (e) {
@@ -246,7 +260,10 @@ class CustomerService {
     return _shopRef(shopId)
         .collection(FirestoreCollections.customers)
         .snapshots()
-        .map((snapshot) => snapshot.docs.length);
+        .map((snapshot) {
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot.docs.length;
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -267,6 +284,7 @@ class CustomerService {
         FirestoreFields.rating: FieldValue.increment(rating),
         FirestoreFields.ratingCount: FieldValue.increment(1),
       });
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Customer rated successfully: $customerId', name: logName);
     } catch (e) {

@@ -9,6 +9,7 @@ import '../../utils/constants/a_enums.dart';
 import '../../utils/storage/app_storage.dart';
 import '../models/user_model.dart';
 import 'agreement_template_service.dart';
+import 'firestore_usage_service.dart';
 
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -85,6 +86,7 @@ class UserService {
       });
 
       await batch.commit();
+      FirestoreUsageService.to.trackWrite(3);
       log('Admin registered successfully', name: logName);
 
       // Create Default Agreement Template for the new shop
@@ -151,6 +153,7 @@ class UserService {
       });
 
       await batch.commit();
+      FirestoreUsageService.to.trackWrite(2);
       log('Staff registered successfully', name: logName);
     } catch (e) {
       log('Error registering staff: $e', name: logName);
@@ -168,6 +171,7 @@ class UserService {
           .collection(FirestoreCollections.users)
           .doc(userId)
           .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
       if (!doc.exists) return null;
 
       return UserModel.fromMap(doc.data()!, doc.id);
@@ -187,6 +191,7 @@ class UserService {
           .collection(FirestoreCollections.users)
           .doc(userId)
           .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
 
       if (!doc.exists) {
         throw Exception('User profile not found');
@@ -215,6 +220,7 @@ class UserService {
           .collection(FirestoreCollections.users)
           .doc(_auth.currentUser!.uid)
           .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
       return doc[FirestoreFields.shopId] as String;
     } catch (e) {
       log('Error fetching shop ID: $e', name: logName);
@@ -232,6 +238,7 @@ class UserService {
           .collection(FirestoreCollections.users)
           .doc(userId)
           .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
       if (!doc.exists) return false;
 
       return doc[FirestoreFields.isActive] == true;
@@ -252,6 +259,7 @@ class UserService {
           .where(FirestoreFields.email, isEqualTo: email)
           .limit(1)
           .get();
+      FirestoreUsageService.to.trackQuerySnapshot(snap);
 
       return snap.docs.isNotEmpty;
     } catch (e) {
@@ -275,6 +283,7 @@ class UserService {
       if (phone != null) data[FirestoreFields.phone] = phone;
 
       await _db.collection(FirestoreCollections.users).doc(userId).update(data);
+      FirestoreUsageService.to.trackWrite(1);
       log('User profile updated: $userId', name: logName);
     } catch (e) {
       log('Error updating user profile: $e', name: logName);
@@ -310,6 +319,7 @@ class UserService {
       );
 
       await batch.commit();
+      FirestoreUsageService.to.trackWrite(2);
       log('User status updated: $userId', name: logName);
     } catch (e) {
       log('Error updating user status: $e', name: logName);
@@ -348,6 +358,7 @@ class UserService {
       );
 
       await batch.commit();
+      FirestoreUsageService.to.trackWrite(2);
       log('User verification updated: $userId', name: logName);
     } catch (e) {
       log('Error updating user verification: $e', name: logName);
@@ -370,6 +381,7 @@ class UserService {
           .collection('members')
           .doc(userId)
           .delete();
+      FirestoreUsageService.to.trackDelete(1);
       log('User removed from shop: $userId', name: logName);
     } catch (e) {
       log('Error removing user from shop: $e', name: logName);

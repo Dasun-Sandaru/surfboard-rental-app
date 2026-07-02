@@ -12,6 +12,7 @@ import '../services/user_service.dart';
 import '../services/connectivity_service.dart';
 import '../services/notification_sync_service.dart';
 import '../services/email_service.dart';
+import '../services/firestore_usage_service.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -28,5 +29,6 @@ class InitialBinding extends Bindings {
     Get.put(ConnectivityService(), permanent: true);
     Get.put(NotificationSyncService(), permanent: true);
     Get.put(EmailService(), permanent: true);
+    Get.put(FirestoreUsageService(), permanent: true);
   }
 }

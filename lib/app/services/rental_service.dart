@@ -7,6 +7,7 @@ import '../../data/firestore/firestore_fields.dart';
 import 'package:get/get.dart';
 import 'activity_log_service.dart';
 import 'email_service.dart';
+import 'firestore_usage_service.dart';
 
 import '../models/rental_model.dart';
 import '../models/payment_model.dart';
@@ -227,6 +228,11 @@ class RentalService {
           'itemName': rentalData.cachedItemName ?? '',
         });
       });
+      int writes = 5;
+      if (rentalData.amountExpected > 0) writes++;
+      if (rentalData.securityDeposit.paid > 0) writes++;
+      FirestoreUsageService.to.trackWrite(writes);
+      FirestoreUsageService.to.trackRead(2);
 
       log('Rental created successfully: $rentalId', name: logName);
 
@@ -235,6 +241,7 @@ class RentalService {
           .collection(FirestoreCollections.customers)
           .doc(rentalData.customerId)
           .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(customerSnap);
       final customerEmail =
           customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
       final customerFirstName =
@@ -271,6 +278,7 @@ class RentalService {
     ).collection(FirestoreCollections.rentals).doc(rentalId);
 
     return docRef.snapshots().map((doc) {
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
       return RentalModel.fromSnapshot(doc);
     });
   }
@@ -283,7 +291,9 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
 
-      return await docRef.get();
+      final doc = await docRef.get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
+      return doc;
     } catch (e) {
       log('Error fetching rental: $e', name: logName);
       rethrow;
@@ -304,6 +314,7 @@ class RentalService {
 
       await docRef.delete();
       await triggerRef.delete();
+      FirestoreUsageService.to.trackDelete(2);
 
       log('Rental deleted: $rentalId', name: logName);
     } catch (e) {
@@ -321,6 +332,7 @@ class RentalService {
       ).collection(FirestoreCollections.rentals).doc(rentalData.id);
 
       await docRef.update(rentalData.toMap());
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Rental updated: ${rentalData.id}', name: logName);
     } catch (e) {
@@ -375,6 +387,8 @@ class RentalService {
         final paymentsQuery = await rentalRef
             .collection(FirestoreCollections.payments)
             .get();
+        FirestoreUsageService.to.trackRead(3);
+        FirestoreUsageService.to.trackQuerySnapshot(paymentsQuery);
         final payments = paymentsQuery.docs
             .map((d) => PaymentModel.fromSnapshot(d))
             .toList();
@@ -391,6 +405,7 @@ class RentalService {
         invoiceLink = await _uploadInvoicePdf(shopId, rentalId, pdfData);
       }
 
+      bool triggerExists = false;
       // 4. Transaction to update statuses and add invoiceLink
       await _db.runTransaction((transaction) async {
         final currentRentalSnap = await transaction.get(rentalRef);
@@ -401,6 +416,7 @@ class RentalService {
             .collection('notification_triggers')
             .doc(rentalId);
         final triggerSnap = await transaction.get(triggerRef);
+        triggerExists = triggerSnap.exists;
 
         transaction.update(rentalRef, {
           FirestoreFields.status: status.toString().split('.').last,
@@ -435,6 +451,11 @@ class RentalService {
         }
       });
 
+      int returnWrites = 3;
+      if (triggerExists) returnWrites++;
+      FirestoreUsageService.to.trackRead(2);
+      FirestoreUsageService.to.trackWrite(returnWrites);
+
       log(
         'Return finalized for rental: $rentalId (Transaction Committed)',
         name: logName,
@@ -453,6 +474,7 @@ class RentalService {
                 .collection(FirestoreCollections.customers)
                 .doc(customerId)
                 .get();
+            FirestoreUsageService.to.trackRead(3);
 
             final customerEmail =
                 customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
@@ -535,6 +557,9 @@ class RentalService {
         });
       });
 
+      FirestoreUsageService.to.trackRead(1);
+      FirestoreUsageService.to.trackWrite(1);
+
       log('Rental balance settled for: $rentalId', name: logName);
     } catch (e) {
       log('Error settling rental balance: $e', name: logName);
@@ -596,6 +621,8 @@ class RentalService {
         );
       });
 
+      FirestoreUsageService.to.trackWrite(3);
+
       log('Late fee charge added to rental: $rentalId', name: logName);
     } catch (e) {
       log('Error adding late fee charge: $e', name: logName);
@@ -651,6 +678,7 @@ class RentalService {
           transaction: transaction,
         );
       });
+      FirestoreUsageService.to.trackWrite(3);
       log('Damage charge added to rental: $rentalId', name: logName);
     } catch (e) {
       log('Error adding damage charge: $e', name: logName);
@@ -670,6 +698,7 @@ class RentalService {
       await docRef.update({
         FirestoreFields.status: status.toString().split('.').last,
       });
+      FirestoreUsageService.to.trackWrite(1);
     } catch (e) {
       log('Error updating rental status: $e', name: logName);
       rethrow;
@@ -688,6 +717,7 @@ class RentalService {
       await docRef.update({
         FirestoreFields.status: status.toString().split('.').last,
       });
+      FirestoreUsageService.to.trackWrite(1);
     } catch (e) {
       log('Error updating inventory status: $e', name: logName);
       rethrow;
@@ -742,7 +772,9 @@ class RentalService {
         }
       }
 
-      return await query.get();
+      final snapshot = await query.get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot;
     } catch (e) {
       log('Error fetching rentals page: $e', name: logName);
       rethrow;
@@ -760,6 +792,7 @@ class RentalService {
           .where(FirestoreFields.status, isEqualTo: status)
           .count()
           .get();
+      FirestoreUsageService.to.trackRead(1);
       return aggregateQuery.count ?? 0;
     } catch (e) {
       log('Error counting rentals: $e', name: logName);
@@ -772,7 +805,10 @@ class RentalService {
         .collection(FirestoreCollections.rentals)
         .where(FirestoreFields.status, isEqualTo: status)
         .snapshots()
-        .map((snapshot) => snapshot.docs.length);
+        .map((snapshot) {
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot.docs.length;
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -794,6 +830,7 @@ class RentalService {
         FirestoreFields.customerRating: rating,
         FirestoreFields.customerRatingComment: comment,
       });
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Customer rating saved in rental: $rentalId', name: logName);
     } catch (e) {

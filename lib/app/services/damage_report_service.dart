@@ -8,6 +8,7 @@ import '../models/payment_model.dart';
 import '../../utils/constants/a_enums.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
+import 'firestore_usage_service.dart';
 
 class DamageReportService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -30,6 +31,7 @@ class DamageReportService {
         .doc();
 
     await ref.set(payment.toMap());
+    FirestoreUsageService.to.trackWrite(1);
   }
 
   // -----------------------------
@@ -87,6 +89,7 @@ class DamageReportService {
         .doc();
 
     await ref.set(report.toMap());
+    FirestoreUsageService.to.trackWrite(1);
     return ref.id;
   }
 
@@ -110,6 +113,7 @@ class DamageReportService {
         .doc();
 
     await ref.set(photo.toMap());
+    FirestoreUsageService.to.trackWrite(1);
   }
 
   // -----------------------------
@@ -133,6 +137,7 @@ class DamageReportService {
       FirestoreFields.status: DamageStatus.approved.name,
       FirestoreFields.estimatedCost: estimatedCost,
     });
+    FirestoreUsageService.to.trackWrite(1);
   }
 
   // -----------------------------
@@ -157,6 +162,7 @@ class DamageReportService {
       FirestoreFields.finalCost: finalCost,
       FirestoreFields.resolvedAt: Timestamp.now(),
     });
+    FirestoreUsageService.to.trackWrite(1);
   }
 
   // -----------------------------
@@ -175,9 +181,12 @@ class DamageReportService {
         .orderBy(FirestoreFields.reportedAt, descending: true)
         .snapshots()
         .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => DamageReportModel.fromSnapshot(doc))
-              .toList(),
+          (snapshot) {
+            FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+            return snapshot.docs
+                .map((doc) => DamageReportModel.fromSnapshot(doc))
+                .toList();
+          },
         );
   }
 
@@ -199,9 +208,12 @@ class DamageReportService {
         .collection(FirestoreCollections.photos)
         .snapshots()
         .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => DamagePhotoModel.fromSnapshot(doc))
-              .toList(),
+          (snapshot) {
+            FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+            return snapshot.docs
+                .map((doc) => DamagePhotoModel.fromSnapshot(doc))
+                .toList();
+          },
         );
   }
 
@@ -220,6 +232,7 @@ class DamageReportService {
         .doc(rentalId);
 
     await ref.update({FirestoreFields.status: status.name});
+    FirestoreUsageService.to.trackWrite(1);
   }
 
   // -----------------------------
@@ -237,5 +250,6 @@ class DamageReportService {
         .doc(itemId);
 
     await ref.update({FirestoreFields.status: status.name});
+    FirestoreUsageService.to.trackWrite(1);
   }
 }

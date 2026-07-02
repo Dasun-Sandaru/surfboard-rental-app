@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/agreement_template_model.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
+import 'firestore_usage_service.dart';
 
 class AgreementTemplateService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -41,6 +42,7 @@ class AgreementTemplateService {
       );
 
       await templateRef.set(template.toMap());
+      FirestoreUsageService.to.trackWrite(1);
       log('Template created: ${templateRef.id}', name: logName);
 
       return templateRef.id;
@@ -61,6 +63,7 @@ class AgreementTemplateService {
           .collection(FirestoreCollections.agreementTemplates)
           .orderBy(FirestoreFields.createdAt, descending: true)
           .get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       final templates = snapshot.docs
           .map((doc) => AgreementTemplateModel.fromMap(doc.data(), doc.id))
@@ -88,6 +91,7 @@ class AgreementTemplateService {
           .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
 
       if (!doc.exists) {
         log('Template not found: $templateId', name: logName);
@@ -113,6 +117,7 @@ class AgreementTemplateService {
           .where(FirestoreFields.isDefault, isEqualTo: true)
           .limit(1)
           .get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       if (snapshot.docs.isEmpty) {
         log('No default template found', name: logName);
@@ -164,6 +169,7 @@ class AgreementTemplateService {
           .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .update(updates);
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Template updated: $templateId', name: logName);
     } catch (e) {
@@ -186,6 +192,7 @@ class AgreementTemplateService {
           .collection(FirestoreCollections.agreementTemplates)
           .doc(templateId)
           .delete();
+      FirestoreUsageService.to.trackDelete(1);
 
       log('Template deleted: $templateId', name: logName);
     } catch (e) {
@@ -235,6 +242,13 @@ class AgreementTemplateService {
       );
 
       await batch.commit();
+      int writes = 1;
+      for (var template in allTemplates) {
+        if (template.id != null && template.isDefault) {
+          writes++;
+        }
+      }
+      FirestoreUsageService.to.trackWrite(writes);
       log('Default template set: $templateId', name: logName);
     } catch (e) {
       log('Error setting default template: $e', name: logName);

@@ -8,6 +8,7 @@ import '../../../../data/firestore/firestore_fields.dart';
 
 import '../../../models/activity_log_model.dart';
 import '../../../services/user_service.dart';
+import '../../../services/firestore_usage_service.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 
 class AlertsController extends GetxController {
@@ -57,6 +58,7 @@ class AlertsController extends GetxController {
       }
 
       final snapshot = await query.get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
       if (isClosed) return;
       final logs = snapshot.docs
           .map(

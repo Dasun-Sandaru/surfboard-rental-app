@@ -75,6 +75,17 @@ class SettingsView extends StatelessWidget {
                             trailingIcon: Iconsax.arrow_right_3,
                             iconColor: colorScheme.primary,
                           ),
+                        if (hasShopSetup) _buildDivider(context),
+                        if (hasShopSetup)
+                          _buildSettingsTile(
+                            context,
+                            icon: Iconsax.receipt_item,
+                            title: "billing_and_usage".tr,
+                            subtitle: "billing_and_usage_sub".tr,
+                            onTap: controller.navigateToBilling,
+                            trailingIcon: Iconsax.arrow_right_3,
+                            iconColor: Colors.teal,
+                          ),
                       ],
                     ),
                   ),

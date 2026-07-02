@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../services/auth_service.dart';
+import '../../../routes/app_pages.dart';
 import '../../../services/shop_service.dart';
 import '../../../services/user_service.dart';
 import '../../../../data/firestore/firestore_fields.dart';
@@ -940,6 +941,10 @@ class SettingsController extends GetxController {
 
   void navigateToAccessControl() {
     Get.to(() => const AccessControlView());
+  }
+
+  void navigateToBilling() {
+    Get.toNamed(Routes.BILLING);
   }
 
   Future<void> toggleAccess(String key, bool value) async {

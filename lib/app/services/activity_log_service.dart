@@ -7,6 +7,7 @@ import 'user_service.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
 import '../../utils/constants/a_enums.dart';
+import 'firestore_usage_service.dart';
 
 class ActivityLogService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -84,6 +85,7 @@ class ActivityLogService {
         log('Activity logged (Transaction): ${type.name}', name: logName);
       } else {
         await docRef.set(logEntry.toMap());
+        FirestoreUsageService.to.trackWrite(1);
         log('Activity logged: ${type.name}', name: logName);
       }
     } catch (e) {
@@ -98,6 +100,7 @@ class ActivityLogService {
         .limit(limit)
         .snapshots()
         .map((snapshot) {
+          FirestoreUsageService.to.trackQuerySnapshot(snapshot);
           return snapshot.docs
               .map(
                 (doc) => ActivityLogModel.fromSnapshot(

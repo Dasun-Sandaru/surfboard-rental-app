@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../data/firestore/firestore_fields.dart';
 import '../../../../data/firestore/firestore_collections.dart';
+import '../../../services/firestore_usage_service.dart';
 import '../../../../utils/storage/app_storage.dart';
 import '../../../models/shop_model.dart';
 
@@ -39,6 +40,7 @@ class ReportsController extends GetxController {
     final String? shopId = AppLocalStorage().readData<String>(FirestoreFields.shopId);
     if (shopId != null) {
       final doc = await FirebaseFirestore.instance.collection(FirestoreCollections.shops).doc(shopId).get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
       if (doc.exists) {
         shop = ShopModel.fromSnapshot(doc);
       }
@@ -164,6 +166,7 @@ class ReportsController extends GetxController {
     
     // Limit to 500 for safety in a report
     final snap = await query.orderBy(FirestoreFields.createdAt, descending: true).limit(500).get();
+    FirestoreUsageService.to.trackQuerySnapshot(snap);
     
     for (var doc in snap.docs) {
       final data = doc.data() as Map<String, dynamic>;
@@ -192,6 +195,7 @@ class ReportsController extends GetxController {
     }
     
     final snap = await query.limit(500).get();
+    FirestoreUsageService.to.trackQuerySnapshot(snap);
     
     for (var doc in snap.docs) {
       final data = doc.data() as Map<String, dynamic>;
@@ -224,6 +228,7 @@ class ReportsController extends GetxController {
     }
     
     final snap = await query.orderBy(FirestoreFields.startTime, descending: true).limit(500).get();
+    FirestoreUsageService.to.trackQuerySnapshot(snap);
     
     for (var doc in snap.docs) {
       final data = doc.data() as Map<String, dynamic>;
@@ -264,6 +269,7 @@ class ReportsController extends GetxController {
     }
     
     final snap = await query.orderBy(FirestoreFields.reportedAt, descending: true).limit(500).get();
+    FirestoreUsageService.to.trackQuerySnapshot(snap);
     
     for (var doc in snap.docs) {
       // Filter out damages from other shops

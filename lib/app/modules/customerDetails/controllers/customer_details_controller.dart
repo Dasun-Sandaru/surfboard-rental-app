@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../data/firestore/firestore_collections.dart';
 import '../../../../data/firestore/firestore_fields.dart';
 import '../../../models/rental_model.dart';
+import '../../../services/firestore_usage_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../routes/app_pages.dart';
@@ -83,6 +84,8 @@ class CustomerDetailsController extends GetxController {
           .orderBy(FirestoreFields.createdAt, descending: true)
           .limit(3)
           .get();
+
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       recentRentals.value = snapshot.docs
           .map((doc) => RentalModel.fromSnapshot(doc))

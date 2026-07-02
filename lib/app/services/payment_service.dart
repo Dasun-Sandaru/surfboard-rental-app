@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/firestore/firestore_collections.dart';
 import '../../data/firestore/firestore_fields.dart';
 import 'activity_log_service.dart';
+import 'firestore_usage_service.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../models/payment_model.dart';
@@ -129,6 +130,11 @@ class PaymentService {
         );
       });
 
+      int writes = 2;
+      if (isCharge || category == PaymentCategory.partialPayment) writes++;
+      FirestoreUsageService.to.trackRead(1);
+      FirestoreUsageService.to.trackWrite(writes);
+
       log("Ledger entry added: ${category.name} | $amount", name: logName);
     } catch (e) {
       log("Add ledger entry failed: $e", name: logName);
@@ -142,6 +148,7 @@ class PaymentService {
       shopId,
       rentalId,
     ).orderBy(FirestoreFields.timestamp).snapshots().map((snapshot) {
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
       log("Payments fetched: ${snapshot.docs.length}", name: logName);
       return snapshot.docs
           .map(
@@ -160,6 +167,7 @@ class PaymentService {
         shopId,
         rentalId,
       ).orderBy(FirestoreFields.timestamp).get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       return snapshot.docs
           .map(
@@ -248,6 +256,10 @@ class PaymentService {
           transaction: transaction,
         );
       });
+
+      FirestoreUsageService.to.trackRead(2);
+      FirestoreUsageService.to.trackDelete(1);
+      FirestoreUsageService.to.trackWrite(2);
 
       log("Payment deleted: $paymentId", name: logName);
     } catch (e) {
