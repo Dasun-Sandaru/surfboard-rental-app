@@ -114,6 +114,8 @@ class BillingController extends GetxController {
           .collection('history')
           .doc(monthStr)
           .get();
+
+      FirestoreUsageService.to.trackDocumentSnapshot(monthlyDoc);
       
       if (monthlyDoc.exists && monthlyDoc.data() != null) {
         final data = monthlyDoc.data()!;
@@ -136,6 +138,8 @@ class BillingController extends GetxController {
           .where(FieldPath.documentId, isGreaterThanOrEqualTo: '$monthStr-01')
           .where(FieldPath.documentId, isLessThanOrEqualTo: '$monthStr-31')
           .get();
+      
+      FirestoreUsageService.to.trackQuerySnapshot(daysSnapshot);
       
       final tempUsage = <String, Map<String, int>>{};
       for (var doc in daysSnapshot.docs) {
