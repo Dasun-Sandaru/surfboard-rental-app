@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../data/firestore/firestore_fields.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/storage/app_storage.dart';
 import '../../../services/firestore_usage_service.dart';
@@ -67,7 +66,7 @@ class BillingController extends GetxController {
       if (shopId != null) {
         final shopDoc = await _shopService.getShop(shopId!);
         if (shopDoc.exists) {
-          shop.value = ShopModel.fromSnapshot(shopDoc);
+          shop.value = ShopModel.fromSnapshot(shopDoc as DocumentSnapshot<Map<String, dynamic>>);
         }
         
         // Load custom billing configs from local storage (if previously configured)

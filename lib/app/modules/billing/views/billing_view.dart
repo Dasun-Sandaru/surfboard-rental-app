@@ -304,7 +304,7 @@ class BillingView extends GetView<BillingController> {
                 _buildMathLine('billing_subtotal'.tr, 'USD ${controller.baseUsdCost.toStringAsFixed(4)}'),
                 SizedBox(height: 8.h),
                 _buildMathLine(
-                  'billing_markup'.tr + ' (${controller.markupPercent.value}%)',
+                  '${'billing_markup'.tr} (${controller.markupPercent.value}%)',
                   'USD ${controller.markupAmount.toStringAsFixed(4)}',
                 ),
                 SizedBox(height: 8.h),

@@ -347,7 +347,9 @@ class AppPages {
       page: () => const AnalyticsView(),
       binding: AnalyticsBinding(),
       middlewares: [
-        AccessControlMiddleware(routeKey: 'reports'), // Same permission key as reports
+        AccessControlMiddleware(
+          routeKey: 'reports',
+        ), // Same permission key as reports
       ],
     ),
     GetPage(
@@ -361,7 +363,9 @@ class AppPages {
       page: () => const BillingView(),
       binding: BillingBinding(),
       middlewares: [
-        AccessControlMiddleware(routeKey: 'shop_setup'), // Reuse shop_setup for Admin-only access
+        AccessControlMiddleware(
+          routeKey: 'shop_setup',
+        ), // Reuse shop_setup for Admin-only access
       ],
     ),
   ];
