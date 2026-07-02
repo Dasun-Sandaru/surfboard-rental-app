@@ -24,6 +24,8 @@ class FirestoreFields {
   static const imageUrl = 'image_url';
   static const rentalsCount = 'rentals_count';
   static const lastRentalDate = 'last_rental_date';
+  static const rating = 'rating';
+  static const ratingCount = 'rating_count';
 
   // Inventory
   static const type = 'type';
@@ -62,6 +64,8 @@ class FirestoreFields {
   static const nameLowercase = 'name_lowercase';
   static const itemNameLowercase = 'itemName_lowercase';
   static const customerNameLowercase = 'customerName_lowercase';
+  static const customerRating = 'customer_rating';
+  static const customerRatingComment = 'customer_rating_comment';
 
   // Payment
   static const rentalId = 'rentalId';
@@ -75,7 +79,7 @@ class FirestoreFields {
   static const feeAmount = 'fee_amount';
   static const description = 'description';
   static const activeStatus = 'active_status';
-  static const damageType = 'damage_type';
+  static const damageType = 'damageType';
   static const damageId = 'damageId';
   static const photoUrl = 'photoUrl';
   static const reportedAt = 'reportedAt';
@@ -99,6 +103,10 @@ class FirestoreFields {
   static const currency = 'currency';
   static const dateFormat = 'date_format';
   static const timeZone = 'time_zone';
+  static const emailjsServiceId = 'emailjs_service_id';
+  static const emailjsTemplateId = 'emailjs_template_id';
+  static const emailjsPublicKey = 'emailjs_public_key';
+  static const shopEmail = 'shop_email';
 
   // Activity Log
   static const activityType = 'activity_type';

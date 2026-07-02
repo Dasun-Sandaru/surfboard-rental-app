@@ -1,18 +1,19 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/models/payment_model.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../models/payment_model.dart';
+import '../../../routes/app_pages.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/user_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/rental_model.dart';
 
-import 'package:surfboard_rental_app/app/services/payment_service.dart';
+import '../../../services/payment_service.dart';
 
 class BoardInspectionController extends GetxController {
   final RentalService _rentalService = Get.find();
@@ -32,9 +33,9 @@ class BoardInspectionController extends GetxController {
 
   // For the real-time countdown timer
   Timer? _timer;
-  final RxString timeLabel = "Time Remaining".obs;
+  final RxString timeLabel = "time_remaining".obs;
   final RxString timeRemaining = "00:00:00".obs;
-  final Rx<Color> timeColor = Colors.white.obs;
+  final Rx<Color> timeColor = Rx<Color>(Colors.white);
 
   @override
   void onInit() {
@@ -105,7 +106,7 @@ class BoardInspectionController extends GetxController {
             paymentHistory.assignAll(payments);
           },
           onError: (e) {
-            print('Error listening to payments: $e');
+            log('Error listening to payments: $e');
           },
         );
   }
@@ -147,24 +148,55 @@ class BoardInspectionController extends GetxController {
 
   // --- Actions ---
   Future<void> reportNoDamage() async {
-    // Save overdue time in rental document using timeRemaining
-    // Logic: If balance is 0, just close (item_returned/completed).
-    // If balance exists, show Payment Dialog.
-    // if (balanceDue.abs() > 0.01) {
-    //   _showSettlementDialog(damageFee: 0);
-    // } else {
+    final r = rental.value;
+    if (r == null) return;
+
+    double calculatedLateFee = 0;
+
+    // 1. Check if overdue
+    if (timeLabel.value == "overdue") {
+      final now = DateTime.now();
+      final difference = r.expectedReturnTime.difference(now).abs();
+
+      // Calculation logic based on rentType
+      if (r.rentType == RentType.hourly) {
+        // Round up to next full hour
+        final hours = (difference.inMinutes / 60).ceil();
+        calculatedLateFee = hours * r.rate;
+      } else {
+        // Daily: Round up to next full day
+        final days = (difference.inHours / 24).ceil();
+        calculatedLateFee = days * r.rate;
+      }
+
+      // 2. Save Late Fee if > 0
+      if (calculatedLateFee > 0) {
+        final currentStaffId = _userService.currentUser?.uid ?? 'System';
+        final shopId = await _userService.getShopIdFromStorage();
+        if (shopId != null) {
+          await _rentalService.addLateFeeCharge(
+            shopId: shopId,
+            rentalId: r.id!,
+            amount: calculatedLateFee,
+            handledBy: currentStaffId,
+          );
+        }
+      }
+    }
+
+    // 3. Finalize Return (Updates Status to item_returned)
     await _finalizeReturn(
       damageFee: 0,
       finalPayment: 0,
       status: RentalStatus.item_returned,
     );
 
-    // Navigate to Rental Payment
+    // 4. Navigate to Rental Payment Screen
+    // We use offAllNamed or similar to ensure we start fresh on the payments flow
     Get.offAllNamed(
       Routes.PAYMENTS,
-      arguments: {'rentalId': rental.value!.id, 'shopId': rental.value!.shopId},
+      arguments: {'rentalId': r.id, 'shopId': r.shopId},
     );
-    // }
   }
 
   void reportDamage() {
@@ -186,12 +218,12 @@ class BoardInspectionController extends GetxController {
 
     if (difference.isNegative) {
       // Overdue
-      timeLabel.value = "Overdue";
+      timeLabel.value = "overdue";
       timeColor.value = colorScheme.error;
       timeRemaining.value = _formatDuration(difference.abs());
     } else {
       // Time Remaining
-      timeLabel.value = "Time Remaining";
+      timeLabel.value = "time_remaining";
       timeColor.value = statusColors?.success ?? Colors.green;
       timeRemaining.value = _formatDuration(difference);
     }
@@ -206,36 +238,36 @@ class BoardInspectionController extends GetxController {
   }
 
   // -- UI Interaction --
-  void _showSettlementDialog({required double damageFee}) {
-    double finalTotal = balanceDue + damageFee;
-    String actionText = finalTotal > 0 ? "Collect Payment" : "Refund Customer";
-    final colorScheme = Get.theme.colorScheme;
-    final statusColors = Get.theme.extension<StatusColors>();
+  // void _showSettlementDialog({required double damageFee}) {
+  //   double finalTotal = balanceDue + damageFee;
+  //   String actionText = finalTotal > 0 ? "Collect Payment" : "Refund Customer";
+  //   final colorScheme = Get.theme.colorScheme;
+  //   final statusColors = Get.theme.extension<StatusColors>();
 
-    Get.defaultDialog(
-      title: "Settlement Required",
-      backgroundColor: colorScheme.surfaceContainer,
-      titleStyle: TextStyle(color: colorScheme.onSurface),
-      content: Column(
-        children: [
-          _summaryRow("Outstanding Rent", balanceDue),
-          if (damageFee > 0) _summaryRow("Damage Fee", damageFee),
-          Divider(color: colorScheme.outline),
-          _summaryRow("Net Payable", finalTotal, isBold: true),
-        ],
-      ),
-      textConfirm: actionText,
-      confirmTextColor: colorScheme.onPrimary,
-      buttonColor: finalTotal > 0
-          ? colorScheme.primary
-          : (statusColors?.warning ?? Colors.orange),
-      onConfirm: () {
-        _finalizeReturn(damageFee: damageFee, finalPayment: finalTotal);
-      },
-      textCancel: "Cancel",
-      cancelTextColor: colorScheme.primary,
-    );
-  }
+  //   Get.defaultDialog(
+  //     title: "Settlement Required",
+  //     backgroundColor: colorScheme.surfaceContainer,
+  //     titleStyle: TextStyle(color: colorScheme.onSurface),
+  //     content: Column(
+  //       children: [
+  //         _summaryRow("Outstanding Rent", balanceDue),
+  //         if (damageFee > 0) _summaryRow("Damage Fee", damageFee),
+  //         Divider(color: colorScheme.outline),
+  //         _summaryRow("Net Payable", finalTotal, isBold: true),
+  //       ],
+  //     ),
+  //     textConfirm: actionText,
+  //     confirmTextColor: colorScheme.onPrimary,
+  //     buttonColor: finalTotal > 0
+  //         ? colorScheme.primary
+  //         : (statusColors?.warning ?? Colors.orange),
+  //     onConfirm: () {
+  //       _finalizeReturn(damageFee: damageFee, finalPayment: finalTotal);
+  //     },
+  //     textCancel: "Cancel",
+  //     cancelTextColor: colorScheme.primary,
+  //   );
+  // }
 
   Future<void> _finalizeReturn({
     required double damageFee,
@@ -248,7 +280,7 @@ class BoardInspectionController extends GetxController {
 
       // Only save overdue time if it's actually overdue
       String? overdueString;
-      if (timeLabel.value == "Overdue") {
+      if (timeLabel.value == "overdue") {
         overdueString = timeRemaining.value;
       }
 
@@ -260,8 +292,6 @@ class BoardInspectionController extends GetxController {
         overdueTime: overdueString,
       );
 
-      Get.back(); // Close dialog
-      Get.back(); // Close screen
       AppSnackBar.success(
         title: "Return Complete",
         message:
@@ -275,22 +305,22 @@ class BoardInspectionController extends GetxController {
     }
   }
 
-  Widget _summaryRow(String label, double amount, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(
-            "\$${amount.abs().toStringAsFixed(2)}",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _summaryRow(String label, double amount, {bool isBold = false}) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 4.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(label, style: const TextStyle(color: Colors.grey)),
+  //         Text(
+  //           "\$${amount.abs().toStringAsFixed(2)}",
+  //           style: TextStyle(
+  //             color: Colors.white,
+  //             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

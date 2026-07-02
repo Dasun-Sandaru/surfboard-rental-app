@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../../utils/constants/a_enums.dart';
 import '../controllers/agreement_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class StepPricing extends GetView<AgreementController> {
   const StepPricing({super.key});
@@ -20,7 +20,7 @@ class StepPricing extends GetView<AgreementController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Rental Details",
+              'rental_details'.tr,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 24.sp,
@@ -29,7 +29,7 @@ class StepPricing extends GetView<AgreementController> {
             ),
             SizedBox(height: 8.h),
             Text(
-              "Set the duration and total price.",
+              'set_duration_price'.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 16.sp,
@@ -40,7 +40,7 @@ class StepPricing extends GetView<AgreementController> {
 
             // Duration Selector
             Text(
-              "Duration",
+              'duration'.tr,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 16.sp,
@@ -54,7 +54,7 @@ class StepPricing extends GetView<AgreementController> {
               final rentalData = controller.initRentalModel.value;
               if (rentalData == null) {
                 return Text(
-                  "No duration data",
+                  'no_duration_data'.tr,
                   style: TextStyle(color: colorScheme.onSurfaceVariant),
                 );
               }
@@ -76,7 +76,7 @@ class StepPricing extends GetView<AgreementController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Start",
+                              'start'.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
@@ -102,7 +102,7 @@ class StepPricing extends GetView<AgreementController> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              "Due",
+                              'due'.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
@@ -144,7 +144,7 @@ class StepPricing extends GetView<AgreementController> {
 
             // Rental Price Section
             Text(
-              "Rental Price",
+              'rental_price'.tr,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 16.sp,
@@ -157,7 +157,7 @@ class StepPricing extends GetView<AgreementController> {
               final rentalData = controller.initRentalModel.value;
               if (rentalData == null || rentalData.items.isEmpty) {
                 return Text(
-                  "No rental data",
+                  'no_rental_data'.tr,
                   style: TextStyle(color: colorScheme.onSurfaceVariant),
                 );
               }
@@ -185,7 +185,7 @@ class StepPricing extends GetView<AgreementController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Hourly Rate",
+                              'hourly_rate'.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
@@ -193,7 +193,7 @@ class StepPricing extends GetView<AgreementController> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              "\$${item.rentalRateHour}",
+                              AFormatter.formatCurrency(item.rentalRateHour),
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 14.sp,
@@ -206,7 +206,7 @@ class StepPricing extends GetView<AgreementController> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "Daily Rate",
+                              'daily_rate'.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
@@ -214,7 +214,7 @@ class StepPricing extends GetView<AgreementController> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              "\$${item.rentalRateDay}",
+                              AFormatter.formatCurrency(item.rentalRateDay),
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 14.sp,
@@ -227,7 +227,7 @@ class StepPricing extends GetView<AgreementController> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              "Duration",
+                              'duration'.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontSize: 12.sp,
@@ -251,7 +251,7 @@ class StepPricing extends GetView<AgreementController> {
                     Container(
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
+                        color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -261,7 +261,7 @@ class StepPricing extends GetView<AgreementController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Suggested Price",
+                                'suggested_price'.tr,
                                 style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
                                   fontSize: 12.sp,
@@ -269,7 +269,7 @@ class StepPricing extends GetView<AgreementController> {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                "\$$suggestedPriceString",
+                                AFormatter.formatCurrency(controller.suggestedPrice),
                                 style: TextStyle(
                                   color: colorScheme.primary,
                                   fontSize: 16.sp,
@@ -292,7 +292,7 @@ class StepPricing extends GetView<AgreementController> {
                               elevation: 0,
                             ),
                             child: Text(
-                              "Use",
+                              'use'.tr,
                               style: TextStyle(fontSize: 12.sp),
                             ),
                           ),
@@ -309,7 +309,7 @@ class StepPricing extends GetView<AgreementController> {
             // Total Rental Price Input
             _buildMoneyInput(
               context: context,
-              label: "Total Rental Price",
+              label: 'total_rental_price'.tr,
               controller: controller.rentalPriceController,
               icon: Iconsax.money_tick,
             ),
@@ -330,14 +330,14 @@ class StepPricing extends GetView<AgreementController> {
                     () => SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        "Require Security Deposit",
+                        'require_security_deposit'.tr,
                         style: TextStyle(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(
-                        "Hold an ID or Cash",
+                        'hold_id_cash'.tr,
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12.sp,
@@ -345,7 +345,7 @@ class StepPricing extends GetView<AgreementController> {
                       ),
                       value: controller.requireDeposit.value,
                       onChanged: (val) => controller.requireDeposit.value = val,
-                      activeColor: colorScheme.primary,
+                      activeThumbColor: colorScheme.primary,
                     ),
                   ),
 
@@ -358,7 +358,7 @@ class StepPricing extends GetView<AgreementController> {
                           SizedBox(height: 12.h),
                           _buildMoneyInput(
                             context: context,
-                            label: "Deposit Amount",
+                            label: 'deposit_amount'.tr,
                             controller: controller.depositController,
                             icon: Iconsax.lock,
                           ),
@@ -404,7 +404,7 @@ class StepPricing extends GetView<AgreementController> {
           ),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant),
-            prefixText: "\$ ",
+            prefixText: "${AFormatter.currencySymbol()} ",
             prefixStyle: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 18.sp,

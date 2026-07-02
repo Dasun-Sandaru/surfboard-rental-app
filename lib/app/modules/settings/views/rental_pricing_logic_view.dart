@@ -1,11 +1,12 @@
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/services/config_service.dart';
-import 'package:surfboard_rental_app/utils/common/a_app_bar.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-
+import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/settings_controller.dart';
 
 class RentalPricingLogicView extends GetView<SettingsController> {
@@ -14,7 +15,7 @@ class RentalPricingLogicView extends GetView<SettingsController> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final ConfigService configService = Get.find<ConfigService>();
+    final canEdit = controller.hasPermission('settings_edit_rental_logic');
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -22,101 +23,124 @@ class RentalPricingLogicView extends GetView<SettingsController> {
         showbackArrow: true,
         leadingIcon: Iconsax.arrow_left,
         title: Text(
-          "Rental Pricing Logic",
+          'rental_pricing'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: canEdit
+            ? [
+                TextButton(
+                  onPressed: controller.saveRentalConfig,
+                  child: Text(
+                    'save'.tr,
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(ASizes.defaultPadding),
-        child: Column(
-          children: [
-            _buildExplanationCard(
-              context,
-              title: "Hourly Grace Period",
-              description:
-                  "The grace period allowed after an hour has passed before charging for the next hour.",
-              example:
-                  "Example: If set to 15 minutes.\nRent Start: 10:00 AM\nReturn: 11:14 AM -> Charged for 1 Hour\nReturn: 11:16 AM -> Charged for 2 Hours",
-              child: SizedBox.shrink(),
-              // Obx(
-              //   () => _buildNumberInput(
-              //     context,
-              //     label: "Minutes",
-              //     value: configService.hourlyGracePeriodMinutes.value,
-              //     onChanged: (val) {
-              //       controller.updateConfig(newHourlyGrace: val);
-              //     },
-              //   ),
-              // ),
-            ),
-            SizedBox(height: 16.h),
-            _buildExplanationCard(
-              context,
-              title: "Daily Grace Period",
-              description:
-                  "The grace period allowed after a 24-hour cycle before charging for the next day.",
-              example:
-                  "Example: If set to 1 hour.\nRent Start: Today 10:00 AM\nReturn: Tomorrow 11:00 AM -> Charged for 1 Day\nReturn: Tomorrow 11:01 AM -> Charged for 2 Days",
-              child: SizedBox.shrink(),
-              // Obx(
-              //   () => _buildNumberInput(
-              //     context,
-              //     label: "Hours",
-              //     value: configService.dailyGracePeriodHours.value,
-              //     onChanged: (val) {
-              //       controller.updateConfig(newDailyGrace: val);
-              //     },
-              //   ),
-              // ),
-            ),
-            SizedBox(height: 16.h),
-            _buildExplanationCard(
-              context,
-              title: "Tax Configuration",
-              description: "Apply a percentage tax to the final rental total.",
-              example:
-                  "Example: If rate = 10% and Total = \$100\nFinal Amount = \$110",
-              child: SizedBox.shrink(),
+        child: Form(
+          key: controller.rentalConfigFormKey,
+          child: Column(
+            children: [
+              _buildExplanationCard(
+                context,
+                title: 'hourly_grace_period_title'.tr,
+                description:
+                    'hourly_grace_description'.tr,
+                example:
+                    'hourly_grace_example'.tr,
+                child: _buildTextField(
+                  context,
+                  controller: controller.hourlyGracePeriodController,
+                  label: 'minutes'.tr,
+                  hintText: "e.g. 15",
+                  icon: Iconsax.clock,
+                  inputType: TextInputType.number,
+                  enabled: canEdit,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              _buildExplanationCard(
+                context,
+                title: 'daily_grace_period_title'.tr,
+                description:
+                    'daily_grace_description'.tr,
+                example:
+                    'daily_grace_example'.tr,
+                child: _buildTextField(
+                  context,
+                  controller: controller.dailyGracePeriodController,
+                  label: 'hours'.tr,
+                  hintText: "e.g. 1",
+                  icon: Iconsax.clock,
+                  inputType: TextInputType.number,
+                  enabled: canEdit,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              _buildExplanationCard(
+                context,
+                title: 'tax_config'.tr,
+                description: 'tax_description'.tr,
+                example:
+                    'tax_example'.tr,
+                child: Column(
+                  children: [
+                    Obx(
+                      () => SwitchListTile(
+                        title: Text(
+                          'enable_tax_label'.tr,
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        value: controller.isTaxEnabled.value,
+                        onChanged: canEdit
+                            ? (val) => controller.isTaxEnabled.value = val
+                            : null,
+                        activeThumbColor: colorScheme.primary,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    Obx(
+                      () => controller.isTaxEnabled.value
+                          ? Padding(
+                              padding: EdgeInsets.only(top: 8.h),
+                              child: _buildTextField(
+                                context,
+                                controller: controller.taxRateController,
+                                label: 'tax_rate'.tr,
+                                hintText: "e.g. 5.0",
+                                icon: Iconsax.percentage_square,
+                                inputType: TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
+                                enabled: canEdit,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16.h),
 
-              // Column(
-              //   children: [
-              //     Obx(
-              //       () => SwitchListTile(
-              //         title: Text(
-              //           "Enable Tax",
-              //           style: TextStyle(
-              //             color: colorScheme.onSurface,
-              //             fontWeight: FontWeight.w500,
-              //           ),
-              //         ),
-              //         value: configService.isTaxEnabled.value,
-              //         onChanged: (val) {
-              //           controller.updateConfig(newIsTaxEnabled: val);
-              //         },
-              //         activeColor: colorScheme.primary,
-              //         contentPadding: EdgeInsets.zero,
-              //       ),
-              //     ),
-              //     SizedBox(height: 8.h),
-              //     Obx(
-              //       () => _buildNumberInput(
-              //         context,
-              //         label: "Tax Rate (%)",
-              //         value: configService.taxRate.value,
-              //         isDouble: true,
-              //         onChanged: (val) {
-              //           controller.updateConfig(newTaxRate: val.toDouble());
-              //         },
-              //       ),
-              //     ),
-              //   ],
-              // ),
-            ),
-          ],
+              /// Pricing Simulator
+              _buildPricingSimulator(context),
+              SizedBox(height: 40.h),
+            ],
+          ),
         ),
       ),
     );
@@ -168,9 +192,11 @@ class RentalPricingLogicView extends GetView<SettingsController> {
             padding: EdgeInsets.all(12.w),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: colorScheme.surface.withOpacity(0.5),
+              color: colorScheme.surface.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.5),
+              ),
             ),
             child: Text(
               example,
@@ -189,64 +215,244 @@ class RentalPricingLogicView extends GetView<SettingsController> {
     );
   }
 
-  Widget _buildNumberInput(
+  Widget _buildTextField(
     BuildContext context, {
+    required TextEditingController controller,
     required String label,
-    required num value,
-    required Function(dynamic) onChanged,
-    bool isDouble = false,
+    required String hintText,
+    required IconData icon,
+    TextInputType inputType = TextInputType.text,
+    bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "$label:",
+          label,
           style: TextStyle(
-            color: colorScheme.onSurface,
+            fontSize: 14.sp,
             fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
           ),
         ),
-        SizedBox(width: 16.w),
-        Expanded(
-          child: Container(
-            height: 40.h,
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outline),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: controller,
+          keyboardType: inputType,
+          enabled: enabled,
+          style: TextStyle(
+            color: enabled ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+          ),
+          decoration: InputDecoration(
+            hintText: hintText,
+            prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant),
+            filled: true,
+            fillColor: colorScheme.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    value.toString(),
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    // Simple decrement
-                    if (value > 0) {
-                      onChanged(isDouble ? value - 0.5 : value - 1);
-                    }
-                  },
-                  child: Icon(Icons.remove, size: 20.sp),
-                ),
-                SizedBox(width: 8.w),
-                InkWell(
-                  onTap: () {
-                    // Simple increment
-                    onChanged(isDouble ? value + 0.5 : value + 1);
-                  },
-                  child: Icon(Icons.add, size: 20.sp),
-                ),
-              ],
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 14.h,
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPricingSimulator(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'pricing_simulator'.tr,
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 16.h),
+
+          // Rent Type Dropdown
+          Row(
+            children: [
+              Expanded(
+                child: Obx(
+                  () => CustomDropdown<RentType>(
+                    hintText: 'select_type'.tr,
+                    items: RentType.values,
+                    initialItem: controller.simRentType.value,
+                    onChanged: (val) {
+                      if (val != null) {
+                        controller.resetSimulator(val);
+                      }
+                    },
+                    decoration: CustomDropdownDecoration(
+                      closedFillColor: colorScheme.surface,
+                      expandedFillColor: colorScheme.surface,
+                      closedBorder: Border.all(color: colorScheme.outline),
+                      closedBorderRadius: BorderRadius.circular(8),
+                    ),
+                    listItemBuilder: (context, item, isSelected, onItemSelect) {
+                      return Text(item.name.capitalizeFirst!);
+                    },
+                    headerBuilder: (context, selectedItem, enabled) {
+                      return Text(selectedItem.name.capitalizeFirst!);
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              ElevatedButton(
+                onPressed: () {
+                  if (controller.rentalConfigFormKey.currentState!.validate()) {
+                    controller.calculateSimulatedPrice();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text('test'.tr),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+
+          // Duration Inputs
+          Obx(() {
+            if (controller.simRentType.value == RentType.daily) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: _buildSimulatorInput(
+                      context,
+                      label: 'days'.tr,
+                      value: controller.simDurationDays,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: _buildSimulatorInput(
+                      context,
+                      label: 'hours'.tr,
+                      value: controller.simDurationHours,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: _buildSimulatorInput(
+                      context,
+                      label: 'minutes'.tr,
+                      value: controller.simDurationMinutes,
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return Row(
+                children: [
+                  Expanded(
+                    child: _buildSimulatorInput(
+                      context,
+                      label: 'hours'.tr,
+                      value: controller.simDurationHours,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: _buildSimulatorInput(
+                      context,
+                      label: 'minutes'.tr,
+                      value: controller.simDurationMinutes,
+                    ),
+                  ),
+                ],
+              );
+            }
+          }),
+
+          SizedBox(height: 24.h),
+          Divider(color: colorScheme.outline),
+          SizedBox(height: 12.h),
+
+          // Result
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'estimated_total'.tr,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              Obx(
+                () => Text(
+                  AFormatter.formatCurrency(controller.simulatedPrice.value),
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimulatorInput(
+    BuildContext context, {
+    required String label,
+    required RxInt value,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        SizedBox(height: 4.h),
+        TextFormField(
+          key: ValueKey('${label}_${value.value}'), // Force rebuild on reset
+          initialValue: value.value.toString(),
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.all(12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            fillColor: Theme.of(context).colorScheme.surface,
+            filled: true,
+          ),
+          onChanged: (val) {
+            if (val.isNotEmpty) {
+              value.value = int.tryParse(val) ?? 0;
+            }
+          },
         ),
       ],
     );

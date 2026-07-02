@@ -2,8 +2,7 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/models/inventory_model.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../models/rental_model.dart';
@@ -113,15 +112,18 @@ class QrScannerController extends GetxController {
 
         default:
           AppSnackBar.warning(
-            title: 'Unknown Type',
-            message: 'QR code type "$type" not recognized',
+            title: 'unknown_type'.tr,
+            message: '${'qr_type_unrecognized'.tr} "$type"',
           );
           resetScanner();
           isProcessing.value = false;
       }
     } catch (e) {
       log('Error identifying QR data: $e', name: _logName);
-      AppSnackBar.error(title: 'Error', message: 'Failed to process QR code');
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_process_qr'.tr,
+      );
       resetScanner();
       isProcessing.value = false;
     }
@@ -132,7 +134,10 @@ class QrScannerController extends GetxController {
     try {
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) {
-        AppSnackBar.error(title: 'Error', message: 'Shop ID not found');
+        AppSnackBar.error(
+          title: 'error'.tr,
+          message: 'shop_id_not_found'.tr,
+        );
         return;
       }
 
@@ -145,19 +150,25 @@ class QrScannerController extends GetxController {
           customerDoc as DocumentSnapshot<Map<String, dynamic>>,
         );
         AppSnackBar.success(
-          title: 'Customer Found',
+          title: 'customer_found'.tr,
           message: '${customer.firstName} ${customer.lastName}',
         );
         Get.back(); // Close scanner
         Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
       } else {
-        AppSnackBar.warning(title: 'Not Found', message: 'Customer not found');
+        AppSnackBar.warning(
+          title: 'not_found'.tr,
+          message: 'customer_not_found'.tr,
+        );
         resetScanner();
         isProcessing.value = false;
       }
     } catch (e) {
       log('Error loading customer: $e', name: _logName);
-      AppSnackBar.error(title: 'Error', message: 'Failed to load customer');
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_load_customer'.tr,
+      );
       resetScanner();
       isProcessing.value = false;
     }
@@ -166,8 +177,8 @@ class QrScannerController extends GetxController {
   /// Navigate to item details
   void _navigateToItem(String itemId) {
     AppSnackBar.success(
-      title: 'Item Found',
-      message: 'Opening item details...',
+      title: 'item_found'.tr,
+      message: 'opening_item_details'.tr,
     );
     Get.back(); // Close scanner
     Get.toNamed(Routes.ITEM_DETAILS, arguments: itemId);
@@ -178,7 +189,10 @@ class QrScannerController extends GetxController {
     try {
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) {
-        AppSnackBar.error(title: 'Error', message: 'Shop ID not found');
+        AppSnackBar.error(
+          title: 'error'.tr,
+          message: 'shop_id_not_found'.tr,
+        );
         return;
       }
 
@@ -188,19 +202,25 @@ class QrScannerController extends GetxController {
           rentalDoc as DocumentSnapshot<Map<String, dynamic>>,
         );
         AppSnackBar.success(
-          title: 'Rental Found',
-          message: 'Opening rental details...',
+          title: 'rental_found'.tr,
+          message: 'opening_rental_details'.tr,
         );
         Get.back(); // Close scanner
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
       } else {
-        AppSnackBar.warning(title: 'Not Found', message: 'Rental not found');
+        AppSnackBar.warning(
+          title: 'not_found'.tr,
+          message: 'rental_not_found'.tr,
+        );
         resetScanner();
         isProcessing.value = false;
       }
     } catch (e) {
       log('Error loading rental: $e', name: _logName);
-      AppSnackBar.error(title: 'Error', message: 'Failed to load rental');
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_load_rental'.tr,
+      );
       resetScanner();
       isProcessing.value = false;
     }
@@ -211,17 +231,26 @@ class QrScannerController extends GetxController {
     try {
       final user = await _userService.getUser(userId);
       if (user != null) {
-        AppSnackBar.success(title: 'User Found', message: user.name ?? 'User');
+        AppSnackBar.success(
+          title: 'user_found'.tr,
+          message: user.name ?? 'user'.tr,
+        );
         Get.back(); // Close scanner
         Get.toNamed(Routes.USER_DETAIL, arguments: user);
       } else {
-        AppSnackBar.warning(title: 'Not Found', message: 'User not found');
+        AppSnackBar.warning(
+          title: 'not_found'.tr,
+          message: 'user_not_found'.tr,
+        );
         resetScanner();
         isProcessing.value = false;
       }
     } catch (e) {
       log('Error loading user: $e', name: _logName);
-      AppSnackBar.error(title: 'Error', message: 'Failed to load user');
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_load_user'.tr,
+      );
       resetScanner();
       isProcessing.value = false;
     }
@@ -235,7 +264,10 @@ class QrScannerController extends GetxController {
       // Get shop ID
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) {
-        AppSnackBar.error(title: 'Error', message: 'Shop ID not found');
+        AppSnackBar.error(
+          title: 'error'.tr,
+          message: 'shop_id_not_found'.tr,
+        );
         isProcessing.value = false;
         return;
       }
@@ -251,7 +283,7 @@ class QrScannerController extends GetxController {
           customerDoc as DocumentSnapshot<Map<String, dynamic>>,
         );
         AppSnackBar.success(
-          title: 'Customer Found',
+          title: 'customer_found'.tr,
           message: '${customer.firstName} ${customer.lastName}',
         );
         Get.back();
@@ -265,7 +297,10 @@ class QrScannerController extends GetxController {
         itemId: scannedId,
       );
       if (itemDoc.exists) {
-        AppSnackBar.success(title: 'Item Found', message: 'Opening item...');
+        AppSnackBar.success(
+          title: 'item_found'.tr,
+          message: 'opening_item'.tr,
+        );
         Get.back();
         Get.toNamed(Routes.ITEM_DETAILS, arguments: scannedId);
         return;
@@ -278,8 +313,8 @@ class QrScannerController extends GetxController {
           rentalDoc as DocumentSnapshot<Map<String, dynamic>>,
         );
         AppSnackBar.success(
-          title: 'Rental Found',
-          message: 'Opening rental...',
+          title: 'rental_found'.tr,
+          message: 'opening_rental'.tr,
         );
         Get.back();
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
@@ -289,7 +324,10 @@ class QrScannerController extends GetxController {
       // 4. Check User
       final user = await _userService.getUser(scannedId);
       if (user != null) {
-        AppSnackBar.success(title: 'User Found', message: user.name ?? 'User');
+        AppSnackBar.success(
+          title: 'user_found'.tr,
+          message: user.name ?? 'user'.tr,
+        );
         Get.back();
         Get.toNamed(Routes.USER_DETAIL, arguments: user);
         return;
@@ -297,14 +335,17 @@ class QrScannerController extends GetxController {
 
       // Nothing found
       AppSnackBar.warning(
-        title: 'Not Found',
-        message: 'No record found for this QR code',
+        title: 'not_found'.tr,
+        message: 'no_record_found_qr'.tr,
       );
       resetScanner();
       isProcessing.value = false;
     } catch (e) {
       log('Error in legacy identification: $e', name: _logName);
-      AppSnackBar.error(title: 'Error', message: 'Failed to process QR code');
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_process_qr'.tr,
+      );
       resetScanner();
       isProcessing.value = false;
     }

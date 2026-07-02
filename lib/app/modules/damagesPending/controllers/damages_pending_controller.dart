@@ -5,19 +5,18 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'dart:async';
 
 import '../../../../utils/constants/a_enums.dart';
-import '../../../models/rental_model.dart';
-import '../../../routes/app_pages.dart';
+import '../../../models/inventory_model.dart';
 import '../../../services/user_service.dart';
-
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
+import '../../../services/inventory_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 class DamagesPendingController extends GetxController {
-  final PagingController<DocumentSnapshot?, RentalModel> pagingController =
+  final PagingController<DocumentSnapshot?, InventoryModel> pagingController =
       PagingController(firstPageKey: null);
 
   final TextEditingController searchTextController = TextEditingController();
 
-  final RentalService _rentalService = RentalService();
+  final InventoryService _inventoryService = InventoryService();
   final UserService _userService = Get.find();
 
   String? shopId;
@@ -59,19 +58,20 @@ class DamagesPendingController extends GetxController {
       return;
     }
     try {
-      final snapshot = await _rentalService.getRentalsPage(
+      final snapshot = await _inventoryService.getInventoryPage(
         shopId: shopId!,
-        limit: _limit,
-        startAfter: pageKey,
+        types: [],
+        statuses: [InventoryStatus.damaged.name],
+        lastDocument: pageKey,
         searchTerm: _currentSearchTerm,
-        status: RentalStatus.mark_as_damaged,
+        pageSize: _limit,
       );
 
       if (isClosed) return;
 
       final newItems = snapshot.docs
           .map(
-            (doc) => RentalModel.fromSnapshot(
+            (doc) => InventoryModel.fromSnapshot(
               doc as DocumentSnapshot<Map<String, dynamic>>,
             ),
           )
@@ -103,8 +103,57 @@ class DamagesPendingController extends GetxController {
     });
   }
 
-  void selectRental(RentalModel rental) {
-    // For overdue/damaged items, proceed to inspection
-    Get.toNamed(Routes.BOARD_INSPECTION, arguments: rental.id);
+  void selectRental(InventoryModel item) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Get.theme.colorScheme.surfaceContainer,
+        title: Text(
+          'mark_repaired_title'.tr,
+          style: TextStyle(color: Get.theme.colorScheme.onSurface),
+        ),
+        content: Text(
+          'mark_repaired_content'.trParams({'item': item.name}),
+          style: TextStyle(color: Get.theme.colorScheme.onSurfaceVariant),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('cancel'.tr),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Get.back();
+              await _markAsRepaired(item);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Get.theme.colorScheme.primary,
+              foregroundColor: Get.theme.colorScheme.onPrimary,
+            ),
+            child: Text('confirm'.tr),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _markAsRepaired(InventoryModel item) async {
+    if (shopId == null) return;
+    try {
+      await _inventoryService.updateInventoryStatus(
+        shopId: shopId!,
+        itemId: item.id,
+        status: InventoryStatus.available.name,
+      );
+      pagingController.refresh();
+      AppSnackBar.success(
+        title: 'success'.tr,
+        message: 'marked_repaired_success'.trParams({'item': item.name}),
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'marked_repaired_error'.tr,
+      );
+    }
   }
 }

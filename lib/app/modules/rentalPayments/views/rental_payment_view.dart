@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
 
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/rental_payment_controller.dart';
 
 class RentalPaymentView extends StatelessWidget {
@@ -134,6 +135,16 @@ class RentalPaymentView extends StatelessWidget {
                           ),
 
                           SizedBox(height: 16.h),
+
+                          _buildFeeRow(
+                            context,
+                            "security_deposit".tr, // Or similar label
+                            controller.depositAmount,
+                            Iconsax.shield_tick,
+                            colorScheme.onSurfaceVariant,
+                          ),
+
+                          SizedBox(height: 16.h),
                           Divider(color: colorScheme.outline),
                           SizedBox(height: 16.h),
 
@@ -149,14 +160,14 @@ class RentalPaymentView extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(
-                                "\$${controller.totalAmount.toStringAsFixed(2)}",
+                              Obx(() => Text(
+                                AFormatter.formatCurrency(controller.totalAmount, currencyCodeOverride: controller.rental.value?.currency),
                                 style: TextStyle(
                                   color: colorScheme.onSurface,
                                   fontSize: 24.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
-                              ),
+                              )),
                             ],
                           ),
                         ],
@@ -229,8 +240,10 @@ class RentalPaymentView extends StatelessWidget {
                                 padding: EdgeInsets.all(10.w),
                                 decoration: BoxDecoration(
                                   color: isRefund
-                                      ? successColor.withOpacity(0.1)
-                                      : colorScheme.primary.withOpacity(0.1),
+                                      ? successColor.withValues(alpha: 0.1)
+                                      : colorScheme.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -271,8 +284,8 @@ class RentalPaymentView extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    "${isRefund ? '-' : '+'}\$${payment.amount.toStringAsFixed(2)}",
+                                  Obx(() => Text(
+                                    "${isRefund ? '-' : '+'}${AFormatter.formatCurrency(payment.amount, currencyCodeOverride: controller.rental.value?.currency)}",
                                     style: TextStyle(
                                       color: isRefund
                                           ? successColor
@@ -280,7 +293,7 @@ class RentalPaymentView extends StatelessWidget {
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
-                                  ),
+                                  )),
                                   if (payment.note != null) ...[
                                     SizedBox(height: 4.h),
                                     Text(
@@ -376,14 +389,14 @@ class RentalPaymentView extends StatelessWidget {
             ),
           ],
         ),
-        Text(
-          "\$${amount.toStringAsFixed(2)}",
+        Obx(() => Text(
+          AFormatter.formatCurrency(amount, currencyCodeOverride: Get.find<RentalPaymentController>().rental.value?.currency),
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 14.sp,
             fontWeight: FontWeight.w500,
           ),
-        ),
+        )),
       ],
     );
   }

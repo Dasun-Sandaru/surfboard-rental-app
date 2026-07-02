@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../../data/firestore/firestore_fields.dart';
 
 import '../../utils/constants/a_enums.dart';
 import 'security_deposit_model.dart';
@@ -42,6 +42,15 @@ class RentalModel {
   final String? cachedItemName;
   final String? cachedStaffName;
 
+  // Rating
+  final double? customerRating;
+  final String? customerRatingComment;
+
+  // Formatting (Snapshotted at creation)
+  final String? currency;
+  final String? dateFormat;
+  final String? timeZone;
+
   // Meta
   final DateTime createdAt;
 
@@ -67,6 +76,11 @@ class RentalModel {
     this.cachedCustomerName,
     this.cachedItemName,
     this.cachedStaffName,
+    this.customerRating,
+    this.customerRatingComment,
+    this.currency,
+    this.dateFormat,
+    this.timeZone,
     required this.createdAt,
   });
 
@@ -122,6 +136,11 @@ class RentalModel {
       cachedCustomerName: data[FirestoreFields.cachedCustomerName],
       cachedItemName: data[FirestoreFields.cachedItemName],
       cachedStaffName: data[FirestoreFields.cachedStaffName],
+      customerRating: (data[FirestoreFields.customerRating] as num?)?.toDouble(),
+      customerRatingComment: data[FirestoreFields.customerRatingComment],
+      currency: data[FirestoreFields.currency],
+      dateFormat: data[FirestoreFields.dateFormat],
+      timeZone: data[FirestoreFields.timeZone],
       createdAt: (data[FirestoreFields.createdAt] as Timestamp).toDate(),
     );
   }
@@ -160,6 +179,11 @@ class RentalModel {
       FirestoreFields.cachedCustomerName: cachedCustomerName,
       FirestoreFields.cachedItemName: cachedItemName,
       FirestoreFields.cachedStaffName: cachedStaffName,
+      FirestoreFields.customerRating: customerRating,
+      FirestoreFields.customerRatingComment: customerRatingComment,
+      if (currency != null) FirestoreFields.currency: currency,
+      if (dateFormat != null) FirestoreFields.dateFormat: dateFormat,
+      if (timeZone != null) FirestoreFields.timeZone: timeZone,
       FirestoreFields.createdAt: Timestamp.fromDate(createdAt),
       FirestoreFields.itemNameLowercase: cachedItemName?.toLowerCase() ?? '',
       FirestoreFields.customerNameLowercase:

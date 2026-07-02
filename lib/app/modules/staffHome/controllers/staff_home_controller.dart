@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/inventory_service.dart';
-import 'package:surfboard_rental_app/app/services/customer_service.dart';
+import '../../../services/user_service.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/inventory_service.dart';
+import '../../../services/customer_service.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/notification_sync_service.dart';
 
 class StaffHomeController extends GetxController {
   final selectedIndex = 0.obs;
@@ -46,46 +47,54 @@ class StaffHomeController extends GetxController {
 
   Future<void> _initialize() async {
     await _setShopId();
-    loadDashboardStats();
+    _setupRealTimeStats();
   }
 
   Future<void> _setShopId() async {
     shopId = await _userService.getShopId();
     log('shopId: $shopId');
+    if (shopId != null) {
+      Get.find<NotificationSyncService>().startSync();
+    }
   }
 
-  /// Load Dashboard Stats (Future based)
-  Future<void> loadDashboardStats() async {
+  /// Setup Real-Time Dashboard Stats
+  void _setupRealTimeStats() {
     if (shopId == null) return;
 
-    try {
-      log('Loading dashboard stats...', name: 'StaffHomeController');
+    log('Setting up real-time dashboard stats...', name: 'StaffHomeController');
 
-      final results = await Future.wait([
-        _rentalService.getRentalCountByStatus(
-          shopId!,
-          RentalStatus.active.name,
-        ),
-        _inventoryService.getInventoryCountByStatus(
-          shopId!,
-          InventoryStatus.available.name,
-        ),
-        _customerService.getCustomerCount(shopId!),
-        _rentalService.getRentalCountByStatus(
-          shopId!,
-          RentalStatus.overdue.name,
-        ),
-      ]);
+    // 1. Active Rentals Stream
+    activeRentals.bindStream(
+      _rentalService.streamRentalCountByStatus(
+        shopId!,
+        RentalStatus.active.name,
+      ),
+    );
 
-      activeRentals.value = results[0];
-      boardsAvailable.value = results[1];
-      totalCustomers.value = results[2];
-      damagesPending.value = results[3];
-    } catch (e) {
-      log('Error loading dashboard stats: $e', name: 'StaffHomeController');
-    } finally {
-      isLoadingStats.value = false;
-    }
+    // 2. Boards Available Stream
+    boardsAvailable.bindStream(
+      _inventoryService.streamInventoryCountByStatus(
+        shopId!,
+        InventoryStatus.available.name,
+      ),
+    );
+
+    // 3. Total Customers Stream
+    totalCustomers.bindStream(_customerService.streamCustomerCount(shopId!));
+
+    // 4. Overdue Rentals (Damages Pending) Stream
+    damagesPending.bindStream(
+      _rentalService.streamRentalCountByStatus(
+        shopId!,
+        RentalStatus.overdue.name,
+      ),
+    );
+  }
+
+  /// Keep for legacy refresh or manual override
+  Future<void> loadDashboardStats() async {
+    _setupRealTimeStats();
   }
 
   Future<void> onRefresh() async {

@@ -1,12 +1,13 @@
 import 'dart:developer';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../../../../data/firestore/firestore_fields.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
-import '../../../models/inventory_model.dart';
 import '../../../services/inventory_service.dart';
 import '../../../services/user_service.dart';
 
@@ -36,9 +37,32 @@ class AddInventoryController extends GetxController {
       SingleSelectController(null);
 
   final RxString boardName =
-      'Enter the details of the surfboard you want to add to your inventory.'
+      'enter_board_details_desc'.tr
           .obs;
   final RxBool isLoading = false.obs;
+  
+  final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxString existingImageUrl = ''.obs;
+
+  // ---------------------------------------------------------------------------
+  // IMAGE PICKER
+  // ---------------------------------------------------------------------------
+  Future<void> pickImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      
+      if (image != null) {
+        selectedImage.value = File(image.path);
+      }
+    } catch (e) {
+      log('Error picking image: $e', name: _logName);
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'Failed to pick image: $e',
+      );
+    }
+  }
 
   @override
   void onInit() {
@@ -53,8 +77,8 @@ class AddInventoryController extends GetxController {
     } catch (e) {
       log('Error in onInit: $e', name: _logName);
       AppSnackBar.error(
-        title: 'Initialization Error',
-        message: 'Failed to initialize form: $e',
+        title: 'initialization_error'.tr,
+        message: '${'failed_init_form'.tr}: $e',
       );
     }
   }
@@ -74,8 +98,8 @@ class AddInventoryController extends GetxController {
     } catch (e) {
       log('Error in onReady: $e', name: _logName);
       AppSnackBar.error(
-        title: 'Initialization Error',
-        message: 'Failed to load form data: $e',
+        title: 'initialization_error'.tr,
+        message: '${'failed_load_form_data'.tr}: $e',
       );
     }
   }
@@ -113,6 +137,7 @@ class AddInventoryController extends GetxController {
       rentalRateDayController.text = data[FirestoreFields.rentalRateDay]
           .toString();
       notesController.text = data[FirestoreFields.note];
+      existingImageUrl.value = data[FirestoreFields.imageUrl] ?? '';
 
       final type = SurfBoardType.values.firstWhereOrNull(
         (e) => e.name == data[FirestoreFields.type],
@@ -123,14 +148,14 @@ class AddInventoryController extends GetxController {
 
       log('Item loaded successfully: $itemId', name: _logName);
       AppSnackBar.info(
-        title: 'Item Loaded',
-        message: 'Item details loaded successfully',
+        title: 'item_loaded'.tr,
+        message: 'item_details_loaded_success'.tr,
       );
     } catch (e) {
       log('Error loading item for edit: $e', name: _logName);
       AppSnackBar.error(
-        title: 'Load Error',
-        message: 'Failed to load item: $e',
+        title: 'load_error'.tr,
+        message: '${'failed_load_item'.tr}: $e',
       );
       Get.back();
     } finally {
@@ -145,16 +170,16 @@ class AddInventoryController extends GetxController {
     try {
       if (!formKey.currentState!.validate()) {
         AppSnackBar.warning(
-          title: 'Validation Error',
-          message: 'Please check all required fields',
+          title: 'validation_error'.tr,
+          message: 'check_required_fields'.tr,
         );
         return;
       }
 
       if (shopId == null) {
         AppSnackBar.warning(
-          title: 'Error',
-          message: 'Shop ID not found. Please restart.',
+          title: 'error'.tr,
+          message: 'shop_id_not_found_restart'.tr,
         );
         return;
       }
@@ -187,15 +212,25 @@ class AddInventoryController extends GetxController {
       };
 
       if (mode == InventoryFormMode.edit && itemId != null) {
+        if (selectedImage.value != null) {
+          final url = await _inventoryService.uploadInventoryImageSupabase(
+            file: selectedImage.value!,
+            shopId: shopId!,
+            itemId: itemId!,
+          );
+          data[FirestoreFields.imageUrl] = url;
+        }
+
         await _inventoryService.updateInventoryItem(
           shopId: shopId!,
           itemId: itemId!,
           data: data,
         );
         log('Item updated successfully: $itemId', name: _logName);
+        Get.back(result: true);
         AppSnackBar.success(
-          title: 'Success',
-          message: 'Item updated successfully',
+          title: 'success'.tr,
+          message: 'item_updated_success'.tr,
         );
       } else {
         final newItemId = await _inventoryService.createInventoryItem(
@@ -203,17 +238,31 @@ class AddInventoryController extends GetxController {
           data: data,
         );
         log('Item created successfully: $newItemId', name: _logName);
+
+        if (selectedImage.value != null) {
+          final url = await _inventoryService.uploadInventoryImageSupabase(
+            file: selectedImage.value!,
+            shopId: shopId!,
+            itemId: newItemId,
+          );
+          await _inventoryService.updateInventoryItem(
+            shopId: shopId!,
+            itemId: newItemId,
+            data: {FirestoreFields.imageUrl: url},
+          );
+        }
+
         AppSnackBar.success(
-          title: 'Success',
-          message: 'Item added successfully',
+          title: 'success'.tr,
+          message: 'item_added_success'.tr,
         );
         clearForm();
       }
     } catch (e) {
       log('Error saving item: $e', name: _logName);
       AppSnackBar.error(
-        title: 'Save Error',
-        message: 'Failed to save item: $e',
+        title: 'save_error'.tr,
+        message: '${'failed_save_item'.tr}: $e',
       );
     } finally {
       isLoading.value = false;
@@ -232,7 +281,7 @@ class AddInventoryController extends GetxController {
     boardName.value =
         "${sizeFeetController.text}' ${sizeInchesController.text}\" "
         "${brandController.text} ${volumeController.text}L "
-        "${surfboardTypeController.value?.name ?? ''}";
+        "${surfboardTypeController.value?.name.tr ?? ''}";
   }
 
   // ---------------------------------------------------------------------------
@@ -247,9 +296,11 @@ class AddInventoryController extends GetxController {
     rentalRateDayController.clear();
     notesController.clear();
     surfboardTypeController.clear();
+    selectedImage.value = null;
+    existingImageUrl.value = '';
 
     boardName.value =
-        'Enter the details of the surfboard you want to add to your inventory.';
+        'enter_board_details_desc'.tr;
   }
 
   @override

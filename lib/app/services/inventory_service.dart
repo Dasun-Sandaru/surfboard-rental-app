@@ -1,9 +1,12 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'activity_log_service.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import '../../utils/constants/a_enums.dart';
+import 'firestore_usage_service.dart';
 
 class InventoryService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -47,7 +50,7 @@ class InventoryService {
         final sizeValue =
             int.tryParse(sizeFeet) ?? 0; // feet as integer for comparison
         if (isLessThan) {
-          query = query.where(FirestoreFields.sizeFeet, isLessThan: sizeValue);
+          query = query.where(FirestoreFields.sizeFeet, isLessThanOrEqualTo: sizeValue);
         } else {
           query = query.where(
             FirestoreFields.sizeFeet,
@@ -61,7 +64,7 @@ class InventoryService {
         if (isLessThan) {
           query = query.where(
             FirestoreFields.sizeInches,
-            isLessThan: sizeValue,
+            isLessThanOrEqualTo: sizeValue,
           );
         } else {
           query = query.where(
@@ -91,6 +94,7 @@ class InventoryService {
 
       // Execute query
       final snapshot = await query.limit(pageSize).get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       log('Fetched ${snapshot.docs.length} inventory items', name: logName);
       return snapshot;
@@ -111,7 +115,10 @@ class InventoryService {
       log('Getting stream for item: $itemId', name: logName);
       return _shopRef(
         shopId,
-      ).collection(FirestoreCollections.inventory).doc(itemId).snapshots();
+      ).collection(FirestoreCollections.inventory).doc(itemId).snapshots().map((snapshot) {
+        FirestoreUsageService.to.trackDocumentSnapshot(snapshot);
+        return snapshot;
+      });
     } catch (e) {
       log('Error creating inventory item stream: $e', name: logName);
       rethrow;
@@ -127,9 +134,11 @@ class InventoryService {
   }) async {
     try {
       log('Fetching inventory item once: $itemId', name: logName);
-      return await _shopRef(
+      final doc = await _shopRef(
         shopId,
       ).collection(FirestoreCollections.inventory).doc(itemId).get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
+      return doc;
     } catch (e) {
       log('Error fetching inventory item: $e', name: logName);
       rethrow;
@@ -165,14 +174,17 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_inventory,
-          description:
-              "Added inventory item: ${data[FirestoreFields.name] ?? 'Unknown'}",
+          description: 'log_add_inventory',
           entityId: docRef.id,
           entityType: 'Inventory',
+          metadata: {
+            'itemName': data[FirestoreFields.name] ?? 'Unknown',
+          },
           transaction: transaction,
         );
       });
 
+      FirestoreUsageService.to.trackWrite(2);
       log('Inventory item created: ${docRef.id}', name: logName);
       return docRef.id;
     } catch (e) {
@@ -207,13 +219,17 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.update_inventory,
-          description: "Updated inventory item details: $itemId",
+          description: 'log_update_inventory',
           entityId: itemId,
           entityType: 'Inventory',
+          metadata: {
+            'itemId': itemId,
+          },
           transaction: transaction,
         );
       });
 
+      FirestoreUsageService.to.trackWrite(2);
       log('Inventory item updated: $itemId', name: logName);
     } catch (e) {
       log('Error updating inventory item: $e', name: logName);
@@ -241,13 +257,18 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.delete_inventory,
-          description: "Deleted inventory item: $itemId",
+          description: 'log_delete_inventory',
           entityId: itemId,
           entityType: 'Inventory',
+          metadata: {
+            'itemId': itemId,
+          },
           transaction: transaction,
         );
       });
 
+      FirestoreUsageService.to.trackDelete(1);
+      FirestoreUsageService.to.trackWrite(1);
       log('Inventory item deleted: $itemId', name: logName);
     } catch (e) {
       log('Error deleting inventory item: $e', name: logName);
@@ -279,7 +300,7 @@ class InventoryService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.update_inventory,
-          description: "Updated inventory status to $status",
+          description: 'log_update_inventory_status',
           entityId: itemId,
           entityType: 'Inventory',
           metadata: {'status': status},
@@ -287,6 +308,7 @@ class InventoryService {
         );
       });
 
+      FirestoreUsageService.to.trackWrite(2);
       log('Inventory status updated: $itemId', name: logName);
     } catch (e) {
       log('Error updating inventory status: $e', name: logName);
@@ -316,6 +338,7 @@ class InventoryService {
         ...feeData,
         FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       });
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Damage fee added to item: $itemId', name: logName);
     } catch (e) {
@@ -335,10 +358,52 @@ class InventoryService {
           .where(FirestoreFields.status, isEqualTo: status)
           .count()
           .get();
+      FirestoreUsageService.to.trackRead(1);
       return aggregateQuery.count ?? 0;
     } catch (e) {
       log('Error counting inventory: $e', name: logName);
       rethrow;
+    }
+  }
+
+  Stream<int> streamInventoryCountByStatus(String shopId, String status) {
+    return _shopRef(shopId)
+        .collection(FirestoreCollections.inventory)
+        .where(FirestoreFields.status, isEqualTo: status)
+        .snapshots()
+        .map((snapshot) {
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot.docs.length;
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // UPLOAD INVENTORY IMAGE TO SUPABASE
+  // ---------------------------------------------------------------------------
+  Future<String> uploadInventoryImageSupabase({
+    required File file,
+    required String shopId,
+    required String itemId,
+  }) async {
+    try {
+      log('Uploading image for item: $itemId', name: logName);
+      final supabase = Supabase.instance.client;
+      const bucketName = 'inventory_images';
+      final ext = file.path.split('.').last;
+      final path = '$shopId/$itemId.$ext';
+
+      await supabase.storage
+          .from(bucketName)
+          .upload(
+            path,
+            file,
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+          );
+      final publicUrl = supabase.storage.from(bucketName).getPublicUrl(path);
+      return publicUrl;
+    } catch (e) {
+      log('Error uploading image to Supabase: $e', name: logName);
+      throw Exception('Failed to upload image: $e');
     }
   }
 }

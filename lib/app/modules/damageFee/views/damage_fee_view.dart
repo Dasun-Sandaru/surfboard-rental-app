@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../models/damage_fee_model.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/damage_fee_controller.dart';
 import '../../../../app/services/config_service.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class DamageFeeView extends GetView<DamageFeeController> {
   DamageFeeView({super.key});
@@ -141,8 +142,8 @@ class DamageFeeView extends GetView<DamageFeeController> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isActive
-              ? colorScheme.outline.withOpacity(0.5)
-              : colorScheme.outline.withOpacity(0.2),
+              ? colorScheme.outline.withValues(alpha: 0.5)
+              : colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -164,7 +165,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  "\$${rule.feeAmount.toStringAsFixed(2)}",
+                  AFormatter.formatCurrency(rule.feeAmount),
                   style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 14.sp,
@@ -175,7 +176,9 @@ class DamageFeeView extends GetView<DamageFeeController> {
                   Text(
                     rule.description,
                     style: TextStyle(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.6,
+                      ),
                       fontSize: 12.sp,
                       fontStyle: FontStyle.italic,
                     ),
@@ -205,7 +208,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
                 _buildIconButton(
                   icon: Iconsax.trash,
                   color: colorScheme.error,
-                  bgColor: colorScheme.error.withOpacity(0.1),
+                  bgColor: colorScheme.error.withValues(alpha: 0.1),
                   onTap: () => controller.deleteRule(rule.id!),
                 ),
               ],
@@ -256,7 +259,7 @@ class DamageFeeView extends GetView<DamageFeeController> {
           Text(
             "tap_add_rule".tr,
             style: TextStyle(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               fontSize: 14.sp,
             ),
           ),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/helper/a_formatter.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../models/agreement_template_model.dart';
@@ -57,7 +57,7 @@ class AgreementTemplateListView extends StatelessWidget {
                 ),
                 hintText: 'Search templates',
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: colorScheme.surfaceContainer,
@@ -118,7 +118,7 @@ class AgreementTemplateListView extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   itemCount: controller.filteredTemplates.length,
                   separatorBuilder: (context, index) => Divider(
-                    color: colorScheme.outline.withOpacity(0.3),
+                    color: colorScheme.outline.withValues(alpha: 0.3),
                     height: 1,
                     thickness: 1,
                   ),
@@ -164,7 +164,7 @@ class AgreementTemplateListView extends StatelessWidget {
               height: 48.w,
               width: 48.w,
               decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

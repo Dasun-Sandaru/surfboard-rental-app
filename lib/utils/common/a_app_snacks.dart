@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import 'app_snack_bar.dart';
 
 void appSnackBarM(String message) {
   ScaffoldMessenger.of(Get.context!).showSnackBar(
     SnackBar(
-      content: Text(message, style: TextStyle(fontSize: 16.sp)),
+      content: Text(message.tr, style: TextStyle(fontSize: 16.sp)),
     ),
   );
 }
 
 void appSnackBarTM(String title, String message) {
-  AppSnackBar.info(title: title, message: message);
+  AppSnackBar.info(title: title.tr, message: message.tr);
 }
 
 void appRoutineSnackBar(String title, String message, {String? routeName}) {
   AppSnackBar.info(
-    title: title,
-    message: message,
+    title: title.tr,
+    message: message.tr,
     duration: const Duration(seconds: 3),
     onTap: (snack) {
       if (routeName != null) {
@@ -45,7 +45,7 @@ void appSnackBarSuccessAndFailure(String message, {bool isSuccess = true}) {
           SizedBox(width: 8.w),
           Expanded(
             child: Text(
-              message,
+              message.tr,
               style: Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(
                 color: isSuccess ? Colors.green : Colors.red,
               ),
@@ -77,7 +77,7 @@ Future<void> appSnackBarWithResult(String message, {bool isSuccess = true}) {
               SizedBox(width: 8.w),
               Expanded(
                 child: Text(
-                  message,
+                  message.tr,
                   style: Theme.of(Get.context!).textTheme.bodyMedium!.copyWith(
                     color: isSuccess ? Colors.green : Colors.red,
                   ),

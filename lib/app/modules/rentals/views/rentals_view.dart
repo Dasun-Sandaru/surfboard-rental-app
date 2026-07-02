@@ -55,7 +55,7 @@ class RentalsView extends GetView<RentalsController> {
                 ),
                 hintText: 'search_customer_item'.tr,
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: colorScheme.surfaceContainer,
@@ -118,7 +118,7 @@ class RentalsView extends GetView<RentalsController> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isOverdue
-                ? colorScheme.error.withOpacity(0.3)
+                ? colorScheme.error.withValues(alpha: 0.3)
                 : Colors.transparent,
           ),
         ),
@@ -195,7 +195,7 @@ class RentalsView extends GetView<RentalsController> {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme.error.withOpacity(0.2),
+                      color: colorScheme.error.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -214,8 +214,9 @@ class RentalsView extends GetView<RentalsController> {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: (statusColors?.success ?? Colors.green)
-                          .withOpacity(0.2),
+                      color: (statusColors?.success ?? Colors.green).withValues(
+                        alpha: 0.2,
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -234,7 +235,7 @@ class RentalsView extends GetView<RentalsController> {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme.error.withOpacity(0.2),
+                      color: colorScheme.error.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -253,7 +254,7 @@ class RentalsView extends GetView<RentalsController> {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.2),
+                      color: Colors.blue.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -273,7 +274,7 @@ class RentalsView extends GetView<RentalsController> {
                     ),
                     decoration: BoxDecoration(
                       color: (statusColors?.warning ?? Colors.orange)
-                          .withOpacity(0.2),
+                          .withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -292,7 +293,9 @@ class RentalsView extends GetView<RentalsController> {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.2),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.2,
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -316,7 +319,9 @@ class RentalsView extends GetView<RentalsController> {
     return Text(
       text,
       style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+        color: Theme.of(
+          context,
+        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
         fontSize: 12.sp,
       ),
     );

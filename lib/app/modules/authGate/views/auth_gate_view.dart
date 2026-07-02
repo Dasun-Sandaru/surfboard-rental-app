@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../controllers/auth_gate_controller.dart';
 
@@ -27,9 +27,11 @@ class AuthGateView extends GetView<AuthGateController> {
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: controller.mainColor.value.withOpacity(0.1), // Glow
+                  color: controller.mainColor.value.withValues(
+                    alpha: 0.1,
+                  ), // Glow
                   border: Border.all(
-                    color: controller.mainColor.value.withOpacity(0.3),
+                    color: controller.mainColor.value.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -45,7 +47,7 @@ class AuthGateView extends GetView<AuthGateController> {
 
             /// Title
             Text(
-              controller.title,
+              controller.title.tr,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 24.sp,
@@ -58,7 +60,7 @@ class AuthGateView extends GetView<AuthGateController> {
 
             /// Description
             Text(
-              controller.description,
+              controller.description.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
@@ -79,9 +81,9 @@ class AuthGateView extends GetView<AuthGateController> {
                     // Open Email or Phone logic
                   },
                   icon: Icon(Iconsax.message, color: colorScheme.onPrimary),
-                  label: const Text(
-                    "Contact Administrator",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Text(
+                    "contact_administrator".tr,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
@@ -110,7 +112,7 @@ class AuthGateView extends GetView<AuthGateController> {
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                 ),
                 child: Text(
-                  "Sign Out",
+                  "sign_out".tr,
                   style: TextStyle(
                     color: colorScheme.error,
                     fontWeight: FontWeight.w600,

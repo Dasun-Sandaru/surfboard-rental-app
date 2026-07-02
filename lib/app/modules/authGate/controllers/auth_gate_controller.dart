@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 
 class AuthGateController extends GetxController {
   // -- State --
@@ -10,7 +10,7 @@ class AuthGateController extends GetxController {
   late final bool isInactive;
 
   // -- UI Variables --
-  final Rx<Color> mainColor = Colors.grey.obs;
+  final Rx<Color> mainColor = Rx<Color>(Colors.grey);
   late final IconData mainIcon;
   late final String title;
   late final String description;

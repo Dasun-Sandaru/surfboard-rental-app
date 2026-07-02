@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/validators/a_validator.dart';
 import '../controllers/sign_in_controller.dart';
 
@@ -122,7 +122,7 @@ class SignInView extends GetView<SignInController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Email
-          _buildLabel(context, 'Email Address'.tr),
+          _buildLabel(context, 'email_address'.tr),
           SizedBox(height: 8.h),
           TextFormField(
             controller: controller.signInEmailController,
@@ -141,7 +141,7 @@ class SignInView extends GetView<SignInController> {
           SizedBox(height: 20.h),
 
           /// Password
-          _buildLabel(context, 'Password'.tr),
+          _buildLabel(context, 'password'.tr),
           SizedBox(height: 8.h),
           Obx(
             () => TextFormField(

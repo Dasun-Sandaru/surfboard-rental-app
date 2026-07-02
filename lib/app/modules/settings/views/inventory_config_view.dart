@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/settings_controller.dart';
 
@@ -14,6 +14,7 @@ class InventoryConfigView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<SettingsController>();
     final colorScheme = Theme.of(context).colorScheme;
+    final canEdit = controller.hasPermission('shop_setup');
 
     return DefaultTabController(
       length: 2,
@@ -42,9 +43,8 @@ class InventoryConfigView extends StatelessWidget {
             _buildListManager(
               context,
               items: controller.brands,
-              onAdd: () => controller.addItem("Brand", controller.brands),
-              onRemove: (item) =>
-                  controller.removeItem(item, controller.brands),
+              onAdd: canEdit ? () => controller.addItem("Brand", controller.brands) : null,
+              onRemove: canEdit ? (item) => controller.removeItem(item, controller.brands) : null,
             ),
 
             /// 2. Board Types Tab

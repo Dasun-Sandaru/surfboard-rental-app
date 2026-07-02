@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/agreement_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class StepDamageFees extends GetView<AgreementController> {
   const StepDamageFees({super.key});
@@ -15,7 +16,7 @@ class StepDamageFees extends GetView<AgreementController> {
       child: ListView(
         children: [
           Text(
-            "Damage Policy",
+            'damage_policy'.tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 24.sp,
@@ -24,7 +25,7 @@ class StepDamageFees extends GetView<AgreementController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            "Select damage fees to include in the agreement. Replacement costs will be charged if items are damaged.",
+            'damage_policy_desc'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
@@ -43,7 +44,7 @@ class StepDamageFees extends GetView<AgreementController> {
                     ),
                     child: Center(
                       child: Text(
-                        "No damage fees available for this item.",
+                        'no_damage_fees_available'.tr,
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 14.sp,
@@ -105,7 +106,7 @@ class StepDamageFees extends GetView<AgreementController> {
                                   onChanged: (val) {
                                     controller.toggleDamageFee(fee.id!, val);
                                   },
-                                  activeColor: colorScheme.primary,
+                                  activeThumbColor: colorScheme.primary,
                                 ),
                               ],
                             ),
@@ -116,14 +117,14 @@ class StepDamageFees extends GetView<AgreementController> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Replacement Cost:",
+                                  'replacement_cost'.tr,
                                   style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontSize: 14.sp,
                                   ),
                                 ),
                                 Text(
-                                  "\$${fee.feeAmount.toStringAsFixed(2)}",
+                                  AFormatter.formatCurrency(fee.feeAmount),
                                   style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontSize: 14.sp,
@@ -159,7 +160,7 @@ class StepDamageFees extends GetView<AgreementController> {
                           foregroundColor: colorScheme.onPrimary,
                           elevation: 0,
                         ),
-                        child: Text("Add Damage Fees"),
+                        child: Text('add_damage_fees'.tr),
                       ),
                     ],
                   )
@@ -181,7 +182,7 @@ class StepDamageFees extends GetView<AgreementController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Total Damage Fees:",
+                    'total_damage_fees'.tr,
                     style: TextStyle(
                       color: colorScheme.onPrimaryContainer,
                       fontSize: 16.sp,
@@ -189,7 +190,7 @@ class StepDamageFees extends GetView<AgreementController> {
                     ),
                   ),
                   Text(
-                    "\$${total.toStringAsFixed(2)}",
+                    AFormatter.formatCurrency(total),
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontSize: 18.sp,

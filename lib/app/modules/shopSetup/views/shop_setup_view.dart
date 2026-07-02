@@ -45,7 +45,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
 
               /// Titles
               Text(
-                'Set Up Your Shop',
+                'set_up_your_shop'.tr,
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontSize: 28.sp,
@@ -55,7 +55,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
               ),
               SizedBox(height: 8.h),
               Text(
-                'Tell us a little about your surf shop to get started.',
+                'set_up_shop_desc'.tr,
                 style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 14.sp,
@@ -65,7 +65,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
               SizedBox(height: 32.h),
 
               /// Form
-              _buildLabel(context, "Shop Name"),
+              _buildLabel(context, "shop_name".tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
@@ -75,7 +75,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Location"),
+              _buildLabel(context, "location".tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
@@ -85,7 +85,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Contact Number"),
+              _buildLabel(context, "contact_number".tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
@@ -96,7 +96,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Business Email"),
+              _buildLabel(context, "business_email".tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
@@ -113,7 +113,6 @@ class ShopSetupView extends GetView<ShopSetupController> {
                 height: 54.h,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement shop setup logic
                     Get.back();
                   },
                   style: ElevatedButton.styleFrom(
@@ -125,7 +124,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
                     elevation: 0,
                   ),
                   child: Text(
-                    "Finish Setup",
+                    "finish_setup".tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -166,7 +165,7 @@ class ShopSetupView extends GetView<ShopSetupController> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,

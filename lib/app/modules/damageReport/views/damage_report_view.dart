@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/damage_report_controller.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class DamageReportView extends StatelessWidget {
   const DamageReportView({super.key});
@@ -106,7 +107,7 @@ class DamageReportView extends StatelessWidget {
                                         controller.toggleDamage(fee.id!, val);
                                       }
                                     },
-                                    activeColor: colorScheme.primary,
+                                    activeThumbColor: colorScheme.primary,
                                   ),
                                 ],
                               ),
@@ -125,7 +126,7 @@ class DamageReportView extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    "\$${feeAmount.toStringAsFixed(2)}",
+                                    AFormatter.formatCurrency(feeAmount),
                                     style: TextStyle(
                                       color: colorScheme.onSurface,
                                       fontSize: 14.sp,
@@ -279,7 +280,7 @@ class DamageReportView extends StatelessWidget {
                                     hintText: "describe_damage".tr,
                                     hintStyle: TextStyle(
                                       color: colorScheme.onSurfaceVariant
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                       fontSize: 12.sp,
                                     ),
                                     filled: true,
@@ -323,7 +324,7 @@ class DamageReportView extends StatelessWidget {
                     return Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
+                        color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: colorScheme.primary),
                       ),
@@ -339,7 +340,7 @@ class DamageReportView extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "\$${controller.totalFee.toStringAsFixed(2)}",
+                            AFormatter.formatCurrency(controller.totalFee),
                             style: TextStyle(
                               color: colorScheme.primary,
                               fontSize: 18.sp,

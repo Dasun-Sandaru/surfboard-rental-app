@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -105,13 +105,9 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                 _buildDetailRow(context, "item_id".tr, item.id),
                 _buildDetailRow(
                   context,
-                  "name".tr,
+                  "board_name".tr,
                   item.name,
-                ), // Added 'name' key? Ah I added 'full_name' and 'enter_name'. I should use 'shop_details_sub' which has 'Name'. Or just 'Name'. I'll add 'name': 'Name' to app_translations if missing. I have 'enter_name'. I'll use 'full_name' or just 'Name'. I'll use 'name' and add it if missing, or use 'full_name' as a fallback? 'full_name' is "Full Name". "Name" is just "Name".
-                // I'll check if 'name' key exists previously. I saw 'shop_details_sub': 'Name, Location...'.
-                // I'll use "name" key and add it to app_translations in next batch if needed. Actually 'name' is very common.
-                // I will add 'name': 'Name' now to app_translations in next step.
-                // For now in this file I'll use "name".tr.
+                ),
                 _buildDetailRow(context, "brand".tr, item.brand),
                 _buildDetailRow(context, "color".tr, item.color),
                 _buildDetailRow(context, "type".tr, item.type),
@@ -232,6 +228,53 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                 }),
               ],
 
+              // Mark as Repaired Button
+              if (item.status == InventoryStatus.repair) ...[
+                Obx(() {
+                  final canEdit =
+                      _configService.staffAccessRules['inventory_edit'] ??
+                      false;
+                  if (!canEdit) return const SizedBox.shrink();
+
+                  return Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: controller.markAsRepaired,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  statusColors?.success ?? Colors.green,
+                              foregroundColor: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Iconsax.tick_circle, size: 20.w),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "mark_repaired".tr,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+
               // View Damage Fees Button
               Obx(() {
                 final canViewFees =
@@ -245,7 +288,9 @@ class ItemDetailsView extends GetView<ItemDetailsController> {
                   child: TextButton(
                     onPressed: controller.viewDamageFees,
                     style: TextButton.styleFrom(
-                      backgroundColor: colorScheme.primary.withOpacity(0.15),
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.15,
+                      ),
                       foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),

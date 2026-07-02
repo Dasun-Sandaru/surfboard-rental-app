@@ -2,12 +2,9 @@ import 'package:get/get.dart';
 import 'package:in_app_update/in_app_update.dart';
 
 import '../../../../utils/logging/app_logger.dart';
-import '../../../../utils/storage/app_storage.dart';
 import '../../../controllers/auth_controller.dart';
-import '../../../routes/app_pages.dart';
 
 class SplashController extends GetxController {
-  final _storage = AppLocalStorage();
   final updateStatus = 'init'.obs;
 
   @override

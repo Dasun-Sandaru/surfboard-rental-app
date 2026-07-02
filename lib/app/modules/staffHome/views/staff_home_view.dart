@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-
+import '../../../routes/app_pages.dart';
+import '../../../../utils/constants/a_image_strings.dart';
 import '../../alerts/views/alerts_view.dart';
 import '../controllers/staff_home_controller.dart';
 
@@ -102,7 +102,14 @@ class StaffHomeView extends GetView<StaffHomeController> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // Logo
-        Icon(Icons.surfing, size: 40.sp, color: colorScheme.primary),
+        ClipOval(
+          child: Image.asset(
+            AImageStrings.appLogo,
+            width: 40.sp,
+            height: 40.sp,
+            fit: BoxFit.cover,
+          ),
+        ),
 
         // QR Scanner
         InkWell(
@@ -130,87 +137,90 @@ class StaffHomeView extends GetView<StaffHomeController> {
 
   Widget _buildStatsGrid(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    // Data For Stats
-    final stats = [
-      {
-        'title': 'active_rentals'.tr,
-        'count': controller.activeRentals.value.toString(),
-      },
-      {
-        'title': 'boards_available'.tr,
-        'count': controller.boardsAvailable.value.toString(),
-      },
-      {
-        'title': 'damages_pending'.tr,
-        'count': controller.damagesPending.value.toString(),
-      },
-      {
-        'title': 'total_customers'.tr,
-        'count': controller.totalCustomers.value.toString(),
-      },
-    ];
+    
+    return Obx(() {
+      // Data For Stats
+      final stats = [
+        {
+          'title': 'active_rentals'.tr,
+          'count': controller.activeRentals.value.toString(),
+        },
+        {
+          'title': 'boards_available'.tr,
+          'count': controller.boardsAvailable.value.toString(),
+        },
+        {
+          'title': 'damages_pending'.tr,
+          'count': controller.damagesPending.value.toString(),
+        },
+        {
+          'title': 'total_customers'.tr,
+          'count': controller.totalCustomers.value.toString(),
+        },
+      ];
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12.w,
-        mainAxisSpacing: 12.h,
-        childAspectRatio: 1.3,
-      ),
-      itemCount: stats.length,
-      itemBuilder: (context, index) {
-        return InkWell(
-          onTap: () {
-            // Handle Navigation Here
-            switch (index) {
-              case 0:
-                Get.toNamed(Routes.RENTALS);
-                break;
-              case 1:
-                Get.toNamed(Routes.AVAILABLE_INVENTORY);
-                break;
-              case 2:
-                Get.toNamed(Routes.DAMAGES_PENDING);
-                break;
-            }
-          },
-          borderRadius: BorderRadius.circular(12.r),
-          child: Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: colorScheme.outline),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  stats[index]['title']!,
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
+      return GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12.w,
+          mainAxisSpacing: 12.h,
+          childAspectRatio: 1.3,
+        ),
+        itemCount: stats.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              // Handle Navigation Here
+              switch (index) {
+                case 0:
+                  Get.toNamed(Routes.RENTALS);
+                  break;
+                case 1:
+                  Get.toNamed(Routes.AVAILABLE_INVENTORY);
+                  break;
+                case 2:
+                  Get.toNamed(Routes.DAMAGES_PENDING);
+                  break;
+              }
+            },
+            borderRadius: BorderRadius.circular(12.r),
+            child: Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: colorScheme.outline),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    stats[index]['title']!,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  stats[index]['count']!,
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 8.h),
+                  Text(
+                    stats[index]['count']!,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    });
   }
 
   Widget _buildManagementGrid(BuildContext context) {
@@ -225,7 +235,7 @@ class StaffHomeView extends GetView<StaffHomeController> {
       },
       {'title': 'rentals'.tr, 'sub': 'rentals_sub'.tr, 'icon': Iconsax.receipt},
       {
-        'title': 'settings'.tr,
+        'title': 'settings_title'.tr,
         'sub': 'settings_sub'.tr,
         'icon': Iconsax.setting_2,
       },

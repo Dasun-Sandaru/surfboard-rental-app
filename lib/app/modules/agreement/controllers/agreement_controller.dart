@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -5,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/pdf_service.dart';
+import '../../../models/rental_model.dart';
+import '../../../routes/app_pages.dart';
+import '../../../services/pdf_service.dart';
 
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/shop_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/shop_service.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import '../../../../utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
@@ -21,8 +22,8 @@ import '../../../models/inventory_model.dart';
 import '../../../models/init_rental_model.dart';
 import '../../../models/security_deposit_model.dart';
 import '../../../models/shop_model.dart';
+import '../../../services/config_service.dart';
 import '../../../services/damage_fee_service.dart';
-import '../../../services/payment_service.dart';
 import '../../../services/user_service.dart';
 
 class AgreementController extends GetxController {
@@ -32,7 +33,6 @@ class AgreementController extends GetxController {
   final PdfService _pdfService = PdfService();
   final ShopService _shopService = ShopService();
   final RentalService _rentalService = RentalService();
-  final PaymentService _paymentService = PaymentService();
 
   // -- Agreement Data --
   final Rxn<InitRentalModel> initRentalModel = Rxn<InitRentalModel>();
@@ -111,16 +111,14 @@ class AgreementController extends GetxController {
     /// -----------------------
     if (rentalData.rentType == RentType.hourly) {
       int hours = difference.inHours;
-
-      // Minimum 1 hour
-      if (hours == 0) {
-        hours = 1;
-      }
-
       final int remainingMinutes = difference.inMinutes % 60;
 
-      // Add extra hour only if grace period exceeded
-      if (remainingMinutes > hourlyGracePeriod.value) {
+      if (hours == 0) {
+        // Less than 1 hour — charge minimum 1 hour, no grace check needed
+        hours = 1;
+      } else if (remainingMinutes > hourlyGracePeriod.value) {
+        // Only add an extra hour if there are leftover minutes beyond full hours
+        // that exceed the grace period
         hours += 1;
       }
 
@@ -131,17 +129,14 @@ class AgreementController extends GetxController {
     /// -----------------------
     else {
       int days = difference.inDays;
+      final remainingMinutes = difference.inMinutes % (24 * 60);
 
-      // Minimum 1 day
       if (days == 0) {
+        // Less than 1 day — charge minimum 1 day, no grace check needed
         days = 1;
-      }
-
-      // Calculate remaining time after full days
-      final remainingDuration = difference - Duration(days: days);
-
-      // Any extra time exceeding daily grace period counts as another day
-      if (remainingDuration.inMinutes > dailyGracePeriod.value) {
+      } else if (remainingMinutes > dailyGracePeriod.value) {
+        // Only add an extra day for leftover time beyond full days
+        // that exceeds the daily grace period
         days += 1;
       }
 
@@ -176,13 +171,21 @@ class AgreementController extends GetxController {
     }
 
     final difference = dueDateTime.difference(startDateTime);
-    int totalHours = difference.inHours;
-    if (difference.inMinutes % 60 > 0) {
-      totalHours++;
+    final int hours = difference.inHours;
+    final int minutes = difference.inMinutes % 60;
+
+    // Use consistent logic with suggestedPrice
+    int displayHours = hours;
+    if (hours == 0) {
+      // Less than 1 hour — display minimum 1 hour
+      displayHours = 1;
+    } else if (minutes > hourlyGracePeriod.value) {
+      // Only round up for leftover minutes beyond full hours
+      displayHours++;
     }
 
-    final days = totalHours ~/ 24;
-    final remainingHours = totalHours % 24;
+    final days = displayHours ~/ 24;
+    final remainingHours = displayHours % 24;
 
     if (days > 0) {
       String duration = "$days d";
@@ -191,7 +194,7 @@ class AgreementController extends GetxController {
       }
       return duration;
     } else {
-      return "$totalHours h";
+      return "$displayHours h";
     }
   }
 
@@ -201,6 +204,7 @@ class AgreementController extends GetxController {
     super.onInit();
     if (Get.arguments != null && Get.arguments is InitRentalModel) {
       initRentalModel.value = Get.arguments as InitRentalModel;
+
       _loadShopConfig();
     }
     // Listeners to invalidate generated agreement on data change
@@ -447,13 +451,16 @@ class AgreementController extends GetxController {
         rentalData.dueDate.year,
         rentalData.dueDate.month,
         rentalData.dueDate.day,
-        rentalData.dueDate.hour,
-        rentalData.dueDate.minute,
+        rentalData.dueTime.hour,
+        rentalData.dueTime.minute,
       );
 
+      final rentalPrice = double.tryParse(rentalPriceController.text) ?? 0.0;
       final deposit = requireDeposit.value
           ? (double.tryParse(depositController.text) ?? 0.0)
           : 0.0;
+
+      final configService = Get.find<ConfigService>();
 
       final newRental = RentalModel(
         shopId: shopId,
@@ -466,13 +473,19 @@ class AgreementController extends GetxController {
         status: RentalStatus.active,
         rentType: initRentalModel.value!.rentType,
         paymentStatus: PaymentStatus.unpaid,
-        rate: double.tryParse(rentalPriceController.text) ?? 0.0,
-        amountExpected: double.tryParse(rentalPriceController.text) ?? 0.0,
+        rate:
+            (initRentalModel.value!.rentType == RentType.hourly
+                    ? board!.rentalRateHour
+                    : board!.rentalRateDay)
+                .toDouble(),
+        // amountExpected represents the base rental fee
+        amountExpected: rentalPrice,
+        // Rent is initially unpaid (Deposit is track separately)
         amountPaid: 0.0,
         securityDeposit: SecurityDepositModel(
           enabled: requireDeposit.value,
           amount: deposit,
-          paid: requireDeposit.value ? deposit : 0.0,
+          paid: deposit,
           refunded: 0.0,
         ),
         agreementLink: null,
@@ -480,27 +493,19 @@ class AgreementController extends GetxController {
         cachedCustomerName: "${customer!.firstName} ${customer!.lastName}",
         cachedItemName: board!.name,
         cachedStaffName: staffName,
+        currency: configService.currency.value,
+        dateFormat: configService.dateFormat.value,
+        timeZone: configService.timeZone.value,
         createdAt: DateTime.now(),
       );
+
+      log(newRental.toMap().toString());
 
       final rentalId = await _rentalService.createRental(
         shopId,
         newRental,
         generatedPdfData.value!,
       );
-
-      // Create Payment Record for Security Deposit if paid
-      if (requireDeposit.value && deposit > 0) {
-        await _paymentService.addPayment(
-          shopId: shopId,
-          rentalId: rentalId,
-          category: PaymentCategory.deposit,
-          amount: deposit,
-          handledBy: staffName,
-          method: PaymentMethod.cash, // Defaulting to cash for now
-          note: "Initial Security Deposit",
-        );
-      }
 
       AppSnackBar.success(
         title: "Success",
@@ -509,6 +514,7 @@ class AgreementController extends GetxController {
       Get.offAllNamed(Routes.ADMIN_HOME);
     } catch (e) {
       AppSnackBar.error(title: "Error", message: "Failed to create rental: $e");
+      log(e.toString());
     } finally {
       isCreatingRental.value = false;
     }
@@ -528,7 +534,7 @@ class AgreementController extends GetxController {
   double getTotalDamageFees() {
     return getSelectedDamageFees().fold<double>(
       0.0,
-      (sum, fee) => sum + fee.feeAmount,
+      (total, fee) => total + fee.feeAmount,
     );
   }
 }

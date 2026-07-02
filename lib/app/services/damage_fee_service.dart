@@ -1,9 +1,10 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../models/damage_fee_model.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import 'firestore_usage_service.dart';
 
 class DamageFeeService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -30,6 +31,7 @@ class DamageFeeService {
           .collection(FirestoreCollections.damageFees)
           .orderBy(FirestoreFields.createdAt, descending: true)
           .get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       final damageRules = snapshot.docs.map((doc) {
         final data = doc.data();
@@ -70,6 +72,7 @@ class DamageFeeService {
             FirestoreFields.createdAt: FieldValue.serverTimestamp(),
             FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
           });
+      FirestoreUsageService.to.trackWrite(1);
 
       final addedRule = damageRule.copyWith(id: docRef.id);
       log('Added damage rule with ID: ${addedRule.id}', name: logName);
@@ -106,6 +109,7 @@ class DamageFeeService {
             ...damageRule.toMap(),
             FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
           });
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Updated damage rule: ${damageRule.id}', name: logName);
     } catch (e) {
@@ -133,6 +137,7 @@ class DamageFeeService {
           .collection(FirestoreCollections.damageFees)
           .doc(ruleId)
           .delete();
+      FirestoreUsageService.to.trackDelete(1);
 
       log('Deleted damage rule: $ruleId', name: logName);
     } catch (e) {
@@ -163,6 +168,7 @@ class DamageFeeService {
           .orderBy(FirestoreFields.createdAt, descending: true);
 
       return query.snapshots().map((snapshot) {
+        FirestoreUsageService.to.trackQuerySnapshot(snapshot);
         final damageRules = snapshot.docs.map((doc) {
           final data = doc.data();
           data[FirestoreFields.id] = doc.id;

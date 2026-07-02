@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/validators/a_validator.dart';
@@ -26,7 +26,7 @@ class EditShopView extends GetView<SettingsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Edit Shop Details",
+          'edit_shop_details'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -88,7 +88,7 @@ class EditShopView extends GetView<SettingsController> {
                           ),
                           SizedBox(height: 12.h),
                           SelectableText(
-                            'ID: $shopId',
+                            '${'id'.tr}: $shopId',
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontSize: 12.sp,
@@ -104,47 +104,62 @@ class EditShopView extends GetView<SettingsController> {
                 SizedBox(height: 40.h),
 
                 /// Shop Name
-                _buildLabel(context, "Shop Name"),
+                _buildLabel(context, 'shop_name'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopNameController,
-                  hintText: "Enter shop name",
+                  hintText: 'enter_shop_name'.tr,
                   icon: Iconsax.shop,
                   enabled: canEdit,
                   validator: (value) =>
-                      AValidator.validateText(value, 'Shop Name'),
+                      AValidator.validateText(value, 'shop_name'.tr),
                 ),
 
                 SizedBox(height: 20.h),
 
                 /// Location
-                _buildLabel(context, "Location"),
+                _buildLabel(context, 'location'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopLocationController,
-                  hintText: "Enter shop location",
+                  hintText: 'enter_location'.tr,
                   icon: Iconsax.location,
                   enabled: canEdit,
                   validator: (value) =>
-                      AValidator.validateText(value, 'Location'),
+                      AValidator.validateText(value, 'location'.tr),
                 ),
 
                 SizedBox(height: 20.h),
 
                 /// Shop Contact Number
-                _buildLabel(context, "Shop Contact Number"),
+                _buildLabel(context, 'shop_contact_number'.tr),
                 SizedBox(height: 8.h),
                 _buildTextField(
                   context,
                   controller: controller.shopContactController,
-                  hintText: "Enter shop contact number",
+                  hintText: 'enter_shop_contact'.tr,
                   icon: Iconsax.call,
                   enabled: canEdit,
                   validator: (value) => AValidator.validatePhoneNumber(value),
                 ),
 
+                SizedBox(height: 20.h),
+
+                /// Shop Email (For Reply-To)
+                _buildLabel(context, 'shop_reply_to_email'.tr),
+                SizedBox(height: 8.h),
+                _buildTextField(
+                  context,
+                  controller: controller.shopEmailController,
+                  hintText: 'enter_shop_email'.tr,
+                  icon: Iconsax.sms,
+                  enabled: canEdit,
+                  inputType: TextInputType.emailAddress,
+                ),
+
+                SizedBox(height: 20.h),
                 SizedBox(height: 40.h),
 
                 /// Save Button
@@ -165,10 +180,10 @@ class EditShopView extends GetView<SettingsController> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 4,
-                        shadowColor: colorScheme.primary.withOpacity(0.4),
+                        shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                       ),
                       child: Text(
-                        "Save Changes",
+                        'save_changes'.tr,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -220,7 +235,7 @@ class EditShopView extends GetView<SettingsController> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,
@@ -228,7 +243,7 @@ class EditShopView extends GetView<SettingsController> {
           icon,
           color: enabled
               ? colorScheme.onSurfaceVariant
-              : colorScheme.onSurfaceVariant.withOpacity(0.5),
+              : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           size: 20.w,
         ),
         border: OutlineInputBorder(

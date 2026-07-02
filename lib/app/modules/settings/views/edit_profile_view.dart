@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/validators/a_validator.dart';
@@ -26,7 +26,7 @@ class EditProfileView extends GetView<SettingsController> {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Edit Profile",
+          'edit_profile'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -52,7 +52,7 @@ class EditProfileView extends GetView<SettingsController> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.5),
+                          color: colorScheme.primary.withValues(alpha: 0.5),
                           width: 2,
                         ),
                       ),
@@ -97,7 +97,7 @@ class EditProfileView extends GetView<SettingsController> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: Offset(0, 2),
                               ),
@@ -118,24 +118,24 @@ class EditProfileView extends GetView<SettingsController> {
               SizedBox(height: 40.h),
 
               /// 2. Input Fields
-              _buildLabel(context, "Full Name"),
+              _buildLabel(context, 'full_name'.tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
                 controller: controller.nameController,
-                hintText: "Enter your full name",
+                hintText: 'enter_full_name'.tr,
                 icon: Iconsax.user,
-                validator: (value) => AValidator.validateText(value, 'Name'),
+                validator: (value) => AValidator.validateText(value, 'full_name'.tr),
               ),
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Phone Number"),
+              _buildLabel(context, 'phone_number'.tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
                 controller: controller.phoneController,
-                hintText: "Enter phone number",
+                hintText: 'enter_phone'.tr,
                 icon: Iconsax.call,
                 inputType: TextInputType.phone,
                 validator: (value) => AValidator.validatePhoneNumber(value),
@@ -143,12 +143,12 @@ class EditProfileView extends GetView<SettingsController> {
 
               SizedBox(height: 20.h),
 
-              _buildLabel(context, "Email Address"),
+              _buildLabel(context, 'email_address'.tr),
               SizedBox(height: 8.h),
               _buildTextField(
                 context,
                 controller: controller.emailController,
-                hintText: "Enter email address",
+                hintText: 'enter_email'.tr,
                 icon: Iconsax.sms,
                 inputType: TextInputType.emailAddress,
                 enabled: false, // Emails are often non-editable
@@ -173,10 +173,10 @@ class EditProfileView extends GetView<SettingsController> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                     elevation: 4,
-                    shadowColor: colorScheme.primary.withOpacity(0.4),
+                    shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                   ),
                   child: Text(
-                    "Save Changes",
+                    'save_changes'.tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class EditProfileView extends GetView<SettingsController> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
         filled: true,
         fillColor: colorScheme.surfaceContainer,
@@ -239,7 +239,7 @@ class EditProfileView extends GetView<SettingsController> {
           icon,
           color: enabled
               ? colorScheme.onSurfaceVariant
-              : colorScheme.onSurfaceVariant.withOpacity(0.5),
+              : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           size: 20.w,
         ),
         border: OutlineInputBorder(
@@ -256,7 +256,9 @@ class EditProfileView extends GetView<SettingsController> {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

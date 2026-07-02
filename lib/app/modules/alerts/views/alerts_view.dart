@@ -4,10 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../models/activity_log_model.dart';
 import '../controllers/alerts_controller.dart';
@@ -33,6 +33,12 @@ class AlertsView extends GetView<AlertsController> {
             fontWeight: FontWeight.w600,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => Get.toNamed('/scheduled-notifications'),
+            icon: Icon(Icons.notifications_active, color: colorScheme.primary),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => controller.refreshLogs(),
@@ -78,7 +84,7 @@ class AlertsView extends GetView<AlertsController> {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +94,9 @@ class AlertsView extends GetView<AlertsController> {
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
-                color: _getActivityColor(log.activityType).withOpacity(0.1),
+                color: _getActivityColor(
+                  log.activityType,
+                ).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -193,7 +201,7 @@ class AlertsView extends GetView<AlertsController> {
           Icon(
             Iconsax.document_text,
             size: 64.w,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           SizedBox(height: 16.h),
           Text(

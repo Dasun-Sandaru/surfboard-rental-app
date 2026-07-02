@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
-import '../../../routes/app_pages.dart';
 import '../../../../utils/theme/app_material_theme.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/board_inspection_controller.dart';
 
 class BoardInspectionView extends StatelessWidget {
@@ -26,7 +27,7 @@ class BoardInspectionView extends StatelessWidget {
         leadingIcon: Iconsax.arrow_left,
         centerTitle: true,
         title: Text(
-          "Inspection & Return",
+          "inspection_and_return".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -52,7 +53,7 @@ class BoardInspectionView extends StatelessWidget {
         if (rental == null) {
           return Center(
             child: Text(
-              'No rental data found.',
+              'no_rental_data_found'.tr,
               style: TextStyle(color: colorScheme.onSurface),
             ),
           );
@@ -73,12 +74,14 @@ class BoardInspectionView extends StatelessWidget {
                           color: colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: controller.timeColor.value.withOpacity(0.5),
+                            color: controller.timeColor.value.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: controller.timeColor.value.withOpacity(
-                                0.1,
+                              color: controller.timeColor.value.withValues(
+                                alpha: 0.1,
                               ),
                               blurRadius: 10,
                               spreadRadius: 2,
@@ -89,7 +92,7 @@ class BoardInspectionView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              controller.timeLabel.value,
+                              controller.timeLabel.value.tr,
                               style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontSize: 16.sp,
@@ -116,17 +119,17 @@ class BoardInspectionView extends StatelessWidget {
                     /// 3. Rental Details (From Model)
                     _buildSectionCard(
                       context,
-                      title: "Rental Details",
+                      title: "rental_details".tr,
                       children: [
                         _buildDetailRow(
                           context,
-                          "Rental ID",
+                          "rental_id".tr,
                           rental.id ?? "N/A",
                         ),
                         Obx(
                           () => _buildDetailRow(
                             context,
-                            "Customer",
+                            "customer".tr,
                             controller.customerName,
                             onTap: controller.goToCustomerDetails,
                             valueColor: colorScheme.primary,
@@ -135,7 +138,7 @@ class BoardInspectionView extends StatelessWidget {
                         Obx(
                           () => _buildDetailRow(
                             context,
-                            "Item",
+                            "item".tr,
                             controller.boardName,
                             onTap: controller.goToItemDetails,
                             valueColor: colorScheme.primary,
@@ -143,18 +146,18 @@ class BoardInspectionView extends StatelessWidget {
                         ),
                         _buildDetailRow(
                           context,
-                          "Start Time",
-                          rental.startTime.toString(),
+                          "start_time".tr,
+                          AFormatter.formatDateWithFormat(rental.startTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
                         ),
                         _buildDetailRow(
                           context,
-                          "Expected Return",
-                          rental.expectedReturnTime.toString(),
+                          "expected_return".tr,
+                          AFormatter.formatDateWithFormat(rental.expectedReturnTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
                         ),
                         _buildDetailRow(
                           context,
-                          "Rate",
-                          "\$${rental.rate}/hr",
+                          "rate".tr,
+                          "${AFormatter.formatCurrency(rental.rate, currencyCodeOverride: rental.currency)}/hr",
                           isLast: true,
                         ),
                       ],
@@ -165,7 +168,7 @@ class BoardInspectionView extends StatelessWidget {
                     /// 2. Payment Info
                     _buildSectionCard(
                       context,
-                      title: "Payment Info",
+                      title: "payment_info".tr,
                       navigateTo: Routes.PAYMENTS,
                       arguments: {
                         'rentalId': rental.id,
@@ -176,21 +179,21 @@ class BoardInspectionView extends StatelessWidget {
                           children: [
                             _buildHighlightRow(
                               context,
-                              "Security Deposit",
-                              "\$${rental.securityDeposit.amount.toStringAsFixed(2)}",
+                              "security_deposit".tr,
+                              AFormatter.formatCurrency(rental.securityDeposit.amount, currencyCodeOverride: rental.currency),
                               Iconsax.lock,
                               statusColors?.warning ?? Colors.orange,
                             ),
                             Divider(color: colorScheme.outline, height: 24.h),
-                            _buildHighlightRow(
+                            Obx(() => _buildHighlightRow(
                               context,
-                              "Balance Due",
-                              "\$${controller.balanceDue.toStringAsFixed(2)}",
+                              "balance_due".tr,
+                              AFormatter.formatCurrency(controller.balanceDue, currencyCodeOverride: rental.currency),
                               Iconsax.money_tick,
                               controller.balanceDue > 0
                                   ? colorScheme.error
                                   : (statusColors?.success ?? Colors.green),
-                            ),
+                            )),
                           ],
                         ),
                       ],
@@ -233,7 +236,7 @@ class BoardInspectionView extends StatelessWidget {
                               elevation: 0,
                             ),
                             child: Text(
-                              "Report Damage",
+                              "report_damage".tr,
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
@@ -260,7 +263,7 @@ class BoardInspectionView extends StatelessWidget {
                             elevation: 4,
                           ),
                           child: Text(
-                            "Confirm Return",
+                            "confirm_return".tr,
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
@@ -297,7 +300,7 @@ class BoardInspectionView extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +320,7 @@ class BoardInspectionView extends StatelessWidget {
                 InkWell(
                   onTap: () => Get.toNamed(navigateTo, arguments: arguments),
                   child: Text(
-                    'View Details',
+                    'view_details'.tr,
                     style: TextStyle(color: colorScheme.primary),
                   ),
                 ),
@@ -393,7 +396,7 @@ class BoardInspectionView extends StatelessWidget {
         border: Border(
           bottom: isLast
               ? BorderSide.none
-              : BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+              : BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
         ),
       ),
       child: Row(

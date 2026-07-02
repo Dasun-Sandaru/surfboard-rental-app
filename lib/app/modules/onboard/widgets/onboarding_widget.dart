@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../../../utils/constants/a_sizes.dart';
 
 class OnBoardingWidget extends StatelessWidget {
@@ -36,7 +37,7 @@ class OnBoardingWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      title,
+                      title.tr,
                       style: TextStyle(
                         fontSize: 28.sp,
                         fontWeight: FontWeight.bold,
@@ -47,7 +48,7 @@ class OnBoardingWidget extends StatelessWidget {
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      subtitle,
+                      subtitle.tr,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: colorScheme.onSurfaceVariant,

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
-import 'package:surfboard_rental_app/app/models/activity_log_model.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/common/a_app_bar.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/helper/a_formatter.dart';
+import '../../../models/activity_log_model.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 class AlertDetailsView extends StatelessWidget {
   const AlertDetailsView({super.key, required this.log});
@@ -40,7 +40,7 @@ class AlertDetailsView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: _getActivityColor(
                         log.activityType,
-                      ).withOpacity(0.1),
+                      ).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -128,7 +128,7 @@ class AlertDetailsView extends StatelessWidget {
                   color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.3),
+                    color: colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -175,13 +175,13 @@ class AlertDetailsView extends StatelessWidget {
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: id);
         break;
       case 'Customer':
-        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: {'customerId': id});
+        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: id);
         break;
       case 'Inventory':
         Get.toNamed(Routes.ITEM_DETAILS, arguments: id);
         break;
       case 'User':
-        Get.toNamed(Routes.USER_DETAIL, arguments: {'userId': id});
+        Get.toNamed(Routes.USER_DETAIL, arguments: id);
         break;
       case 'Payment':
         // We might not have a dedicated payment detail view yet,
@@ -211,7 +211,7 @@ class AlertDetailsView extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

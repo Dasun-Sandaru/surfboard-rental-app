@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/settings_controller.dart';
 
@@ -61,10 +61,12 @@ class AccessControlView extends GetView<SettingsController> {
                         ),
                         child: Column(
                           children: keys.map((key) {
+                            final canEdit =
+                                controller.hasPermission('settings_manage_access');
                             final isAllowed =
                                 controller.staffAccessRules[key] ?? false;
                             final label =
-                                controller.AccessRouteLabels[key] ?? key;
+                                controller.accessRouteLabels[key] ?? key;
                             final isLast = key == keys.last;
 
                             return Column(
@@ -85,7 +87,7 @@ class AccessControlView extends GetView<SettingsController> {
                                     ),
                                   ),
                                   title: Text(
-                                    label,
+                                    label.tr,
                                     style: TextStyle(
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w500,
@@ -93,12 +95,16 @@ class AccessControlView extends GetView<SettingsController> {
                                   ),
                                   trailing: Switch(
                                     value: isAllowed,
-                                    onChanged: (val) =>
-                                        controller.toggleAccess(key, val),
-                                    activeColor: colorScheme.primary,
+                                    onChanged: canEdit
+                                        ? (val) =>
+                                            controller.toggleAccess(key, val)
+                                        : null,
+                                    activeThumbColor: colorScheme.primary,
                                   ),
-                                  onTap: () =>
-                                      controller.toggleAccess(key, !isAllowed),
+                                  onTap: canEdit
+                                      ? () =>
+                                          controller.toggleAccess(key, !isAllowed)
+                                      : null,
                                 ),
                                 if (!isLast)
                                   Divider(

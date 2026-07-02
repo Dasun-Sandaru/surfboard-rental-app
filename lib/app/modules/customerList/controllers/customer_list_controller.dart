@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'dart:async';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
+import '../../../../data/firestore/firestore_fields.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';
@@ -101,9 +101,12 @@ class CustomerListController extends GetxController {
     });
   }
 
-  void addCustomer() {
-    // Navigate to add customer screen or show dialog
-    Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: {'isEdit': false});
+  void addCustomer() async {
+    // Navigate to add customer screen and wait
+    await Get.toNamed(Routes.ADD_EDIT_CUSTOMER, arguments: {'isEdit': false});
+
+    // Refresh list if a new customer was added
+    pagingController.refresh();
   }
 
   // ---------------------------------------------------------------------------

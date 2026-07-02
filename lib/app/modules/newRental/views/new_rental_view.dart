@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../models/inventory_model.dart';
@@ -288,7 +288,7 @@ class NewRentalView extends StatelessWidget {
             ? Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: colorScheme.primary.withOpacity(0.2),
+                    backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
                     child: Text(
                       customer.firstName.isNotEmpty
                           ? customer.firstName[0]

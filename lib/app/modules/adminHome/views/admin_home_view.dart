@@ -3,7 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/constants/a_image_strings.dart';
 
 import '../../alerts/views/alerts_view.dart';
 import '../controllers/admin_home_controller.dart';
@@ -71,9 +72,11 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 margin: EdgeInsets.only(top: 16.h),
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,27 +193,60 @@ class AdminHomeView extends GetView<AdminHomeController> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // Logo
-        Icon(Icons.surfing, size: 40.sp, color: colorScheme.primary),
-
-        // Profile Pic
-        InkWell(
-          onTap: () {
-            Get.toNamed(Routes.QR_SCANNER);
-          },
-          child: Container(
-            height: 40.w,
-            width: 40.w,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainer,
-              shape: BoxShape.circle,
-              border: Border.all(color: colorScheme.outline),
-            ),
-            child: Icon(
-              Iconsax.scan_barcode,
-              color: colorScheme.onSurface,
-              size: 20.sp,
-            ),
+        ClipOval(
+          child: Image.asset(
+            AImageStrings.appLogo,
+            width: 40.sp,
+            height: 40.sp,
+            fit: BoxFit.cover,
           ),
+        ),
+
+        // Action Buttons Row
+        Row(
+          children: [
+            // Analytics Button
+            InkWell(
+              onTap: () {
+                Get.toNamed(Routes.ANALYTICS);
+              },
+              child: Container(
+                height: 40.w,
+                width: 40.w,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colorScheme.outline),
+                ),
+                child: Icon(
+                  Iconsax.chart_21,
+                  color: colorScheme.onSurface,
+                  size: 20.sp,
+                ),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            // Barcode Scanner Button
+            InkWell(
+              onTap: () {
+                Get.toNamed(Routes.QR_SCANNER);
+              },
+              child: Container(
+                height: 40.w,
+                width: 40.w,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colorScheme.outline),
+                ),
+                child: Icon(
+                  Iconsax.scan_barcode,
+                  color: colorScheme.onSurface,
+                  size: 20.sp,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -218,86 +254,87 @@ class AdminHomeView extends GetView<AdminHomeController> {
 
   Widget _buildStatsGrid(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    // Data For Stats
-    final stats = [
-      {
-        'title': 'active_rentals'.tr,
-        'count': controller.activeRentals.value.toString(),
-      },
-      {
-        'title': 'boards_available'.tr,
-        'count': controller.boardsAvailable.value.toString(),
-      },
-      {
-        'title': 'damages_pending'.tr,
-        'count': controller.damagesPending.value.toString(),
-      },
-      {
-        'title': 'total_customers'.tr,
-        'count': controller.totalCustomers.value.toString(),
-      },
-    ];
+    return Obx(() {
+      final stats = [
+        {
+          'title': 'active_rentals'.tr,
+          'count': controller.activeRentals.value.toString(),
+        },
+        {
+          'title': 'boards_available'.tr,
+          'count': controller.boardsAvailable.value.toString(),
+        },
+        {
+          'title': 'damages_pending'.tr,
+          'count': controller.damagesPending.value.toString(),
+        },
+        {
+          'title': 'total_customers'.tr,
+          'count': controller.totalCustomers.value.toString(),
+        },
+      ];
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12.w,
-        mainAxisSpacing: 12.h,
-        childAspectRatio: 1.3,
-      ),
-      itemCount: stats.length,
-      itemBuilder: (context, index) {
-        return InkWell(
-          onTap: () {
-            // Handle Navigation Here
-            switch (index) {
-              case 0:
-                Get.toNamed(Routes.RENTALS);
-                break;
-              case 1:
-                Get.toNamed(Routes.AVAILABLE_INVENTORY);
-                break;
-              case 2:
-                Get.toNamed(Routes.DAMAGES_PENDING);
-                break;
-            }
-          },
-          child: Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: colorScheme.outline),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  stats[index]['title']!,
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
+      return GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12.w,
+          mainAxisSpacing: 12.h,
+          childAspectRatio: 1.3,
+        ),
+        itemCount: stats.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              // Handle Navigation Here
+              switch (index) {
+                case 0:
+                  Get.toNamed(Routes.RENTALS);
+                  break;
+                case 1:
+                  Get.toNamed(Routes.AVAILABLE_INVENTORY);
+                  break;
+                case 2:
+                  Get.toNamed(Routes.DAMAGES_PENDING);
+                  break;
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: colorScheme.outline),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    stats[index]['title']!,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  stats[index]['count']!,
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 8.h),
+                  Text(
+                    stats[index]['count']!,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    });
   }
 
   Widget _buildManagementGrid(BuildContext context) {
@@ -323,7 +360,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
         'icon': Iconsax.document_text,
       },
       {
-        'title': 'settings'.tr,
+        'title': 'settings_title'.tr,
         'sub': 'settings_sub'.tr,
         'icon': Iconsax.setting_2,
       },
@@ -360,6 +397,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 break;
               case 3:
                 Get.toNamed(Routes.RENTAL_HISTORY);
+                break;
+              case 4:
+                Get.toNamed(Routes.REPORTS);
                 break;
               case 5:
                 Get.toNamed(Routes.AGREEMENT_TEMPLATE);

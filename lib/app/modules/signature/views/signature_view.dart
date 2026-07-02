@@ -3,9 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:signature/signature.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../controllers/signature_pad_controller.dart';
@@ -28,7 +28,7 @@ class SignaturePadView extends StatelessWidget {
             Iconsax.close_circle, // "Close" icon instead of back for modals
         centerTitle: true,
         title: Text(
-          "Customer Signature",
+          'customer_signature'.tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -41,7 +41,7 @@ class SignaturePadView extends StatelessWidget {
             onPressed: controller.clearSignature,
             icon: Icon(Iconsax.eraser, size: 18.w, color: colorScheme.error),
             label: Text(
-              "Clear",
+              'clear'.tr,
               style: TextStyle(
                 color: colorScheme.error,
                 fontWeight: FontWeight.bold,
@@ -59,7 +59,7 @@ class SignaturePadView extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
             child: Text(
-              "Please sign within the box below to accept the rental agreement.",
+              'sign_within_box'.tr,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
@@ -79,7 +79,7 @@ class SignaturePadView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -110,15 +110,15 @@ class SignaturePadView extends StatelessWidget {
                       : controller.saveSignature,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
-                    disabledBackgroundColor: colorScheme.primary.withOpacity(
-                      0.3,
+                    disabledBackgroundColor: colorScheme.primary.withValues(
+                      alpha: 0.3,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: Text(
-                    "Confirm Signature",
+                    'confirm_signature'.tr,
                     style: TextStyle(
                       color: controller.isEmpty.value
                           ? colorScheme.onSurfaceVariant

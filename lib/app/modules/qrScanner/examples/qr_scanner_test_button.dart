@@ -1,10 +1,12 @@
 // Example: Add this button anywhere in your app to test the QR scanner
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 class QrScannerTestButton extends StatelessWidget {
   const QrScannerTestButton({super.key});
@@ -26,7 +28,7 @@ class QrScannerTestButton extends StatelessWidget {
           );
 
           // You can use the result for your logic here
-          print('Scanned QR Code: $result');
+          log('Scanned QR Code: $result');
 
           // Examples:
           // - Navigate to a rental by ID: Get.toNamed(Routes.RENTAL_DETAIL, arguments: result);

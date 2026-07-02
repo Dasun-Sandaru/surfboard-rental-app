@@ -66,7 +66,7 @@ class CustomerQrCodeDialog extends StatelessWidget {
             //     children: [
             //       CircleAvatar(
             //         radius: 20.w,
-            //         backgroundColor: colorScheme.primary.withOpacity(0.1),
+            //         backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
             //         backgroundImage:
             //             customer.imageUrl != null &&
             //                 customer.imageUrl!.isNotEmpty

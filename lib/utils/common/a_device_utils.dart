@@ -82,10 +82,7 @@ class ADeviceUtils {
 
   static void vibrate(Duration duration) {
     HapticFeedback.vibrate();
-    Future.delayed(
-      duration,
-      () => HapticFeedback.vibrate(),
-    );
+    Future.delayed(duration, () => HapticFeedback.vibrate());
   }
 
   static Future<void> setPreferredOrientaions(
@@ -95,10 +92,7 @@ class ADeviceUtils {
   }
 
   static void hideStatusbar() {
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: [],
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   }
 
   static void showStatusbar() {

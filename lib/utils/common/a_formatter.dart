@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import 'package:surfboard_rental_app/app/services/config_service.dart';
+import '../../app/services/config_service.dart';
 
 class AFormatter {
   static String formatDate(DateTime? date, {String? sdate}) {

@@ -3,11 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/app/services/rental_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../models/rental_model.dart';
+import '../../../routes/app_pages.dart';
+import '../../../services/rental_service.dart';
+import '../../../services/user_service.dart';
+import '../../../../utils/constants/a_enums.dart';
 
 class RentalHistoryController extends GetxController {
   final PagingController<DocumentSnapshot?, RentalModel> pagingController =

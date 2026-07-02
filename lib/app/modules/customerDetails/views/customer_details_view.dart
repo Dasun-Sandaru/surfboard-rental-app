@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../models/customer_model.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../controllers/customer_details_controller.dart';
 import '../../../../app/services/config_service.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
 class CustomerDetailsView extends GetView<CustomerDetailsController> {
   CustomerDetailsView({super.key});
@@ -141,6 +144,33 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
         ),
         SizedBox(height: 4.h),
 
+        // Rating Stars
+        if (customer.ratingCount > 0) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ...List.generate(5, (index) {
+                final isFilled = index < customer.averageRating.round();
+                return Icon(
+                  isFilled ? Iconsax.star5 : Iconsax.star,
+                  color: isFilled ? Colors.amber : colorScheme.outline,
+                  size: 16.w,
+                );
+              }),
+              SizedBox(width: 8.w),
+              Text(
+                "${customer.averageRating.toStringAsFixed(1)} (${customer.ratingCount})",
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+        ],
+
         // ID Badge
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
@@ -251,7 +281,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -342,18 +372,54 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
     final colorScheme = Theme.of(context).colorScheme;
     final statusColors = Theme.of(context).extension<StatusColors>();
 
-    return Obx(
-      () => ListView.separated(
+    return Obx(() {
+      if (controller.isLoadingRentals.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      
+      if (controller.recentRentals.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.h),
+            child: Text("no_recent_activity".tr, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+          ),
+        );
+      }
+
+      return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: controller.history.length,
+        itemCount: controller.recentRentals.length,
         separatorBuilder: (c, i) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
-          final item = controller.history[index];
-          final bool isLate = item['status'] == "late_return";
-          final Color statusColor = isLate
-              ? (statusColors?.warning ?? Colors.orange)
-              : (statusColors?.success ?? Colors.green);
+          final rental = controller.recentRentals[index];
+          
+          final isLate = rental.status == RentalStatus.overdue;
+          final isReturned = rental.status == RentalStatus.completed;
+          
+          Color statusColor = statusColors?.info ?? Colors.blue;
+          String statusText = "active_label".tr; // assuming this key exists or just fallback to Active
+          
+          if (isLate) {
+             statusColor = statusColors?.warning ?? Colors.orange;
+             statusText = "late_return".tr;
+          } else if (isReturned) {
+             statusColor = statusColors?.success ?? Colors.green;
+             statusText = "returned_label".tr;
+          }
+          
+          final date = rental.createdAt;
+          final day = DateFormat('dd').format(date);
+          final month = DateFormat('MMM').format(date);
+          
+          final itemName = rental.cachedItemName?.isNotEmpty == true 
+              ? rental.cachedItemName! 
+              : "Item #${(rental.itemId.length >= 5) ? rental.itemId.substring(0, 5) : rental.itemId}";
+              
+          final durationHours = rental.expectedReturnTime.difference(rental.startTime).inHours;
+          final durationStr = rental.rentType == RentType.daily 
+              ? "${(durationHours / 24).ceil()} Days"
+              : "$durationHours Hours";
 
           return Container(
             padding: EdgeInsets.all(12.w),
@@ -377,7 +443,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                   child: Column(
                     children: [
                       Text(
-                        item['date'].split(' ')[0], // Day
+                        day,
                         style: TextStyle(
                           color: colorScheme.onSurface,
                           fontSize: 16.sp,
@@ -385,7 +451,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                         ),
                       ),
                       Text(
-                        item['date'].split(' ')[1], // Month
+                        month,
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12.sp,
@@ -402,7 +468,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item['items'],
+                        itemName,
                         style: TextStyle(
                           color: colorScheme.onSurface,
                           fontSize: 14.sp,
@@ -421,7 +487,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            "${item['duration']} • ${item['cost']}",
+                            "$durationStr • ${AFormatter.formatCurrency(rental.amountExpected, currencyCodeOverride: rental.currency)}",
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontSize: 12.sp,
@@ -437,11 +503,11 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
+                    color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    (item['status'] as String).tr,
+                    statusText,
                     style: TextStyle(
                       color: statusColor,
                       fontSize: 10.sp,
@@ -453,7 +519,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
             ),
           );
         },
-      ),
-    );
+      );
+    });
   }
 }

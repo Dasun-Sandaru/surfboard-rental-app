@@ -73,7 +73,7 @@ class SignUpController extends GetxController {
         phone: phoneController.text.trim(),
       );
 
-      Get.offAllNamed(Routes.VERIFY_EMAIL);
+      // Navigate automatically via AuthController
     } catch (e) {
       AppErrorHandler.handleError(e);
     } finally {
@@ -105,7 +105,7 @@ class SignUpController extends GetxController {
         phone: phoneController.text.trim(),
       );
 
-      Get.offAllNamed(Routes.VERIFY_EMAIL);
+      // Navigate automatically via AuthController
     } catch (e) {
       AppErrorHandler.handleError(e);
     } finally {
@@ -115,7 +115,10 @@ class SignUpController extends GetxController {
 
   Future<void> scanShopCode() async {
     try {
-      final result = await Get.toNamed(Routes.QR_SCANNER);
+      final result = await Get.toNamed(
+        Routes.QR_SCANNER,
+        arguments: {'returnResult': true},
+      );
       if (result != null && result is String) {
         shopCodeController.text = result;
       }

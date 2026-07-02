@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../../app/models/rental_model.dart';
+import '../../../../app/models/inventory_model.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/damages_pending_controller.dart';
 
 class DamagesPendingView extends GetView<DamagesPendingController> {
@@ -51,7 +52,7 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
                 ),
                 hintText: 'search_customer_item'.tr,
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: colorScheme.surfaceContainer,
@@ -66,18 +67,22 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
 
           /// 2. Rental List
           Expanded(
-            child: PagedListView<DocumentSnapshot?, RentalModel>(
-              pagingController: controller.pagingController,
-              padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
-              builderDelegate: PagedChildBuilderDelegate<RentalModel>(
-                itemBuilder: (context, rental, index) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: _buildRentalCard(context, rental, controller),
+            child: RefreshIndicator(
+              onRefresh: () async => controller.pagingController.refresh(),
+              color: colorScheme.primary,
+              child: PagedListView<DocumentSnapshot?, InventoryModel>(
+                pagingController: controller.pagingController,
+                padding: EdgeInsets.symmetric(horizontal: ASizes.defaultPadding),
+                builderDelegate: PagedChildBuilderDelegate<InventoryModel>(
+                  itemBuilder: (context, item, index) => Padding(
+                    padding: EdgeInsets.only(bottom: 12.h),
+                    child: _buildItemCard(context, item, controller),
+                  ),
+                  noItemsFoundIndicatorBuilder: (context) =>
+                      _buildEmptyState(context),
+                  firstPageErrorIndicatorBuilder: (context) =>
+                      _buildErrorState(context),
                 ),
-                noItemsFoundIndicatorBuilder: (context) =>
-                    _buildEmptyState(context),
-                firstPageErrorIndicatorBuilder: (context) =>
-                    _buildErrorState(context),
               ),
             ),
           ),
@@ -90,16 +95,16 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
   // WIDGET BUILDERS
   // ===========================================================================
 
-  Widget _buildRentalCard(
+  Widget _buildItemCard(
     BuildContext context,
-    RentalModel rental,
+    InventoryModel item,
     DamagesPendingController controller,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isOverdue = rental.expectedReturnTime.isBefore(DateTime.now());
 
     return InkWell(
-      onTap: () => controller.selectRental(rental),
+      onTap: () => controller.selectRental(item),
+      onLongPress: () => Get.toNamed(Routes.ITEM_DETAILS, arguments: item.id),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: EdgeInsets.all(16.w),
@@ -107,9 +112,9 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: colorScheme.error.withOpacity(
-              0.5,
-            ), // Red border for damages/overdue
+            color: colorScheme.error.withValues(
+              alpha: 0.3,
+            ), // Red border for damages
           ),
         ),
         child: Row(
@@ -120,7 +125,7 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
               height: 48.w,
               width: 48.w,
               decoration: BoxDecoration(
-                color: colorScheme.errorContainer.withOpacity(0.5),
+                color: colorScheme.errorContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -138,7 +143,7 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    rental.cachedCustomerName ?? rental.customerId,
+                    item.name,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontSize: 16.sp,
@@ -147,62 +152,50 @@ class DamagesPendingView extends GetView<DamagesPendingController> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    rental.cachedItemName ?? rental.itemId,
+                    "${item.brand} - ${item.type}",
                     style: TextStyle(
-                      color: colorScheme.primary,
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: 14.sp,
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
-                      _buildTimeBadge(
+                      _buildBadge(
                         context,
-                        "${'start_label'.tr}: ${rental.startTime}",
+                        "${'size'.tr}: ${item.displaySize}",
                       ),
                       SizedBox(width: 8.w),
-                      _buildTimeBadge(
+                      _buildBadge(
                         context,
-                        "${'due_label'.tr}: ${rental.expectedReturnTime}",
+                        "${'color'.tr}: ${item.color}",
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-
-            SizedBox(width: 8.w),
-
-            /// Status Indicator
-            if (isOverdue)
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: colorScheme.error.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  "overdue".tr,
-                  style: TextStyle(
-                    color: colorScheme.error,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTimeBadge(BuildContext context, String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
-        fontSize: 12.sp,
+  Widget _buildBadge(BuildContext context, String text) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.outline),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: colorScheme.onSurfaceVariant,
+          fontSize: 12.sp,
+        ),
       ),
     );
   }

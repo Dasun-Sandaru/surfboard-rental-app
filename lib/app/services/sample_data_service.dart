@@ -4,15 +4,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
-import 'package:surfboard_rental_app/app/models/inventory_model.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/app/models/payment_model.dart';
-import 'package:surfboard_rental_app/app/models/security_deposit_model.dart';
-import 'package:surfboard_rental_app/app/models/user_model.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../models/customer_model.dart';
+import '../models/inventory_model.dart';
+import '../models/rental_model.dart';
+import '../models/payment_model.dart';
+import '../models/security_deposit_model.dart';
+import '../models/user_model.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import '../../utils/constants/a_enums.dart';
 
 class SampleDataService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -674,10 +674,12 @@ class SampleDataService {
 
       // Trigger Share Dialog so the user can save it elsewhere (Publicly)
       log('Triggering share dialog for: ${file.path}', name: logName);
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        subject: 'Database Backup for Shop $shopId',
-        text: 'Attached is the JSON database backup for shop ID: $shopId',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'Database Backup for Shop $shopId',
+          text: 'Attached is the JSON database backup for shop ID: $shopId',
+        ),
       );
 
       log('Database exported successfully to: ${file.path}', name: logName);
@@ -706,17 +708,15 @@ class SampleDataService {
   }
 }
 
-
-
 // Users (Root)
 // Shops (Root)
-  // Activity Logs (Sub)
-  // Customers (Sub)
-  // Inventory (Sub)
-    // Damage Fees (Nested Sub)
-  // Members (Sub)
-  // Rentals (Sub)
-    // Damage Reports (Nested Sub)
-      // Photos (Nested Nested Sub)
-    // Payments (Nested Sub)
-  // Agreement Templates (Sub)
+// Activity Logs (Sub)
+// Customers (Sub)
+// Inventory (Sub)
+// Damage Fees (Nested Sub)
+// Members (Sub)
+// Rentals (Sub)
+// Damage Reports (Nested Sub)
+// Photos (Nested Nested Sub)
+// Payments (Nested Sub)
+// Agreement Templates (Sub)

@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
-import 'package:surfboard_rental_app/utils/common/a_app_bar.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
+import '../../../models/rental_model.dart';
+import '../../../../utils/common/a_app_bar.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/theme/app_material_theme.dart';
 import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/rental_history_controller.dart';
 
@@ -60,7 +60,9 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                       ),
                       hintText: 'search_hint'.tr,
                       hintStyle: TextStyle(
-                        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                       filled: true,
                       fillColor: colorScheme.surfaceContainer,
@@ -225,7 +227,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
             if (status != null) controller.updateFilter(null);
           }
         },
-        selectedColor: (color ?? colorScheme.primary).withOpacity(0.2),
+        selectedColor: (color ?? colorScheme.primary).withValues(alpha: 0.2),
         labelStyle: TextStyle(
           color: isSelected
               ? (color ?? colorScheme.primary)
@@ -257,7 +259,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isOverdue
-                ? colorScheme.error.withOpacity(0.3)
+                ? colorScheme.error.withValues(alpha: 0.3)
                 : Colors.transparent,
           ),
         ),
@@ -322,18 +324,18 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
                     children: [
                       _buildTimeBadge(
                         context,
-                        "${'start_label'.tr}: ${AFormatter.formatDate(rental.startTime)}",
+                        "${'start_label'.tr}: ${_formatDate(rental.startTime, rental)}",
                       ),
                       SizedBox(width: 8.w),
                       if (rental.actualReturnTime != null)
                         _buildTimeBadge(
                           context,
-                          "${'returned_label'.tr}: ${AFormatter.formatDate(rental.actualReturnTime)}",
+                          "${'returned_label'.tr}: ${_formatDate(rental.actualReturnTime!, rental)}",
                         )
                       else
                         _buildTimeBadge(
                           context,
-                          "${'due_label'.tr}: ${AFormatter.formatDate(rental.expectedReturnTime)}",
+                          "${'due_label'.tr}: ${_formatDate(rental.expectedReturnTime, rental)}",
                         ),
                     ],
                   ),
@@ -389,9 +391,9 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         text,
@@ -408,10 +410,17 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
     return Text(
       text,
       style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+        color: Theme.of(
+          context,
+        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
         fontSize: 12.sp,
       ),
     );
+  }
+
+  String _formatDate(DateTime date, dynamic rental) {
+    String format = rental?.dateFormat ?? 'yyyy-MM-dd';
+    return AFormatter.formatDateWithFormat(date, outputFormat: format);
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -423,7 +432,7 @@ class RentalHistoryView extends GetView<RentalHistoryController> {
           Icon(
             Iconsax.receipt,
             size: 64.w,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           SizedBox(height: 16.h),
           Text(

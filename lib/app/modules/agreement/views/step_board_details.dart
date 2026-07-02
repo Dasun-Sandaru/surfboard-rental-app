@@ -17,7 +17,7 @@ class StepBoardDetails extends GetView<AgreementController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "What are they renting?",
+            'what_are_they_renting'.tr,
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 24.sp,
@@ -26,7 +26,7 @@ class StepBoardDetails extends GetView<AgreementController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            "Select the board and accessories.",
+            'select_board_accessories'.tr,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 16.sp,
@@ -40,9 +40,9 @@ class StepBoardDetails extends GetView<AgreementController> {
           Obx(
             () => _buildSelectionCard(
               context,
-              "Selected Board",
+              'selected_board'.tr,
               Iconsax.box,
-              controller.board?.name ?? "No board selected",
+              controller.board?.name ?? 'no_board_selected'.tr,
             ),
           ),
 
@@ -70,27 +70,30 @@ class StepBoardDetails extends GetView<AgreementController> {
         children: [
           Icon(icon, color: colorScheme.primary),
           SizedBox(width: 16.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 12.sp,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12.sp,
+                  ),
                 ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
+                Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const Spacer(),
           Icon(Iconsax.arrow_down_1, color: colorScheme.onSurfaceVariant),
         ],
       ),

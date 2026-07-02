@@ -2,18 +2,21 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/services/auth_service.dart';
-import 'package:surfboard_rental_app/app/services/shop_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../services/auth_service.dart';
+import '../../../routes/app_pages.dart';
+import '../../../services/shop_service.dart';
+import '../../../services/user_service.dart';
+import '../../../../data/firestore/firestore_fields.dart';
+import '../../../../utils/constants/a_enums.dart';
 
 import '../../../../utils/common/app_snack_bar.dart';
+import '../../../../utils/common/a_app_dialogs.dart';
 import '../views/inventory_config_view.dart';
 import '../views/edit_profile_view.dart';
 import '../views/edit_shop_view.dart';
 import '../views/access_control_view.dart';
 import '../../../../app/services/config_service.dart';
+import '../../../../utils/helper/rental_calculator.dart';
 
 class SettingsController extends GetxController {
   final UserService _userService = Get.find();
@@ -53,6 +56,7 @@ class SettingsController extends GetxController {
   final shopNameController = TextEditingController();
   final shopLocationController = TextEditingController();
   final shopContactController = TextEditingController();
+  final shopEmailController = TextEditingController();
 
   // -- Text Controller for Dialogs (Inventory) --
   final textInputController = TextEditingController();
@@ -97,6 +101,14 @@ class SettingsController extends GetxController {
   final RxInt simDurationMinutes = 0.obs;
   final RxDouble simulatedPrice = 0.0.obs;
 
+  void resetSimulator(RentType type) {
+    simRentType.value = type;
+    simDurationDays.value = 0;
+    simDurationHours.value = type == RentType.hourly ? 1 : 0;
+    simDurationMinutes.value = 0;
+    simulatedPrice.value = 0.0;
+  }
+
   // -- Date & Time Configuration --
   final RxString dateFormat = 'dd/MM/yyyy'.obs;
   final List<String> availableDateFormats = [
@@ -108,21 +120,63 @@ class SettingsController extends GetxController {
   ];
 
   final RxString timeZone = 'UTC'.obs;
-  // A simplified list of major timezones.
+  // Valid IANA timezone identifiers compatible with the `timezone` package.
   final List<String> availableTimeZones = [
     'UTC',
-    'Asia/Colombo',
-    'Asia/Dubai',
+    // Americas
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'America/Anchorage',
+    'America/Sao_Paulo',
+    'America/Argentina/Buenos_Aires',
+    'America/Mexico_City',
+    'America/Bogota',
+    'America/Lima',
+    'America/Toronto',
+    'America/Vancouver',
+    // Europe
     'Europe/London',
     'Europe/Paris',
     'Europe/Berlin',
-    'America/New_York',
-    'America/Los_Angeles',
-    'America/Chicago',
-    'Australia/Sydney',
-    'Pacific/Honolulu',
+    'Europe/Rome',
+    'Europe/Madrid',
+    'Europe/Lisbon',
+    'Europe/Amsterdam',
+    'Europe/Moscow',
+    'Europe/Istanbul',
+    'Europe/Athens',
+    // Asia
+    'Asia/Colombo',
+    'Asia/Kolkata',
+    'Asia/Dubai',
     'Asia/Tokyo',
     'Asia/Singapore',
+    'Asia/Hong_Kong',
+    'Asia/Shanghai',
+    'Asia/Seoul',
+    'Asia/Bangkok',
+    'Asia/Jakarta',
+    'Asia/Kuala_Lumpur',
+    'Asia/Manila',
+    'Asia/Karachi',
+    'Asia/Dhaka',
+    // Africa
+    'Africa/Johannesburg',
+    'Africa/Cairo',
+    'Africa/Nairobi',
+    'Africa/Lagos',
+    'Africa/Casablanca',
+    // Oceania
+    'Australia/Sydney',
+    'Australia/Melbourne',
+    'Australia/Perth',
+    'Australia/Brisbane',
+    'Pacific/Auckland',
+    'Pacific/Fiji',
+    'Pacific/Honolulu',
+    'Pacific/Guam',
   ];
 
   // -- Access Control --
@@ -160,6 +214,9 @@ class SettingsController extends GetxController {
     'damage_fee': true, // Might want to restrict
     'reports': false,
 
+    // User Management
+    'manage_users': false,
+
     // Settings & Configuration
     'settings_view_shop': true,
     'settings_edit_shop': false,
@@ -172,37 +229,39 @@ class SettingsController extends GetxController {
     'agreement_template': false,
   }.obs;
 
-  final Map<String, String> AccessRouteLabels = {
-    'new_rental': 'New Rental',
-    'rentals': 'Active Rentals',
-    'rental_history': 'Rental History',
-    'alerts': 'Alerts & Notifications',
-    'qr_scanner': 'QR Scanner',
+  final Map<String, String> accessRouteLabels = {
+    'new_rental': 'new_rental',
+    'rentals': 'active_rentals',
+    'rental_history': 'rental_history',
+    'alerts': 'alerts_notifications',
+    'qr_scanner': 'qr_scanner',
 
-    'inventory_view': 'View Inventory',
-    'inventory_view_damage_fees': 'View Damage Fees',
-    'inventory_add': 'Add Items',
-    'inventory_edit': 'Edit Items',
-    'inventory_delete': 'Delete Items',
+    'inventory_view': 'inventory_view',
+    'inventory_view_damage_fees': 'inventory_view_damage_fees',
+    'inventory_add': 'inventory_add',
+    'inventory_edit': 'inventory_edit',
+    'inventory_delete': 'inventory_delete',
 
-    'customers_view': 'View Customers',
-    'customers_add': 'Add Customers',
-    'customers_edit': 'Edit Customers',
-    'customer_contact': 'Contact Customers (Call/Msg/Email)',
+    'customers_view': 'customers_view',
+    'customers_add': 'customers_add',
+    'customers_edit': 'customers_edit',
+    'customer_contact': 'customer_contact',
 
-    'payments': 'Payments & Transactions',
-    'damage_fee': 'Damage Fee Configuration',
-    'reports': 'Reports & Analytics',
+    'payments': 'payments_transactions',
+    'damage_fee': 'damage_fee_config',
+    'reports': 'reports_analytics',
 
-    'settings_view_shop': 'View Shop Details',
-    'settings_edit_shop': 'Edit Shop Details',
-    'settings_edit_currency': 'Edit Currency',
-    'settings_edit_date_format': 'Edit Date Format',
-    'settings_edit_timezone': 'Edit Time Zone',
-    'settings_edit_rental_logic': 'Edit Rental Pricing Logic',
-    'settings_manage_access': 'Manage Access Rules',
-    'shop_setup': 'Shop Configuration',
-    'agreement_template': 'Agreement Templates',
+    'manage_users': 'manage_users',
+
+    'settings_view_shop': 'settings_view_shop',
+    'settings_edit_shop': 'settings_edit_shop',
+    'settings_edit_currency': 'settings_edit_currency',
+    'settings_edit_date_format': 'settings_edit_date_format',
+    'settings_edit_timezone': 'settings_edit_timezone',
+    'settings_edit_rental_logic': 'settings_edit_rental_logic',
+    'settings_manage_access': 'settings_manage_access',
+    'shop_setup': 'shop_setup_label',
+    'agreement_template': 'agreement_template_label',
   };
 
   final List<Map<String, dynamic>> accessGroups = [
@@ -227,7 +286,7 @@ class SettingsController extends GetxController {
       ],
     },
     {
-      'title': 'Customer Management',
+      'title': 'customer_management',
       'keys': [
         'customers_view',
         'customers_add',
@@ -241,7 +300,7 @@ class SettingsController extends GetxController {
     },
     {
       'title': 'analytics_group', // "Analytics"
-      'keys': ['reports'],
+      'keys': ['reports', 'manage_users'],
     },
     {
       'title': 'configuration_group', // "Configuration"
@@ -282,8 +341,6 @@ class SettingsController extends GetxController {
         "image": '',
       };
 
-      print(userProfile.value);
-
       // Get shop data
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) throw 'Shop ID not found in storage';
@@ -299,6 +356,7 @@ class SettingsController extends GetxController {
         FirestoreFields.id: shopDoc.id,
         FirestoreFields.contactNumber:
             shopData[FirestoreFields.contactNumber] ?? 'No Contact Number',
+        FirestoreFields.shopEmail: shopData[FirestoreFields.shopEmail] ?? '',
       };
 
       currency.value = shopData[FirestoreFields.currency] ?? 'USD';
@@ -345,13 +403,13 @@ class SettingsController extends GetxController {
       final effectiveRules = <String, bool>{};
 
       // We iterate over known keys to ensure complete map
-      staffAccessRules.keys.forEach((key) {
+      for (var key in staffAccessRules.keys) {
         if (isAdmin) {
           effectiveRules[key] = true;
         } else {
           effectiveRules[key] = staffAccessRules[key] ?? false;
         }
-      });
+      }
       // Also ensure keys that might be missing from staffAccessRules but present in defaults are handled?
       // staffAccessRules was initialized with defaults. assignAll overwrites it.
       // If DB has partial data, assignAll might lose keys if accessData is partial.
@@ -359,7 +417,9 @@ class SettingsController extends GetxController {
       // If isAdmin, we just want full access for other modules using ConfigService.
       if (isAdmin) {
         // Fill all known keys with true
-        AccessRouteLabels.keys.forEach((k) => effectiveRules[k] = true);
+        for (var k in accessRouteLabels.keys) {
+          effectiveRules[k] = true;
+        }
       }
 
       _configService.updateAccessRules(effectiveRules);
@@ -385,7 +445,10 @@ class SettingsController extends GetxController {
     final newPhone = phoneController.text.trim();
 
     if (newName.isEmpty) {
-      AppSnackBar.error(title: "Error", message: "Name cannot be empty");
+      AppSnackBar.error(
+        title: "error".tr,
+        message: "name_required".tr,
+      );
       return;
     }
 
@@ -401,12 +464,15 @@ class SettingsController extends GetxController {
         Get.back(); // Close Edit Profile View
         _loadData(); // Refresh data
         AppSnackBar.success(
-          title: "Success",
-          message: "Profile updated successfully",
+          title: "success".tr,
+          message: "profile_updated".tr,
         );
       }
     } catch (e) {
-      AppSnackBar.error(title: "Update Failed", message: e.toString());
+      AppSnackBar.error(
+        title: "update_failed".tr,
+        message: e.toString(),
+      );
     }
   }
 
@@ -418,6 +484,8 @@ class SettingsController extends GetxController {
         shopProfile.value[FirestoreFields.location] ?? '';
     shopContactController.text =
         shopProfile.value[FirestoreFields.contactNumber] ?? '';
+    shopEmailController.text =
+        shopProfile.value[FirestoreFields.shopEmail] ?? '';
 
     // Navigate to Edit Shop View
     Get.to(() => EditShopView());
@@ -427,44 +495,58 @@ class SettingsController extends GetxController {
     final newName = shopNameController.text.trim();
     final newLocation = shopLocationController.text.trim();
     final newContactNumber = shopContactController.text.trim();
+    final newShopEmail = shopEmailController.text.trim();
 
     final canEdit = staffAccessRules['settings_edit_shop'] ?? false;
     if (!canEdit) {
       AppSnackBar.error(
-        title: "Access Denied",
-        message: "You don't have permission to edit shop details",
+        title: "access_denied".tr,
+        message: "access_denied_msg".tr,
       );
       return;
     }
 
     if (newName.isEmpty) {
-      AppSnackBar.error(title: "Error", message: "Shop Name cannot be empty");
+      AppSnackBar.error(
+        title: "error".tr,
+        message: "shop_name_required".tr,
+      );
       return;
     }
 
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId != null) {
-        await _shopService.updateShop(
-          shopId: shopId,
-          name: newName,
-          location: newLocation,
-          contactNumber: newContactNumber,
-        );
+        await _shopService.updateShopFields(shopId, {
+          FirestoreFields.businessName: newName,
+          FirestoreFields.location: newLocation,
+          FirestoreFields.contactNumber: newContactNumber,
+          FirestoreFields.shopEmail: newShopEmail,
+        });
 
         Get.back();
         _loadData();
         AppSnackBar.success(
-          title: "Success",
-          message: "Shop details updated successfully",
+          title: "success".tr,
+          message: "shop_details_updated".tr,
         );
       }
     } catch (e) {
-      AppSnackBar.error(title: "Update Failed", message: e.toString());
+      AppSnackBar.error(
+        title: "update_failed".tr,
+        message: e.toString(),
+      );
     }
   }
 
   Future<void> saveRentalConfig() async {
+    if (!hasPermission('settings_edit_rental_logic')) {
+      AppSnackBar.error(
+        title: "access_denied".tr,
+        message: "edit_rental_logic_denied".tr,
+      );
+      return;
+    }
     if (!rentalConfigFormKey.currentState!.validate()) {
       return;
     }
@@ -503,13 +585,13 @@ class SettingsController extends GetxController {
       Get.back(); // Close dialog or view
       _loadData();
       AppSnackBar.success(
-        title: "Success",
-        message: "Rental configuration updated",
+        title: "success".tr,
+        message: "rental_config_updated".tr,
       );
     } catch (e) {
       AppSnackBar.error(
-        title: "Error",
-        message: "Failed to save configuration",
+        title: "error".tr,
+        message: "failed_to_save_config".tr,
       );
     }
   }
@@ -524,45 +606,39 @@ class SettingsController extends GetxController {
     final dailyGrace =
         int.tryParse(dailyGracePeriodController.text.trim()) ?? 1;
 
-    double price = 0.0;
+    final startDateTime = DateTime.now();
+    DateTime dueDateTime;
 
     if (simRentType.value == RentType.hourly) {
-      int hours = simDurationHours.value;
-      final minutes = simDurationMinutes.value;
-
-      // Logic: Minimum 1 hour
-      if (hours == 0 && minutes == 0) hours = 1;
-
-      // Logic: Grace Period
-      if (minutes > hourlyGrace) {
-        hours += 1;
-      }
-
-      price = hours * hourlyRate;
+      dueDateTime = startDateTime.add(
+        Duration(
+          hours: simDurationHours.value,
+          minutes: simDurationMinutes.value,
+        ),
+      );
     } else {
-      int days = simDurationDays.value;
-      final hours = simDurationHours.value;
-      final minutes = simDurationMinutes.value;
-
-      // Logic: Minimum 1 day
-      if (days == 0 && hours == 0 && minutes == 0) days = 1;
-
-      // Convert excess time to minutes
-      final excessMinutes = (hours * 60) + minutes;
-
-      // Logic: Grace Period for extra day
-      if (excessMinutes > dailyGrace) {
-        days += 1;
-      }
-
-      price = days * dailyRate;
+      dueDateTime = startDateTime.add(
+        Duration(
+          days: simDurationDays.value,
+          hours: simDurationHours.value,
+          minutes: simDurationMinutes.value,
+        ),
+      );
     }
 
-    // Apply Tax if enabled
-    if (isTaxEnabled.value) {
-      final tax = double.tryParse(taxRateController.text.trim()) ?? 0.0;
-      price += (price * tax / 100);
-    }
+    final tax = double.tryParse(taxRateController.text.trim()) ?? 0.0;
+
+    final price = RentalCalculator.calculateEstimatedTotal(
+      startDateTime: startDateTime,
+      dueDateTime: dueDateTime,
+      rentType: simRentType.value,
+      hourlyRate: hourlyRate,
+      dailyRate: dailyRate,
+      hourlyGraceMinutes: hourlyGrace,
+      dailyGraceHours: dailyGrace,
+      isTaxEnabled: isTaxEnabled.value,
+      taxRate: tax,
+    );
 
     simulatedPrice.value = price;
     log("Simulated Price: ${simulatedPrice.value}");
@@ -607,6 +683,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> updateCurrency(String newCurrency) async {
+    if (!hasPermission('settings_edit_currency')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to change currency",
+      );
+      return;
+    }
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId == null) return;
@@ -664,6 +747,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> updateDateFormat(String newFormat) async {
+    if (!hasPermission('settings_edit_date_format')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to change date format",
+      );
+      return;
+    }
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId == null) return;
@@ -728,6 +818,13 @@ class SettingsController extends GetxController {
   }
 
   Future<void> updateTimeZone(String newTimeZone) async {
+    if (!hasPermission('settings_edit_timezone')) {
+      AppSnackBar.error(
+        title: "Access Denied",
+        message: "You don't have permission to change time zone",
+      );
+      return;
+    }
     try {
       final shopId = shopProfile.value[FirestoreFields.id];
       if (shopId == null) return;
@@ -788,18 +885,9 @@ class SettingsController extends GetxController {
   }
 
   void logout() {
-    Get.defaultDialog(
-      title: "logout".tr,
-      middleText: "logout_confirm_msg".tr,
-      textConfirm: "yes".tr,
-      textCancel: "no".tr,
-      confirmTextColor: Colors.white,
-      onConfirm: () async {
-        Get.back(); // Close dialog
-        await _authService.signOut();
-        // AuthController will handle the redirection to SIGN_IN or SPLASH based on state
-      },
-    );
+    showLogoutFromAppDialog(() async {
+      await _authService.signOut();
+    });
   }
 
   // Generic function to add item to a list
@@ -835,16 +923,14 @@ class SettingsController extends GetxController {
 
   // Generic function to remove item
   void removeItem(dynamic item, RxList<dynamic> list) {
-    Get.defaultDialog(
+    showAppConfirmation(
+      context: Get.context!,
       title: "remove_item".tr,
-      middleText: "delete_confirm_msg".tr,
-      textConfirm: "delete".tr,
-      textCancel: "cancel".tr,
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+      message: "delete_confirm_msg".tr,
+      confirmText: "delete".tr,
+      cancelText: "cancel".tr,
       onConfirm: () {
         list.remove(item);
-        Get.back();
       },
     );
   }
@@ -857,7 +943,18 @@ class SettingsController extends GetxController {
     Get.to(() => const AccessControlView());
   }
 
+  void navigateToBilling() {
+    Get.toNamed(Routes.BILLING);
+  }
+
   Future<void> toggleAccess(String key, bool value) async {
+    if (!hasPermission('settings_manage_access')) {
+      AppSnackBar.error(
+        title: "access_denied".tr,
+        message: "manage_access_denied_msg".tr,
+      );
+      return;
+    }
     staffAccessRules[key] = value;
 
     // Save to Firestore
@@ -874,7 +971,10 @@ class SettingsController extends GetxController {
         _configService.updateAccessRules(staffAccessRules);
       }
     } catch (e) {
-      AppSnackBar.error(title: "Error", message: "Failed to save access rule");
+      AppSnackBar.error(
+        title: "error".tr,
+        message: "failed_save_access_rule".tr,
+      );
       // Revert on failure
       staffAccessRules[key] = !value;
     }

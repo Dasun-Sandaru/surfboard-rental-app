@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../services/customer_service.dart';
@@ -49,7 +49,7 @@ class AddEditCustomerController extends GetxController {
     shopId = await _userService.getShopIdFromStorage();
   }
 
-  void saveCustomer() {
+  Future<void> saveCustomer() async {
     if (!formKey.currentState!.validate()) return;
 
     if (shopId == null) {
@@ -72,30 +72,45 @@ class AddEditCustomerController extends GetxController {
           ? currentCustomer.value!.createdAt
           : DateTime.now(),
       imageUrl: isEditMode.value ? currentCustomer.value!.imageUrl : null,
+      rentalsCount: isEditMode.value ? currentCustomer.value!.rentalsCount : 0,
+      lastRentalDate: isEditMode.value
+          ? currentCustomer.value!.lastRentalDate
+          : null,
     );
 
     log('Customer Data: ${customer.toMap()}');
 
-    if (isEditMode.value) {
-      // Update existing customer
-      _customerService.updateCustomer(
-        shopId!,
-        currentCustomer.value!.id!,
-        customer,
-      );
-      AppSnackBar.success(
-        title: 'Customer Updated',
-        message: 'Customer has been updated successfully.',
-      );
-    } else {
-      // Add new customer
-      _customerService.addCustomer(shopId!, customer);
-      AppSnackBar.success(
-        title: 'Customer Added',
-        message: 'Customer has been added successfully.',
-      );
-      // Clear fields
-      clearForm();
+    try {
+      if (isEditMode.value) {
+        // Update existing customer
+        await _customerService.updateCustomer(
+          shopId!,
+          currentCustomer.value!.id!,
+          customer,
+        );
+
+        Get.back(result: customer); // Close screen FIRST
+
+        AppSnackBar.success(
+          title: 'Customer Updated',
+          message: 'Customer has been updated successfully.',
+        );
+      } else {
+        // Add new customer
+        await _customerService.addCustomer(shopId!, customer);
+
+        Get.back(); // Close screen FIRST
+
+        AppSnackBar.success(
+          title: 'Customer Added',
+          message: 'Customer has been added successfully.',
+        );
+        // Clear fields
+        clearForm();
+      }
+    } catch (e) {
+      log('Error saving customer: $e');
+      AppSnackBar.error(title: 'Error', message: 'Failed to save customer: $e');
     }
   }
 

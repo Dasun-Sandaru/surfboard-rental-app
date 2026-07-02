@@ -1,12 +1,13 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/app/models/activity_log_model.dart';
-import 'package:surfboard_rental_app/app/services/auth_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../models/activity_log_model.dart';
+import 'auth_service.dart';
+import 'user_service.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import '../../utils/constants/a_enums.dart';
+import 'firestore_usage_service.dart';
 
 class ActivityLogService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -53,7 +54,7 @@ class ActivityLogService {
             // A better approach: The caller should pass actor info if known.
             // Optimization: If UserService has cached user, use it.
             if (Get.isRegistered<UserService>()) {
-              final userService = Get.find<UserService>();
+              Get.find<UserService>();
               // This might trigger a fetch if not cached, which is slow for a log.
               // We will skip deep fetch and rely on Auth Display Name if available.
               actorName = user.displayName ?? user.email ?? 'Staff';
@@ -84,6 +85,7 @@ class ActivityLogService {
         log('Activity logged (Transaction): ${type.name}', name: logName);
       } else {
         await docRef.set(logEntry.toMap());
+        FirestoreUsageService.to.trackWrite(1);
         log('Activity logged: ${type.name}', name: logName);
       }
     } catch (e) {
@@ -98,6 +100,7 @@ class ActivityLogService {
         .limit(limit)
         .snapshots()
         .map((snapshot) {
+          FirestoreUsageService.to.trackQuerySnapshot(snapshot);
           return snapshot.docs
               .map(
                 (doc) => ActivityLogModel.fromSnapshot(

@@ -1,259 +1,312 @@
 import 'package:flutter/material.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/rental_payment_controller.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
+import 'customer_rating_dialog.dart';
+import '../../../../utils/helper/a_formatter.dart';
 
-class CollectPaymentTip extends StatelessWidget {
+class CollectPaymentTip extends StatefulWidget {
   final RentalPaymentController controller;
 
   const CollectPaymentTip({super.key, required this.controller});
 
   @override
+  State<CollectPaymentTip> createState() => _CollectPaymentTipState();
+}
+
+class _CollectPaymentTipState extends State<CollectPaymentTip> {
+  final ValueNotifier<bool> _isProcessing = ValueNotifier(false);
+
+  RentalPaymentController get controller => widget.controller;
+
+  @override
+  void dispose() {
+    _isProcessing.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final statusColors = Theme.of(context).extension<StatusColors>();
-    // Use Scaffold backgroundColor for overlay effect
-    return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.8),
-      body: Center(
-        child: Container(
-          width: 340.w,
-          margin: EdgeInsets.symmetric(horizontal: 24.w),
-          padding: EdgeInsets.all(24.w),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: colorScheme.outline),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header Icon
-              Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Iconsax.receipt,
-                  size: 32.w,
-                  color: colorScheme.primary,
-                ),
-              ),
-              SizedBox(height: 16.h),
 
-              // Title
-              Text(
-                "collect_payment".tr,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                "final_settlement".tr,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 14.sp,
-                ),
-              ),
+    return Obx(() {
+      final rental = controller.rental.value;
+      if (rental == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-              SizedBox(height: 24.h),
+      final double balance = controller.totalAmount;
+      final double deposit = controller.depositHeld;
+      final double netCollect = controller.netCashToCollect;
 
-              // Breakdown List
-              Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
+      return Scaffold(
+        backgroundColor: Colors.black.withValues(alpha: 0.8),
+        body: Center(
+          child: Container(
+            width: 340.w,
+            margin: EdgeInsets.symmetric(horizontal: 24.w),
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outline),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
-                child: Column(
-                  children: [
-                    _buildDetailRow(
-                      context,
-                      "rentals".tr,
-                      "\$${controller.rentalFee.toStringAsFixed(2)}",
-                    ),
-                    SizedBox(height: 8.h),
-                    _buildDetailRow(
-                      context,
-                      "late_fee".tr,
-                      "\$${controller.lateFee.toStringAsFixed(2)}",
-                      color: statusColors?.warning,
-                    ),
-                    SizedBox(height: 8.h),
-                    _buildDetailRow(
-                      context,
-                      "damage_fee".tr,
-                      "\$${controller.damageFee.toStringAsFixed(2)}",
-                      color: statusColors?.error ?? Colors.red,
-                    ),
-                    SizedBox(height: 12.h),
-                    Divider(color: colorScheme.outline),
-                    SizedBox(height: 12.h),
-                    _buildDetailRow(
-                      context,
-                      "total_due".tr,
-                      "\$${controller.totalAmount.toStringAsFixed(2)}",
-                      isTotal: true,
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 24.h),
-
-              // Tip Box
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: (statusColors?.warning ?? Colors.orange).withOpacity(
-                    0.1,
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header Icon
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: (statusColors?.warning ?? Colors.orange).withOpacity(
-                      0.3,
-                    ),
+                  child: Icon(
+                    Iconsax.receipt,
+                    size: 32.w,
+                    color: colorScheme.primary,
                   ),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Iconsax.info_circle,
-                      color: statusColors?.warning,
-                      size: 20.w,
+                SizedBox(height: 16.h),
+
+                // Title
+                Text(
+                  "collect_payment".tr,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  "final_settlement".tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 14.sp,
+                  ),
+                ),
+
+                SizedBox(height: 20.h),
+
+                // Breakdown List
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildDetailRow(
+                        context,
+                        "rentals".tr,
+                        AFormatter.formatCurrency(controller.rentalFee, currencyCodeOverride: rental.currency),
+                      ),
+                      if (controller.lateFee > 0) ...[
+                        SizedBox(height: 8.h),
+                        _buildDetailRow(
+                          context,
+                          "late_fee".tr,
+                          AFormatter.formatCurrency(controller.lateFee, currencyCodeOverride: rental.currency),
+                          color: statusColors?.warning,
+                        ),
+                      ],
+                      if (controller.damageFee > 0) ...[
+                        SizedBox(height: 8.h),
+                        _buildDetailRow(
+                          context,
+                          "damage_fee".tr,
+                          AFormatter.formatCurrency(controller.damageFee, currencyCodeOverride: rental.currency),
+                          color: statusColors?.error,
+                        ),
+                      ],
+                      if (controller.totalPaid > 0) ...[
+                        SizedBox(height: 8.h),
+                        _buildDetailRow(
+                          context,
+                          "amount_paid".tr,
+                          "-${AFormatter.formatCurrency(controller.totalPaid, currencyCodeOverride: rental.currency)}",
+                          color: Colors.green,
+                        ),
+                      ],
+                      SizedBox(height: 12.h),
+                      Divider(color: colorScheme.outline, thickness: 1),
+                      SizedBox(height: 12.h),
+                      _buildDetailRow(
+                        context,
+                        "total_due".tr,
+                        AFormatter.formatCurrency(balance, currencyCodeOverride: rental.currency),
+                        isTotal: true,
+                      ),
+                      if (deposit > 0) ...[
+                        SizedBox(height: 12.h),
+                        _buildDetailRow(
+                          context,
+                          "${"security_deposit".tr} (${"held".tr})",
+                          "-${AFormatter.formatCurrency(deposit, currencyCodeOverride: rental.currency)}",
+                          color: colorScheme.secondary,
+                        ),
+                        SizedBox(height: 12.h),
+                        _buildDetailRow(
+                          context,
+                          netCollect >= 0 ? "To Collect" : "To Refund",
+                          AFormatter.formatCurrency(netCollect.abs(), currencyCodeOverride: rental.currency),
+                          isTotal: true,
+                          color: netCollect >= 0
+                              ? colorScheme.primary
+                              : Colors.orange,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 20.h),
+
+                // Dynamic Tip Box
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: (statusColors?.warning ?? Colors.orange).withValues(
+                      alpha: 0.1,
                     ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: (statusColors?.warning ?? Colors.orange)
+                          .withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Iconsax.info_circle,
+                        color: statusColors?.warning,
+                        size: 20.w,
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Text(
+                          _getTipMessage(balance, deposit, netCollect, rental.currency),
                           style: TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 13.sp,
                             height: 1.4,
                           ),
-                          children: [
-                            TextSpan(
-                              text: "${"tip_prefix".tr} ",
-                            ), // I added 'tip_payment' as a whole sentence. I should replace the whole RichText or use 'tip_payment' parts.
-                            // The RichText splits it: "Tip: Keep the " + amount + " security deposit..."
-                            // I'll replace the full text sentence segments.
-                            // But I only added 'tip_payment' as one string.
-                            // I'll just use the tip_payment string and append amount? No, current code inserts amount in middle.
-                            // I'll skip localizing the tip text logic COMPLEXLY and just localize "Tip: " etc?
-                            // I'll replace the whole RichText with a simpler Text using translation with params?
-                            // 'tip_payment_msg'.trParams({'deposit': ..., 'collect': ...})?
-                            // I didn't add 'tip_payment_msg'. I added 'tip_payment'.
-                            // 'tip_payment': 'Tip: Keep the security deposit and collect the remaining from the customer.'
-                            // This generic string is good enough?
-                            // I'll just use the generic string and show the numbers below or separate?
-                            // I'll keep the English structure for now but localize "Tip: ".
-                            // Or I'll just use the simple text "tip_payment".tr which I added, and ignore the complex interpolation for now to save time/risk.
-                            // I'll replace the RichText content with just Text("tip_payment".tr).
-                            TextSpan(text: "tip_payment".tr),
-                            TextSpan(
-                              text:
-                                  "\$${controller.rental.value?.securityDeposit.amount.toStringAsFixed(2) ?? '0.00'}",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const TextSpan(
-                              text:
-                                  " security deposit and collect the remaining ",
-                            ),
-                            TextSpan(
-                              text:
-                                  "\$${(controller.totalAmount - (controller.rental.value?.securityDeposit.amount ?? 0)).toStringAsFixed(2)}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                            const TextSpan(text: " from the customer."),
-                          ],
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 24.h),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: colorScheme.outline),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          "cancel".tr,
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: _isProcessing,
+                        builder: (context, isProcessing, _) {
+                          return ElevatedButton(
+                            onPressed: isProcessing ? null : _processPayment,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              disabledBackgroundColor: colorScheme.primary
+                                  .withValues(alpha: 0.5),
+                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: isProcessing
+                                ? SizedBox(
+                                    height: 20.w,
+                                    width: 20.w,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: colorScheme.onPrimary,
+                                    ),
+                                  )
+                                : Text(
+                                    balance > 0
+                                        ? "collect_payment".tr
+                                        : "complete".tr,
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          );
+                        },
                       ),
                     ),
                   ],
                 ),
-              ),
-
-              SizedBox(height: 24.h),
-
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: colorScheme.outline),
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        "cancel".tr,
-                        style: TextStyle(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Get.back(); // Handled in controller if needed, or here?
-                        // Controller logic calls Get.back() inside _processPayment usually
-                        _processPayment();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: colorScheme.onPrimary,
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        "collect_payment".tr,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
+  }
+
+  String _getTipMessage(double balance, double deposit, double netCollect, String? currency) {
+    if (deposit > 0) {
+      if (netCollect > 0) {
+        return "Keep the full ${AFormatter.formatCurrency(deposit, currencyCodeOverride: currency)} deposit and collect an additional ${AFormatter.formatCurrency(netCollect, currencyCodeOverride: currency)} in cash.";
+      } else if (netCollect < 0) {
+        return "Apply ${AFormatter.formatCurrency(balance, currencyCodeOverride: currency)} from the deposit to cover the balance, and refund the remaining ${AFormatter.formatCurrency(netCollect.abs(), currencyCodeOverride: currency)} to the customer.";
+      } else {
+        return "The security deposit of ${AFormatter.formatCurrency(deposit, currencyCodeOverride: currency)} exactly covers the remaining balance. No additional payment needed.";
+      }
+    } else {
+      if (balance > 0) {
+        return "Collect ${AFormatter.formatCurrency(balance, currencyCodeOverride: currency)} in cash from the customer.";
+      } else if (balance < 0) {
+        return "Refund ${AFormatter.formatCurrency(balance.abs(), currencyCodeOverride: currency)} to the customer.";
+      } else {
+        return "All payments are settled. No additional collection required.";
+      }
+    }
   }
 
   Widget _buildDetailRow(
@@ -292,25 +345,74 @@ class CollectPaymentTip extends StatelessWidget {
   }
 
   Future<void> _processPayment() async {
+    if (_isProcessing.value) return; // Prevent double-tap
+    _isProcessing.value = true;
+
     try {
-      // 1. Add Payment Record
-      await controller.paymentService.addPayment(
+      final double totalBalance = controller.totalBalance;
+      final double deposit = controller.depositHeld;
+      final double netCash = controller.netCashToCollect;
+
+      // Fetch Staff name
+      final staffUser = await controller.userService.getUser(
+        controller.userService.currentUid ?? "",
+      );
+      final staffName = staffUser?.name ?? 'Staff';
+
+      // Calculate how much of the deposit covers the balance
+      final double depositApplied = totalBalance > 0
+          ? (totalBalance < deposit ? totalBalance : deposit)
+          : 0.0;
+
+      // Calculate the refund (remaining deposit after covering balance)
+      final double refundAmount = (deposit - totalBalance).clamp(0.0, deposit);
+
+      // 1. Record ONLY actual cash collection (real money changing hands)
+      if (netCash > 0) {
+        await controller.paymentService.addPayment(
+          shopId: controller.shopId,
+          rentalId: controller.rentalId,
+          category: PaymentCategory.partialPayment,
+          amount: netCash,
+          handledBy: staffName,
+          method: PaymentMethod.cash,
+          note: "Cash collected at settlement",
+        );
+      }
+
+      // 2. Record refund if deposit exceeds the balance (real money handed back)
+      if (refundAmount > 0) {
+        await controller.paymentService.addPayment(
+          shopId: controller.shopId,
+          rentalId: controller.rentalId,
+          category: PaymentCategory.refund,
+          amount: refundAmount,
+          handledBy: staffName,
+          method: PaymentMethod.cash,
+          note:
+              "Deposit held: ${AFormatter.formatCurrency(deposit)}, "
+              "Applied to balance: ${AFormatter.formatCurrency(depositApplied)}, "
+              "Refunded: ${AFormatter.formatCurrency(refundAmount)}",
+        );
+      }
+
+      // 3. Settle the rental balance directly
+      // This applies the deposit towards amountPaid without creating a fake payment entry.
+      // depositApplied is an internal transfer, not new cash, so we just update the rental fields.
+      await controller.rentalService.settleRentalBalance(
         shopId: controller.shopId,
         rentalId: controller.rentalId,
-        category: PaymentCategory.rental,
-        amount: controller.totalAmount,
-        handledBy: controller.userService.currentUser?.uid ?? 'Staff',
-        method: PaymentMethod.cash,
+        depositApplied: depositApplied,
+        refundedAmount: refundAmount,
       );
 
-      // 2. Determine inventory status based on damage
-      // If there are damage fees, mark the board as damaged
+      // 4. Determine inventory status based on damage
       final bool hasDamage = controller.damageFee > 0;
       final InventoryStatus inventoryStatus = hasDamage
           ? InventoryStatus.damaged
           : InventoryStatus.available;
 
-      // 3. Finalize Return (update rental to completed and inventory status)
+      // 5. Finalize Return (Updates Rental Status)
       if (controller.rental.value?.itemId != null) {
         await controller.rentalService.finalizeReturn(
           shopId: controller.shopId,
@@ -321,16 +423,31 @@ class CollectPaymentTip extends StatelessWidget {
         );
       }
 
-      Get.back(); // Close Payment Screen
-      Get.back(); // Close Rental Payment Screen
+      if (!mounted) return;
+
+      // 6. Show Rating Dialog
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => CustomerRatingDialog(
+          customerName: controller.customerName,
+          onSubmit: (rating, comment) {
+            controller.submitRating(rating, comment);
+          },
+        ),
+      );
+
+      // 7. Success & Navigation
+      Get.offAllNamed(Routes.ADMIN_HOME);
 
       AppSnackBar.success(
         title: "Success",
-        message: hasDamage
-            ? "Payment collected. Board marked as damaged."
-            : "Payment collected & Rental Closed",
+        message: totalBalance > 0
+            ? "Payment collected & Finalized"
+            : "Rental concluded successfully",
       );
     } catch (e) {
+      _isProcessing.value = false;
       AppSnackBar.error(title: "Error", message: "Payment failed: $e");
     }
   }

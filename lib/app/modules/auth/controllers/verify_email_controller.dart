@@ -3,12 +3,10 @@ import 'package:get/get.dart';
 import '../../../../utils/common/a_app_error_handler.dart';
 import '../../../../utils/common/a_app_snacks.dart';
 import '../../../services/auth_service.dart';
-import '../../../routes/app_pages.dart';
-import '../../../services/user_service.dart';
+import '../../../controllers/auth_controller.dart';
 
 class VerifyEmailController extends GetxController {
   final AuthService _authService = Get.find();
-  final UserService _userService = Get.find();
 
   final isLoading = false.obs;
   final isEmailVerified = false.obs;
@@ -50,25 +48,9 @@ class VerifyEmailController extends GetxController {
       if (verified) {
         _verificationTimer?.cancel();
 
-        // Navigate To Role-Based Home
-        final user = _authService.currentUser;
-        if (user != null) {
-          final membership = await _userService.getUserMembership(
-            _authService.currentUser!.uid,
-          );
-
-          final role = membership.role;
-          // final shopId = membership['shopId']!;
-
-          if (role == 'admin') {
-            Get.offAllNamed(Routes.ADMIN_HOME);
-          } else if (role == 'staff') {
-            Get.offAllNamed(Routes.STAFF_HOME);
-          } else {
-            await _authService.signOut();
-            Get.offAllNamed(Routes.SIGN_IN);
-          }
-        }
+        // Delegate to AuthController to handle role-based navigation and load configuration
+        final authController = Get.find<AuthController>();
+        await authController.handleAuthChanged(_authService.currentUser);
       }
     } catch (e) {
       AppErrorHandler.handleError(e);
@@ -116,7 +98,7 @@ class VerifyEmailController extends GetxController {
   Future<void> goToLogin() async {
     try {
       await _authService.signOut();
-      Get.offAllNamed(Routes.SIGN_IN);
+      // AuthController will automatically route them to SIGN_IN
     } catch (e) {
       AppErrorHandler.handleError(e);
     }

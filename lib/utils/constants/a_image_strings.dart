@@ -3,9 +3,10 @@ class AImageStrings {
       "https://pub.dev/static/hash-mb54d9c1/img/pub-dev-logo.svg";
 
   // App Icon
-  static const String appLogo = "assets/app_logo.png";
-  static const String appPlayStoreIcon = "assets/appstore.png";
-  static const String appAppStoreIcon = "assets/playstore.png";
+  // App Icon
+  static const String appLogo = "assets/appstore.png";
+  static const String appPlayStoreIcon = "assets/playstore.png";
+  static const String appAppStoreIcon = "assets/appstore.png";
 
   // svg
   static const String logoLightSvg = "assets/t1.svg";

@@ -1,10 +1,11 @@
+
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/validators/a_validator.dart'; // Assuming you have validators
@@ -27,8 +28,8 @@ class AddInventoryView extends StatelessWidget {
         centerTitle: true,
         title: Text(
           controller.mode == InventoryFormMode.edit
-              ? "Edit Board"
-              : "Add Board",
+              ? "edit_board".tr
+              : "add_board".tr,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontSize: 18.sp,
@@ -46,36 +47,40 @@ class AddInventoryView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// Image Picker
+                    _buildImagePicker(context, controller),
+                    SizedBox(height: 20.h),
+
                     /// Name
-                    _buildLabel(context, 'Board Name'),
+                    _buildLabel(context, 'board_name'.tr),
                     SizedBox(height: 8.h),
                     _buildBoardName(context, controller),
 
                     SizedBox(height: 20.h),
 
                     /// 3. Type
-                    _buildLabel(context, 'Surfboard Type'),
+                    _buildLabel(context, 'surfboard_type'.tr),
                     SizedBox(height: 8.h),
                     _buildTypeDropdown(context, controller),
 
                     SizedBox(height: 20.h),
 
                     /// 1. Brand (Dropdown)
-                    _buildLabel(context, 'Brand'),
+                    _buildLabel(context, 'brand'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.brandController,
                       hintText: "e.g., Surfline",
                       icon: Icons.storefront,
-                      validator: (v) => AValidator.validateText(v, 'Brand'),
+                      validator: (v) => AValidator.validateText(v, 'brand'.tr),
                       textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
 
                     /// 2. Size (Split Inputs)
-                    _buildLabel(context, 'Size'),
+                    _buildLabel(context, 'size'.tr),
                     SizedBox(height: 8.h),
                     Row(
                       children: [
@@ -84,9 +89,9 @@ class AddInventoryView extends StatelessWidget {
                           child: _buildTextField(
                             context,
                             controller: controller.sizeFeetController,
-                            hintText: "6 ft",
+                            hintText: "6 ${'feet'.tr}",
                             validator: (v) =>
-                                AValidator.validateNumber(v, 'Size Feet'),
+                                AValidator.validateNumber(v, 'feet'.tr),
                             icon: Icons.height,
                             inputType: TextInputType.number,
                             textAction: TextInputAction.next,
@@ -98,9 +103,9 @@ class AddInventoryView extends StatelessWidget {
                           child: _buildTextField(
                             context,
                             controller: controller.sizeInchesController,
-                            hintText: "2 in",
+                            hintText: "2 ${'inches'.tr}",
                             validator: (v) =>
-                                AValidator.validateNumber(v, 'Size Inches'),
+                                AValidator.validateNumber(v, 'inches'.tr),
                             icon: Icons.straighten,
                             inputType: TextInputType.number,
                             textAction: TextInputAction.next,
@@ -112,12 +117,12 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// Volume
-                    _buildLabel(context, 'Volume'),
+                    _buildLabel(context, 'volume'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.volumeController,
-                      validator: (v) => AValidator.validateNumber(v, 'Volume'),
+                      validator: (v) => AValidator.validateNumber(v, 'volume'.tr),
                       icon: Icons.water_drop,
                       hintText: "e.g., 34L",
                       inputType: TextInputType.number,
@@ -127,13 +132,13 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// 4. Color
-                    _buildLabel(context, 'Color'),
+                    _buildLabel(context, 'color'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.colorController,
                       icon: Icons.color_lens,
-                      validator: (v) => AValidator.validateText(v, 'Color'),
+                      validator: (v) => AValidator.validateText(v, 'color'.tr),
                       hintText: "e.g., Blue with stripes",
                       textAction: TextInputAction.next,
                     ),
@@ -141,7 +146,7 @@ class AddInventoryView extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     /// 5. Purchase Cost
-                    _buildLabel(context, 'Purchase Cost'),
+                    _buildLabel(context, 'purchase_cost'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -152,13 +157,13 @@ class AddInventoryView extends StatelessWidget {
                         decimal: true,
                       ),
                       validator: (v) =>
-                          AValidator.validateAmount(v, 'Purchase Cost'),
+                          AValidator.validateAmount(v, 'purchase_cost'.tr),
                       textAction: TextInputAction.next,
                     ),
 
                     /// rental rate hour
                     SizedBox(height: 20.h),
-                    _buildLabel(context, 'Rental Rate (Hourly)'),
+                    _buildLabel(context, 'rental_rate_hourly'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -169,14 +174,14 @@ class AddInventoryView extends StatelessWidget {
                         decimal: true,
                       ),
                       validator: (v) =>
-                          AValidator.validateAmount(v, 'Rental Rate'),
+                          AValidator.validateAmount(v, 'rental_rate_hourly'.tr),
                       textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
 
                     /// rental rate day
-                    _buildLabel(context, 'Rental Rate (Daily)'),
+                    _buildLabel(context, 'rental_rate_daily'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
@@ -187,20 +192,20 @@ class AddInventoryView extends StatelessWidget {
                         decimal: true,
                       ),
                       validator: (v) =>
-                          AValidator.validateAmount(v, 'Rental Rate (Daily)'),
+                          AValidator.validateAmount(v, 'rental_rate_daily'.tr),
                       textAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: 20.h),
 
                     /// Notes
-                    _buildLabel(context, 'Notes'),
+                    _buildLabel(context, 'notes'.tr),
                     SizedBox(height: 8.h),
                     _buildTextField(
                       context,
                       controller: controller.notesController,
                       icon: Icons.note,
-                      hintText: "Additional details about the board",
+                      hintText: "additional_details_hint".tr,
                       inputType: TextInputType.multiline,
                       textAction: TextInputAction.done,
                       validator: (v) => null,
@@ -236,8 +241,8 @@ class AddInventoryView extends StatelessWidget {
                   ),
                   child: Text(
                     controller.mode == InventoryFormMode.edit
-                        ? "Update Board Details"
-                        : "Add Board Details",
+                        ? "update_board_details".tr
+                        : "add_board_details".tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -282,7 +287,7 @@ class AddInventoryView extends StatelessWidget {
       prefixIcon: Icon(icon, size: 20.w, color: colorScheme.onSurfaceVariant),
       hintText: hintText,
       hintStyle: TextStyle(
-        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
       ),
       filled: true,
       fillColor: colorScheme.surfaceContainer,
@@ -348,11 +353,11 @@ class AddInventoryView extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return CustomDropdown<SurfBoardType>(
       controller: controller.surfboardTypeController,
-      hintText: 'Select board type',
+      hintText: 'select_board_type'.tr,
       items: SurfBoardType.values,
       headerBuilder: (context, selectedItem, enabled) {
         return Text(
-          selectedItem.name,
+          selectedItem.name.tr,
           style: TextStyle(color: colorScheme.onSurface, fontSize: 16.sp),
         );
       },
@@ -363,11 +368,11 @@ class AddInventoryView extends StatelessWidget {
               : colorScheme.surface,
           child: InkWell(
             onTap: onItemSelect,
-            splashColor: colorScheme.primary.withOpacity(0.1),
+            splashColor: colorScheme.primary.withValues(alpha: 0.1),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: Text(
-                item.name,
+                item.name.tr,
                 style: TextStyle(
                   color: isSelected
                       ? colorScheme.onPrimaryContainer
@@ -386,7 +391,7 @@ class AddInventoryView extends StatelessWidget {
       },
       validator: (SurfBoardType? value) {
         if (value == null) {
-          return 'Please select a board type';
+          return 'select_board_type_err'.tr;
         }
         return null;
       },
@@ -401,7 +406,7 @@ class AddInventoryView extends StatelessWidget {
           selectedColor: colorScheme.primaryContainer,
         ),
         hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           fontSize: 16.sp,
         ),
         closedErrorBorder: Border.all(color: colorScheme.error),
@@ -442,6 +447,54 @@ class AddInventoryView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImagePicker(BuildContext context, AddInventoryController controller) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: controller.pickImage,
+      child: Obx(() {
+        final localImage = controller.selectedImage.value;
+        final existingUrl = controller.existingImageUrl.value;
+        
+        return Container(
+          height: 200.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colorScheme.outline, style: BorderStyle.solid),
+            image: localImage != null
+                ? DecorationImage(
+                    image: FileImage(localImage),
+                    fit: BoxFit.cover,
+                  )
+                : (existingUrl.isNotEmpty && existingUrl != '000')
+                    ? DecorationImage(
+                        image: NetworkImage(existingUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+          ),
+          child: (localImage == null && (existingUrl.isEmpty || existingUrl == '000'))
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.camera, size: 48.w, color: colorScheme.onSurfaceVariant),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Tap to add image',
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ],
+                )
+              : null,
+        );
+      }),
     );
   }
 }

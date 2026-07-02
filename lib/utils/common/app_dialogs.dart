@@ -30,6 +30,7 @@ class AppDialogs {
           actions: <Widget>[
             if (cancelText != null)
               TextButton(
+                onPressed: onCancel ?? () => Get.back(),
                 child: Text(
                   cancelText,
                   style: TextStyle(
@@ -37,7 +38,6 @@ class AppDialogs {
                     fontSize: 14.sp,
                   ),
                 ),
-                onPressed: onCancel ?? () => Get.back(),
               ),
             if (confirmText != null)
               ElevatedButton(
@@ -49,8 +49,8 @@ class AppDialogs {
                   ),
                   elevation: 0,
                 ),
-                child: Text(confirmText, style: TextStyle(fontSize: 14.sp)),
                 onPressed: onConfirm,
+                child: Text(confirmText, style: TextStyle(fontSize: 14.sp)),
               ),
           ],
         );

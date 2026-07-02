@@ -18,4 +18,7 @@ class FirestoreCollections {
 
   /// Sub-collection under damage_reports (shops/{shopId}/rentals/{rentalId}/damage_reports/{reportId}/photos)
   static const photos = 'photos';
+
+  /// Top-level collection for Firebase Trigger Email extension
+  static const mail = 'mail';
 }

@@ -2,13 +2,14 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:surfboard_rental_app/app/models/agreement_template_model.dart';
-import 'package:surfboard_rental_app/app/models/customer_model.dart';
-import 'package:surfboard_rental_app/app/models/damage_fee_model.dart';
-import 'package:surfboard_rental_app/app/models/inventory_model.dart';
-import 'package:surfboard_rental_app/app/models/init_rental_model.dart';
-import 'package:surfboard_rental_app/app/models/shop_model.dart';
-import 'package:surfboard_rental_app/app/services/agreement_template_service.dart';
+import '../models/agreement_template_model.dart';
+import '../models/customer_model.dart';
+import '../models/damage_fee_model.dart';
+import '../models/inventory_model.dart';
+import '../models/init_rental_model.dart';
+import '../models/shop_model.dart';
+import 'agreement_template_service.dart';
+import '../../utils/helper/a_formatter.dart';
 
 class PdfService {
   final AgreementTemplateService _templateService = AgreementTemplateService();
@@ -216,11 +217,11 @@ class PdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _buildDetailRow("Rental Fee:", "R\$ ${rentalFee.toStringAsFixed(2)}"),
+        _buildDetailRow("Rental Fee:", AFormatter.formatCurrency(rentalFee)),
         if (deposit > 0)
           _buildDetailRow(
             "Deposit (if required):",
-            "R\$ ${deposit.toStringAsFixed(2)}",
+            AFormatter.formatCurrency(deposit),
           ),
       ],
     );
@@ -253,14 +254,12 @@ class PdfService {
           ),
         pw.SizedBox(height: 10),
         _buildSubHeader("DAMAGE PRICE GUIDE"),
-        ...fees
-            .map(
-              (fee) => _buildDetailRow(
-                "${fee.damageType}:",
-                "R\$ ${fee.feeAmount.toStringAsFixed(2)}",
-              ),
-            )
-            .toList(),
+        ...fees.map(
+          (fee) => _buildDetailRow(
+            "${fee.damageType}:",
+            AFormatter.formatCurrency(fee.feeAmount),
+          ),
+        ),
         pw.SizedBox(height: 5),
         pw.Text(
           "Prices are estimates. Final charges depend on repair or replacement cost.",

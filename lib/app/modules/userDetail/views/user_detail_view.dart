@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -11,8 +10,8 @@ import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/constants/a_enums.dart';
 
-import 'package:surfboard_rental_app/utils/theme/app_material_theme.dart';
-
+import '../../../../utils/theme/app_material_theme.dart';
+import '../../../models/activity_log_model.dart';
 import '../../../models/user_model.dart';
 import '../controllers/user_detail_controller.dart';
 
@@ -138,7 +137,7 @@ class UserDetailView extends GetView<UserDetailController> {
       children: [
         CircleAvatar(
           radius: 40.w,
-          backgroundColor: colorScheme.primary.withOpacity(0.2),
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
           child: Text(
             name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?',
             style: TextStyle(
@@ -161,9 +160,11 @@ class UserDetailView extends GetView<UserDetailController> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colorScheme.primary.withOpacity(0.3)),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.3),
+            ),
           ),
           child: Text(
             user.role.name.toUpperCase(),
@@ -235,7 +236,7 @@ class UserDetailView extends GetView<UserDetailController> {
               ),
               Switch(
                 value: controller.isActive.value,
-                activeColor: successColor,
+                activeThumbColor: successColor,
                 inactiveTrackColor: colorScheme.surface,
                 onChanged: user.role == UserRole.admin
                     ? null
@@ -300,7 +301,7 @@ class UserDetailView extends GetView<UserDetailController> {
                     ),
                     decoration: BoxDecoration(
                       color: controller.isVerified.value
-                          ? successColor.withOpacity(0.1)
+                          ? successColor.withValues(alpha: 0.1)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
@@ -347,7 +348,7 @@ class UserDetailView extends GetView<UserDetailController> {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -410,17 +411,32 @@ class UserDetailView extends GetView<UserDetailController> {
   }
 
   Widget _buildPerformanceRow(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(context, "rentals".tr, "142", Iconsax.receipt),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: _buildStatCard(context, "revenue".tr, "\$4.2k", Iconsax.money),
-        ),
-      ],
-    );
+    return Obx(() {
+      if (controller.isLoadingStats.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      return Row(
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              context,
+              "rentals".tr,
+              controller.totalRentals.value.toString(),
+              Iconsax.receipt,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: _buildStatCard(
+              context,
+              "revenue".tr,
+              AFormatter.formatCurrency(controller.totalRevenue.value),
+              Iconsax.money,
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildStatCard(
@@ -435,7 +451,7 @@ class UserDetailView extends GetView<UserDetailController> {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -464,46 +480,34 @@ class UserDetailView extends GetView<UserDetailController> {
 
   Widget _buildHistoryList(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final statusColors = Theme.of(context).extension<StatusColors>();
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: 3, // Mock items
-      itemBuilder: (context, index) {
-        return Container(
-          margin: EdgeInsets.only(bottom: 12.h),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ListTile(
-            leading: Icon(
-              Iconsax.activity,
-              color: colorScheme.onSurfaceVariant,
-              size: 20.w,
-            ),
-            title: Text(
-              "${"processed_rental".tr} #284$index",
-              style: TextStyle(color: colorScheme.onSurface, fontSize: 14.sp),
-            ),
-            subtitle: Text(
-              "2 hours ago",
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 12.sp,
-              ),
-            ),
-            trailing: Text(
-              "+ \$45",
-              style: TextStyle(
-                color: statusColors?.success ?? Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
+
+    return Obx(() {
+      if (controller.isLoadingStats.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (controller.recentActivities.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.h),
+            child: Text(
+              "no_recent_activity".tr,
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
           ),
         );
-      },
-    );
+      }
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.recentActivities.length,
+        itemBuilder: (context, index) {
+          final logModel = controller.recentActivities[index];
+          return _ActivityLogCard(logModel: logModel);
+        },
+      );
+    });
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
@@ -516,6 +520,307 @@ class UserDetailView extends GetView<UserDetailController> {
           color: colorScheme.onSurface,
           fontSize: 16.sp,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityLogCard extends StatefulWidget {
+  final ActivityLogModel logModel;
+
+  const _ActivityLogCard({required this.logModel});
+
+  @override
+  State<_ActivityLogCard> createState() => _ActivityLogCardState();
+}
+
+class _ActivityLogCardState extends State<_ActivityLogCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final logModel = widget.logModel;
+    final date = logModel.timestamp;
+
+    final day = DateFormat('dd').format(date);
+    final month = DateFormat('MMM').format(date);
+    final time = DateFormat('hh:mm a').format(date);
+
+    Map<String, String> stringMetadata = {};
+    if (logModel.metadata != null) {
+      logModel.metadata!.forEach((key, value) {
+        stringMetadata[key] = value.toString();
+      });
+    }
+
+    String title = logModel.description.trParams(stringMetadata);
+    String badgeText = "activity_label".tr;
+    Color badgeColor = colorScheme.primary.withValues(alpha: 0.1);
+    Color badgeTextColor = colorScheme.primary;
+
+    if (logModel.activityType == ActivityType.create_rental) {
+      badgeText = "rental_label".tr;
+      badgeColor = Colors.green.withValues(alpha: 0.15);
+      badgeTextColor = Colors.green;
+    } else if (logModel.activityType == ActivityType.return_rental) {
+      badgeText = "returned_label".tr;
+      badgeColor = Colors.teal.withValues(alpha: 0.15);
+      badgeTextColor = Colors.teal;
+    } else if (logModel.activityType == ActivityType.report_damage) {
+      badgeText = "damage_label".tr;
+      badgeColor = Colors.orange.withValues(alpha: 0.15);
+      badgeTextColor = Colors.orange;
+    } else if (logModel.activityType == ActivityType.add_payment) {
+      badgeText = "payment".tr;
+      badgeColor = Colors.purple.withValues(alpha: 0.15);
+      badgeTextColor = Colors.purple;
+    }
+
+    String amountStr = "";
+    if (logModel.metadata != null) {
+      if (logModel.metadata!.containsKey('amountExpected')) {
+        amountStr =
+            " • \$${(logModel.metadata!['amountExpected'] as num).toStringAsFixed(2)}";
+      } else if (logModel.metadata!.containsKey('amount')) {
+        amountStr =
+            " • \$${(logModel.metadata!['amount'] as num).toStringAsFixed(2)}";
+      }
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          setState(() {
+            _isExpanded = !_isExpanded;
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.all(12.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Date Box
+                  Container(
+                    width: 56.w,
+                    height: 64.h,
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          day,
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          month,
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+
+                  // Details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: _isExpanded ? 3 : 1,
+                          overflow: _isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 6.h),
+                        Row(
+                          children: [
+                            Icon(
+                              Iconsax.clock,
+                              color: colorScheme.onSurfaceVariant,
+                              size: 14.w,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              "$time$amountStr",
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(width: 12.w),
+
+                  // Badge & Chevron
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: badgeColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          badgeText,
+                          style: TextStyle(
+                            color: badgeTextColor,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      Icon(
+                        _isExpanded ? Iconsax.arrow_up_2 : Iconsax.arrow_down_1,
+                        color: colorScheme.onSurfaceVariant,
+                        size: 16.w,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Expanded Content
+              if (_isExpanded) ...[
+                SizedBox(height: 16.h),
+                Divider(
+                  color: colorScheme.outline.withValues(alpha: 0.5),
+                  height: 1,
+                ),
+                SizedBox(height: 12.h),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "entity_type".tr,
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11.sp,
+                            ),
+                          ),
+                          Text(
+                            logModel.entityType,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            "entity_id".tr,
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11.sp,
+                            ),
+                          ),
+                          Text(
+                            logModel.entityId.length > 8
+                                ? "...${logModel.entityId.substring(logModel.entityId.length - 8)}"
+                                : logModel.entityId,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (logModel.metadata != null &&
+                        logModel.metadata!.isNotEmpty)
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "additional_data".tr,
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            ...logModel.metadata!.entries.map((e) {
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 4.h),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${e.key}: ",
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        "${e.value}",
+                                        style: TextStyle(
+                                          color: colorScheme.onSurface,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

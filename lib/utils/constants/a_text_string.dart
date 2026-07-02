@@ -11,6 +11,6 @@ class ATextString {
 
   static const String onBoardingSubTitle2 =
       'Surf Shop is your one-stop destination for all things surf.';
-      
+
   static const String onBoardingSubTitle3 = 'Get started with Surf Shop today!';
 }

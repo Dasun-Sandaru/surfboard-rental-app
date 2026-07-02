@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
+import '../../../../utils/constants/a_sizes.dart';
 
 import '../../../models/customer_model.dart';
 import '../../../routes/app_pages.dart';
@@ -141,8 +141,16 @@ class CustomerListView extends GetView<CustomerListController> {
   Widget _buildCustomerCard(BuildContext context, CustomerModel customer) {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
-      onTap: () {
-        Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
+      onTap: () async {
+        final result = await Get.toNamed(
+          Routes.CUSTOMER_DETAILS,
+          arguments: customer,
+        );
+        // If we returning from details, and an edit happened, refresh list
+        // Note: Details screen returns the updated model when edited
+        if (result != null) {
+          controller.pagingController.refresh();
+        }
       },
       onLongPress: () {
         if (controller.isSelectionMode) {
@@ -158,7 +166,7 @@ class CustomerListView extends GetView<CustomerListController> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: colorScheme.primary.withOpacity(0.2),
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
               child: Text(
                 customer.firstName.isNotEmpty ? customer.firstName[0] : "C",
                 style: TextStyle(color: colorScheme.primary),

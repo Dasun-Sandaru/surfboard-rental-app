@@ -116,23 +116,117 @@ void apiFailedWithUnauthorized(String title, List<String> errors) {
   );
 }
 
-void showYesNoAppDialog(String title, String message) {
-  Get.defaultDialog(
-    title: title.tr,
-    middleText: message.tr,
-    barrierDismissible: true,
-    confirm: ElevatedButton(
-      onPressed: () {
-        Get.back();
-      },
-      child: Text("YES".tr),
-    ),
-    cancel: ElevatedButton(
-      onPressed: () {
-        Get.back();
-      },
-      child: Text("NO".tr),
-    ),
+void _showCustomConfirmationDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+  required String confirmText,
+  required String cancelText,
+  required VoidCallback onConfirm,
+  VoidCallback? onCancel,
+  bool barrierDismissible = true,
+  Color? buttonColor,
+}) {
+  showDialog(
+    context: context,
+    barrierDismissible: barrierDismissible,
+    builder: (BuildContext context) {
+      final colorScheme = Theme.of(context).colorScheme;
+      final Color activeBtnColor = buttonColor ?? colorScheme.primary;
+
+      return AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.r),
+          side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
+        ),
+        titlePadding: EdgeInsets.only(left: 24.w, top: 24.h, right: 24.w, bottom: 12.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+        actionsPadding: EdgeInsets.only(left: 24.w, right: 16.w, bottom: 16.h, top: 8.h),
+        title: Text(
+          title.tr,
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          message.tr,
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 15.sp,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (onCancel != null) onCancel();
+            },
+            child: Text(
+              cancelText.tr.toUpperCase(),
+              style: TextStyle(
+                color: activeBtnColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onConfirm();
+            },
+            child: Text(
+              confirmText.tr.toUpperCase(),
+              style: TextStyle(
+                color: activeBtnColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showAppConfirmation({
+  required BuildContext context,
+  required String title,
+  required String message,
+  String confirmText = 'OK',
+  String cancelText = 'CANCEL',
+  required VoidCallback onConfirm,
+  VoidCallback? onCancel,
+  bool barrierDismissible = true,
+  Color? buttonColor,
+}) {
+  _showCustomConfirmationDialog(
+    context: context,
+    title: title,
+    message: message,
+    confirmText: confirmText,
+    cancelText: cancelText,
+    onConfirm: onConfirm,
+    onCancel: onCancel,
+    barrierDismissible: barrierDismissible,
+    buttonColor: buttonColor,
+  );
+}
+
+void showYesNoAppDialog(String title, String message, {Color? buttonColor}) {
+  _showCustomConfirmationDialog(
+    context: Get.context!,
+    title: title,
+    message: message,
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
+    onConfirm: () {},
+    buttonColor: buttonColor,
   );
 }
 
@@ -141,23 +235,17 @@ void showYesNoRoutineAppDialog(
   String message, {
   VoidCallback? onYes,
   VoidCallback? onNo,
+  Color? buttonColor,
 }) {
-  Get.defaultDialog(
-    title: title.tr,
-    middleText: message.tr,
-    barrierDismissible: true,
-    confirm: ElevatedButton(
-      onPressed: () {
-        onYes?.call();
-      },
-      child: Text("YES".tr),
-    ),
-    cancel: ElevatedButton(
-      onPressed: () {
-        onNo?.call();
-      },
-      child: Text("NO".tr),
-    ),
+  _showCustomConfirmationDialog(
+    context: Get.context!,
+    title: title,
+    message: message,
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
+    onConfirm: () => onYes?.call(),
+    onCancel: onNo,
+    buttonColor: buttonColor,
   );
 }
 
@@ -197,80 +285,88 @@ void showYesNoRoutineAppDialog(
 // }
 
 Future<bool> showAppExitDialog() async {
-  final shouldExit = await showDialog(
+  final shouldExit = await showDialog<bool>(
     context: Get.context!,
-    builder: (context) => AlertDialog(
-      title: Text('Exit App'.tr, style: Theme.of(context).textTheme.bodyLarge),
-      content: Text('Are you sure you want to exit?'.tr),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text('NO'.tr),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: Text('YES'.tr),
-        ),
-      ],
-    ),
-  );
-
-  return shouldExit ?? false; // Default to false if the user doesn't confirm
-}
-
-void showLogoutFromAppDialog(void Function()? onPressed) {
-  showDialog(
-    barrierDismissible: false,
-    context: Get.context!,
-    builder: (BuildContext context) {
+    builder: (context) {
+      final colorScheme = Theme.of(context).colorScheme;
       return AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.r),
+          side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
+        ),
+        titlePadding: EdgeInsets.only(left: 24.w, top: 24.h, right: 24.w, bottom: 12.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+        actionsPadding: EdgeInsets.only(left: 24.w, right: 16.w, bottom: 16.h, top: 8.h),
+        title: Text(
+          'Exit App'.tr,
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Text(
-          'Are you sure you want to logout?'.tr,
-          style: Theme.of(context).textTheme.bodyLarge,
+          'Are you sure you want to exit?'.tr,
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontSize: 15.sp,
+          ),
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text("NO".tr),
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'NO'.tr.toUpperCase(),
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
+            ),
           ),
-          TextButton(onPressed: onPressed, child: Text("YES".tr)),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'YES'.tr.toUpperCase(),
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
         ],
       );
     },
+  );
+
+  return shouldExit ?? false;
+}
+
+void showLogoutFromAppDialog(void Function()? onPressed) {
+  _showCustomConfirmationDialog(
+    context: Get.context!,
+    title: 'confirmation'.tr,
+    message: 'logout_confirm_msg'.tr,
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
+    onConfirm: () => onPressed?.call(),
+    barrierDismissible: false,
   );
 }
 
 void showDeleteWarningDialog(VoidCallback? onYes) {
-  showDialog(
-    barrierDismissible: true,
-    context: Get.context!,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Delete'.tr, style: Theme.of(context).textTheme.bodyLarge),
-        content: Text(
-          'Are you sure you want to delete this item?'.tr,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text("NO".tr),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Close the dialog immediately before performing logout
-              Navigator.of(context).pop();
-              onYes?.call();
-            },
-            child: Text("YES".tr),
-          ),
-        ],
-      );
-    },
+  final context = Get.context;
+  _showCustomConfirmationDialog(
+    context: context ?? Get.context!,
+    title: 'delete'.tr,
+    message: 'delete_confirm_msg'.tr,
+    confirmText: 'YES'.tr,
+    cancelText: 'NO'.tr,
+    onConfirm: () => onYes?.call(),
+    buttonColor: context != null ? Theme.of(context).colorScheme.error : null,
   );
 }
 
@@ -454,17 +550,12 @@ void showCongratulationsDialog(BuildContext context) {
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Image.network(
-        //   'https://i.ibb.co/680r20H/congratulations-illustration.png',
-        //   height: 150,
-        //   fit: BoxFit.contain,
-        // ),
         SizedBox(height: 20.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Congratulations',
+              'congratulations'.tr,
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -477,7 +568,7 @@ void showCongratulationsDialog(BuildContext context) {
         SizedBox(height: ASizes.smallPadding),
 
         Text(
-          'Your account is ready to use',
+          'account_ready'.tr,
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
@@ -496,7 +587,7 @@ void showCongratulationsDialog(BuildContext context) {
               ),
             ),
             child: Text(
-              'Back to Home',
+              'back_to_home'.tr,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium!.copyWith(color: Colors.white),

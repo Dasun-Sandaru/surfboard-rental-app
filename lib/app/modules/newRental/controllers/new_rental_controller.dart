@@ -1,16 +1,16 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/services/customer_service.dart';
-import 'package:surfboard_rental_app/app/services/inventory_service.dart';
-import 'package:surfboard_rental_app/app/services/user_service.dart';
-import 'package:surfboard_rental_app/app/services/config_service.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import '../../../services/customer_service.dart';
+import '../../../services/inventory_service.dart';
+import '../../../services/user_service.dart';
+import '../../../services/config_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/helper/a_formatter.dart';
-import 'package:surfboard_rental_app/app/routes/app_pages.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../../utils/helper/a_formatter.dart';
+import '../../../routes/app_pages.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/customer_model.dart';
 import '../../../models/inventory_model.dart';
 import '../../../models/init_rental_model.dart';
@@ -36,7 +36,6 @@ class NewRentalController extends GetxController {
 
   void selectCustomer() async {
     // Navigate to Customer List in 'selection mode'
-    // You need to update your CustomerListView to handle arguments for selection
     final result = await Get.toNamed(
       Routes.CUSTOMER_LIST,
       arguments: {'selectMode': true},
@@ -311,27 +310,26 @@ class NewRentalController extends GetxController {
         int hours = difference.inHours;
         final int minutes = difference.inMinutes % 60;
 
-        // Grace period logic
-        if (minutes > hourlyGrace) {
+        if (hours == 0) {
+          // Less than 1 hour — charge minimum 1 hour, no grace check needed
+          hours = 1;
+        } else if (minutes > hourlyGrace) {
+          // Only add an extra hour for leftover minutes beyond full hours
           hours++;
         }
-
-        // Minimum 1 hour
-        if (hours == 0) hours = 1;
 
         total = (hours * hourlyRate).toDouble();
       } else {
         int days = difference.inDays;
-        int remainingMinutes = difference.inMinutes % (24 * 60);
+        final int remainingMinutes = difference.inMinutes % (24 * 60);
 
-        // Daily Grace Logic: if remaining time exceeds grace period (in minutes), charge extra day
-        // Note: dailyGracePeriodHours is in hours.
-        if (remainingMinutes > (dailyGraceHours * 60)) {
+        if (days == 0) {
+          // Less than 1 day — charge minimum 1 day, no grace check needed
+          days = 1;
+        } else if (remainingMinutes > (dailyGraceHours * 60)) {
+          // Only add an extra day for leftover time beyond full days
           days++;
         }
-
-        // Minimum 1 day
-        if (days == 0) days = 1;
 
         total = (days * dailyRate).toDouble();
       }

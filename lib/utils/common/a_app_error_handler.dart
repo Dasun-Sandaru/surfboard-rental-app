@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:surfboard_rental_app/utils/common/app_snack_bar.dart';
+import 'app_snack_bar.dart';
 import '../exceptions/firebase_exceptions.dart';
 
 class AppErrorHandler {

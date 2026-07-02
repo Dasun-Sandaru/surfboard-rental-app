@@ -1,12 +1,13 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import 'activity_log_service.dart';
+import 'firestore_usage_service.dart';
 
 import '../../utils/constants/a_enums.dart';
 import '../models/payment_model.dart';
-import '../models/rental_model.dart'; // Import RentalModel for status checks
+// Import RentalModel for status checks
 
 class PaymentService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -30,7 +31,7 @@ class PaymentService {
     ).collection(FirestoreCollections.payments);
   }
 
-  // ---------------- ADD PAYMENT (TRANSACTION) ----------------
+  // ---------------- ADD LEDGER ENTRY (CHARGE OR PAYMENT) ----------------
   Future<void> addPayment({
     required String shopId,
     required String rentalId,
@@ -43,6 +44,14 @@ class PaymentService {
     try {
       final rentalDocRef = _rentalRef(shopId, rentalId);
       final paymentDocRef = _paymentCollectionRef(shopId, rentalId).doc();
+
+      // Determine if this is a Charge (debit) or a Payment (credit)
+      // Usually, fees and rent are charges. Partial payments and refunds are credits.
+      // NOTE: Security deposits are handled separately and shouldn't inflate the "Rental Liability".
+      final bool isCharge =
+          category == PaymentCategory.rental ||
+          category == PaymentCategory.damageFee ||
+          category == PaymentCategory.lateFee;
 
       final payment = PaymentModel(
         id: paymentDocRef.id,
@@ -62,44 +71,54 @@ class PaymentService {
           throw Exception("Rental not found!");
         }
 
-        // 2. Calculate New Totals
-        final currentAmountPaid =
-            (rentalSnap.data()
-                    as Map<String, dynamic>)[FirestoreFields.amountPaid]
-                as num? ??
-            0.0;
-        final amountExpected =
-            (rentalSnap.data()
-                    as Map<String, dynamic>)[FirestoreFields.amountExpected]
-                as num? ??
-            0.0;
+        // 2. Update Totals
+        if (isCharge) {
+          // Increment Expected Amount (Debit) - only for Rent/Damage/Late fees
+          transaction.update(rentalDocRef, {
+            FirestoreFields.amountExpected: FieldValue.increment(amount),
+          });
+        } else if (category == PaymentCategory.partialPayment) {
+          // Record Payment (Credit) - only partial payments affect status
+          final currentAmountPaid =
+              (rentalSnap.data()
+                      as Map<String, dynamic>)[FirestoreFields.amountPaid]
+                  as num? ??
+              0.0;
+          final amountExpected =
+              (rentalSnap.data()
+                      as Map<String, dynamic>)[FirestoreFields.amountExpected]
+                  as num? ??
+              0.0;
 
-        final newAmountPaid = currentAmountPaid + amount;
+          final double newAmountPaid = (currentAmountPaid + amount).toDouble();
 
-        // 3. Determine New Status
-        PaymentStatus newStatus;
-        if (newAmountPaid >= amountExpected) {
-          newStatus = PaymentStatus.paid; // Or overpaid
-        } else if (newAmountPaid > 0) {
-          newStatus = PaymentStatus.partial;
-        } else {
-          newStatus = PaymentStatus.unpaid;
+          PaymentStatus newStatus;
+          if (newAmountPaid >= amountExpected && amountExpected > 0) {
+            newStatus = PaymentStatus.paid;
+          } else if (newAmountPaid > 0) {
+            newStatus = PaymentStatus.partial;
+          } else {
+            newStatus = PaymentStatus.unpaid;
+          }
+
+          transaction.update(rentalDocRef, {
+            FirestoreFields.amountPaid: newAmountPaid,
+            FirestoreFields.paymentStatus: newStatus.name,
+          });
+        } else if (category == PaymentCategory.refund ||
+            category == PaymentCategory.deposit) {
+          // For Refunds and Deposits, we just record the ledger entry and don't touch Rental totals.
+          // This ensures that giving back a deposit doesn't make the rental "Unpaid".
         }
 
-        // 4. Write Payment
+        // 3. Write Payment Record
         transaction.set(paymentDocRef, payment.toMap());
 
-        // 5. Update Rental
-        transaction.update(rentalDocRef, {
-          FirestoreFields.amountPaid: newAmountPaid,
-          FirestoreFields.paymentStatus: newStatus.name,
-        });
-
-        // 6. Log Activity
+        // 4. Log Activity
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.add_payment,
-          description: "Added payment of $amount for rental $rentalId",
+          description: isCharge ? 'log_applied_charge' : 'log_recorded_payment',
           entityId: paymentDocRef.id,
           entityType: 'Payment',
           metadata: {
@@ -111,9 +130,14 @@ class PaymentService {
         );
       });
 
-      log("Payment added: ${category.name} | $amount", name: logName);
+      int writes = 2;
+      if (isCharge || category == PaymentCategory.partialPayment) writes++;
+      FirestoreUsageService.to.trackRead(1);
+      FirestoreUsageService.to.trackWrite(writes);
+
+      log("Ledger entry added: ${category.name} | $amount", name: logName);
     } catch (e) {
-      log("Add payment failed: $e", name: logName);
+      log("Add ledger entry failed: $e", name: logName);
       rethrow;
     }
   }
@@ -124,6 +148,7 @@ class PaymentService {
       shopId,
       rentalId,
     ).orderBy(FirestoreFields.timestamp).snapshots().map((snapshot) {
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
       log("Payments fetched: ${snapshot.docs.length}", name: logName);
       return snapshot.docs
           .map(
@@ -142,6 +167,7 @@ class PaymentService {
         shopId,
         rentalId,
       ).orderBy(FirestoreFields.timestamp).get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
 
       return snapshot.docs
           .map(
@@ -223,13 +249,17 @@ class PaymentService {
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.delete_payment,
-          description: "Deleted payment $paymentId ($amountToReverse)",
+          description: 'log_delete_payment',
           entityId: paymentId,
           entityType: 'Payment',
           metadata: {'rentalId': rentalId, 'amountReversed': amountToReverse},
           transaction: transaction,
         );
       });
+
+      FirestoreUsageService.to.trackRead(2);
+      FirestoreUsageService.to.trackDelete(1);
+      FirestoreUsageService.to.trackWrite(2);
 
       log("Payment deleted: $paymentId", name: logName);
     } catch (e) {

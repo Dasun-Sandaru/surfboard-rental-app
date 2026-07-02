@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:surfboard_rental_app/utils/constants/a_sizes.dart';
-import 'package:surfboard_rental_app/utils/validators/a_validator.dart';
+import '../../../../utils/constants/a_sizes.dart';
+import '../../../../utils/validators/a_validator.dart';
 
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
@@ -61,7 +62,7 @@ class InventoryListView extends StatelessWidget {
                 ),
                 hintText: 'search_inventory_hint'.tr,
                 hintStyle: TextStyle(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: colorScheme.surfaceContainer,
@@ -131,7 +132,7 @@ class InventoryListView extends StatelessWidget {
                     vertical: 8.h,
                   ),
                   itemCount: controller.items.length + 1,
-                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  separatorBuilder: (_, _) => SizedBox(height: 12.h),
                   itemBuilder: (context, index) {
                     if (index == controller.items.length) {
                       controller.loadMore();
@@ -238,7 +239,7 @@ class InventoryListView extends StatelessWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final bgColor = isActive
-        ? colorScheme.primary.withOpacity(0.2)
+        ? colorScheme.primary.withValues(alpha: 0.2)
         : colorScheme.secondaryContainer;
     final textColor = isActive ? colorScheme.primary : colorScheme.onSurface;
     final borderColor = isActive ? colorScheme.primary : Colors.transparent;
@@ -296,7 +297,7 @@ class InventoryListView extends StatelessWidget {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -363,7 +364,7 @@ class InventoryListView extends StatelessWidget {
         return Obx(() {
           final isSelected = controller.selectedSurfboardTypes.contains(type);
           return FilterChip(
-            label: Text(type.name),
+            label: Text(type.name.tr),
             selected: isSelected,
             onSelected: (_) => controller.toggleSurfboardType(type),
           );
@@ -383,7 +384,7 @@ class InventoryListView extends StatelessWidget {
         return Obx(() {
           final isSelected = controller.selectedStatuses.contains(status);
           return FilterChip(
-            label: Text(status.name),
+            label: Text(status.name.tr),
             selected: isSelected,
             onSelected: (_) => controller.toggleStatus(status),
           );
@@ -422,7 +423,7 @@ class InventoryListView extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colorScheme.primary.withOpacity(0.15),
+                  color: colorScheme.primary.withValues(alpha: 0.15),
                 ),
                 child: Icon(
                   controller.isLessThan.value
@@ -503,7 +504,40 @@ class InventoryListView extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(width: 80.w, height: 80.w, color: colorScheme.surface),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: item.imageUrl.isNotEmpty && item.imageUrl != '000'
+                  ? CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      width: 80.w,
+                      height: 80.w,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        width: 80.w,
+                        height: 80.w,
+                        color: colorScheme.surface,
+                        child: Center(
+                          child: SizedBox(
+                            width: 24.w,
+                            height: 24.w,
+                            child: const CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 80.w,
+                        height: 80.w,
+                        color: colorScheme.surface,
+                        child: Icon(Iconsax.image, color: colorScheme.onSurfaceVariant),
+                      ),
+                    )
+                  : Container(
+                      width: 80.w,
+                      height: 80.w,
+                      color: colorScheme.surface,
+                      child: Icon(Iconsax.image, color: colorScheme.onSurfaceVariant),
+                    ),
+            ),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
@@ -519,7 +553,7 @@ class InventoryListView extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    item.status.name.toUpperCase(),
+                    item.status.name.tr.toUpperCase(),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 12.sp,

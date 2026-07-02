@@ -19,7 +19,7 @@ class OnBoardingSkipWidget extends GetView<OnboardController> {
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       ),
       child: Text(
-        'Skip',
+        'skip'.tr,
         style: TextStyle(
           color: colorScheme.onSurfaceVariant,
           fontSize: 14.sp,

@@ -1,13 +1,20 @@
 import 'dart:developer';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:surfboard_rental_app/app/models/rental_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_collections.dart';
-import 'package:surfboard_rental_app/data/firestore/firestore_fields.dart';
-import 'package:surfboard_rental_app/app/services/activity_log_service.dart';
+import '../../data/firestore/firestore_collections.dart';
+import '../../data/firestore/firestore_fields.dart';
+import 'package:get/get.dart';
+import 'activity_log_service.dart';
+import 'email_service.dart';
+import 'firestore_usage_service.dart';
 
+import '../models/rental_model.dart';
+import '../models/payment_model.dart';
 import '../../utils/constants/a_enums.dart';
+import '../../utils/helper/invoice_generator.dart';
+import '../models/customer_model.dart';
+import '../models/shop_model.dart';
 
 class RentalService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -45,6 +52,36 @@ class RentalService {
       return publicUrl;
     } catch (e) {
       log('Error uploading agreement PDF: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<String> _uploadInvoicePdf(
+    String shopId,
+    String rentalId,
+    Uint8List pdfData,
+  ) async {
+    try {
+      log('Uploading invoice PDF for rental: $rentalId', name: logName);
+
+      final filePath = 'shops/$shopId/rentals/$rentalId/invoice.pdf';
+
+      await supabase.storage
+          .from('invoices')
+          .uploadBinary(
+            filePath,
+            pdfData,
+            fileOptions: const FileOptions(contentType: 'application/pdf'),
+          );
+
+      final String publicUrl = supabase.storage
+          .from('invoices')
+          .getPublicUrl(filePath);
+
+      log('Invoice PDF uploaded: $publicUrl', name: logName);
+      return publicUrl;
+    } catch (e) {
+      log('Error uploading invoice PDF: $e', name: logName);
       rethrow;
     }
   }
@@ -123,22 +160,108 @@ class RentalService {
           FirestoreFields.lastRentalDate: FieldValue.serverTimestamp(),
         });
 
+        // --- LEDGER ENTRIES ---
+        final paymentCollectionRef = rentalRef.collection(
+          FirestoreCollections.payments,
+        );
+
+        // 1. Rental Charge (Debit)
+        // amountExpected now only represents the base rental fee liability.
+        final rentalFee = rentalData.amountExpected;
+        if (rentalFee > 0) {
+          final p = PaymentModel(
+            rentalId: rentalId,
+            amount: rentalFee,
+            category: PaymentCategory.rental,
+            method: PaymentMethod.cash,
+            handledBy: 'System',
+            timestamp: DateTime.now(),
+            note: 'Base rental fee',
+          );
+          transaction.set(paymentCollectionRef.doc(), p.toMap());
+        }
+
+        // 2. Initial Security Deposit Payment (Credit)
+        // This acts as the sole record of the deposit being handed over. We don't create a
+        // 'charge' for it because it's tracked separately from the main rental liability.
+        if (rentalData.securityDeposit.paid > 0) {
+          final p = PaymentModel(
+            rentalId: rentalId,
+            amount: rentalData.securityDeposit.paid,
+            category: PaymentCategory.deposit,
+            method: PaymentMethod.cash,
+            handledBy: rentalData.cachedStaffName ?? 'System',
+            timestamp: DateTime.now(),
+            note: 'Initial security deposit collected',
+          );
+          transaction.set(paymentCollectionRef.doc(), p.toMap());
+        }
+
         // Log Activity
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.create_rental,
-          description: "Created rental for ${rentalData.customerId}",
+          description: 'log_rental_created',
           entityId: rentalId,
           entityType: 'Rental',
           metadata: {
             'amountExpected': rentalData.amountExpected,
             'items': rentalData.itemId,
+            'customerId': rentalData.customerId,
           },
           transaction: transaction,
         );
+        // --- NOTIFICATION TRIGGER ---
+        final triggerRef = _shopRef(
+          shopId,
+        ).collection('notification_triggers').doc(rentalId);
+        transaction.set(triggerRef, {
+          'rentalId': rentalId,
+          'shopId': shopId,
+          'expectedReturnTime': Timestamp.fromDate(
+            rentalData.expectedReturnTime,
+          ),
+          'status': 'pending',
+          'title': 'Rental Return Due',
+          'body': 'Rental for ${rentalData.cachedItemName ?? "Item"} is due.',
+          'customerName': rentalData.cachedCustomerName ?? '',
+          'itemName': rentalData.cachedItemName ?? '',
+        });
       });
+      int writes = 5;
+      if (rentalData.amountExpected > 0) writes++;
+      if (rentalData.securityDeposit.paid > 0) writes++;
+      FirestoreUsageService.to.trackWrite(writes);
+      FirestoreUsageService.to.trackRead(2);
 
       log('Rental created successfully: $rentalId', name: logName);
+
+      // --- SEND EMAIL VIA EmailJS ---
+      final customerSnap = await _shopRef(shopId)
+          .collection(FirestoreCollections.customers)
+          .doc(rentalData.customerId)
+          .get();
+      FirestoreUsageService.to.trackDocumentSnapshot(customerSnap);
+      final customerEmail =
+          customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
+      final customerFirstName =
+          customerSnap.data()?[FirestoreFields.firstName]?.toString() ??
+          'Customer';
+
+      if (customerEmail.isNotEmpty) {
+        try {
+          final emailService = Get.find<EmailService>();
+          await emailService.sendAgreementEmail(
+            shopId: shopId,
+            customerEmail: customerEmail,
+            customerName: customerFirstName,
+            agreementLink: agreementLink,
+          );
+        } catch (e) {
+          log('Error sending agreement email: $e', name: logName);
+        }
+      }
+
       return rentalId;
     } catch (e) {
       log('Error creating rental: $e', name: logName);
@@ -155,6 +278,7 @@ class RentalService {
     ).collection(FirestoreCollections.rentals).doc(rentalId);
 
     return docRef.snapshots().map((doc) {
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
       return RentalModel.fromSnapshot(doc);
     });
   }
@@ -167,7 +291,9 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
 
-      return await docRef.get();
+      final doc = await docRef.get();
+      FirestoreUsageService.to.trackDocumentSnapshot(doc);
+      return doc;
     } catch (e) {
       log('Error fetching rental: $e', name: logName);
       rethrow;
@@ -182,7 +308,13 @@ class RentalService {
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
 
+      final triggerRef = _shopRef(
+        shopId,
+      ).collection('notification_triggers').doc(rentalId);
+
       await docRef.delete();
+      await triggerRef.delete();
+      FirestoreUsageService.to.trackDelete(2);
 
       log('Rental deleted: $rentalId', name: logName);
     } catch (e) {
@@ -200,6 +332,7 @@ class RentalService {
       ).collection(FirestoreCollections.rentals).doc(rentalData.id);
 
       await docRef.update(rentalData.toMap());
+      FirestoreUsageService.to.trackWrite(1);
 
       log('Rental updated: ${rentalData.id}', name: logName);
     } catch (e) {
@@ -219,51 +352,280 @@ class RentalService {
     try {
       log('Finalizing return for rental: $rentalId', name: logName);
 
-      final rentalRef = _shopRef(
-        shopId,
-      ).collection(FirestoreCollections.rentals).doc(rentalId);
-      final inventoryRef = _shopRef(
-        shopId,
-      ).collection(FirestoreCollections.inventory).doc(itemId);
+      final shopRef = _shopRef(shopId);
+      final rentalRef = shopRef
+          .collection(FirestoreCollections.rentals)
+          .doc(rentalId);
+      final inventoryRef = shopRef
+          .collection(FirestoreCollections.inventory)
+          .doc(itemId);
 
-      // Moved from Batch to Transaction to support Logging within the same atomic operation
+      // 1. Fetch data for Invoice Generation (Only on final completion)
+      String? invoiceLink;
+
+      if (status == RentalStatus.completed) {
+        final shopSnap =
+            await shopRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+        final rentalSnap = await rentalRef.get();
+
+        if (!shopSnap.exists || !rentalSnap.exists) {
+          throw Exception("Shop or Rental data missing for invoice generation");
+        }
+
+        final shop = ShopModel.fromSnapshot(shopSnap);
+        final rental = RentalModel.fromSnapshot(rentalSnap);
+
+        final customerSnap = await shopRef
+            .collection(FirestoreCollections.customers)
+            .doc(rental.customerId)
+            .get();
+        if (!customerSnap.exists) {
+          throw Exception("Customer data missing for invoice generation");
+        }
+        final customer = CustomerModel.fromSnapshot(customerSnap);
+
+        final paymentsQuery = await rentalRef
+            .collection(FirestoreCollections.payments)
+            .get();
+        FirestoreUsageService.to.trackRead(3);
+        FirestoreUsageService.to.trackQuerySnapshot(paymentsQuery);
+        final payments = paymentsQuery.docs
+            .map((d) => PaymentModel.fromSnapshot(d))
+            .toList();
+
+        // 2. Generate PDF
+        final pdfData = await InvoiceGenerator.generateInvoice(
+          shop: shop,
+          customer: customer,
+          rental: rental,
+          payments: payments,
+        );
+
+        // 3. Upload PDF
+        invoiceLink = await _uploadInvoicePdf(shopId, rentalId, pdfData);
+      }
+
+      bool triggerExists = false;
+      // 4. Transaction to update statuses and add invoiceLink
       await _db.runTransaction((transaction) async {
-        // Optional: Check if already returned?
-        // final rentalSnap = await transaction.get(rentalRef);
+        final currentRentalSnap = await transaction.get(rentalRef);
+        final hasActualReturnTime =
+            currentRentalSnap.data()?[FirestoreFields.actualReturnTime] != null;
 
-        // Update rental status
+        final triggerRef = shopRef
+            .collection('notification_triggers')
+            .doc(rentalId);
+        final triggerSnap = await transaction.get(triggerRef);
+        triggerExists = triggerSnap.exists;
+
         transaction.update(rentalRef, {
           FirestoreFields.status: status.toString().split('.').last,
-          FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+          if (!hasActualReturnTime)
+            FirestoreFields.actualReturnTime: FieldValue.serverTimestamp(),
+          if (invoiceLink != null) FirestoreFields.invoiceLink: invoiceLink,
           if (overdueTime != null) FirestoreFields.overdueTime: overdueTime,
         });
 
-        // Update inventory item status based on damage
         transaction.update(inventoryRef, {
           FirestoreFields.status: inventoryStatus.toString().split('.').last,
         });
 
-        // Log Activity
         await _activityLogService.logActivity(
           shopId: shopId,
           type: ActivityType.return_rental,
-          description: "Returned rental $rentalId",
+          description: 'log_rental_returned',
           entityId: rentalId,
           entityType: 'Rental',
           metadata: {
             'itemId': itemId,
             'inventoryStatus': inventoryStatus.toString().split('.').last,
+            'invoiceLink': invoiceLink,
+            'rentalId': rentalId,
           },
           transaction: transaction,
         );
+
+        // --- CANCEL NOTIFICATION TRIGGER ---
+        if (triggerSnap.exists) {
+          transaction.update(triggerRef, {'status': 'completed'});
+        }
       });
+
+      int returnWrites = 3;
+      if (triggerExists) returnWrites++;
+      FirestoreUsageService.to.trackRead(2);
+      FirestoreUsageService.to.trackWrite(returnWrites);
 
       log(
         'Return finalized for rental: $rentalId (Transaction Committed)',
         name: logName,
       );
+
+      // --- SEND INVOICE EMAIL VIA EmailJS ---
+      if (status == RentalStatus.completed && invoiceLink != null) {
+        try {
+          final shopSnap =
+              await shopRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+          final rentalSnap = await rentalRef.get();
+          final customerId =
+              rentalSnap.data()?[FirestoreFields.customerId] as String?;
+          if (customerId != null) {
+            final customerSnap = await shopRef
+                .collection(FirestoreCollections.customers)
+                .doc(customerId)
+                .get();
+            FirestoreUsageService.to.trackRead(3);
+
+            final customerEmail =
+                customerSnap.data()?[FirestoreFields.email]?.toString() ?? '';
+            final customerFirstName =
+                customerSnap.data()?[FirestoreFields.firstName]?.toString() ??
+                'Customer';
+            final totalAmount =
+                (rentalSnap.data()?[FirestoreFields.amountPaid] as num?)
+                    ?.toDouble() ??
+                0.0;
+            final currency =
+                shopSnap.data()?[FirestoreFields.currency]?.toString() ?? 'LKR';
+
+            if (customerEmail.isNotEmpty) {
+              final emailService = Get.find<EmailService>();
+              await emailService.sendInvoiceEmail(
+                shopId: shopId,
+                customerEmail: customerEmail,
+                customerName: customerFirstName,
+                invoiceLink: invoiceLink,
+                totalAmount: totalAmount,
+                currency: currency,
+              );
+            }
+          }
+        } catch (e) {
+          log('Error sending invoice email: $e', name: logName);
+        }
+      }
     } catch (e) {
       log('Error finalizing return: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  /// Settles the rental balance by applying the security deposit directly
+  /// to the rental's amountPaid field. This is NOT recorded as a payment
+  /// entry because no new cash is changing hands — it's an internal transfer.
+  Future<void> settleRentalBalance({
+    required String shopId,
+    required String rentalId,
+    required double depositApplied,
+    required double refundedAmount,
+  }) async {
+    try {
+      log(
+        'Settling rental balance: $rentalId (depositApplied: $depositApplied, refunded: $refundedAmount)',
+        name: logName,
+      );
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      await _db.runTransaction((transaction) async {
+        final rentalSnap = await transaction.get(rentalRef);
+        if (!rentalSnap.exists) throw Exception("Rental not found!");
+
+        final data = rentalSnap.data() as Map<String, dynamic>;
+        final currentAmountPaid =
+            (data[FirestoreFields.amountPaid] as num? ?? 0.0).toDouble();
+        final amountExpected =
+            (data[FirestoreFields.amountExpected] as num? ?? 0.0).toDouble();
+
+        final newAmountPaid = currentAmountPaid + depositApplied;
+
+        // Determine payment status
+        PaymentStatus newStatus;
+        if (newAmountPaid >= amountExpected && amountExpected > 0) {
+          newStatus = PaymentStatus.paid;
+        } else if (newAmountPaid > 0) {
+          newStatus = PaymentStatus.partial;
+        } else {
+          newStatus = PaymentStatus.unpaid;
+        }
+
+        transaction.update(rentalRef, {
+          FirestoreFields.amountPaid: newAmountPaid,
+          FirestoreFields.paymentStatus: newStatus.name,
+          '${FirestoreFields.securityDeposit}.refunded': refundedAmount,
+        });
+      });
+
+      FirestoreUsageService.to.trackRead(1);
+      FirestoreUsageService.to.trackWrite(1);
+
+      log('Rental balance settled for: $rentalId', name: logName);
+    } catch (e) {
+      log('Error settling rental balance: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Future<void> addLateFeeCharge({
+    required String shopId,
+    required String rentalId,
+    required double amount,
+    required String handledBy,
+  }) async {
+    try {
+      log(
+        'Adding late fee charge of $amount to rental: $rentalId',
+        name: logName,
+      );
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      // Create a unique ID for the payment record
+      final paymentRef = rentalRef
+          .collection(FirestoreCollections.payments)
+          .doc();
+
+      // Transaction to ensure atomicity
+      await _db.runTransaction((transaction) async {
+        // 1. Update Rental amountExpected
+        transaction.update(rentalRef, {
+          FirestoreFields.amountExpected: FieldValue.increment(amount),
+        });
+
+        // 2. Create Payment Record (for ledger audit)
+        transaction.set(paymentRef, {
+          FirestoreFields.rentalId: rentalId,
+          FirestoreFields.amount: amount,
+          FirestoreFields.category: PaymentCategory.lateFee.name,
+          FirestoreFields.method: PaymentMethod.cash.name, // Charge placeholder
+          FirestoreFields.handledBy: handledBy,
+          FirestoreFields.timestamp: FieldValue.serverTimestamp(),
+          FirestoreFields.note: "Automated Late Fee Calculation",
+        });
+
+        // 3. Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.add_payment,
+          description: 'log_applied_late_fee',
+          entityId: paymentRef.id,
+          entityType: 'Payment',
+          metadata: {
+            'rentalId': rentalId,
+            'amount': amount,
+            'category': 'lateFee',
+          },
+          transaction: transaction,
+        );
+      });
+
+      FirestoreUsageService.to.trackWrite(3);
+
+      log('Late fee charge added to rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error adding late fee charge: $e', name: logName);
       rethrow;
     }
   }
@@ -272,18 +634,51 @@ class RentalService {
     required String shopId,
     required String rentalId,
     required double amount,
+    required String damageType,
+    String? handledBy,
   }) async {
     try {
       log(
-        'Adding damage charge of $amount to rental: $rentalId',
+        'Adding $damageType charge of $amount to rental: $rentalId',
         name: logName,
       );
       final rentalRef = _shopRef(
         shopId,
       ).collection(FirestoreCollections.rentals).doc(rentalId);
-      await rentalRef.update({
-        FirestoreFields.amountExpected: FieldValue.increment(amount),
+      final paymentRef = rentalRef
+          .collection(FirestoreCollections.payments)
+          .doc();
+
+      await _db.runTransaction((transaction) async {
+        // 1. Increment Expected Amount
+        transaction.update(rentalRef, {
+          FirestoreFields.amountExpected: FieldValue.increment(amount),
+        });
+
+        // 2. Create Ledger Entry
+        final p = PaymentModel(
+          rentalId: rentalId,
+          amount: amount,
+          category: PaymentCategory.damageFee,
+          method: PaymentMethod.cash,
+          handledBy: handledBy ?? 'System',
+          timestamp: DateTime.now(),
+          note: 'Damage charge: $damageType',
+        );
+        transaction.set(paymentRef, p.toMap());
+
+        // 3. Log Activity
+        await _activityLogService.logActivity(
+          shopId: shopId,
+          type: ActivityType.report_damage,
+          description: 'log_applied_damage_charge',
+          entityId: rentalId,
+          entityType: 'Rental',
+          metadata: {'amount': amount, 'type': damageType},
+          transaction: transaction,
+        );
       });
+      FirestoreUsageService.to.trackWrite(3);
       log('Damage charge added to rental: $rentalId', name: logName);
     } catch (e) {
       log('Error adding damage charge: $e', name: logName);
@@ -303,6 +698,7 @@ class RentalService {
       await docRef.update({
         FirestoreFields.status: status.toString().split('.').last,
       });
+      FirestoreUsageService.to.trackWrite(1);
     } catch (e) {
       log('Error updating rental status: $e', name: logName);
       rethrow;
@@ -321,6 +717,7 @@ class RentalService {
       await docRef.update({
         FirestoreFields.status: status.toString().split('.').last,
       });
+      FirestoreUsageService.to.trackWrite(1);
     } catch (e) {
       log('Error updating inventory status: $e', name: logName);
       rethrow;
@@ -355,15 +752,6 @@ class RentalService {
 
       if (searchTerm != null && searchTerm.isNotEmpty) {
         final searchLower = searchTerm.toLowerCase();
-        // Since Firestore can't do OR queries with range filters effectively across different fields,
-        // we'll prioritize Item Name search here, or we'd need a composite field if both are needed at once.
-        // For now, let's allow searching by item name or customer name by checking both if possible,
-        // but typically prefix search is best on one field.
-        // I will implement search by item name lowercase as the primary search field for "active rentals"
-        // or optimize it to check either if we can.
-        // Actually, for multiple fields, we might need a combined lowercase field or search twice.
-        // Let's settle for searching by itemName_lowercase for now as board identity is primary.
-
         query = query
             .where(
               FirestoreFields.itemNameLowercase,
@@ -384,7 +772,9 @@ class RentalService {
         }
       }
 
-      return await query.get();
+      final snapshot = await query.get();
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot;
     } catch (e) {
       log('Error fetching rentals page: $e', name: logName);
       rethrow;
@@ -402,9 +792,49 @@ class RentalService {
           .where(FirestoreFields.status, isEqualTo: status)
           .count()
           .get();
+      FirestoreUsageService.to.trackRead(1);
       return aggregateQuery.count ?? 0;
     } catch (e) {
       log('Error counting rentals: $e', name: logName);
+      rethrow;
+    }
+  }
+
+  Stream<int> streamRentalCountByStatus(String shopId, String status) {
+    return _shopRef(shopId)
+        .collection(FirestoreCollections.rentals)
+        .where(FirestoreFields.status, isEqualTo: status)
+        .snapshots()
+        .map((snapshot) {
+      FirestoreUsageService.to.trackQuerySnapshot(snapshot);
+      return snapshot.docs.length;
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // SAVE CUSTOMER RATING IN RENTAL
+  // ---------------------------------------------------------------------------
+  Future<void> saveCustomerRating({
+    required String shopId,
+    required String rentalId,
+    required double rating,
+    required String comment,
+  }) async {
+    try {
+      log('Saving customer rating in rental: $rentalId', name: logName);
+      final rentalRef = _shopRef(
+        shopId,
+      ).collection(FirestoreCollections.rentals).doc(rentalId);
+
+      await rentalRef.update({
+        FirestoreFields.customerRating: rating,
+        FirestoreFields.customerRatingComment: comment,
+      });
+      FirestoreUsageService.to.trackWrite(1);
+
+      log('Customer rating saved in rental: $rentalId', name: logName);
+    } catch (e) {
+      log('Error saving customer rating in rental: $e', name: logName);
       rethrow;
     }
   }

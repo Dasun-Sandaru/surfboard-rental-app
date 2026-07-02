@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:surfboard_rental_app/utils/constants/a_enums.dart';
+import '../../../../utils/constants/a_enums.dart';
 import 'inventory_controller.dart';
 
 class AvailableInventoryController extends InventoryController {
