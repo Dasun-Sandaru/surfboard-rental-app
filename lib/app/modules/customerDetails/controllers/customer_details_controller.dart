@@ -121,8 +121,27 @@ class CustomerDetailsController extends GetxController {
     }
   }
 
-  void sendEmail() {
-    AppSnackBar.info(title: "Action", message: "Opening Email App...");
+  void sendMessage() async {
+    if (customer.value == null) return;
+    final Uri launchUri = Uri(scheme: 'sms', path: customer.value!.phone);
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      AppSnackBar.error(title: "Error", message: "Could not launch SMS app");
+    }
+  }
+
+  void sendEmail() async {
+    if (customer.value == null || customer.value!.email.isEmpty) {
+      AppSnackBar.warning(title: "Warning", message: "Customer has no email address");
+      return;
+    }
+    final Uri launchUri = Uri(scheme: 'mailto', path: customer.value!.email);
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      AppSnackBar.error(title: "Error", message: "Could not launch Email app");
+    }
   }
 
   void showQR() {
