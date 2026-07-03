@@ -191,64 +191,71 @@ class QrScannerView extends GetView<QrScannerController> {
                           SizedBox(height: 20.h),
 
                           // Action Buttons
-                          Row(
-                            children: [
-                              // Scan Again
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: controller.resetScanner,
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(
-                                      color: colorScheme.outline,
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 14.h,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                          controller.isProcessing.value
+                              ? Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                                    child: const CircularProgressIndicator(),
                                   ),
-                                  child: Text(
-                                    'scan_again'.tr,
-                                    style: TextStyle(
-                                      color: colorScheme.onSurface,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
+                                )
+                              : Row(
+                                  children: [
+                                    // Scan Again
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: controller.resetScanner,
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(
+                                            color: colorScheme.outline,
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 14.h,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'scan_again'.tr,
+                                          style: TextStyle(
+                                            color: colorScheme.onSurface,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ),
 
-                              SizedBox(width: 12.w),
+                                    SizedBox(width: 12.w),
 
-                              // Use Value (Close with result)
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () => Get.back(
-                                    result: controller.scannedValue.value,
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: colorScheme.primary,
-                                    foregroundColor: colorScheme.onPrimary,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 14.h,
+                                    // Use Value (Close with result)
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () => Get.back(
+                                          result: controller.scannedValue.value,
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: colorScheme.primary,
+                                          foregroundColor: colorScheme.onPrimary,
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 14.h,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        child: Text(
+                                          'use_value'.tr,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: Text(
-                                    'use_value'.tr,
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ),

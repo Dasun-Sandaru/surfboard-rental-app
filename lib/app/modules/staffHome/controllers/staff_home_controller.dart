@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:get/get.dart';
+import '../../../services/config_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import '../../../services/user_service.dart';
 import '../../../services/rental_service.dart';
 import '../../../services/inventory_service.dart';
@@ -17,6 +19,20 @@ class StaffHomeController extends GetxController {
   void changeIndex(int index) {
     if (index == 1) {
       Get.toNamed('/new-rental');
+    } else if (index == 2) {
+      if (Get.isRegistered<ConfigService>()) {
+        final configService = Get.find<ConfigService>();
+        if (configService.staffAccessRules.containsKey('activity_logs') &&
+            configService.staffAccessRules['activity_logs'] == false) {
+          AppSnackBar.warning(
+            title: 'Access Denied',
+            message:
+                'You do not have access to this feature. Please contact the admin.',
+          );
+          return;
+        }
+      }
+      selectedIndex.value = index;
     } else {
       selectedIndex.value = index;
     }

@@ -195,6 +195,7 @@ class SettingsController extends GetxController {
     'rentals': true, // Active Rentals
     'rental_history': true,
     'alerts': true,
+    'activity_logs': true,
     'qr_scanner': true,
 
     // Inventory
@@ -234,6 +235,7 @@ class SettingsController extends GetxController {
     'rentals': 'active_rentals',
     'rental_history': 'rental_history',
     'alerts': 'alerts_notifications',
+    'activity_logs': 'activity_logs',
     'qr_scanner': 'qr_scanner',
 
     'inventory_view': 'inventory_view',
@@ -273,6 +275,7 @@ class SettingsController extends GetxController {
         'rental_history',
         'qr_scanner',
         'alerts',
+        'activity_logs',
       ],
     },
     {

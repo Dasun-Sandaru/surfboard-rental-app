@@ -23,6 +23,13 @@ class QrScannerController extends GetxController {
   final RxBool hasScanned = false.obs;
   final RxBool isProcessing = false.obs;
 
+  bool get isReturnMode {
+    if (Get.arguments != null && Get.arguments is Map) {
+      return Get.arguments['returnResult'] == true;
+    }
+    return false;
+  }
+
   // Services
   final CustomerService _customerService = Get.find();
   final InventoryService _inventoryService = InventoryService();
@@ -56,10 +63,8 @@ class QrScannerController extends GetxController {
         isScanning.value = false;
         isProcessing.value = true;
 
-        if (Get.arguments != null &&
-            Get.arguments is Map &&
-            Get.arguments['returnResult'] == true) {
-          Get.back(result: barcode.rawValue!);
+        if (isReturnMode) {
+          isProcessing.value = false;
           return;
         }
 
@@ -153,7 +158,7 @@ class QrScannerController extends GetxController {
           title: 'customer_found'.tr,
           message: '${customer.firstName} ${customer.lastName}',
         );
-        Get.back(); // Close scanner
+        resetScanner();
         Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
       } else {
         AppSnackBar.warning(
@@ -180,7 +185,7 @@ class QrScannerController extends GetxController {
       title: 'item_found'.tr,
       message: 'opening_item_details'.tr,
     );
-    Get.back(); // Close scanner
+    resetScanner();
     Get.toNamed(Routes.ITEM_DETAILS, arguments: itemId);
   }
 
@@ -205,7 +210,7 @@ class QrScannerController extends GetxController {
           title: 'rental_found'.tr,
           message: 'opening_rental_details'.tr,
         );
-        Get.back(); // Close scanner
+        resetScanner();
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
       } else {
         AppSnackBar.warning(
@@ -235,7 +240,7 @@ class QrScannerController extends GetxController {
           title: 'user_found'.tr,
           message: user.name ?? 'user'.tr,
         );
-        Get.back(); // Close scanner
+        resetScanner();
         Get.toNamed(Routes.USER_DETAIL, arguments: user);
       } else {
         AppSnackBar.warning(
@@ -286,7 +291,7 @@ class QrScannerController extends GetxController {
           title: 'customer_found'.tr,
           message: '${customer.firstName} ${customer.lastName}',
         );
-        Get.back();
+        resetScanner();
         Get.toNamed(Routes.CUSTOMER_DETAILS, arguments: customer);
         return;
       }
@@ -301,7 +306,7 @@ class QrScannerController extends GetxController {
           title: 'item_found'.tr,
           message: 'opening_item'.tr,
         );
-        Get.back();
+        resetScanner();
         Get.toNamed(Routes.ITEM_DETAILS, arguments: scannedId);
         return;
       }
@@ -316,7 +321,7 @@ class QrScannerController extends GetxController {
           title: 'rental_found'.tr,
           message: 'opening_rental'.tr,
         );
-        Get.back();
+        resetScanner();
         Get.toNamed(Routes.RENTAL_DETAIL, arguments: rental);
         return;
       }
@@ -328,7 +333,7 @@ class QrScannerController extends GetxController {
           title: 'user_found'.tr,
           message: user.name ?? 'user'.tr,
         );
-        Get.back();
+        resetScanner();
         Get.toNamed(Routes.USER_DETAIL, arguments: user);
         return;
       }
