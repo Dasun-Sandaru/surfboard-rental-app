@@ -315,7 +315,7 @@ class SettingsController extends GetxController {
         'settings_edit_timezone',
         'settings_edit_rental_logic',
         'settings_manage_access',
-        'shop_setup',
+        // 'shop_setup',
         'agreement_template',
       ],
     },
