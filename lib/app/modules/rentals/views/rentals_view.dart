@@ -10,6 +10,7 @@ import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import '../../../../utils/theme/app_material_theme.dart';
+import '../../../../utils/helper/a_formatter.dart';
 import '../controllers/rentals_controller.dart';
 
 class RentalsView extends GetView<RentalsController> {
@@ -169,12 +170,12 @@ class RentalsView extends GetView<RentalsController> {
                     children: [
                       _buildTimeBadge(
                         context,
-                        "${'start_label'.tr}: ${rental.startTime}",
+                        "${'start_label'.tr}: ${AFormatter.formatDateWithFormat(rental.startTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a')}",
                       ),
                       SizedBox(width: 8.w),
                       _buildTimeBadge(
                         context,
-                        "${'due_label'.tr}: ${rental.expectedReturnTime}",
+                        "${'due_label'.tr}: ${AFormatter.formatDateWithFormat(rental.expectedReturnTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a')}",
                       ),
                     ],
                   ),
