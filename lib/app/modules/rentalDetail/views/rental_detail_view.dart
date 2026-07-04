@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../../utils/helper/a_formatter.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../models/damage_report_model.dart';
 import '../../../models/payment_model.dart';
 import '../../../models/damage_photo_model.dart';
@@ -48,6 +49,16 @@ class RentalDetailView extends GetView<RentalDetailController> {
             centerTitle: true,
             backgroundColor: colorScheme.surface,
             scrolledUnderElevation: 0,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.qr_code_2),
+                onPressed: () {
+                  if (rental.id != null) {
+                    _showQrCode(context, rental.id!, colorScheme);
+                  }
+                },
+              ),
+            ],
             bottom: TabBar(
               labelColor: colorScheme.primary,
               unselectedLabelColor: colorScheme.onSurfaceVariant,
@@ -721,6 +732,61 @@ class RentalDetailView extends GetView<RentalDetailController> {
     return AFormatter.formatDateWithFormat(
       date,
       outputFormat: '$dateFormat - hh:mm a',
+    );
+  }
+
+  void _showQrCode(BuildContext context, String rentalId, ColorScheme colorScheme) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: colorScheme.surface,
+          title: Text(
+            'rental_qr_code'.tr,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+              fontSize: 18.sp,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: QrImageView(
+                  data: 'R-$rentalId',
+                  version: QrVersions.auto,
+                  size: 200.w,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'ID: $rentalId',
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'close'.tr,
+                style: TextStyle(color: colorScheme.primary),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
