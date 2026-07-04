@@ -441,14 +441,14 @@ class _CollectPaymentTipState extends State<CollectPaymentTip> {
       Get.offAllNamed(Routes.ADMIN_HOME);
 
       AppSnackBar.success(
-        title: "Success",
+        title: "success".tr,
         message: totalBalance > 0
-            ? "Payment collected & Finalized"
-            : "Rental concluded successfully",
+            ? "payment_collected_finalized".tr
+            : "rental_concluded_successfully".tr,
       );
     } catch (e) {
       _isProcessing.value = false;
-      AppSnackBar.error(title: "Error", message: "Payment failed: $e");
+      AppSnackBar.error(title: 'error'.tr, message: 'payment_failed'.trParams({'error': e.toString()}));
     }
   }
 }

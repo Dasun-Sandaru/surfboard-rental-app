@@ -355,15 +355,40 @@ class NewRentalController extends GetxController {
   void proceedToAgreement() {
     if (selectedCustomer.value == null) {
       AppSnackBar.error(
-        title: "Missing Info",
-        message: "Please select a customer",
+        title: "missing_info".tr,
+        message: "please_select_a_customer".tr,
       );
       return;
     }
+
+    final startDateTime = DateTime(
+      startDate.value.year,
+      startDate.value.month,
+      startDate.value.day,
+      startTime.value.hour,
+      startTime.value.minute,
+    );
+    
+    final dueDateTime = DateTime(
+      dueDate.value.year,
+      dueDate.value.month,
+      dueDate.value.day,
+      dueTime.value.hour,
+      dueTime.value.minute,
+    );
+
+    if (startDateTime.isAtSameMomentAs(dueDateTime) || startDateTime.isAfter(dueDateTime)) {
+      AppSnackBar.error(
+        title: "invalid_duration".tr,
+        message: "invalid_duration_msg".tr,
+      );
+      return;
+    }
+
     if (selectedItems.isEmpty) {
       AppSnackBar.error(
-        title: "Missing Info",
-        message: "Please add at least one item",
+        title: "missing_info".tr,
+        message: "please_add_at_least_one_item".tr,
       );
       return;
     }

@@ -10,6 +10,7 @@ import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:intl/intl.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 class AlertDetailsView extends StatelessWidget {
   const AlertDetailsView({super.key, required this.log});
@@ -186,7 +187,7 @@ class AlertDetailsView extends StatelessWidget {
           if (await canLaunchUrlString(value)) {
             await launchUrlString(value, mode: LaunchMode.externalApplication);
           } else {
-            Get.snackbar('Error', 'Could not open link');
+            AppSnackBar.error(title: 'error'.tr, message: 'could_not_open_link'.tr);
           }
         },
         child: Text(
@@ -238,10 +239,10 @@ class AlertDetailsView extends StatelessWidget {
         // We might not have a dedicated payment detail view yet,
         // but usually payments are linked to rentals.
         // If metadata has rentalId, we could go there, otherwise just show snackbar
-        Get.snackbar('Info', 'Payment details view not available yet');
+        AppSnackBar.info(title: 'info'.tr, message: 'payment_details_unavailable'.tr);
         break;
       default:
-        Get.snackbar('Info', 'Details view for $type not available');
+        AppSnackBar.info(title: 'info'.tr, message: 'details_unavailable'.trParams({'type': type}));
     }
   }
 

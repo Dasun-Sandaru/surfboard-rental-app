@@ -14,6 +14,7 @@ import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../../../models/activity_log_model.dart';
 import '../../../models/user_model.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import '../controllers/user_detail_controller.dart';
 
 class UserDetailView extends GetView<UserDetailController> {
@@ -831,7 +832,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
           if (await canLaunchUrlString(value)) {
             await launchUrlString(value, mode: LaunchMode.externalApplication);
           } else {
-            Get.snackbar('Error', 'Could not open link');
+            AppSnackBar.error(title: 'error'.tr, message: 'could_not_open_link'.tr);
           }
         },
         child: Text(
