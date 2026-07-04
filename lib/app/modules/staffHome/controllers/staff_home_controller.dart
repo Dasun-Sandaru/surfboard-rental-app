@@ -11,6 +11,7 @@ import '../../../services/customer_service.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/notification_sync_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class StaffHomeController extends GetxController {
   final selectedIndex = 0.obs;
@@ -46,6 +47,9 @@ class StaffHomeController extends GetxController {
   final totalCustomers = 0.obs;
   final isLoadingStats = false.obs;
 
+  // App Version
+  final appVersion = ''.obs;
+
   // Services
   final AuthService _authService = Get.find<AuthService>();
   final UserService _userService = Get.find<UserService>();
@@ -62,8 +66,18 @@ class StaffHomeController extends GetxController {
   }
 
   Future<void> _initialize() async {
+    _loadPackageInfo();
     await _setShopId();
     _setupRealTimeStats();
+  }
+
+  Future<void> _loadPackageInfo() async {
+    try {
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      appVersion.value = 'v${packageInfo.version} (${packageInfo.buildNumber})';
+    } catch (e) {
+      log('Failed to get app version: $e');
+    }
   }
 
   Future<void> _setShopId() async {
