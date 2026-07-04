@@ -195,6 +195,7 @@ class SettingsController extends GetxController {
     'rentals': true, // Active Rentals
     'rental_history': true,
     'alerts': true,
+    'activity_logs': true,
     'qr_scanner': true,
 
     // Inventory
@@ -234,6 +235,7 @@ class SettingsController extends GetxController {
     'rentals': 'active_rentals',
     'rental_history': 'rental_history',
     'alerts': 'alerts_notifications',
+    'activity_logs': 'activity_logs',
     'qr_scanner': 'qr_scanner',
 
     'inventory_view': 'inventory_view',
@@ -273,6 +275,7 @@ class SettingsController extends GetxController {
         'rental_history',
         'qr_scanner',
         'alerts',
+        'activity_logs',
       ],
     },
     {
@@ -312,7 +315,7 @@ class SettingsController extends GetxController {
         'settings_edit_timezone',
         'settings_edit_rental_logic',
         'settings_manage_access',
-        'shop_setup',
+        // 'shop_setup',
         'agreement_template',
       ],
     },
@@ -424,7 +427,7 @@ class SettingsController extends GetxController {
 
       _configService.updateAccessRules(effectiveRules);
     } catch (e) {
-      AppSnackBar.error(title: 'Error Loading Data', message: e.toString());
+      AppSnackBar.error(title: 'error_loading_data'.tr, message: e.toString());
     }
   }
 
@@ -704,7 +707,7 @@ class SettingsController extends GetxController {
         message: "Currency updated to $newCurrency",
       );
     } catch (e) {
-      AppSnackBar.error(title: "Error", message: "Failed to update currency");
+      AppSnackBar.error(title: 'error'.tr, message: 'failed_update_currency'.tr);
     }
   }
 
@@ -763,7 +766,7 @@ class SettingsController extends GetxController {
       });
       dateFormat.value = newFormat;
       _configService.updateConfig(newDateFormat: newFormat);
-      AppSnackBar.success(title: "Success", message: "Date format updated");
+      AppSnackBar.success(title: 'success'.tr, message: 'date_format_updated'.tr);
     } catch (e) {
       AppSnackBar.error(
         title: "Error",
@@ -834,9 +837,9 @@ class SettingsController extends GetxController {
       });
       timeZone.value = newTimeZone;
       _configService.updateConfig(newTimeZone: newTimeZone);
-      AppSnackBar.success(title: "Success", message: "Time zone updated");
+      AppSnackBar.success(title: 'success'.tr, message: 'time_zone_updated'.tr);
     } catch (e) {
-      AppSnackBar.error(title: "Error", message: "Failed to update time zone");
+      AppSnackBar.error(title: 'error'.tr, message: 'failed_update_time_zone'.tr);
     }
   }
 
@@ -913,8 +916,8 @@ class SettingsController extends GetxController {
           list.add(textInputController.text.trim());
           Get.back();
           AppSnackBar.success(
-            title: 'Success',
-            message: '$title added successfully',
+            title: 'success'.tr,
+            message: 'item_added_success'.trParams({'item': title}),
           );
         }
       },

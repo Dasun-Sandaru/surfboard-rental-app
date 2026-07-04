@@ -12,6 +12,8 @@ import '../../../../data/firestore/firestore_collections.dart';
 import '../../../services/firestore_usage_service.dart';
 import '../../../../utils/storage/app_storage.dart';
 import '../../../models/shop_model.dart';
+import '../../../services/pdf_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 
 enum ReportType { customers, inventory, rentals, damages }
 
@@ -45,7 +47,7 @@ class ReportsController extends GetxController {
         shop = ShopModel.fromSnapshot(doc);
       }
     } else {
-      Get.snackbar('Error', 'Shop data not found');
+      AppSnackBar.error(title: 'error'.tr, message: 'shop_data_not_found'.tr);
     }
   }
 
@@ -119,7 +121,7 @@ class ReportsController extends GetxController {
     if (shop.id == null) return;
     
     if (selectedReportType.value != ReportType.inventory && startDate.value == null) {
-      Get.snackbar('Validation', 'Please select a date range for this report.');
+      AppSnackBar.info(title: 'info'.tr, message: 'select_date_range_report'.tr);
       return;
     }
 
@@ -146,7 +148,7 @@ class ReportsController extends GetxController {
       }
     } catch (e) {
       log('Error generating report: $e');
-      Get.snackbar('Error', 'Failed to generate report.');
+      AppSnackBar.error(title: 'error'.tr, message: 'failed_generate_report'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -295,7 +297,7 @@ class ReportsController extends GetxController {
   // --- PDF Export ---
   Future<void> exportToPdf() async {
     if (reportResults.isEmpty) {
-      Get.snackbar('Empty', 'No data to export.');
+      AppSnackBar.info(title: 'empty'.tr, message: 'no_data_export'.tr);
       return;
     }
 
@@ -373,7 +375,7 @@ class ReportsController extends GetxController {
       
     } catch (e) {
       log('Error exporting PDF: $e');
-      Get.snackbar('Export Failed', 'An error occurred while creating the PDF.');
+      AppSnackBar.error(title: 'export_failed'.tr, message: 'error_creating_pdf'.tr);
     }
   }
 }

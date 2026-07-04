@@ -23,7 +23,7 @@ class QrScannerTestButton extends StatelessWidget {
         if (result != null) {
           // Show the scanned value
           AppSnackBar.success(
-            title: 'QR Code Scanned',
+            title: 'success'.tr,
             message: 'Value: $result',
           );
 
@@ -37,7 +37,7 @@ class QrScannerTestButton extends StatelessWidget {
         } else {
           // User closed scanner without scanning
           AppSnackBar.info(
-            title: 'Cancelled',
+            title: 'info'.tr,
             message: 'QR scan was cancelled',
           );
         }

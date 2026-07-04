@@ -12,6 +12,7 @@ import '../../../../utils/common/a_app_bar.dart';
 import '../../../models/activity_log_model.dart';
 import '../controllers/alerts_controller.dart';
 import 'alert_details_view.dart';
+import 'package:intl/intl.dart';
 
 class AlertsView extends GetView<AlertsController> {
   const AlertsView({super.key});
@@ -74,6 +75,15 @@ class AlertsView extends GetView<AlertsController> {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    Map<String, String> stringMetadata = {};
+    if (log.metadata != null) {
+      log.metadata!.forEach((key, value) {
+        stringMetadata[key] = value.toString();
+      });
+    }
+
+    String translatedDescription = log.description.trParams(stringMetadata);
+
     return InkWell(
       onTap: () {
         Get.to(() => AlertDetailsView(log: log));
@@ -114,7 +124,7 @@ class AlertsView extends GetView<AlertsController> {
                 children: [
                   // Description
                   Text(
-                    log.description,
+                    translatedDescription,
                     style: TextStyle(
                       color: colorScheme.onSurface,
                       fontSize: 14.sp,
@@ -175,7 +185,7 @@ class AlertsView extends GetView<AlertsController> {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        AFormatter.formatDate(log.timestamp),
+                        '${AFormatter.formatDate(log.timestamp)} at ${DateFormat('hh:mm a').format(log.timestamp)}',
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 11.sp,

@@ -84,6 +84,24 @@ class StaffHomeView extends GetView<StaffHomeController> {
             /// Management Grid
             _buildManagementGrid(context),
 
+            SizedBox(height: 32.h),
+
+            /// App Version
+            Center(
+              child: Obx(() {
+                if (controller.appVersion.value.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Text(
+                  controller.appVersion.value,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    fontSize: 12.sp,
+                  ),
+                );
+              }),
+            ),
+
             SizedBox(height: 20.h),
           ],
         ),

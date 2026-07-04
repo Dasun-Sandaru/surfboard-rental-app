@@ -112,7 +112,7 @@ class RentalPaymentController extends GetxController {
         comment: comment,
       );
     } catch (e) {
-      AppSnackBar.error(title: "Rating Failed", message: e.toString());
+      AppSnackBar.error(title: 'rating_failed'.tr, message: e.toString());
     }
   }
 

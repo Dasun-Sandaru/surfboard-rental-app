@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:get/get.dart';
+import '../../../services/config_service.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import '../../../services/user_service.dart';
 import '../../../services/rental_service.dart';
 import '../../../services/inventory_service.dart';
@@ -9,6 +11,7 @@ import '../../../services/customer_service.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/notification_sync_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class StaffHomeController extends GetxController {
   final selectedIndex = 0.obs;
@@ -17,6 +20,20 @@ class StaffHomeController extends GetxController {
   void changeIndex(int index) {
     if (index == 1) {
       Get.toNamed('/new-rental');
+    } else if (index == 2) {
+      if (Get.isRegistered<ConfigService>()) {
+        final configService = Get.find<ConfigService>();
+        if (configService.staffAccessRules.containsKey('activity_logs') &&
+            configService.staffAccessRules['activity_logs'] == false) {
+          AppSnackBar.warning(
+            title: 'Access Denied',
+            message:
+                'You do not have access to this feature. Please contact the admin.',
+          );
+          return;
+        }
+      }
+      selectedIndex.value = index;
     } else {
       selectedIndex.value = index;
     }
@@ -29,6 +46,9 @@ class StaffHomeController extends GetxController {
       0.obs; // This was tracking 'overdue' rentals in previous code
   final totalCustomers = 0.obs;
   final isLoadingStats = false.obs;
+
+  // App Version
+  final appVersion = ''.obs;
 
   // Services
   final AuthService _authService = Get.find<AuthService>();
@@ -46,8 +66,18 @@ class StaffHomeController extends GetxController {
   }
 
   Future<void> _initialize() async {
+    _loadPackageInfo();
     await _setShopId();
     _setupRealTimeStats();
+  }
+
+  Future<void> _loadPackageInfo() async {
+    try {
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      appVersion.value = 'v${packageInfo.version} (${packageInfo.buildNumber})';
+    } catch (e) {
+      log('Failed to get app version: $e');
+    }
   }
 
   Future<void> _setShopId() async {

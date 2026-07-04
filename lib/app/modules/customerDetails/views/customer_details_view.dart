@@ -215,7 +215,7 @@ class CustomerDetailsView extends GetView<CustomerDetailsController> {
                       context,
                       icon: Iconsax.sms,
                       label: "message".tr,
-                      onTap: controller.makeCall,
+                      onTap: controller.sendMessage,
                     ),
                     SizedBox(width: 16.w),
                     _buildActionButton(

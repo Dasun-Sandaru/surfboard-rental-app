@@ -19,6 +19,7 @@ class ConfigService extends GetxService {
     'rentals',
     'rental_history',
     'alerts',
+    'activity_logs',
     'qr_scanner',
     'inventory_view',
     'inventory_view_damage_fees',

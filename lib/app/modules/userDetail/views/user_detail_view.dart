@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../utils/helper/a_formatter.dart';
 import '../../../../utils/common/a_app_bar.dart';
@@ -13,6 +14,7 @@ import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/theme/app_material_theme.dart';
 import '../../../models/activity_log_model.dart';
 import '../../../models/user_model.dart';
+import '../../../../utils/common/app_snack_bar.dart';
 import '../controllers/user_detail_controller.dart';
 
 class UserDetailView extends GetView<UserDetailController> {
@@ -759,9 +761,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                             ),
                           ),
                           Text(
-                            logModel.entityId.length > 8
-                                ? "...${logModel.entityId.substring(logModel.entityId.length - 8)}"
-                                : logModel.entityId,
+                            logModel.entityId,
                             style: TextStyle(
                               color: colorScheme.onSurface,
                               fontSize: 13.sp,
@@ -801,13 +801,7 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
                                       ),
                                     ),
                                     Expanded(
-                                      child: Text(
-                                        "${e.value}",
-                                        style: TextStyle(
-                                          color: colorScheme.onSurface,
-                                          fontSize: 12.sp,
-                                        ),
-                                      ),
+                                      child: _buildMetadataValue(context, e.key, e.value.toString()),
                                     ),
                                   ],
                                 ),
@@ -822,6 +816,51 @@ class _ActivityLogCardState extends State<_ActivityLogCard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMetadataValue(BuildContext context, String key, String value) {
+    final colorScheme = Theme.of(context).colorScheme;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      String linkText = 'View Link'.tr;
+      if (key.toLowerCase().contains('invoice')) {
+        linkText = 'View Invoice'.tr;
+      }
+      return InkWell(
+        onTap: () async {
+          if (await canLaunchUrlString(value)) {
+            await launchUrlString(value, mode: LaunchMode.externalApplication);
+          } else {
+            AppSnackBar.error(title: 'error'.tr, message: 'could_not_open_link'.tr);
+          }
+        },
+        child: Text(
+          linkText,
+          style: TextStyle(
+            color: colorScheme.primary,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+    if (value.toLowerCase() == 'null' || value.isEmpty) {
+      return Text(
+        'not_available'.tr,
+        style: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontSize: 12.sp,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+
+    return Text(
+      value,
+      style: TextStyle(
+        color: colorScheme.onSurface,
+        fontSize: 12.sp,
       ),
     );
   }

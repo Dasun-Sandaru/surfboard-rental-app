@@ -259,7 +259,7 @@ class AppPages {
       name: _Paths.DAMAGE_FEE,
       page: () => DamageFeeView(),
       binding: DamageFeeBinding(),
-      middlewares: [AccessControlMiddleware(routeKey: 'damage_fee')],
+      middlewares: [AccessControlMiddleware(routeKey: 'inventory_view_damage_fees')],
     ),
     GetPage(
       name: _Paths.AGREEMENT_WIZARD,

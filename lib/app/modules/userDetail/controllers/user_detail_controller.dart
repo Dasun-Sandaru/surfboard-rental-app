@@ -59,7 +59,7 @@ class UserDetailController extends GetxController {
         if (fetchedUser != null) {
           user.value = fetchedUser;
         } else {
-          AppSnackBar.error(title: 'Error', message: 'User not found');
+          AppSnackBar.error(title: 'error'.tr, message: 'user_not_found'.tr);
           Get.back();
           return;
         }
@@ -72,7 +72,7 @@ class UserDetailController extends GetxController {
         _loadPerformanceStats(user.value!.uid);
       }
     } catch (e) {
-      AppSnackBar.error(title: 'Error', message: 'Failed to load user: $e');
+      AppSnackBar.error(title: 'error'.tr, message: 'failed_load_user'.trParams({'error': e.toString()}));
     }
   }
 
@@ -124,7 +124,7 @@ class UserDetailController extends GetxController {
   Future<void> toggleActiveStatus(bool value) async {
     try {
       if (user.value == null) {
-        AppSnackBar.error(title: 'Error', message: 'User data not available');
+        AppSnackBar.error(title: 'error'.tr, message: 'user_data_unavailable'.tr);
         return;
       }
 
@@ -135,18 +135,18 @@ class UserDetailController extends GetxController {
         isActive: value,
       );
       AppSnackBar.success(
-        title: 'Status Updated',
-        message: 'User is now ${value ? 'Active' : 'Inactive'}',
+        title: 'status_updated'.tr,
+        message: value ? 'user_now_active'.tr : 'user_now_inactive'.tr,
       );
     } catch (e) {
-      AppSnackBar.error(title: 'Error', message: 'Failed to update status: $e');
+      AppSnackBar.error(title: 'error'.tr, message: 'failed_update_status'.trParams({'error': e.toString()}));
     }
   }
 
   Future<void> toggleVerification() async {
     try {
       if (user.value == null) {
-        AppSnackBar.error(title: 'Error', message: 'User data not available');
+        AppSnackBar.error(title: 'error'.tr, message: 'user_data_unavailable'.tr);
         return;
       }
 
@@ -157,13 +157,13 @@ class UserDetailController extends GetxController {
         verified: isVerified.value,
       );
       AppSnackBar.success(
-        title: 'Verification Updated',
-        message: 'User verification status changed.',
+        title: 'verification_updated'.tr,
+        message: 'user_verification_changed'.tr,
       );
     } catch (e) {
       AppSnackBar.error(
-        title: 'Error',
-        message: 'Failed to update verification: $e',
+        title: 'error'.tr,
+        message: 'failed_update_verification'.trParams({'error': e.toString()}),
       );
     }
   }

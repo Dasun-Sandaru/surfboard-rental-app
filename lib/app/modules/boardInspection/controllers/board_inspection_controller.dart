@@ -7,6 +7,7 @@ import '../../../models/payment_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../services/rental_service.dart';
 import '../../../services/user_service.dart';
+import '../../../services/config_service.dart';
 import '../../../../utils/common/app_snack_bar.dart';
 
 import '../../../../utils/theme/app_material_theme.dart';
@@ -158,19 +159,30 @@ class BoardInspectionController extends GetxController {
       final now = DateTime.now();
       final difference = r.expectedReturnTime.difference(now).abs();
 
+      bool applyLateFee = false;
+      final configService = Get.isRegistered<ConfigService>() ? Get.find<ConfigService>() : null;
+      final hourlyGrace = configService?.hourlyGracePeriodMinutes.value ?? 15;
+      final dailyGrace = configService?.dailyGracePeriodHours.value ?? 1;
+
       // Calculation logic based on rentType
       if (r.rentType == RentType.hourly) {
-        // Round up to next full hour
-        final hours = (difference.inMinutes / 60).ceil();
-        calculatedLateFee = hours * r.rate;
+        if (difference.inMinutes > hourlyGrace) {
+          applyLateFee = true;
+          // Round up to next full hour
+          final hours = (difference.inMinutes / 60).ceil();
+          calculatedLateFee = hours * r.rate;
+        }
       } else {
-        // Daily: Round up to next full day
-        final days = (difference.inHours / 24).ceil();
-        calculatedLateFee = days * r.rate;
+        if (difference.inHours > dailyGrace) {
+          applyLateFee = true;
+          // Daily: Round up to next full day
+          final days = (difference.inHours / 24).ceil();
+          calculatedLateFee = days * r.rate;
+        }
       }
 
       // 2. Save Late Fee if > 0
-      if (calculatedLateFee > 0) {
+      if (applyLateFee && calculatedLateFee > 0) {
         final currentStaffId = _userService.currentUser?.uid ?? 'System';
         final shopId = await _userService.getShopIdFromStorage();
         if (shopId != null) {

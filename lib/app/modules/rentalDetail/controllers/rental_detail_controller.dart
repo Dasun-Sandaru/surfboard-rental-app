@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/damage_photo_model.dart';
 import '../../../models/damage_report_model.dart';
 import '../../../models/payment_model.dart';
+import '../../../routes/app_pages.dart';
 import '../../../services/damage_report_service.dart';
 import '../../../services/payment_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../utils/common/app_snack_bar.dart';
+
 import '../../../models/rental_model.dart';
 import '../../../services/rental_service.dart';
 import '../../../services/user_service.dart';
@@ -38,7 +42,7 @@ class RentalDetailController extends GetxController {
       await _fetchRental(args);
     } else {
       isLoading.value = false;
-      Get.snackbar('Error', 'Invalid navigation arguments');
+      AppSnackBar.error(title: 'error'.tr, message: 'invalid_nav_arguments'.tr);
     }
   }
 
@@ -47,7 +51,7 @@ class RentalDetailController extends GetxController {
       isLoading.value = true;
       final shopId = await _userService.getShopIdFromStorage();
       if (shopId == null) {
-        Get.snackbar('Error', 'Shop ID not found');
+        AppSnackBar.error(title: 'error'.tr, message: 'shop_id_not_found'.tr);
         return;
       }
 
@@ -58,10 +62,13 @@ class RentalDetailController extends GetxController {
         );
         _bindStreams();
       } else {
-        Get.snackbar('Error', 'Rental not found');
+        AppSnackBar.error(title: 'error'.tr, message: 'rental_not_found'.tr);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load rental details: $e');
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_load_rental_details'.trParams({'error': e.toString()}),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -96,7 +103,7 @@ class RentalDetailController extends GetxController {
 
   Future<void> openDocument(String? url) async {
     if (url == null || url.isEmpty) {
-      Get.snackbar('Error', 'Document link is not available.');
+      AppSnackBar.error(title: 'error'.tr, message: 'doc_link_unavailable'.tr);
       return;
     }
 
@@ -104,7 +111,25 @@ class RentalDetailController extends GetxController {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     } else {
-      Get.snackbar('Error', 'Could not open document.');
+      AppSnackBar.error(title: 'error'.tr, message: 'could_not_open_doc'.tr);
+    }
+  }
+
+  void proceedToNextStep() {
+    final currentRental = rental.value;
+    if (currentRental == null) return;
+
+    if (currentRental.status == RentalStatus.item_returned) {
+      Get.toNamed(
+        Routes.PAYMENTS,
+        arguments: {
+          'rentalId': currentRental.id,
+          'shopId': currentRental.shopId,
+        },
+      );
+    } else if (currentRental.status != RentalStatus.completed &&
+        currentRental.status != RentalStatus.cancelled) {
+      Get.toNamed(Routes.BOARD_INSPECTION, arguments: currentRental.id);
     }
   }
 }

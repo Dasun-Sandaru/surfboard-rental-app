@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../utils/constants/a_enums.dart';
+import '../../utils/common/app_snack_bar.dart';
 import '../controllers/auth_controller.dart';
 import '../services/config_service.dart';
 import '../routes/app_pages.dart';
@@ -40,6 +41,12 @@ class AccessControlMiddleware extends GetMiddleware {
         // If rule exists and is FALSE, block access
         if (accessRules.containsKey(routeKey) &&
             accessRules[routeKey] == false) {
+          Future.microtask(() {
+            AppSnackBar.warning(
+              title: 'Access Denied',
+              message: 'You do not have access to this feature. Please contact the admin.',
+            );
+          });
           return const RouteSettings(name: Routes.STAFF_HOME);
         }
       }
