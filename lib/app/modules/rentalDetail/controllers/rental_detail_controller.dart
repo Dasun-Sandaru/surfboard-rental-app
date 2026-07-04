@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import '../../../../utils/constants/a_enums.dart';
 import '../../../models/damage_photo_model.dart';
 import '../../../models/damage_report_model.dart';
 import '../../../models/payment_model.dart';
+import '../../../routes/app_pages.dart';
 import '../../../services/damage_report_service.dart';
 import '../../../services/payment_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -63,7 +65,10 @@ class RentalDetailController extends GetxController {
         AppSnackBar.error(title: 'error'.tr, message: 'rental_not_found'.tr);
       }
     } catch (e) {
-      AppSnackBar.error(title: 'error'.tr, message: 'failed_load_rental_details'.trParams({'error': e.toString()}));
+      AppSnackBar.error(
+        title: 'error'.tr,
+        message: 'failed_load_rental_details'.trParams({'error': e.toString()}),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -107,6 +112,24 @@ class RentalDetailController extends GetxController {
       await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     } else {
       AppSnackBar.error(title: 'error'.tr, message: 'could_not_open_doc'.tr);
+    }
+  }
+
+  void proceedToNextStep() {
+    final currentRental = rental.value;
+    if (currentRental == null) return;
+
+    if (currentRental.status == RentalStatus.item_returned) {
+      Get.toNamed(
+        Routes.PAYMENTS,
+        arguments: {
+          'rentalId': currentRental.id,
+          'shopId': currentRental.shopId,
+        },
+      );
+    } else if (currentRental.status != RentalStatus.completed &&
+        currentRental.status != RentalStatus.cancelled) {
+      Get.toNamed(Routes.BOARD_INSPECTION, arguments: currentRental.id);
     }
   }
 }
