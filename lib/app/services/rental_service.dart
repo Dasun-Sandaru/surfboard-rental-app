@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:typed_data';
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/firestore/firestore_collections.dart';
@@ -33,8 +34,8 @@ class RentalService {
   ) async {
     try {
       log('Uploading agreement PDF for rental: $rentalId', name: logName);
-
-      final filePath = 'shops/$shopId/rentals/$rentalId/agreement.pdf';
+      final dateStr = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final filePath = 'shops/$shopId/rentals/$rentalId/agreement_${rentalId}_$dateStr.pdf';
 
       await supabase.storage
           .from('agreements')
@@ -63,8 +64,8 @@ class RentalService {
   ) async {
     try {
       log('Uploading invoice PDF for rental: $rentalId', name: logName);
-
-      final filePath = 'shops/$shopId/rentals/$rentalId/invoice.pdf';
+      final dateStr = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final filePath = 'shops/$shopId/rentals/$rentalId/invoice_${rentalId}_$dateStr.pdf';
 
       await supabase.storage
           .from('invoices')

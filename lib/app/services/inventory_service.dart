@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'activity_log_service.dart';
@@ -390,7 +391,8 @@ class InventoryService {
       final supabase = Supabase.instance.client;
       const bucketName = 'inventory_images';
       final ext = file.path.split('.').last;
-      final path = '$shopId/$itemId.$ext';
+      final dateStr = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final path = '$shopId/${itemId}_$dateStr.$ext';
 
       await supabase.storage
           .from(bucketName)

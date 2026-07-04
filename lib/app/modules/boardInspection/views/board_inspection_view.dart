@@ -147,12 +147,20 @@ class BoardInspectionView extends StatelessWidget {
                         _buildDetailRow(
                           context,
                           "start_time".tr,
-                          AFormatter.formatDateWithFormat(rental.startTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
+                          AFormatter.formatDateWithFormat(
+                            rental.startTime,
+                            outputFormat:
+                                '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a',
+                          ),
                         ),
                         _buildDetailRow(
                           context,
                           "expected_return".tr,
-                          AFormatter.formatDateWithFormat(rental.expectedReturnTime, outputFormat: '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a'),
+                          AFormatter.formatDateWithFormat(
+                            rental.expectedReturnTime,
+                            outputFormat:
+                                '${rental.dateFormat ?? "yyyy-MM-dd"} - hh:mm a',
+                          ),
                         ),
                         _buildDetailRow(
                           context,
@@ -180,20 +188,28 @@ class BoardInspectionView extends StatelessWidget {
                             _buildHighlightRow(
                               context,
                               "security_deposit".tr,
-                              AFormatter.formatCurrency(rental.securityDeposit.amount, currencyCodeOverride: rental.currency),
+                              AFormatter.formatCurrency(
+                                rental.securityDeposit.amount,
+                                currencyCodeOverride: rental.currency,
+                              ),
                               Iconsax.lock,
                               statusColors?.warning ?? Colors.orange,
                             ),
                             Divider(color: colorScheme.outline, height: 24.h),
-                            Obx(() => _buildHighlightRow(
-                              context,
-                              "balance_due".tr,
-                              AFormatter.formatCurrency(controller.balanceDue, currencyCodeOverride: rental.currency),
-                              Iconsax.money_tick,
-                              controller.balanceDue > 0
-                                  ? colorScheme.error
-                                  : (statusColors?.success ?? Colors.green),
-                            )),
+                            Obx(
+                              () => _buildHighlightRow(
+                                context,
+                                "balance_due".tr,
+                                AFormatter.formatCurrency(
+                                  controller.balanceDue,
+                                  currencyCodeOverride: rental.currency,
+                                ),
+                                Iconsax.money_tick,
+                                controller.balanceDue > 0
+                                    ? colorScheme.error
+                                    : (statusColors?.success ?? Colors.green),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -422,7 +438,6 @@ class BoardInspectionView extends StatelessWidget {
                   color: valueColor ?? colorScheme.onSurface,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
-                  decoration: onTap != null ? TextDecoration.underline : null,
                 ),
                 textAlign: TextAlign.right,
               ),

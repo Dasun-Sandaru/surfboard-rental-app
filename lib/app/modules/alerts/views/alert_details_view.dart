@@ -8,6 +8,8 @@ import '../../../routes/app_pages.dart';
 import '../../../../utils/common/a_app_bar.dart';
 import '../../../../utils/constants/a_enums.dart';
 import '../../../../utils/constants/a_sizes.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:intl/intl.dart';
 
 class AlertDetailsView extends StatelessWidget {
   const AlertDetailsView({super.key, required this.log});
@@ -17,6 +19,15 @@ class AlertDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    Map<String, String> stringMetadata = {};
+    if (log.metadata != null) {
+      log.metadata!.forEach((key, value) {
+        stringMetadata[key] = value.toString();
+      });
+    }
+
+    String translatedDescription = log.description.trParams(stringMetadata);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -60,7 +71,7 @@ class AlertDetailsView extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    AFormatter.formatDate(log.timestamp),
+                    '${AFormatter.formatDate(log.timestamp)} at ${DateFormat('hh:mm a').format(log.timestamp)}',
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 14.sp,
@@ -75,7 +86,7 @@ class AlertDetailsView extends StatelessWidget {
             _buildSection(
               context: context,
               title: "Description",
-              content: log.description,
+              content: translatedDescription,
               icon: Iconsax.document_text,
             ),
             SizedBox(height: 20.h),
@@ -148,13 +159,7 @@ class AlertDetailsView extends StatelessWidget {
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              entry.value.toString(),
-                              style: TextStyle(
-                                color: colorScheme.onSurface,
-                                fontSize: 14.sp,
-                              ),
-                            ),
+                            child: _buildMetadataValue(context, entry.key, entry.value.toString()),
                           ),
                         ],
                       ),
@@ -165,6 +170,52 @@ class AlertDetailsView extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMetadataValue(BuildContext context, String key, String value) {
+    final colorScheme = Theme.of(context).colorScheme;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      String linkText = 'View Link'.tr;
+      if (key.toLowerCase().contains('invoice')) {
+        linkText = 'View Invoice'.tr;
+      }
+      return InkWell(
+        onTap: () async {
+          if (await canLaunchUrlString(value)) {
+            await launchUrlString(value, mode: LaunchMode.externalApplication);
+          } else {
+            Get.snackbar('Error', 'Could not open link');
+          }
+        },
+        child: Text(
+          linkText,
+          style: TextStyle(
+            color: colorScheme.primary,
+            fontSize: 14.sp,
+            // decoration: TextDecoration.underline,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+    if (value.toLowerCase() == 'null' || value.isEmpty) {
+      return Text(
+        'not_available'.tr,
+        style: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontSize: 14.sp,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+
+    return Text(
+      value,
+      style: TextStyle(
+        color: colorScheme.onSurface,
+        fontSize: 14.sp,
       ),
     );
   }
